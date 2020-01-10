@@ -2,13 +2,15 @@ package amf.plugins.syntax
 
 import amf.client.plugins.{AMFPlugin, AMFSyntaxPlugin}
 import amf.core.client.ParsingOptions
+import amf.core.encoding.AmfStringEncoder
 import amf.core.parser.{ParsedDocument, ParserContext, SyamlParsedDocument}
 import amf.core.rdf.RdfModelDocument
 import amf.core.unsafe.PlatformSecrets
 import org.mulesoft.common.io.Output
+import org.yaml.encoder.Encoder
 import org.yaml.model.{YComment, YDocument, YMap, YNode}
 import org.yaml.parser.{JsonParser, YamlParser}
-import org.yaml.render.{JsonRender, YamlRender}
+import org.yaml.render.{JsonRender, JsonRenderOptions, YamlRender}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -57,10 +59,11 @@ object SYamlSyntaxPlugin extends AMFSyntaxPlugin with PlatformSecrets {
   override def unparse[W: Output](mediaType: String, doc: ParsedDocument, writer: W): Option[W] = {
     doc match {
       case input: SyamlParsedDocument =>
-        val ast = input.document
+        val ast     = input.document
+        val encoder = new AmfStringEncoder
         render(mediaType, ast) { (format, ast) =>
           if (format == "yaml") YamlRender.render(writer, ast, expandReferences = false)
-          else JsonRender.render(ast, writer)
+          else JsonRender.render(ast, writer, options = JsonRenderOptions().customEncoder(encoder))
           Some(writer)
         }
       case input: RdfModelDocument if platform.rdfFramework.isDefined =>
