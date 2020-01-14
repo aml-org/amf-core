@@ -39,7 +39,7 @@ case class AmfScalar(value: Any, annotations: Annotations = new Annotations()) e
     }
   }
 
-  override def equals(obj: scala.Any): Boolean = {
+  override def equals(obj: Any): Boolean = {
     obj match {
       case AmfScalar(otherValue, _) =>
         value equals (otherValue)
@@ -47,5 +47,6 @@ case class AmfScalar(value: Any, annotations: Annotations = new Annotations()) e
     }
   }
 
-  override private[amf] def cloneElement(branch: mutable.Map[String, AmfObject]): AmfScalar = AmfScalar(value, annotations.copy())
+  override private[amf] def cloneElement(branch: mutable.Map[String, AmfObject]): AmfScalar =
+    AmfScalar(value, annotations.copy())
 }

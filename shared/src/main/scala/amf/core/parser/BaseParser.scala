@@ -48,13 +48,14 @@ object ArrayNode {
 /** Default scalar node. */
 case class DefaultScalarNode(node: YNode)(implicit iv: IllegalTypeHandler) extends ScalarNode {
 
-  override def string(): AmfScalar     = scalar(_.as[String])
-  override def text(): AmfScalar       = scalar(_.as[YScalar].text)
-  override def integer(): AmfScalar    = scalar(_.as[Int])
-  override def double(): AmfScalar     = scalar(_.as[Double])
-  override def boolean(): AmfScalar    = scalar(_.as[Boolean])
-  override def negated(): AmfScalar    = scalar(!_.as[Boolean])
-  private def scalar(fn: YNode => Any) = AmfScalar(fn(node), Annotations.valueNode(node))
+  override def string(): AmfScalar  = scalar(_.as[String])
+  override def text(): AmfScalar    = scalar(_.as[YScalar].text)
+  override def integer(): AmfScalar = scalar(_.as[Int])
+  override def double(): AmfScalar  = scalar(_.as[Double])
+  override def boolean(): AmfScalar = scalar(_.as[Boolean])
+  override def negated(): AmfScalar = scalar(!_.as[Boolean])
+  private def scalar(fn: YNode => Any): AmfScalar =
+    AmfScalar(fn(node), Annotations.valueNode(node))
 }
 
 trait BaseArrayNode extends ArrayNode {
