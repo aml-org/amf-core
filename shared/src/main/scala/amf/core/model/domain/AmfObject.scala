@@ -73,6 +73,11 @@ trait AmfObject extends AmfElement {
     this
   }
 
+  def remove(field: Field): this.type = {
+    fields.removeField(field)
+    this
+  }
+
   /** Set field value. */
   def setArray(field: Field, values: Seq[AmfElement]): this.type = {
     fields.set(id, field, AmfArray(values))
