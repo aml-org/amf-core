@@ -1,7 +1,10 @@
 package amf.core.model
-import amf.core.annotations.SourceVendor
+import amf.core.annotations.{ErrorDeclaration, SourceVendor}
+import amf.core.metamodel.Obj
+import amf.core.metamodel.domain.DomainElementModel
 import amf.core.model.document.Document
 import amf.core.model.domain.{ArrayNode, LinkNode, ObjectNode, ScalarNode}
+import amf.core.parser.{Annotations, Fields}
 import amf.core.remote.Raml10
 import amf.core.render.ElementsFixture
 import amf.core.vocabulary.Namespace.XsdTypes
@@ -78,6 +81,48 @@ class ModelCloneTest extends FunSuite with ElementsFixture with Matchers{
 
     val cloned = linkNode.cloneElement(mutable.Map.empty)
     cloned.linkedDomainElement.get.id should be(scalarNode.id)
+
+  }
+
+  test("Test clone error declaration"){
+    trait Error extends ErrorDeclaration {
+
+
+      override def meta: Obj = DomainElementModel
+
+      /** Set of fields composing object. */
+      override val fields: Fields = Fields()
+
+      /** Value , path + field value that is used to compose the id when the object its adopted */
+      override def componentId: String = "erro1"
+
+      /** Set of annotations for element. */
+      override val annotations: Annotations = Annotations()
+    }
+
+    case class Error1() extends Error {
+      override val namespace: String = "http://errorDeclaration#error1"
+
+      override def newErrorInstance: ErrorDeclaration = Error1()
+    }
+
+    case class Error2() extends Error {
+      override val namespace: String = "http://errorDeclaration#error2"
+
+      override def newErrorInstance: ErrorDeclaration = Error2()
+    }
+
+    val error1 = Error1()
+    val error2 = Error2()
+
+    val document1 = Document().withId("amf://id1").withDeclares(Seq(error1, error1))
+    val cloned = document1.cloneUnit()
+    val declares = cloned.asInstanceOf[Document].declares
+    val error1Cloned = declares.head
+    error1Cloned.isInstanceOf[Error1] should be(true)
+    (error1Cloned == error1) should be(false)
+    error2.isInstanceOf[Error2] should be(true)
+
 
   }
 }
