@@ -1,13 +1,14 @@
 package amf.core.model
 import amf.core.annotations.{ErrorDeclaration, SourceVendor}
-import amf.core.metamodel.Obj
+import amf.core.metamodel.{Field, ModelDefaultBuilder, Obj}
 import amf.core.metamodel.domain.DomainElementModel
 import amf.core.model.document.Document
-import amf.core.model.domain.{ArrayNode, LinkNode, ObjectNode, ScalarNode}
+import amf.core.model.domain.{AmfElement, AmfObject, ArrayNode, DomainElement, LinkNode, ObjectNode, ScalarNode}
 import amf.core.parser.{Annotations, Fields}
 import amf.core.remote.Raml10
 import amf.core.render.ElementsFixture
 import amf.core.vocabulary.Namespace.XsdTypes
+import amf.core.vocabulary.ValueType
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.collection.mutable
@@ -84,45 +85,35 @@ class ModelCloneTest extends FunSuite with ElementsFixture with Matchers{
 
   }
 
-  test("Test clone error declaration"){
-    trait Error extends ErrorDeclaration {
-
-
-      override def meta: Obj = DomainElementModel
-
-      /** Set of fields composing object. */
-      override val fields: Fields = Fields()
-
-      /** Value , path + field value that is used to compose the id when the object its adopted */
-      override def componentId: String = "erro1"
-
-      /** Set of annotations for element. */
-      override val annotations: Annotations = Annotations()
+  test("Test clone with elements that have same hash code"){
+    case class SomeType(fields: Fields, annotations: Annotations) extends DomainElement {
+      override def meta: Obj = new Obj with ModelDefaultBuilder {
+        override def fields: List[Field] = Nil
+        override val `type`: List[ValueType] = Nil
+        override def modelInstance: AmfObject = SomeType(Fields(), Annotations())
+      }
+      override def componentId: String = "someId"
+      override def hashCode(): Int = 1
     }
 
-    case class Error1() extends Error {
-      override val namespace: String = "http://errorDeclaration#error1"
+    val type1 = SomeType(Fields(), Annotations())
+    type1.withId("amf://type-1-id")
+    val type2 = SomeType(Fields(), Annotations())
+    type2.withId("amf://type-1-id")
 
-      override def newErrorInstance: ErrorDeclaration = Error1()
-    }
+    val doc = Document().withId("amf://id1").withDeclares(Seq(type1, type2))
+    val clonedDoc = doc.cloneUnit()
+    val declares = clonedDoc.asInstanceOf[Document].declares
+    val type1Cloned = declares.head
+    val type2Cloned = declares(1)
 
-    case class Error2() extends Error {
-      override val namespace: String = "http://errorDeclaration#error2"
+    // cloned instances are effectively different
+    (type1 eq type1Cloned) should be(false)
+    (type2 eq type2Cloned) should be(false)
 
-      override def newErrorInstance: ErrorDeclaration = Error2()
-    }
-
-    val error1 = Error1()
-    val error2 = Error2()
-
-    val document1 = Document().withId("amf://id1").withDeclares(Seq(error1, error1))
-    val cloned = document1.cloneUnit()
-    val declares = cloned.asInstanceOf[Document].declares
-    val error1Cloned = declares.head
-    error1Cloned.isInstanceOf[Error1] should be(true)
-    (error1Cloned == error1) should be(false)
-    error2.isInstanceOf[Error2] should be(true)
-
+    // when cloning document, both objects must be cloned
+    (type1Cloned eq type2Cloned) should be(false)
 
   }
+
 }

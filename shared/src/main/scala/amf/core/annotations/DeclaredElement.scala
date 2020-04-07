@@ -17,8 +17,5 @@ trait ErrorDeclaration extends DomainElement {
 
   override def withId(value: String): ErrorDeclaration.this.type = super.withId(namespace + value)
 
-  override def hashCode(): Int = super.hashCode() + namespace.hashCode
-
-  override def equals(obj: Any): Boolean = super.equals(obj)
   def newErrorInstance:ErrorDeclaration
 }
