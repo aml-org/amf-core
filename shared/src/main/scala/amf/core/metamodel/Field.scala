@@ -16,4 +16,5 @@ case class Field(`type`: Type, value: ValueType, doc: ModelDoc = ModelDoc(), jso
       case _           => false
     }
 
+  override def hashCode(): Int = value.iri().hashCode
 }

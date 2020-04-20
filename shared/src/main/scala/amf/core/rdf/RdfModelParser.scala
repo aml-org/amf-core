@@ -5,13 +5,12 @@ import amf.core.metamodel.Type.{Array, Bool, Iri, LiteralUri, RegExp, SortedArra
 import amf.core.metamodel.document.{BaseUnitModel, DocumentModel, SourceMapModel}
 import amf.core.metamodel.domain._
 import amf.core.metamodel.domain.extensions.DomainExtensionModel
-import amf.core.metamodel.{Field, ModelDefaultBuilder, Obj, Type}
+import amf.core.metamodel.{Field, Obj, Type}
 import amf.core.model.document._
 import amf.core.model.domain._
 import amf.core.model.domain.extensions.{CustomDomainProperty, DomainExtension}
 import amf.core.model.{DataType, domain}
 import amf.core.parser.{Annotations, FieldEntry, ParserContext}
-import amf.core.registries.AMFDomainRegistry
 import amf.core.remote.Platform
 import amf.core.vocabulary.Namespace
 import amf.plugins.document.graph.parser.GraphParserHelpers
@@ -32,6 +31,8 @@ class RdfModelParser(platform: Platform)(implicit val ctx: ParserContext) extend
 
   private var nodes: Map[String, AmfElement] = Map()
   private var graph: Option[RdfModel]        = None
+
+  private val recursions: RecursionControl = new RecursionControl()
 
   def parse(model: RdfModel, location: String): BaseUnit = {
     graph = Some(model)
@@ -64,6 +65,7 @@ class RdfModelParser(platform: Platform)(implicit val ctx: ParserContext) extend
 
   def parse(node: Node, findBaseUnit: Boolean = false): Option[AmfObject] = {
     val id = node.subject
+    recursions.visit(node)
     retrieveType(id, node, findBaseUnit) map { model =>
       val sources  = retrieveSources(id, node)
       val instance = buildType(model)(annots(sources, id))
@@ -72,38 +74,45 @@ class RdfModelParser(platform: Platform)(implicit val ctx: ParserContext) extend
       checkLinkables(instance)
 
       // workaround for lazy values in shape
-      val modelFields = model match {
-        case shapeModel: ShapeModel =>
-          shapeModel.fields ++ Seq(
-            ShapeModel.CustomShapePropertyDefinitions,
-            ShapeModel.CustomShapeProperties
-          )
-        case _ => model.fields
-      }
-
-      modelFields.foreach(f => {
-        val k          = f.value.iri()
-        val properties = key(node, k)
-        traverse(instance, f, properties, sources, k)
-      })
-
+      val modelFields = extractModelFields(model)
+      modelFields.foreach(f => traverse(node, sources, instance, f))
       // parsing custom extensions
-      instance match {
-        case l: DomainElement with Linkable => parseLinkableProperties(node, l)
-        case ex: ExternalDomainElement if unresolvedExtReferencesMap.get(ex.id).isDefined =>
-          unresolvedExtReferencesMap.get(ex.id).foreach { element =>
-            ex.raw.option().foreach(element.set(ExternalSourceElementModel.Raw, _))
-          }
-          unresolvedExtReferencesMap.remove(ex.id)
-        case _ => // ignore
-      }
-      instance match {
-        case elm: DomainElement => parseCustomProperties(node, elm)
-        case _                  => // ignore
-      }
-
+      parseCustomExtensions(node, instance)
       nodes = nodes + (id -> instance)
       instance
+    }
+  }
+
+  private def parseCustomExtensions(node: Node, instance: AmfObject) = {
+    instance match {
+      case l: DomainElement with Linkable => parseLinkableProperties(node, l)
+      case ex: ExternalDomainElement if unresolvedExtReferencesMap.get(ex.id).isDefined =>
+        unresolvedExtReferencesMap.get(ex.id).foreach { element =>
+          ex.raw.option().foreach(element.set(ExternalSourceElementModel.Raw, _))
+        }
+        unresolvedExtReferencesMap.remove(ex.id)
+      case _ => // ignore
+    }
+    instance match {
+      case elm: DomainElement => parseCustomProperties(node, elm)
+      case _ => // ignore
+    }
+  }
+
+  private def traverse(node: Node, sources: SourceMap, instance: AmfObject, f: Field): Unit = {
+    val k = f.value.iri()
+    val properties = key(node, k)
+    traverse(instance, f, properties, sources, k)
+  }
+
+  private def extractModelFields(model: Obj) = {
+    model match {
+      case shapeModel: ShapeModel =>
+        shapeModel.fields.distinct ++ Seq(
+          ShapeModel.CustomShapePropertyDefinitions,
+          ShapeModel.CustomShapeProperties
+        )
+      case _ => model.fields.distinct
     }
   }
 
@@ -319,28 +328,39 @@ class RdfModelParser(platform: Platform)(implicit val ctx: ParserContext) extend
             UnableToParseRdfDocument,
             instance.id,
             s"Error, more than one sorted array values found in node for property $key in node ${instance.id}")
-        case a: Array =>
-          val items = properties
-          val values: Seq[AmfElement] = a.element match {
-            case _: Obj =>
-              val shouldParseUnit = f.value.iri() == (Namespace.Document + "references")
-                .iri() // this is for self-encoded documents
-              items.flatMap(n =>
-                findLink(n) match {
-                  case Some(o) => parse(o, shouldParseUnit)
-                  case _       => None
-                })
-            case Str | Iri => items.map(n => strCoercion(n))
-          }
-          a.element match {
-            case _: DomainElementModel if f == DocumentModel.Declares =>
-              instance.setArrayWithoutId(f, values, annots(sources, key))
-            case _: BaseUnitModel => instance.setArrayWithoutId(f, values, annots(sources, key))
-            case _                => instance.setArrayWithoutId(f, values, annots(sources, key))
-          }
+        case a: Array => parsePropertyArray(instance, f, properties, sources, key, a)
       }
     } else {
       // ignore
+    }
+  }
+
+  private def parsePropertyArray(instance: AmfObject, f: Field, properties: Seq[PropertyObject], sources: SourceMap, key: String, a: Array) = {
+    val values: Seq[AmfElement] = a.element match {
+      case _: Obj =>
+        val shouldParseUnit = f.value.iri() == (Namespace.Document + "references")
+          .iri() // this is for self-encoded documents
+        properties.flatMap(n =>
+          if (recursions.hasVisited(n)) nodes.get(n.value) match {
+            case Some(instance) => Some(instance)
+            case None => ctx.eh.violation(
+              UnableToParseRdfDocument,
+              instance.id,
+              s"Recursive error in node ${instance.id} for field ${f.toString
+              }")
+              None
+          }
+          else findLink(n) match {
+            case Some(o) => parse(o, shouldParseUnit)
+            case _ => None
+          })
+      case Str | Iri => properties.map(n => strCoercion(n))
+    }
+    a.element match {
+      case _: DomainElementModel if f == DocumentModel.Declares =>
+        instance.setArrayWithoutId(f, values, annots(sources, key))
+      case _: BaseUnitModel => instance.setArrayWithoutId(f, values, annots(sources, key))
+      case _ => instance.setArrayWithoutId(f, values, annots(sources, key))
     }
   }
 
@@ -652,4 +672,12 @@ class RdfModelParser(platform: Platform)(implicit val ctx: ParserContext) extend
 
   private def annots(sources: SourceMap, key: String) =
     annotations(nodes, sources, key).into(collected, _.isInstanceOf[ResolvableAnnotation])
+
+  private class RecursionControl(private var visited: Set[String] = Set()) {
+    def visit(node: Node): Unit = {
+      this.visited = visited + node.subject
+    }
+    def hasVisited(node: Node): Boolean = visited.contains(node.subject)
+    def hasVisited(property: PropertyObject): Boolean = visited.contains(property.value)
+  }
 }
