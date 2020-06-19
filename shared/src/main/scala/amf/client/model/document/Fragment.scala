@@ -8,17 +8,18 @@ import amf.core.model.document.{Fragment => InternalFragment, PayloadFragment =>
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportAll
+@JSExportTopLevel("model.document.Fragment")
 class Fragment(private[amf] val _internal: InternalFragment) extends BaseUnit with EncodesModel
 
 @JSExportAll
 case class PayloadFragment(override private[amf] val _internal: InternalPayloadFragment) extends Fragment(_internal) {
-  @JSExportTopLevel("model.domain.PayloadFragment")
+  @JSExportTopLevel("model.document.PayloadFragment")
   def this(scalar: ScalarNode, mediaType: String) = this(InternalPayloadFragment(scalar._internal, mediaType))
 
-  @JSExportTopLevel("model.domain.PayloadFragment")
+  @JSExportTopLevel("model.document.PayloadFragment")
   def this(obj: ObjectNode, mediaType: String) = this(InternalPayloadFragment(obj._internal, mediaType))
 
-  @JSExportTopLevel("model.domain.PayloadFragment")
+  @JSExportTopLevel("model.document.PayloadFragment")
   def this(arr: ArrayNode, mediaType: String) = this(InternalPayloadFragment(arr._internal, mediaType))
 
   def mediaType: StrField = _internal.mediaType

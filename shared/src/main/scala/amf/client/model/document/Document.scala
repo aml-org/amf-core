@@ -10,6 +10,7 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
   * Document model class.
   */
 @JSExportAll
+@JSExportTopLevel("model.document.Document")
 class Document(private[amf] val _internal: InternalDocument) extends BaseUnit with EncodesModel with DeclaresModel {
 
   @JSExportTopLevel("model.document.Document")

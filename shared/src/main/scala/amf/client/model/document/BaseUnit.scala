@@ -1,8 +1,8 @@
 package amf.client.model.document
 
 import amf.client.convert.CoreClientConverters._
-import amf.client.model.{AmfObjectWrapper, StrField}
 import amf.client.model.domain.DomainElement
+import amf.client.model.{AmfObjectWrapper, StrField}
 import amf.client.render.RenderOptions
 import amf.core.model.document.{BaseUnit => InternalBaseUnit}
 import amf.core.rdf.RdfModel
