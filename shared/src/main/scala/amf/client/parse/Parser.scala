@@ -5,6 +5,7 @@ import amf.client.environment.{DefaultEnvironment, Environment}
 import amf.client.execution.BaseExecutionEnvironment
 import amf.client.model.document.BaseUnit
 import amf.client.validate.ValidationReport
+import amf.core.adoption.IdAdopter
 import amf.core.client.ParsingOptions
 import amf.core.errorhandling.UnhandledErrorHandler
 import amf.core.model.document.{BaseUnit => InternalBaseUnit}
@@ -118,6 +119,7 @@ class Parser(vendor: String, mediaType: String, private val env: Option[Environm
       errorHandler = DefaultParserErrorHandler.withRun()
     ) map { model =>
       parsedModel = Some(model)
+      new IdAdopter(model, model.location + "#").adopt()
       model
     }
   }

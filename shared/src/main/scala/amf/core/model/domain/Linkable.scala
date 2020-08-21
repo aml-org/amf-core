@@ -16,8 +16,10 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
     linkTarget
       .map {
         case linkable: Linkable if linkTarget.isDefined =>
-          if (links.contains(linkable.id)) linkable.linkTarget.get
-          else linkable.effectiveLinkTarget(linkable.id +: links)
+          // TODO FIX ID USE
+//          if (links.contains(linkable.id)) linkable.linkTarget.get
+//          else linkable.effectiveLinkTarget(linkable.id +: links)
+          linkable.effectiveLinkTarget()
         case other => other
       }
       .getOrElse(this)
