@@ -5,3 +5,4 @@
 AMF core components, including document model and plugin system.
 
 More info in: https://github.com/aml-org/amf
+
