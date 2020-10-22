@@ -226,7 +226,7 @@ class ExpandedGraphParser()(implicit val ctx: GraphParserContext) extends GraphP
               val obj       = entry.value.as[YMap]
 
               parseScalarProperty(obj, DomainExtensionModel.Name)
-                .map(extension.withName)
+                .map(extension.set(DomainExtensionModel.Name,_))
               parseScalarProperty(obj, DomainExtensionModel.Element)
                 .map(extension.withElement)
 

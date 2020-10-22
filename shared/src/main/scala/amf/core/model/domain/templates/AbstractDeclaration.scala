@@ -20,6 +20,7 @@ abstract class AbstractDeclaration(fields: Fields, annotations: Annotations)
   def withVariables(variables: Seq[String]): this.type = set(Variables, variables)
   def withDescription(description: String): this.type  = set(Description, description)
 
-  override def componentId: String        = "/" + name.option().getOrElse("default-abstract").urlComponentEncoded
+  protected def declarationComponent:String
+  override def componentId: String        = "/" + declarationComponent + "/" + name.option().getOrElse("default-abstract").urlComponentEncoded
   override def nameField: Field = Name
 }
