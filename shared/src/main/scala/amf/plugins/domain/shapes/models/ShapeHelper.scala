@@ -13,7 +13,7 @@ trait ShapeHelper { this: Shape =>
       case Some(s) => s.text
       case _       => YamlRender.render(entry.value)
     }
-    this.set(ShapeModel.DefaultValueString, AmfScalar(str), Annotations(entry))
+    this.set(ShapeModel.DefaultValueString, AmfScalar(str, Annotations(entry.value)), Annotations(entry))
   }
 
 }

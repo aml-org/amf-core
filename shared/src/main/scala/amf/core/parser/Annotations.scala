@@ -1,6 +1,6 @@
 package amf.core.parser
 
-import amf.core.annotations.{LexicalInformation, SourceAST, SourceNode, SourceLocation => AmfSourceLocation}
+import amf.core.annotations.{Inferred, LexicalInformation, SourceAST, SourceNode, SourceLocation => AmfSourceLocation}
 import amf.core.model.domain.{Annotation, EternalSerializedAnnotation, SerializableAnnotation}
 import org.mulesoft.lexer.{InputRange, SourceLocation}
 import org.yaml.model.{YMapEntry, YNode, YPart}
@@ -108,4 +108,6 @@ object Annotations {
     override def ++=(other: Annotations): this.type                 = this
     override def ++=(other: TraversableOnce[Annotation]): this.type = this
   }
+
+  def inferred(): Annotations = apply(Inferred())
 }

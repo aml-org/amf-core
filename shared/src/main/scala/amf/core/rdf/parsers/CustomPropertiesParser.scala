@@ -5,7 +5,7 @@ import amf.core.metamodel.domain.DomainElementModel
 import amf.core.metamodel.domain.extensions.DomainExtensionModel
 import amf.core.model.domain.DomainElement
 import amf.core.model.domain.extensions.{CustomDomainProperty, DomainExtension}
-import amf.core.parser.FieldEntry
+import amf.core.parser.{Annotations, FieldEntry}
 import amf.core.rdf.graph.NodeFinder
 import amf.core.rdf.{Literal, Node, RdfParserCommon, RdfParserContext, Uri}
 
@@ -43,7 +43,7 @@ class CustomPropertiesParser(linkFinder: NodeFinder, sourcesRetriever: SourcesRe
 
                 new DynamicTypeParser(linkFinder, sourcesRetriever).parse(entries.head).foreach { pn =>
                   extension.withId(pn.id)
-                  extension.withExtension(pn)
+                  extension.set(DomainExtensionModel.Extension,pn, Annotations.inferred())
                 }
 
                 val sources = sourcesRetriever.retrieve(node)

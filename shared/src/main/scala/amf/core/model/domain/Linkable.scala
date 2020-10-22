@@ -1,5 +1,6 @@
 package amf.core.model.domain
 
+import amf.core.annotations.{Inferred, SynthesizedField}
 import amf.core.metamodel.domain.LinkableElementModel
 import amf.core.model.{BoolField, StrField}
 import amf.core.parser.{Annotations, DeclarationPromise, Fields, ParserContext}
@@ -28,9 +29,10 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
   def linkCopy(): Linkable
 
   def withLinkTarget(target: DomainElement): this.type = {
-    fields.setWithoutId(LinkableElementModel.Target, target)
-    set(LinkableElementModel.TargetId, target.id)
+    fields.setWithoutId(LinkableElementModel.Target, target,Annotations(Inferred()))
+    set(LinkableElementModel.TargetId, AmfScalar(target.id), Annotations(SynthesizedField()))
   }
+
   def withLinkLabel(label: String): this.type              = set(LinkableElementModel.Label, label)
   def withSupportsRecursion(recursive: Boolean): this.type = set(LinkableElementModel.SupportsRecursion, recursive)
 
@@ -40,7 +42,7 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
     copied
       .withId(s"${copied.id}/link-$hash")
       .withLinkTarget(this)
-      .withLinkLabel(label)
+      .set(LinkableElementModel.Label, AmfScalar(label, annotations), Annotations.inferred())
       .add(annotations)
       .asInstanceOf[T]
   }

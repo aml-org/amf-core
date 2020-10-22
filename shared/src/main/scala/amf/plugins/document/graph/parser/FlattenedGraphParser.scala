@@ -384,7 +384,7 @@ class FlattenedGraphParser()(implicit val ctx: GraphParserContext) extends Graph
               val obj        = contentOfNode(entryValue).getOrElse(entryValue.as[YMap])
 
               parseScalarProperty(obj, DomainExtensionModel.Name)
-                .map(extension.withName)
+                .map(s => extension.set(DomainExtensionModel.Name,s))
               parseScalarProperty(obj, DomainExtensionModel.Element)
                 .map(extension.withElement)
 
