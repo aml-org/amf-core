@@ -39,7 +39,7 @@ abstract class Shape extends DomainElement with Linkable with NamedDomainElement
 
   def withDisplayName(name: String): this.type        = set(DisplayName, name)
   def withDescription(description: String): this.type = set(Description, description)
-  def withDefault(default: DataNode): this.type       = set(Default, default)
+  def withDefault(default: DataNode, annotations: Annotations = Annotations()): this.type       = set(Default, default, annotations)
   def withValues(values: Seq[DataNode]): this.type    = setArray(Values, values)
   def withInherits(inherits: Seq[Shape]): this.type   = setArray(Inherits, inherits)
   def withOr(subShapes: Seq[Shape]): this.type        = setArray(Or, subShapes)
@@ -62,7 +62,7 @@ abstract class Shape extends DomainElement with Linkable with NamedDomainElement
   def withElse(elseShape: Shape): this.type          = set(Else, elseShape)
   def withThen(thenShape: Shape): this.type          = set(Then, thenShape)
 
-  def withDefaultStr(value: String): Shape.this.type = set(DefaultValueString, value)
+  def withDefaultStr(value: String): Shape.this.type = set(DefaultValueString, value, Annotations.synthesized())
 
   def effectiveInherits: Seq[Shape] = {
     inherits.map { base =>

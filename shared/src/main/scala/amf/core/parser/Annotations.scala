@@ -1,6 +1,6 @@
 package amf.core.parser
 
-import amf.core.annotations.{LexicalInformation, SourceAST, SourceNode, SourceLocation => AmfSourceLocation}
+import amf.core.annotations.{Inferred, LexicalInformation, SourceAST, SourceNode, SynthesizedField, VirtualElement, SourceLocation => AmfSourceLocation}
 import amf.core.model.domain.{Annotation, EternalSerializedAnnotation, SerializableAnnotation}
 import org.mulesoft.lexer.{InputRange, SourceLocation}
 import org.yaml.model.{YMapEntry, YNode, YPart}
@@ -86,9 +86,10 @@ object Annotations {
   }
 
   def apply(ast: YPart): Annotations = {
-    val annotations = new Annotations() ++= Set(LexicalInformation(Range(ast.range)),
+    val annotations = new Annotations() ++= Set(LexicalInformation(ast),
                                                 SourceAST(ast),
-                                                AmfSourceLocation(ast.sourceName))
+//      AmfSourceLocation(ast.sourceName))
+                                                AmfSourceLocation(ast))
     ast match {
       case node: YNode      => annotations += SourceNode(node)
       case entry: YMapEntry => annotations += SourceNode(entry.value)
@@ -108,4 +109,10 @@ object Annotations {
     override def ++=(other: Annotations): this.type                 = this
     override def ++=(other: TraversableOnce[Annotation]): this.type = this
   }
+
+  def inferred(): Annotations = apply(Inferred())
+
+  def virtual(): Annotations = apply(VirtualElement())
+
+  def synthesized(): Annotations = apply(SynthesizedField())
 }

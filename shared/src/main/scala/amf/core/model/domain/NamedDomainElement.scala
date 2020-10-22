@@ -1,9 +1,8 @@
 package amf.core.model.domain
 
 import amf.core.metamodel.Field
-import amf.core.metamodel.domain.ShapeModel.Name
 import amf.core.model.StrField
-import amf.core.parser.Annotations
+import amf.core.parser.{Annotations, ScalarNode => ScalarNodeObj}
 import org.yaml.model.YNode
 
 /**
@@ -16,6 +15,14 @@ trait NamedDomainElement extends DomainElement {
   /** Return DomainElement name. */
   def name: StrField = fields.field(nameField)
 
+  def withName(node: YNode): this.type = withName(ScalarNodeObj(node))
+
+  def withName(name:String, a:Annotations): this.type = set(nameField, AmfScalar(name, a), Annotations.inferred())
+
   /** Update DomainElement name. */
-  def withName(name: String, a: Annotations = Annotations()): this.type = set(nameField, AmfScalar(name, a))
+  def withName(nameNode: ScalarNodeObj): this.type = set(nameField, nameNode.text(), Annotations.inferred())
+
+  def withSynthesizeName(name:String): this.type = set(nameField, AmfScalar(name), Annotations.synthesized())
+
+
 }

@@ -1,11 +1,12 @@
 package amf.core.model.domain
 
+import amf.core.annotations.Inferred
 import amf.core.metamodel.domain.LinkableElementModel
 import amf.core.model.{BoolField, StrField}
 import amf.core.parser.{Annotations, DeclarationPromise, Fields, ParserContext}
-import org.yaml.model.YPart
 import amf.core.utils._
 import amf.plugins.features.validation.CoreValidations.UnresolvedReference
+import org.yaml.model.YPart
 
 trait Linkable extends AmfObject { this: DomainElement with Linkable =>
 
@@ -28,11 +29,12 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
   def linkCopy(): Linkable
 
   def withLinkTarget(target: DomainElement): this.type = {
-    fields.setWithoutId(LinkableElementModel.Target, target)
-    set(LinkableElementModel.TargetId, target.id)
+    fields.setWithoutId(LinkableElementModel.Target, target,Annotations(Inferred()))
+    set(LinkableElementModel.TargetId, AmfScalar(target.id), Annotations.synthesized())
   }
-  def withLinkLabel(label: String): this.type              = set(LinkableElementModel.Label, label)
-  def withSupportsRecursion(recursive: Boolean): this.type = set(LinkableElementModel.SupportsRecursion, recursive)
+
+  def withLinkLabel(label: String, annotations: Annotations = Annotations()): this.type              = set(LinkableElementModel.Label, AmfScalar(label, annotations), Annotations.inferred())
+  def withSupportsRecursion(recursive: Boolean): this.type = set(LinkableElementModel.SupportsRecursion, AmfScalar(recursive), Annotations.synthesized())
 
   def link[T](label: String, annotations: Annotations = Annotations()): T = {
     val copied = linkCopy()
@@ -40,7 +42,7 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
     copied
       .withId(s"${copied.id}/link-$hash")
       .withLinkTarget(this)
-      .withLinkLabel(label)
+      .set(LinkableElementModel.Label, AmfScalar(label, annotations), Annotations.inferred())
       .add(annotations)
       .asInstanceOf[T]
   }

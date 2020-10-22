@@ -2,7 +2,9 @@ package amf.core.annotations
 
 import amf.core.model.domain.{AmfElement, Annotation, AnnotationGraphLoader, SerializableAnnotation}
 
-case class SynthesizedField() extends SerializableAnnotation {
+trait VirtualNode extends Annotation
+
+case class SynthesizedField() extends SerializableAnnotation with VirtualNode {
   override val name: String  = "synthesized-field"
   override val value: String = "true"
 }
@@ -12,4 +14,6 @@ object SynthesizedField extends AnnotationGraphLoader {
     Some(SynthesizedField())
 }
 
-case class VirtualObject() extends Annotation
+case class Inferred() extends VirtualNode
+
+case class VirtualElement() extends VirtualNode
