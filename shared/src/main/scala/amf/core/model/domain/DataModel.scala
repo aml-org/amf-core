@@ -96,7 +96,7 @@ class ObjectNode(override val fields: Fields, val annotations: Annotations) exte
 
   private def overrideName(objectValue:DataNode, newName:String) = {
     objectValue.fields.getValueAsOption(DataNodeModel.Name).fold({
-      objectValue.synthesizeName(newName)
+      objectValue.withSynthesizeName(newName)
     })(value => {
       objectValue.set(DataNodeModel.Name, AmfScalar(newName, value.value.annotations), value.annotations)
     })

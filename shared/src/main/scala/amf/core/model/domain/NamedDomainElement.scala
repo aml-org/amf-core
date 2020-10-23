@@ -24,7 +24,7 @@ trait NamedDomainElement extends DomainElement {
   /** Update DomainElement name. */
   def withName(nameNode: ScalarNodeObj): this.type = set(nameField, nameNode.text(), Annotations.inferred())
 
-  def synthesizeName(name:String): this.type = set(nameField, AmfScalar(name), Annotations(SynthesizedField()))
+  def withSynthesizeName(name:String): this.type = set(nameField, AmfScalar(name), Annotations(SynthesizedField()))
 
 
 }
