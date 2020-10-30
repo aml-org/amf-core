@@ -296,26 +296,26 @@ class ExpandedGraphParser()(implicit val ctx: GraphParserContext) extends GraphP
     private def doTraverse(instance: AmfObject, f: Field, node: YNode, sources: SourceMap, key: String) = {
       f.`type` match {
         case _: Obj =>
-          parse(node.as[YMap]).foreach(n => instance.set(f, n, annotations(nodes, sources, key)))
+          parse(node.as[YMap]).foreach(n => instance.setWithoutId(f, n, annotations(nodes, sources, key)))
           instance
         case Str | RegExp | Iri | LiteralUri =>
-          instance.set(f, str(node), annotations(nodes, sources, key))
+          instance.setWithoutId(f, str(node), annotations(nodes, sources, key))
         case Bool =>
-          instance.set(f, bool(node), annotations(nodes, sources, key))
+          instance.setWithoutId(f, bool(node), annotations(nodes, sources, key))
         case Type.Int =>
-          instance.set(f, int(node), annotations(nodes, sources, key))
+          instance.setWithoutId(f, int(node), annotations(nodes, sources, key))
         case Type.Float =>
-          instance.set(f, float(node), annotations(nodes, sources, key))
+          instance.setWithoutId(f, float(node), annotations(nodes, sources, key))
         case Type.Double =>
-          instance.set(f, double(node), annotations(nodes, sources, key))
+          instance.setWithoutId(f, double(node), annotations(nodes, sources, key))
         case Type.DateTime =>
-          instance.set(f, date(node), annotations(nodes, sources, key))
+          instance.setWithoutId(f, date(node), annotations(nodes, sources, key))
         case Type.Date =>
-          instance.set(f, date(node), annotations(nodes, sources, key))
+          instance.setWithoutId(f, date(node), annotations(nodes, sources, key))
         case Type.Any =>
-          instance.set(f, any(node), annotations(nodes, sources, key))
+          instance.setWithoutId(f, any(node), annotations(nodes, sources, key))
         case l: SortedArray =>
-          instance.setArray(f, parseList(instance.id, l.element, node.as[YMap]), annotations(nodes, sources, key))
+          instance.setArrayWithoutId(f, parseList(instance.id, l.element, node.as[YMap]), annotations(nodes, sources, key))
         case a: Array =>
           val items = node.as[Seq[YNode]]
           val values: Seq[AmfElement] = a.element match {
