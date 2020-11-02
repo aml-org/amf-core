@@ -16,6 +16,8 @@ version in ThisBuild := {
   lazy val branch = sys.env.get("BRANCH_NAME")
 
   if (branch.contains("master")) s"$major.$minor.$build" else s"$major.${minor + 1}.0-SNAPSHOT"
+
+  "4.1.0-SNAPSHOT-INTERNAL"
 }
 
 publish := {}
