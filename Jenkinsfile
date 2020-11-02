@@ -31,8 +31,10 @@ pipeline {
     }
     stage('Publish') {
       when {
-        branch 'master'
-        branch 'sourcemaps/master'
+        anyOf{
+          branch 'master'
+          branch 'sourcemaps/master'
+        }
       }
       steps {
         wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
