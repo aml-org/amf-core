@@ -17,7 +17,7 @@ version in ThisBuild := {
 
   if (branch.contains("master")) s"$major.$minor.$build" else s"$major.${minor + 1}.0-SNAPSHOT"
 
-  "4.1.0-SNAPSHOT-INTERNAL"
+  "4.1.0-INTERNAL-SNAPSHOT"
 }
 
 publish := {}
