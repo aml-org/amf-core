@@ -1,5 +1,6 @@
 package amf.core.parser
 
+import amf.core.annotations.{Inferred, SynthesizedField}
 import amf.core.metamodel.Type._
 import amf.core.metamodel.{Field, Obj, Type}
 import amf.core.model._
@@ -309,6 +310,10 @@ class Value(var value: AmfElement, val annotations: Annotations) {
   def cloneAnnotated(annotation: Annotation) = Value(value, Annotations(annotations))
 
   def cloneValue(branch: mutable.Map[AmfObject, AmfObject]) = Value(value.cloneElement(branch), annotations.copy())
+
+  lazy val isInferred: Boolean = annotations.contains(classOf[Inferred])
+
+  lazy val isSynthesized: Boolean = annotations.contains(classOf[SynthesizedField])
 }
 
 object Value {
