@@ -2,8 +2,8 @@ package amf.plugins.document.graph.parser
 
 import amf.core.metamodel.{Field, Obj, Type}
 import amf.core.metamodel.Type._
-import amf.core.metamodel.document.SourceMapModel
-import amf.core.metamodel.domain.DomainElementModel
+import amf.core.metamodel.document.{ExtensionLikeModel, SourceMapModel}
+import amf.core.metamodel.domain.{DomainElementModel, ExternalSourceElementModel, LinkableElementModel, RecursiveShapeModel}
 import amf.core.model.document.SourceMap
 import amf.core.model.domain.{AmfElement, AmfScalar, Annotation}
 import amf.core.parser.{Annotations, _}
@@ -32,8 +32,10 @@ trait GraphParserHelpers extends GraphContextHelper {
     AmfScalar(value)
   }
 
-  protected def str(node: YNode): AmfScalar = {
-    val value = node.tagType match {
+  protected def str(node: YNode): AmfScalar = AmfScalar(stringValue(node))
+
+  private def stringValue(node: YNode): String =
+    node.tagType match {
       case YType.Map =>
         node.as[YMap].entries.find(_.key.as[String] == "@value") match {
           case Some(entry) => entry.value.as[YScalar].text
@@ -41,7 +43,13 @@ trait GraphParserHelpers extends GraphContextHelper {
         }
       case _ => node.as[YScalar].text
     }
-    AmfScalar(value)
+
+  val fieldsWithId = Set(RecursiveShapeModel.FixPoint, LinkableElementModel.TargetId, ExternalSourceElementModel.ReferenceId, ExtensionLikeModel.Extends)
+
+  protected def iri(node: YNode, field: Field)(implicit ctx: GraphParserContext): AmfScalar = {
+    val uri = stringValue(node)
+    val transformed = if(fieldsWithId.contains(field)) transformIdFromContext(uri) else uri
+    AmfScalar(transformed)
   }
 
   protected def bool(node: YNode): AmfScalar = {

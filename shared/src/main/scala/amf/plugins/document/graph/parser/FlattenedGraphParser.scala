@@ -459,7 +459,9 @@ class FlattenedGraphParser()(implicit val ctx: GraphParserContext) extends Graph
         case _: Obj =>
           parse(node.as[YMap]).foreach(n => instance.setWithoutId(f, n, annotations(nodes, sources, key)))
           instance
-        case Str | RegExp | Iri | LiteralUri =>
+        case Iri =>
+          instance.setWithoutId(f, iri(node, f), annotations(nodes, sources, key))
+        case Str | RegExp | LiteralUri =>
           instance.setWithoutId(f, str(node), annotations(nodes, sources, key))
         case Bool =>
           instance.setWithoutId(f, bool(node), annotations(nodes, sources, key))
