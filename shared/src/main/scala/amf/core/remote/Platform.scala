@@ -125,7 +125,7 @@ trait Platform extends FileMediaType {
   }
 
   /** Resolve remote url. */
-  def resolve(url: String, env: Environment)(implicit executionContext: ExecutionContext): Future[Content] =
+  def fetchContent(url: String, env: Environment)(implicit executionContext: ExecutionContext): Future[Content] =
     loaderConcat(url, env.loaders.filter(_.accepts(url)))
 
   /** Platform out of the box [ResourceLoader]s */

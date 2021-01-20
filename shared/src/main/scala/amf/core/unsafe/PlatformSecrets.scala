@@ -78,7 +78,7 @@ case class TrunkPlatform(content: String,
 
   override def tmpdir(): String = throw new Exception("Unsupported tmpdir operation")
 
-  override def resolve(url: String, env: Environment = Environment())(
+  override def fetchContent(url: String, env: Environment = Environment())(
       implicit executionContext: ExecutionContext): Future[Content] =
     Future.successful(new Content(content, url, forcedMediaType))
 

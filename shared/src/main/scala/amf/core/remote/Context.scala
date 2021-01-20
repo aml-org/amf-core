@@ -1,93 +1,102 @@
 package amf.core.remote
 
+import amf.Core.platform
+import amf.core.remote.Context.resolveRelativeTo
+
 /**
   * Context class for URL resolution.
   */
-class Context protected (val platform: Platform,
-                         val history: List[String],
-                         val mappings: Map[String, String] = Map.empty) {
+class Context protected(val platform: Platform,
+                        val history: List[String]) {
 
   def hasCycles: Boolean = history.count(_.equals(current)) == 2
 
   def current: String = if (history.isEmpty) "" else history.last
   def root: String    = if (history.isEmpty) "" else history.head
 
-  def update(url: String): Context = Context(platform, history, resolve(url), mappings)
+  def update(url: String): Context = Context(platform, history, resolve(url))
 
   def resolve(url: String): String =
     try {
-      applyMapping(platform.resolvePath(resolvePathAccordingToRelativeness(url)))
+      resolvePathAccordingToRelativeness(url)
     } catch {
       case e: Exception => throw new PathResolutionError(s"url: $url - ${e.getMessage}")
     }
 
   private def resolvePathAccordingToRelativeness(url: String) = {
-    val prefix = url match {
-      case Absolute(_)               => ""
-      case RelativeToRoot(_)         => Context.stripFile(root, platform.operativeSystem())
-      case RelativeToIncludedFile(_) => Context.stripFile(current, platform.operativeSystem())
+    val base = url match {
+      case Absolute(_)               => None
+      case RelativeToRoot(_)         => Some(root)
+      case RelativeToIncludedFile(_) => Some(current)
     }
-    concatWithoutDuplicateSlash(prefix, url)
+    resolveRelativeTo(base, url)
   }
 
-  private def concatWithoutDuplicateSlash(prefix: String, url: String) = {
-    if (prefix.nonEmpty && prefix.last == '/' && url.nonEmpty && url.head == '/') prefix + url.drop(1)
-    else prefix + url
-  }
-
-  private def applyMapping(path: String): String =
-    mappings.find(m => path.startsWith(m._1)).fold(path)(m => path.replace(m._1, m._2))
 }
 
 object Context {
   private def apply(platform: Platform,
                     history: List[String],
-                    currentResolved: String,
-                    mapping: Map[String, String]): Context =
-    new Context(platform, history :+ currentResolved, mapping)
+                    currentResolved: String): Context =
+    new Context(platform, history :+ currentResolved)
 
-  def apply(platform: Platform, root: String): Context = Context(platform, root, Map.empty)
+  def apply(platform: Platform): Context = new Context(platform, Nil)
 
-  def apply(platform: Platform): Context = Context(platform, "", Map.empty)
+  def apply(platform: Platform, root: String): Context =
+    new Context(platform, List(root))
 
-  def apply(platform: Platform, root: String, mapping: Map[String, String]): Context =
-    new Context(platform, Option(root).filter(_.nonEmpty).map(List(_)).getOrElse(Nil), mapping)
+  def stripFileName(url: String): String = {
+    val withoutFrag = if (url.contains("#")) url.split("#").head else url
 
-  def apply(platform: Platform, mapping: Map[String, String]): Context =
-    new Context(platform, Nil, mapping)
-
-  private def stripFile(url: String, so: String): String = {
-    val containsBackSlash = url.contains('\\') && so == "win"
-    val containsForwardSlash = url.contains('/')
+    val so = platform.operativeSystem()
+    val containsBackSlash = withoutFrag.contains('\\') && so == "win"
+    val containsForwardSlash = withoutFrag.contains('/')
     if (!containsBackSlash && !containsForwardSlash) {
       return ""
     }
     val sep = if (containsBackSlash) '\\' else '/'
-    val lastPieceHasExtension = url.split(sep).last.contains('.')
+    val lastPieceHasExtension = withoutFrag.split(sep).last.contains('.')
     if (lastPieceHasExtension) {
-      url.substring(0, url.lastIndexOf(sep) + 1)
-    } else if (!url.endsWith(sep.toString)) {
-      url + sep
+      withoutFrag.substring(0, withoutFrag.lastIndexOf(sep) + 1)
+    } else if (!withoutFrag.endsWith(sep.toString)) {
+      withoutFrag + sep
     } else {
-      url
+      withoutFrag
     }
+  }
+
+  def resolveRelativeTo(base: Option[String], url: String): String = {
+    val result = base.map { baseUri =>
+      if (url.startsWith("#")) baseUri + url
+      else {
+        val baseDir = Context.stripFileName(baseUri)
+        safeConcat(baseDir, url)
+      }
+    }.getOrElse(url)
+    platform.resolvePath(result)
+  }
+
+  private def safeConcat(base: String, url: String) = {
+    if (base.nonEmpty && base.last == '/' && url.nonEmpty && url.head == '/') base + url.drop(1)
+    else if ((base == "file://") && url.startsWith("./")) base + url.substring(2) // associated to APIMF-2357
+    else base + url
   }
 }
 
-private object Absolute {
+object Absolute {
   def unapply(url: String): Option[String] = url match {
     case s if s.contains(":") => Some(s)
     case _                    => None
   }
 }
 
-private object RelativeToRoot {
+object RelativeToRoot {
   def unapply(url: String): Option[String] = url match {
     case s if s.startsWith("/") => Some(s)
     case _                      => None
   }
 }
 
-private object RelativeToIncludedFile {
+object RelativeToIncludedFile {
   def unapply(url: String): Option[String] = Some(url)
 }

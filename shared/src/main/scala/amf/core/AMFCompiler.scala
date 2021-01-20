@@ -65,8 +65,8 @@ class CompilerContext(url: String,
 
   def resolvePath(url: String): String = fileContext.resolve(fileContext.platform.normalizePath(url))
 
-  def resolveContent()(implicit executionContext: ExecutionContext): Future[Content] =
-    platform.resolve(location, environment)
+  def fetchContent()(implicit executionContext: ExecutionContext): Future[Content] =
+    platform.fetchContent(location, environment)
 
   def forReference(url: String, withNormalizedUri: Boolean = true)(
       implicit executionContext: ExecutionContext): CompilerContext = {
@@ -171,7 +171,7 @@ class AMFCompiler(compilerContext: CompilerContext,
   }
 
   private def compile()(implicit executionContext: ExecutionContext): Future[BaseUnit] =
-    resolve().map(parseSyntax).flatMap(parseDomain)
+    fetchContent().map(parseSyntax).flatMap(parseDomain)
 
   def autodetectSyntax(stream: CharSequence): Option[String] = {
     if (stream.length() > 2 && stream.charAt(0) == '#' && stream.charAt(1) == '%') {
@@ -350,7 +350,7 @@ class AMFCompiler(compilerContext: CompilerContext,
     Future.sequence(parsed).map(rs => root.copy(references = rs.flatten))
   }
 
-  private def resolve()(implicit executionContext: ExecutionContext): Future[Content] = compilerContext.resolveContent()
+  private def fetchContent()(implicit executionContext: ExecutionContext): Future[Content] = compilerContext.fetchContent()
 
   private def verifyCrossReference(refVendor: Option[Vendor], domainPlugin: AMFDocumentPlugin, nodes: Seq[YNode]): Unit = {
     val rootVendors = domainPlugin.vendors.map(Vendor.apply)
@@ -366,7 +366,7 @@ class AMFCompiler(compilerContext: CompilerContext,
 
   private def isJsonRef(vendors: Seq[Vendor]) = vendors.forall(_.name.equals(JSON_REFS))
 
-  def root()(implicit executionContext: ExecutionContext): Future[Root] = resolve().map(parseSyntax).flatMap {
+  def root()(implicit executionContext: ExecutionContext): Future[Root] = fetchContent().map(parseSyntax).flatMap {
     case Right(document: Root) =>
       AMFPluginsRegistry.documentPluginForMediaType(document.mediatype).find(_.canParse(document)) match {
         case Some(domainPlugin) =>
