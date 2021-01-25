@@ -291,10 +291,10 @@ class JsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderOptions)(i
         sources(v)
       case Type.Double =>
         // this will transform the value to double and will not emit @type TODO: ADD YType.Double
-        listWithScalar(b, v.value, SType.Float)
+        listWithScalar(b, v.value, numberType(v.value.asInstanceOf[AmfScalar]))
         sources(v)
       case Type.Float =>
-        listWithScalar(b, v.value, SType.Float)
+        listWithScalar(b, v.value, numberType(v.value.asInstanceOf[AmfScalar]))
         sources(v)
       case Type.DateTime =>
         val dateTime = v.value.asInstanceOf[AmfScalar].value.asInstanceOf[SimpleDateTime]
@@ -349,7 +349,7 @@ class JsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderOptions)(i
             case Type.Float =>
               seq.values
                 .asInstanceOf[Seq[AmfScalar]]
-                .foreach(e => scalar(b, e.value.toString, SType.Float))
+                .foreach(e => scalar(b, e.value.toString, numberType(e)))
             case Bool =>
               seq.values
                 .asInstanceOf[Seq[AmfScalar]]

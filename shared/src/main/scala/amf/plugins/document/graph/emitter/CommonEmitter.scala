@@ -3,10 +3,10 @@ package amf.plugins.document.graph.emitter
 import amf.core.annotations.{Declares, References}
 import amf.core.metamodel.{Field, Obj}
 import amf.core.metamodel.domain.{ExternalSourceElementModel, ShapeModel}
-import amf.core.model.domain.{AmfArray, AmfElement, AmfObject, ExternalSourceElement}
+import amf.core.model.domain.{AmfArray, AmfElement, AmfObject, AmfScalar, ExternalSourceElement}
 import amf.core.parser.{Annotations, FieldEntry}
 import amf.plugins.document.graph.MetaModelHelper
-import org.yaml.builder.DocBuilder.{Entry, Part}
+import org.yaml.builder.DocBuilder.{Entry, Part, SType}
 
 trait CommonEmitter {
 
@@ -56,6 +56,11 @@ trait CommonEmitter {
         }
     )
   }
+
+  /**
+    * defaults to Int to retain more precision in large numbers.
+    */
+  def numberType(v: AmfScalar): SType = if(v.value.toString.contains(".")) SType.Float else SType.Int
 
   def createTypeNode[T](b: Entry[T], obj: Obj)(implicit ctx: EmissionContext): Unit =
     createTypeNode(b, getTypesAsIris(obj))

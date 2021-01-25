@@ -460,10 +460,10 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
         sources(v)
       case Type.Double =>
         // this will transform the value to double and will not emit @type TODO: ADD YType.Double
-        emitScalar(b, v.value, SType.Float)
+        emitScalar(b, v.value, numberType(v.value.asInstanceOf[AmfScalar]))
         sources(v)
       case Type.Float =>
-        emitScalar(b, v.value, SType.Float)
+        emitScalar(b, v.value, numberType(v.value.asInstanceOf[AmfScalar]))
         sources(v)
       case Type.DateTime =>
         val dateTime = v.value.asInstanceOf[AmfScalar].value.asInstanceOf[SimpleDateTime]
@@ -521,7 +521,7 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
             case Type.Float =>
               seq.values
                 .asInstanceOf[Seq[AmfScalar]]
-                .foreach(e => scalar(b, e.value.toString, SType.Float))
+                .foreach(e => scalar(b, e.value.toString, numberType(e)))
             case Bool =>
               seq.values
                 .asInstanceOf[Seq[AmfScalar]]
