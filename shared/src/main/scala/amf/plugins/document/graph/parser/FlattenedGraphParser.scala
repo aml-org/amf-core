@@ -464,7 +464,7 @@ class FlattenedGraphParser()(implicit val ctx: GraphParserContext) extends Graph
         case Type.Int =>
           instance.setWithoutId(f, int(node), annotations(nodes, sources, key))
         case Type.Float =>
-          instance.setWithoutId(f, float(node), annotations(nodes, sources, key))
+          instance.setWithoutId(f, double(node), annotations(nodes, sources, key))
         case Type.Double =>
           instance.setWithoutId(f, double(node), annotations(nodes, sources, key))
         case Type.DateTime =>

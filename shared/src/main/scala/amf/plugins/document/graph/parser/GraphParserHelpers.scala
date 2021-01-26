@@ -20,19 +20,6 @@ import scala.collection.{immutable, mutable}
 
 trait GraphParserHelpers extends GraphContextHelper {
 
-  protected def float(node: YNode)(implicit errorHandler: IllegalTypeHandler): AmfScalar = {
-    val value = node.tagType match {
-      case YType.Map =>
-        node.as[YMap].entries.find(_.key.as[String] == "@value") match {
-          case Some(entry) =>
-            entry.value.as[YScalar].text.toDouble
-          case _ => node.as[YScalar].text.toDouble
-        }
-      case _ => node.as[YScalar].text.toDouble
-    }
-    AmfScalar(value)
-  }
-
   protected def str(node: YNode)(implicit errorHandler: IllegalTypeHandler): AmfScalar = AmfScalar(stringValue(node))
 
   private def stringValue(node: YNode)(implicit errorHandler: IllegalTypeHandler): String =
@@ -81,10 +68,10 @@ trait GraphParserHelpers extends GraphContextHelper {
     val value = node.tagType match {
       case YType.Map =>
         node.as[YMap].entries.find(_.key.as[String] == "@value") match {
-          case Some(entry) => entry.value.as[YScalar].text.toDouble
-          case _           => node.as[YScalar].text.toDouble
+          case Some(entry) => entry.value.as[YScalar].text
+          case _           => node.as[YScalar].text
         }
-      case _ => node.as[YScalar].text.toDouble
+      case _ => node.as[YScalar].text
     }
     AmfScalar(value)
   }
