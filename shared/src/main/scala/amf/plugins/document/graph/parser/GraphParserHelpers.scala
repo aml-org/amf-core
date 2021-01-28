@@ -15,7 +15,7 @@ import amf.core.model.domain.{AmfElement, AmfScalar, Annotation}
 import amf.core.parser.errorhandler.ParserErrorHandler
 import amf.core.parser.{Annotations, _}
 import amf.core.vocabulary.Namespace.SourceMaps
-import amf.core.vocabulary.{Namespace, ValueType}
+import amf.core.vocabulary.{AbsoluteIri, IriClassification, Namespace, RelativeIri, ValueType}
 import amf.plugins.document.graph.JsonLdKeywords
 import amf.plugins.document.graph.context.{ExpandedTermDefinition, GraphContextOperations, TermDefinition}
 import amf.plugins.features.validation.CoreValidations.{MissingIdInNode, MissingTypeInNode}
@@ -315,14 +315,19 @@ abstract class GraphContextHelper extends GraphContextOperations {
     compact(iri)(ctx.graphContext)
   }
 
-  protected def transformIdFromContext(id: String)(implicit ctx: GraphParserContext): String = {
+  protected def transformIdFromContext(iri: String)(implicit ctx: GraphParserContext): String = {
+    IriClassification.classify(iri) match {
+      case AbsoluteIri => iri
+      case RelativeIri => resolveWithBase(iri, ctx)
+    }
+  }
+
+  private def resolveWithBase(id: String, ctx: GraphParserContext): String = {
     val prefixOption = ctx.graphContext.base.map { base =>
       if (id.startsWith("./")) base.parent.iri + "/"
       else base.iri
     }
     val prefix = prefixOption.getOrElse("")
-
     s"$prefix$id"
   }
-
 }
