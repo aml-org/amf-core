@@ -108,13 +108,8 @@ package object BaseEmitters {
     private def simpleScalar(b: EntryBuilder): Unit = {
 
       val value = dataType match {
-        case Some(YType.Int)   => f.scalar.value.toString.toDouble.floor.toInt.toString
-        case Some(YType.Float) =>
-          // Hack to fix difference in float emittion between JS and Java (Java prints '.0')
-          f.scalar.value.toString.toDouble.toString match {
-            case e if e.endsWith(".0") => e.substring(0, e.indexOf(".0"))
-            case o                     => o
-          }
+        case Some(YType.Int)   => integerValue(f.scalar.value.toString)
+        case Some(YType.Float) => floatValue(f.scalar.value.toString)
         case _ => f.scalar.value
       }
 
@@ -122,6 +117,17 @@ package object BaseEmitters {
         key,
         YNode(YScalar(value), dataType.getOrElse(tag))
       )
+    }
+
+    private def integerValue(text: String) = BigDecimal(text).setScale(0, BigDecimal.RoundingMode.FLOOR).toString
+
+    // Hack to fix difference in float emittion between JS and Java (Java prints '.0')
+    private def floatValue(text: String) = {
+      val removeLeadingZeros = BigDecimal(text).toString()
+      removeLeadingZeros match {
+        case e if e.endsWith(".0") => e.substring(0, e.indexOf(".0"))
+        case o => o
+      }
     }
   }
 
