@@ -1,11 +1,10 @@
 package amf.core.remote
 
 import java.util.Date
-
 import amf.client.remote.Content
-import amf.core.common.ListAssertions
 import amf.core.remote.Mimes.`APPLICATION/YAML`
 import amf.core.unsafe.PlatformSecrets
+import org.mulesoft.common.test.ListAssertions
 import org.scalatest.{Assertion, AsyncFunSuite}
 import org.scalatest.Matchers._
 
