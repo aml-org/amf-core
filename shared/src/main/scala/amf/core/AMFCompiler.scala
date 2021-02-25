@@ -326,10 +326,9 @@ class AMFCompiler(compilerContext: CompilerContext,
       .filter(_.isRemote)
       .map { link =>
         val nodes = link.refs.map(_.node)
-        link.resolve(compilerContext, nodes, domainPlugin.allowRecursiveReferences, domainPlugin) flatMap {
+        link.resolve(compilerContext, domainPlugin.allowRecursiveReferences) flatMap {
           case ReferenceResolutionResult(_, Some(unit)) =>
             verifyCrossReference(unit.sourceVendor, domainPlugin, nodes)
-            domainPlugin.verifyValidFragment(unit.sourceVendor, link.refs, compilerContext)
             val reference = ParsedReference(unit, link)
             handler.update(reference, compilerContext).map(Some(_))
           case ReferenceResolutionResult(Some(e), _) =>
