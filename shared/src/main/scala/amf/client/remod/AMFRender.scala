@@ -5,8 +5,8 @@ import org.yaml.model.YDocument
 
 private[remod] object AMFRender {
 
-  def render(bu:BaseUnit, env:BaseEnvironment): String = ???
+  def render(bu:BaseUnit, env: AMFConfiguration): String = ???
 
-  def buildAST(bu:BaseUnit, env: BaseEnvironment): YDocument = ???
+  def buildAST(bu:BaseUnit, env: AMFConfiguration): YDocument = ???
 
 }

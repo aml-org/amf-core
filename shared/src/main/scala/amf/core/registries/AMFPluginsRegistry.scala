@@ -1,7 +1,7 @@
 package amf.core.registries
 
 import amf.client.plugins._
-import amf.client.remod.AMFEnvironment
+import amf.client.remod.AMFConfiguration
 import amf.client.remod.amfcore.plugins.parse.AMFParsePluginAdapter
 import amf.client.remod.amfcore.plugins.render.AMFRenderPluginAdapter
 import amf.core.validation.AMFPayloadValidationPlugin
@@ -10,7 +10,7 @@ import scala.collection.mutable
 
 object AMFPluginsRegistry {
   // all static registries will end up here, and with a mayor version release the AmfEnvironment will not be static
-  private var staticEnvironment: AMFEnvironment = AMFEnvironment.default()
+  private var staticCofiguration: AMFConfiguration = AMFConfiguration.predefined()
 
   private val syntaxPluginIDRegistry: mutable.HashMap[String, AMFSyntaxPlugin]               = mutable.HashMap()
   private val syntaxPluginRegistry: mutable.HashMap[String, AMFSyntaxPlugin]                 = mutable.HashMap()
@@ -30,14 +30,14 @@ object AMFPluginsRegistry {
 
   def documentPlugins: Iterable[AMFDocumentPlugin] = documentPluginIDRegistry.values
 
-  def obtainStaticEnv(): AMFEnvironment = staticEnvironment
+  def obtainStaticConfig(): AMFConfiguration = staticCofiguration
 
   private def registerPluginInEnv(plugin: AMFDocumentPlugin): Unit =
-    staticEnvironment =
-      staticEnvironment.withPlugins(List(AMFParsePluginAdapter(plugin), AMFRenderPluginAdapter(plugin)))
+    staticCofiguration =
+      staticCofiguration.withPlugins(List(AMFParsePluginAdapter(plugin), AMFRenderPluginAdapter(plugin)))
 
   private def unregisterPluginFromEnv(plugin: AMFDocumentPlugin): Unit =
-    staticEnvironment = staticEnvironment.removePlugin(plugin.ID)
+    staticCofiguration = staticCofiguration.removePlugin(plugin.ID)
 
   def registerSyntaxPlugin(syntaxPlugin: AMFSyntaxPlugin): Unit = {
     syntaxPluginIDRegistry.get(syntaxPlugin.ID) match {

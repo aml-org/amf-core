@@ -1,7 +1,7 @@
 package amf.core.unsafe
 
-import amf.client.remod.BaseEnvironment
 import amf.client.execution.BaseExecutionEnvironment
+import amf.client.remod.AMFConfiguration
 import amf.client.remote.Content
 import amf.core.execution.ExecutionEnvironment
 import amf.core.model.document.BaseUnit
@@ -9,7 +9,6 @@ import amf.core.rdf.RdfModel
 import amf.core.remote.{Platform, UnsupportedFileSystem}
 import amf.core.services.ValidationOptions
 import amf.core.validation.core.{SHACLValidator, ValidationReport, ValidationSpecification}
-import amf.internal.environment.Environment
 import amf.internal.resource.ResourceLoader
 import org.mulesoft.common.io.FileSystem
 
@@ -79,7 +78,7 @@ case class TrunkPlatform(content: String,
 
   override def tmpdir(): String = throw new Exception("Unsupported tmpdir operation")
 
-  override def fetchContent(url: String, loaders: Seq[ResourceLoader])(
+  override def fetchContent(url: String, env: AMFConfiguration)(
       implicit executionContext: ExecutionContext): Future[Content] =
     Future.successful(new Content(content, url, forcedMediaType))
 

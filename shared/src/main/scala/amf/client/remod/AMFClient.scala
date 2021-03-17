@@ -11,14 +11,14 @@ import amf.core.resolution.pipelines.ResolutionPipeline
 import amf.core.services.RuntimeCompiler
 import amf.core.validation.AMFValidationReport
 
-import scala.concurrent.Future
-
+import scala.concurrent.{ExecutionContext, Future}
 
 // client
-private[remod] class AMFClient(env: BaseEnvironment) {
+private[amf] class AMFClient(val configuration: AMFConfiguration) {
 
+  implicit val exec: ExecutionContext = configuration.getExecutionContext
 
-  def getEnvironment:BaseEnvironment = env
+  def getEnvironment: AMFConfiguration = configuration
   // how do we return the ErrorHandler that is created by the provider?
   // relation between EH vs BU? should the BU have an EH inside?
   // should parse always return error handler + base unit? (Amf result)
@@ -26,14 +26,15 @@ private[remod] class AMFClient(env: BaseEnvironment) {
   // sync or async?
 
   // content type format, pendiente
-  def parse(url: String, vendor: Option[Vendor] = None): Future[AmfResult] = AMFParser.parse(url, env)
-    // build parsing context?
+  def parse(url: String, vendor: Option[Vendor] = None): Future[AmfResult] = AMFParser.parse(url, configuration)
+  // build parsing context?
 
-  def resolve(bu: BaseUnit): AmfResult = AMFResolver.resolve(bu, env) // clone? BaseUnit.resolved
+  def resolve(bu: BaseUnit): AmfResult = AMFResolver.resolve(bu, configuration) // clone? BaseUnit.resolved
 
-  def render(bu:BaseUnit, target:Vendor):String = AMFRender.render(bu, env)
+  def render(bu: BaseUnit, target: Vendor): String = AMFRender.render(bu, configuration)
   // bu.clone?
-  def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport = ??? // how we can handle the parsing validations? error handler at base unit?
+  def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport =
+    ??? // how we can handle the parsing validations? error handler at base unit?
 
   // render
 

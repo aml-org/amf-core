@@ -16,8 +16,7 @@ import amf.internal.resource.{ResourceLoader, StringResourceLoader}
 import scala.concurrent.Future
 import scala.scalajs.js.annotation.JSExport
 
-private[remod] object AMFParser {
-
+private[amf] object AMFParser {
 
   /**
     * Asynchronously generate a BaseUnit from the unit located in the given url.
@@ -25,16 +24,15 @@ private[remod] object AMFParser {
     * @param env: AnfEnvironment
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
-  def parse(url: String, env:BaseEnvironment): Future[AmfResult] = parseAsync(url, None, env)
+  def parse(url: String, env: AMFConfiguration): Future[AmfResult] = parseAsync(url, None, env)
 
   /**
     * Asynchronously generate a BaseUnit from the unit located in the given url.
     * @param url : Location of the api.
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
-
   // check Vendor , only param? ParseParams?
-  def parse(url: String, vendor:Vendor, env:BaseEnvironment): Future[AmfResult] = parseAsync(url, Some(vendor), env)
+  def parse(url: String, vendor: Vendor, env: AMFConfiguration): Future[AmfResult] = parseAsync(url, Some(vendor), env)
 
   /**
     * Asynchronously generate a BaseUnit from a given string.
@@ -42,7 +40,7 @@ private[remod] object AMFParser {
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
   @JSExport
-  def parseStream(stream: String, env:AMFEnvironment): Future[AmfResult] = ???
+  def parseStream(stream: String, env: AMFConfiguration): Future[AmfResult] = ???
 //    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)), env)
 
   /**
@@ -51,7 +49,7 @@ private[remod] object AMFParser {
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
   @JSExport
-  def parseStream(stream: String,vendor:Vendor, env:AMFEnvironment): Future[AmfResult] = {
+  def parseStream(stream: String, vendor: Vendor, env: AMFConfiguration): Future[AmfResult] = {
     ???
 //    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)))
   }
@@ -72,8 +70,8 @@ private[remod] object AMFParser {
 //  }
 
   private[amf] def parseAsync(url: String,
-                              vendor:Option[Vendor],
-                              amfEnvironment: BaseEnvironment): Future[AmfResult] = {
+                              vendor: Option[Vendor],
+                              amfEnvironment: AMFConfiguration): Future[AmfResult] = {
 //    amfEnvironment.beforeParse().flatMap { _ =>
 //      val environment = {
 //        val e = internalEnv()

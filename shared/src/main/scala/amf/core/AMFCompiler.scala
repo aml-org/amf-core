@@ -1,7 +1,7 @@
 package amf.core
 
 import amf.client.parse.DefaultParserErrorHandler
-import amf.client.remod.BaseEnvironment
+import amf.client.remod.AMFConfiguration
 import amf.client.remod.amfcore.config.ParsingOptionsConverter
 import amf.client.remod.amfcore.plugins.parse.{AMFParsePlugin, ParsingInfo}
 import amf.client.remote.Content
@@ -26,7 +26,7 @@ import amf.core.utils.AmfStrings
 import amf.core.validation.core.ValidationSpecification
 import amf.internal.environment.Environment
 import amf.plugins.features.validation.CoreValidations._
-import org.yaml.model.{YNode, YPart}
+import org.yaml.model.YPart
 
 import java.net.URISyntaxException
 import scala.concurrent.Future.failed
@@ -47,7 +47,7 @@ class CompilerContext(url: String,
                       val parserContext: ParserContext,
                       val fileContext: Context,
                       cache: Cache,
-                      val environment: BaseEnvironment)(implicit executionContext: ExecutionContext) {
+                      val configuration: AMFConfiguration)(implicit executionContext: ExecutionContext) {
 
   /**
     * The resolved path that result to be the normalized url
@@ -65,7 +65,7 @@ class CompilerContext(url: String,
   def resolvePath(url: String): String = fileContext.resolve(fileContext.platform.normalizePath(url))
 
   def fetchContent()(implicit executionContext: ExecutionContext): Future[Content] =
-    platform.fetchContent(location, environment.resolvers.resourceLoaders)
+    platform.fetchContent(location, configuration)
 
   def forReference(url: String, withNormalizedUri: Boolean = true)(
       implicit executionContext: ExecutionContext): CompilerContext = {
@@ -74,7 +74,7 @@ class CompilerContext(url: String,
       .withBaseParserContext(parserContext)
       .withFileContext(fileContext)
       .withNormalizedUri(withNormalizedUri)
-      .withBaseEnvironment(environment)
+      .withBaseEnvironment(configuration)
       .build()
   }
 
@@ -95,7 +95,7 @@ class CompilerContextBuilder(url: String,
   private var givenContent: Option[ParserContext] = None
   private var cache                               = Cache()
   private var normalizeUri: Boolean               = true
-  private var env: BaseEnvironment                = AMFPluginsRegistry.obtainStaticEnv()
+  private var env: AMFConfiguration               = AMFPluginsRegistry.obtainStaticConfig()
 
   def withBaseParserContext(parserContext: ParserContext): this.type = {
     givenContent = Some(parserContext)
@@ -113,12 +113,12 @@ class CompilerContextBuilder(url: String,
   }
 
   def withEnvironment(environment: Environment): CompilerContextBuilder = {
-    val newEnv = BaseEnvironment.fromLegacy(this.env, environment)
+    val newEnv = AMFConfiguration.fromLegacy(this.env, environment)
     this.env = newEnv
     this
   }
 
-  def withBaseEnvironment(environment: BaseEnvironment): CompilerContextBuilder = {
+  def withBaseEnvironment(environment: AMFConfiguration): CompilerContextBuilder = {
     this.env = environment
     this
   }
@@ -164,9 +164,9 @@ class AMFCompiler(compilerContext: CompilerContext,
                   val vendor: Option[String],
                   val referenceKind: ReferenceKind = UnspecifiedReference) {
 
-  private val sortedParsePlugins = compilerContext.environment.registry.plugins.parsePlugins.sorted
-  private val domainFallback     = compilerContext.environment.registry.plugins.domainParsingFallback
-  private val parsingOptions     = ParsingOptionsConverter.toLegacy(compilerContext.environment.options.parsingOptions)
+  private val sortedParsePlugins = compilerContext.configuration.registry.plugins.parsePlugins.sorted
+  private val domainFallback     = compilerContext.configuration.registry.plugins.domainParsingFallback
+  private val parsingOptions     = ParsingOptionsConverter.toLegacy(compilerContext.configuration.options.parsingOptions)
 
   def build()(implicit executionContext: ExecutionContext): Future[BaseUnit] = {
     compilerContext.logForFile(s"AMFCompiler#build: Building")

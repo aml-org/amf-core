@@ -1,11 +1,13 @@
 package amf.client.remod.amfcore.config
 import amf.core.client.{ParsingOptions => LegacyParsingOptions}
+
 /**
   * Immutable implementation of parsing options
   */
-private[remod] case class ParsingOptions(amfJsonLdSerialization: Boolean = true,
-                                         baseUnitUrl: Option[String] = None,
-                                         maxYamlReferences: Option[Long] = None){
+private[amf] case class ParsingOptions(amfJsonLdSerialization: Boolean = true,
+                                       baseUnitUrl: Option[String] = None,
+                                       maxYamlReferences: Option[Long] = None) {
+
   /**
     * Parse specific AMF JSON-LD serialization
     * @return
@@ -27,17 +29,16 @@ private[remod] case class ParsingOptions(amfJsonLdSerialization: Boolean = true,
     */
   def setMaxYamlReferences(value: Long): ParsingOptions = copy(maxYamlReferences = Some(value))
 
-  def isAmfJsonLdSerilization: Boolean = amfJsonLdSerialization
-  def definedBaseUrl: Option[String]   = baseUnitUrl
-  def getMaxYamlReferences: Option[Long]  = maxYamlReferences
-
+  def isAmfJsonLdSerilization: Boolean   = amfJsonLdSerialization
+  def definedBaseUrl: Option[String]     = baseUnitUrl
+  def getMaxYamlReferences: Option[Long] = maxYamlReferences
 
 }
 
 private[amf] object ParsingOptionsConverter {
   def toLegacy(options: ParsingOptions): LegacyParsingOptions = {
     val mutableOptions = new LegacyParsingOptions()
-    if(!options.amfJsonLdSerialization) mutableOptions.withoutAmfJsonLdSerialization
+    if (!options.amfJsonLdSerialization) mutableOptions.withoutAmfJsonLdSerialization
     options.baseUnitUrl.foreach(mutableOptions.withBaseUnitUrl)
     options.maxYamlReferences.foreach(mutableOptions.setMaxYamlReferences)
     mutableOptions

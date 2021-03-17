@@ -3,8 +3,8 @@ package amf.core
 import java.io.StringWriter
 import amf.client.remod.amfcore.plugins.render.{
   AMFRenderPlugin,
-  DefaultRenderEnvironment,
-  RenderEnvironment,
+  DefaultRenderConfiguration,
+  RenderConfiguration,
   RenderInfo
 }
 import amf.core.benchmark.ExecutionLog
@@ -34,7 +34,7 @@ import org.yaml.model.YDocument
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, env: RenderEnvironment) {
+class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, env: RenderConfiguration) {
 
   private def this(unit: BaseUnit,
                    mediaType: String,
@@ -71,8 +71,10 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, env: Rend
       case Vendor.AMF.name =>
         val namespaceAliases = generateNamespaceAliasesFromPlugins
         legacyOptions.toGraphSerialization match {
-          case JsonLdSerialization(FlattenedForm) => FlattenedJsonLdEmitter.emit(unit, builder, options, namespaceAliases)
-          case JsonLdSerialization(EmbeddedForm)  => EmbeddedJsonLdEmitter.emit(unit, builder, options, namespaceAliases)
+          case JsonLdSerialization(FlattenedForm) =>
+            FlattenedJsonLdEmitter.emit(unit, builder, options, namespaceAliases)
+          case JsonLdSerialization(EmbeddedForm) =>
+            EmbeddedJsonLdEmitter.emit(unit, builder, options, namespaceAliases)
         }
     }
   }
@@ -114,7 +116,7 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, env: Rend
   }
 
   private def emitJsonLd[W: Output](writer: W, form: JsonLdDocumentForm): Unit = {
-    val b = JsonOutputBuilder[W](writer, options.isPrettyPrint)
+    val b                = JsonOutputBuilder[W](writer, options.isPrettyPrint)
     val namespaceAliases = generateNamespaceAliasesFromPlugins
     form match {
       case FlattenedForm => FlattenedJsonLdEmitter.emit(unit, b, options, namespaceAliases)
@@ -141,46 +143,51 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, env: Rend
     val renderPlugin = env.renderPlugins.sorted.find(_.applies(RenderInfo(unit, vendor, mediaType)))
     renderPlugin.getOrElse {
       throw new Exception(
-        s"Cannot serialize domain model '${unit.location()}' for detected media type $mediaType and vendor $vendor")
+          s"Cannot serialize domain model '${unit.location()}' for detected media type $mediaType and vendor $vendor")
     }
   }
 }
 
 object AMFSerializer {
 
-  private def generateRenderEnv(options: Option[RenderOptions], shapeOptions: ShapeRenderOptions): RenderEnvironment = {
+  private def generateRenderEnv(options: Option[RenderOptions],
+                                shapeOptions: ShapeRenderOptions): RenderConfiguration = {
     val renderOptions    = options.getOrElse(RenderOptions())
     val immutableOptions = RenderOptions.toImmutable(renderOptions, ShapeRenderOptions.toImmutable(shapeOptions))
     val errorHandler     = options.map(_.errorHandler).getOrElse(shapeOptions.errorHandler)
     val env = AMFPluginsRegistry
-      .obtainStaticEnv()
+      .obtainStaticConfig()
       .withRenderOptions(immutableOptions)
       .withErrorHandlerProvider(() => errorHandler)
-    DefaultRenderEnvironment(env)
+    DefaultRenderConfiguration(env)
   }
 
   def init()(implicit executionContext: ExecutionContext): Unit = {
-    RuntimeSerializer.register(new RuntimeSerializer {
-      override def dump(unit: BaseUnit,
-                        mediaType: String,
-                        vendor: String,
-                        options: RenderOptions,
-                        shapeOptions: ShapeRenderOptions): String =
-        new AMFSerializer(unit, mediaType, vendor, options, shapeOptions).render()
+    RuntimeSerializer.register(
+        new RuntimeSerializer {
+          override def dump(unit: BaseUnit,
+                            mediaType: String,
+                            vendor: String,
+                            options: RenderOptions,
+                            shapeOptions: ShapeRenderOptions): String =
+            new AMFSerializer(unit, mediaType, vendor, options, shapeOptions).render()
 
-      override def dump(unit: BaseUnit, mediaType: String, vendor: String, shapeOptions: ShapeRenderOptions): String = {
-        new AMFSerializer(unit, mediaType, vendor, shapeOptions).render()
-      }
+          override def dump(unit: BaseUnit,
+                            mediaType: String,
+                            vendor: String,
+                            shapeOptions: ShapeRenderOptions): String = {
+            new AMFSerializer(unit, mediaType, vendor, shapeOptions).render()
+          }
 
-      override def dumpToFile(platform: Platform,
-                              file: String,
-                              unit: BaseUnit,
-                              mediaType: String,
-                              vendor: String,
-                              options: RenderOptions,
-                              shapeOptions: ShapeRenderOptions): Future[Unit] = {
-        new AMFSerializer(unit, mediaType, vendor, options, shapeOptions).renderToFile(platform, file)
-      }
-    })
+          override def dumpToFile(platform: Platform,
+                                  file: String,
+                                  unit: BaseUnit,
+                                  mediaType: String,
+                                  vendor: String,
+                                  options: RenderOptions,
+                                  shapeOptions: ShapeRenderOptions): Future[Unit] = {
+            new AMFSerializer(unit, mediaType, vendor, options, shapeOptions).renderToFile(platform, file)
+          }
+        })
   }
 }
