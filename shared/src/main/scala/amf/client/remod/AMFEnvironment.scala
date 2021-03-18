@@ -37,6 +37,9 @@ abstract private[amf] class BaseEnvironment(val resolvers: AMFResolvers,
 
 //  private [amf] def beforeParse() = init()
 
+  def withoutPlugin(plugin: AMFPlugin[_]): Self = doCopy(registry.withoutPlugin(plugin))
+
+  // Can uses Lenses for this! Lenses are used to simplify copying nested data structures
   protected def doCopy(registry: AMFRegistry): Self
 
   protected def doCopy(resolvers: AMFResolvers): Self

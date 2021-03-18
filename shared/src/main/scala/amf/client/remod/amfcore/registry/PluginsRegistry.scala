@@ -22,6 +22,12 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
     }
   }
 
+  def withoutPlugin(plugin: AMFPlugin[_]): PluginsRegistry = {
+    val pps = parsePlugins.filter(_ != plugin)
+    val vps = validatePlugins.filter(_ != plugin)
+    copy(parsePlugins = pps, validatePlugins = vps)
+  }
+
   def withPlugins(plugins: List[AMFPlugin[_]]): PluginsRegistry = {
     plugins.foldLeft(this) { case (registry, plugin) => registry.withPlugin(plugin) }
   }
@@ -44,8 +50,6 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
   //  }
   //
   //  def getParsePluginFor(document:ParsedDocument): AmfParsePlugin = pickPlugin(document, (p:AmfParsePlugin, d:YDocument) => p.applies(d))
-
-
   //  def getResolvePluginFor(bu: BaseUnit, vendor: Vendor): Option[AmfResolvePlugin]
 
   def getValidationsPlugin(bu: BaseUnit): Seq[AMFValidatePlugin] = ???
@@ -53,6 +57,6 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
   def getValidationPlugin(bu: BaseUnit, profile: ProfileName): Option[AMFValidatePlugin] = ???
 }
 
-object PluginsRegistry{
-  val empty: PluginsRegistry = PluginsRegistry(Nil,Nil, ExternalFragmentDomainFallback)
+object PluginsRegistry {
+  val empty: PluginsRegistry = PluginsRegistry(Nil, Nil, ExternalFragmentDomainFallback)
 }

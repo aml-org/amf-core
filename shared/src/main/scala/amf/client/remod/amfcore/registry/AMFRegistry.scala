@@ -12,7 +12,7 @@ case class AMFRegistry(plugins: PluginsRegistry,
 
   def withPlugin(amfPlugin: AMFPlugin[_]): AMFRegistry = copy(plugins = plugins.withPlugin(amfPlugin))
   def withPlugins(amfPlugins: List[AMFPlugin[_]]): AMFRegistry = copy(plugins = plugins.withPlugins(amfPlugins))
-
+  def withoutPlugin(amfPlugin: AMFPlugin[_]): AMFRegistry = copy(plugins = plugins.withoutPlugin(amfPlugin))
   def withConstraints(profile:ValidationProfile): AMFRegistry = copy(constraintsRules = constraintsRules + (profile.name -> profile))
 }
 
