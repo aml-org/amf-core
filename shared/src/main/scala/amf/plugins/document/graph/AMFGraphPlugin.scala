@@ -34,6 +34,8 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
   override val ID: String                   = Amf.name
   override def dependencies(): Seq[Nothing] = Seq()
 
+  override val validVendorsToReference: Seq[String] = Nil
+
   val vendors: Seq[String] = Seq(Amf.name)
 
   override def modelEntities: Seq[Obj] = Seq(

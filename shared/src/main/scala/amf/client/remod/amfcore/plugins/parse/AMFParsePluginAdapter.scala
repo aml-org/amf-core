@@ -12,11 +12,15 @@ private[amf] case class AMFParsePluginAdapter(plugin: AMFDocumentPlugin) extends
   override def parse(document: Root, ctx: ParserContext, options: ParsingOptions): BaseUnit =
     plugin.parse(document, ctx, options)
 
+  override def validVendorsToReference: Seq[String] = plugin.validVendorsToReference
+
   override def referenceHandler(eh: ErrorHandler): ReferenceHandler = plugin.referenceHandler(eh)
 
   override def allowRecursiveReferences: Boolean = plugin.allowRecursiveReferences
 
   override val id: String = plugin.ID
+
+  override def vendors: Seq[String] = plugin.vendors
 
   override def applies(element: ParsingInfo): Boolean = {
     val syntaxCondition = element.vendor match {

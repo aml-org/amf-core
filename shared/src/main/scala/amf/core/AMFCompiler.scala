@@ -47,7 +47,8 @@ class CompilerContext(url: String,
                       val parserContext: ParserContext,
                       val fileContext: Context,
                       cache: Cache,
-                      val configuration: AMFGraphConfiguration)(implicit executionContext: ExecutionContext) {
+                      val configuration: AMFGraphConfiguration,
+                      val allowedVendors: Option[Seq[String]])(implicit executionContext: ExecutionContext) {
 
   /**
     * The resolved path that result to be the normalized url
@@ -67,15 +68,16 @@ class CompilerContext(url: String,
   def fetchContent()(implicit executionContext: ExecutionContext): Future[Content] =
     platform.fetchContent(location, configuration)
 
-  def forReference(url: String, withNormalizedUri: Boolean = true)(
+  def forReference(url: String, withNormalizedUri: Boolean = true, allowedVendors: Option[Seq[String]] = None)(
       implicit executionContext: ExecutionContext): CompilerContext = {
-    new CompilerContextBuilder(url, fileContext.platform, parserContext.eh)
+    val builder = new CompilerContextBuilder(url, fileContext.platform, parserContext.eh)
       .withCache(cache)
       .withBaseParserContext(parserContext)
       .withFileContext(fileContext)
       .withNormalizedUri(withNormalizedUri)
       .withBaseEnvironment(configuration)
-      .build()
+    allowedVendors.foreach(builder.withAllowedVendors)
+    builder.build()
   }
 
   def violation(id: ValidationSpecification, node: String, message: String, ast: YPart): Unit =
@@ -96,6 +98,7 @@ class CompilerContextBuilder(url: String,
   private var cache                               = Cache()
   private var normalizeUri: Boolean               = true
   private var env: AMFGraphConfiguration          = AMFPluginsRegistry.obtainStaticConfig()
+  private var allowedVendors: Option[Seq[String]] = None
 
   def withBaseParserContext(parserContext: ParserContext): this.type = {
     givenContent = Some(parserContext)
@@ -128,6 +131,11 @@ class CompilerContextBuilder(url: String,
     this
   }
 
+  def withAllowedVendors(allowed: Seq[String]): CompilerContextBuilder = {
+    this.allowedVendors = Some(allowed)
+    this
+  }
+
   /**
     * normalized url
     * */
@@ -155,7 +163,7 @@ class CompilerContextBuilder(url: String,
 
   def build()(implicit executionContext: ExecutionContext): CompilerContext = {
     val fc = buildFileContext()
-    new CompilerContext(url, path, buildParserContext(fc), fc, cache, this.env)
+    new CompilerContext(url, path, buildParserContext(fc), fc, cache, this.env, allowedVendors)
   }
 }
 
@@ -309,8 +317,19 @@ class AMFCompiler(compilerContext: CompilerContext,
 
   }
 
-  private def getDomainPluginFor(document: Root): Option[AMFParsePlugin] =
-    sortedParsePlugins.find(_.applies(ParsingInfo(document, vendor)))
+  private def getDomainPluginFor(document: Root): Option[AMFParsePlugin] = {
+    val allowed = filterByAllowed(sortedParsePlugins, compilerContext.allowedVendors)
+    allowed.find(_.applies(ParsingInfo(document, vendor)))
+  }
+
+  /**
+    * filters plugins that are allowed given the current compiler context.
+    */
+  private def filterByAllowed(plugins: Seq[AMFParsePlugin], allowed: Option[Seq[String]]): Seq[AMFParsePlugin] =
+    allowed match {
+      case Some(allowedList) => plugins.filter(_.vendors.exists(allowedList.contains(_)))
+      case None              => plugins
+    }
 
   private def parseReferences(root: Root, domainPlugin: AMFParsePlugin)(
       implicit executionContext: ExecutionContext): Future[Root] = {
@@ -321,7 +340,7 @@ class AMFCompiler(compilerContext: CompilerContext,
       .filter(_.isRemote)
       .map { link =>
         val nodes = link.refs.map(_.node)
-        link.resolve(compilerContext, domainPlugin.allowRecursiveReferences) flatMap {
+        link.resolve(compilerContext, domainPlugin, domainPlugin.allowRecursiveReferences) flatMap {
           case ReferenceResolutionResult(_, Some(unit)) =>
             val reference = ParsedReference(unit, link)
             handler.update(reference, compilerContext).map(Some(_))
