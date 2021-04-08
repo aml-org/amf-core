@@ -14,7 +14,7 @@ import amf.core.validation.AMFValidationReport
 import scala.concurrent.{ExecutionContext, Future}
 
 // client
-private[amf] class AMFClient(val configuration: AMFConfiguration) {
+private[amf] class AMFClient(configuration: AMFConfiguration) {
 
   implicit val exec: ExecutionContext = configuration.getExecutionContext
 
@@ -33,8 +33,7 @@ private[amf] class AMFClient(val configuration: AMFConfiguration) {
 
   def render(bu: BaseUnit, target: Vendor): String = AMFRender.render(bu, configuration)
   // bu.clone?
-  def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport =
-    ??? // how we can handle the parsing validations? error handler at base unit?
+  def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport = ???
 
   // render
 

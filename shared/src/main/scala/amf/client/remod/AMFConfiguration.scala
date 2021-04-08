@@ -11,13 +11,14 @@ import amf.internal.resource.ResourceLoader
 
 import scala.concurrent.ExecutionContext
 // all constructors only visible from amf. Users should always use builders or defaults
-
-class AMFConfiguration(private[amf] val resolvers: AMFResolvers,
-                       private[amf] val errorHandlerProvider: ErrorHandlerProvider,
-                       private[amf] val registry: AMFRegistry,
-                       private[amf] val logger: AMFLogger,
-                       private[amf] val listeners: List[AMFEventListener],
-                       private[amf] val options: AMFOptions) { // break platform into more specific classes?
+//TODO: ARM - delete private[amf]
+private[amf] class AMFConfiguration(
+    private[amf] val resolvers: AMFResolvers,
+    private[amf] val errorHandlerProvider: ErrorHandlerProvider,
+    private[amf] val registry: AMFRegistry,
+    private[amf] val logger: AMFLogger,
+    private[amf] val listeners: List[AMFEventListener],
+    private[amf] val options: AMFOptions) { // break platform into more specific classes?
 
   def createClient(): AMFClient = new AMFClient(this)
 
@@ -42,10 +43,10 @@ class AMFConfiguration(private[amf] val resolvers: AMFResolvers,
 
   def withPlugins(plugins: List[AMFPlugin[_]]): AMFConfiguration = copy(registry = registry.withPlugins(plugins))
 
-  // TODO: delete after branch?
+  // //TODO: ARM - delete
   def removePlugin(id: String): AMFConfiguration = copy(registry = registry.removePlugin(id))
 
-  def withConstraints(profile: ValidationProfile): AMFConfiguration =
+  def withValidationProfile(profile: ValidationProfile): AMFConfiguration =
     copy(registry = registry.withConstraints(profile))
 
   /**
