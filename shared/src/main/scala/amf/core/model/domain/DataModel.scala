@@ -93,12 +93,14 @@ class ObjectNode(override val fields: Fields, val annotations: Annotations) exte
     this
   }
 
-  private def overrideName(objectValue:DataNode, newName:String) = {
-    objectValue.fields.getValueAsOption(DataNodeModel.Name).fold({
-      objectValue.withSynthesizeName(newName)
-    })(value => {
-      objectValue.set(DataNodeModel.Name, AmfScalar(newName, value.value.annotations), value.annotations)
-    })
+  private def overrideName(objectValue: DataNode, newName: String) = {
+    objectValue.fields
+      .getValueAsOption(DataNodeModel.Name)
+      .fold({
+        objectValue.withSynthesizeName(newName)
+      })(value => {
+        objectValue.set(DataNodeModel.Name, AmfScalar(newName, value.value.annotations), value.annotations)
+      })
   }
 
   private def createField(property: String) = {
@@ -217,9 +219,8 @@ class ScalarNode(override val fields: Fields, val annotations: Annotations) exte
   def withValue(v: String, ann: Annotations): this.type =
     set(ScalarNodeModel.Value, AmfScalar(v, ann))
 
-  def withDataType(dataType: String): this.type = {
-    set(ScalarNodeModel.DataType, forDataType(dataType), Annotations.synthesized())
-  }
+  def withDataType(dataType: String): this.type =
+    set(ScalarNodeModel.DataType, forDataType(dataType))
 
   def withDataType(dataType: String, ann: Annotations): this.type =
     set(ScalarNodeModel.DataType, AmfScalar(dataType, ann))
@@ -247,15 +248,6 @@ object ScalarNode {
 
   def apply(value: String, dataType: Option[String]): ScalarNode =
     apply(value, dataType, Annotations())
-
-  def apply(value: amf.core.parser.ScalarNode, dataType: Option[String], annotations: Annotations): ScalarNode = {
-    val scalar = new ScalarNode(Fields(), annotations)
-    dataType.foreach(d => {
-      annotations += ScalarType(d)
-      scalar.withDataType(d)
-    })
-    scalar.set(ScalarNodeModel.Value, value.text(), Annotations.inferred())
-  }
 
   def apply(value: String, dataType: Option[String], ast: YPart): ScalarNode =
     apply(value, dataType, Annotations(ast))

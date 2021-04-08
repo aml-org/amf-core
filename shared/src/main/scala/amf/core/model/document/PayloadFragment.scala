@@ -1,7 +1,7 @@
 package amf.core.model.document
 
 import amf.core.annotations.SourceLocation
-import amf.core.metamodel.document.PayloadFragmentModel
+import amf.core.metamodel.document.{FragmentModel, PayloadFragmentModel}
 import amf.core.model.StrField
 import amf.core.model.domain.{DataNode, ScalarNode}
 import amf.core.parser.{Annotations, Fields}
@@ -22,7 +22,7 @@ case class PayloadFragment(fields: Fields = Fields(), annotations: Annotations =
 
 object PayloadFragment {
   private def apply(payload: DataNode): PayloadFragment = {
-    val fragment = apply().withEncodes(payload)
+    val fragment = apply().set(FragmentModel.Encodes, payload, Annotations.inferred())
     payload.annotations.find(classOf[SourceLocation]).foreach(l => fragment.withLocation(l.location))
     fragment
   }
