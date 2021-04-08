@@ -55,7 +55,8 @@ trait AmfObject extends AmfElement {
   /** Set scalar value. */
   def set(field: Field, value: Boolean): this.type = set(field, AmfScalar(value))
 
-  def set(field: Field, value: Boolean, annotations: Annotations): this.type = set(field, AmfScalar(value), annotations)
+  def set(field: Field, value: Boolean, annotations: Annotations): this.type =
+    set(field, AmfScalar(value), annotations)
 
   /** Set scalar value. */
   def set(field: Field, value: Int): this.type = set(field, AmfScalar(value))
@@ -88,7 +89,7 @@ trait AmfObject extends AmfElement {
 
   /** Set field value. */
   def setArray(field: Field, values: Seq[AmfElement], annotations: Annotations): this.type = {
-    fields.set(id, field, AmfArray(values, annotations), annotations)
+    fields.set(id, field, AmfArray(values, annotations), Annotations.inferred())
     this
   }
 
@@ -100,7 +101,7 @@ trait AmfObject extends AmfElement {
 
   /** Set field value. */
   def setArrayWithoutId(field: Field, values: Seq[AmfElement], annotations: Annotations): this.type = {
-    fields.setWithoutId(field, AmfArray(values, annotations), annotations)
+    fields.setWithoutId(field, AmfArray(values, annotations), Annotations.inferred())
     this
   }
 
