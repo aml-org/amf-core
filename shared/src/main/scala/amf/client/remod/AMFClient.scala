@@ -31,7 +31,7 @@ private[amf] class AMFClient(configuration: AMFConfiguration) {
 
   def resolve(bu: BaseUnit): AMFResult = AMFResolver.resolve(bu, configuration) // clone? BaseUnit.resolved
 
-  def render(bu: BaseUnit, target: Vendor): String = AMFRender.render(bu, configuration)
+  def render(bu: BaseUnit, target: Vendor): String = AMFRenderer.render(bu, configuration)
   // bu.clone?
   def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport = ???
 

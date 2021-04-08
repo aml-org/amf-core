@@ -17,7 +17,7 @@ private[amf] class AMFConfiguration(
     private[amf] val errorHandlerProvider: ErrorHandlerProvider,
     private[amf] val registry: AMFRegistry,
     private[amf] val logger: AMFLogger,
-    private[amf] val listeners: List[AMFEventListener],
+    private[amf] val listeners: Set[AMFEventListener],
     private[amf] val options: AMFOptions) { // break platform into more specific classes?
 
   def createClient(): AMFClient = new AMFClient(this)
@@ -74,7 +74,7 @@ private[amf] class AMFConfiguration(
   private[amf] def getExecutionContext: ExecutionContext    = resolvers.executionContext.executionContext
 }
 
-object AMFConfiguration {
+private[amf] object AMFConfiguration {
 
   /**
     * Predefined AMF core environment with
@@ -90,7 +90,7 @@ object AMFConfiguration {
         DefaultErrorHandlerProvider,
         AMFRegistry.empty,
         MutedLogger,
-        Nil,
+        Set.empty,
         AMFOptions.default()
     )
   }
