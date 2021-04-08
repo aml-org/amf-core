@@ -26,10 +26,10 @@ private[amf] class AMFClient(val configuration: AMFConfiguration) {
   // sync or async?
 
   // content type format, pendiente
-  def parse(url: String, vendor: Option[Vendor] = None): Future[AmfResult] = AMFParser.parse(url, configuration)
+  def parse(url: String, vendor: Option[Vendor] = None): Future[AMFResult] = AMFParser.parse(url, configuration)
   // build parsing context?
 
-  def resolve(bu: BaseUnit): AmfResult = AMFResolver.resolve(bu, configuration) // clone? BaseUnit.resolved
+  def resolve(bu: BaseUnit): AMFResult = AMFResolver.resolve(bu, configuration) // clone? BaseUnit.resolved
 
   def render(bu: BaseUnit, target: Vendor): String = AMFRender.render(bu, configuration)
   // bu.clone?

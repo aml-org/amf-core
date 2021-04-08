@@ -24,7 +24,7 @@ private[amf] object AMFParser {
     * @param env: AnfEnvironment
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
-  def parse(url: String, env: AMFConfiguration): Future[AmfResult] = parseAsync(url, None, env)
+  def parse(url: String, env: AMFConfiguration): Future[AMFResult] = parseAsync(url, None, env)
 
   /**
     * Asynchronously generate a BaseUnit from the unit located in the given url.
@@ -32,7 +32,7 @@ private[amf] object AMFParser {
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
   // check Vendor , only param? ParseParams?
-  def parse(url: String, vendor: Vendor, env: AMFConfiguration): Future[AmfResult] = parseAsync(url, Some(vendor), env)
+  def parse(url: String, vendor: Vendor, env: AMFConfiguration): Future[AMFResult] = parseAsync(url, Some(vendor), env)
 
   /**
     * Asynchronously generate a BaseUnit from a given string.
@@ -40,7 +40,7 @@ private[amf] object AMFParser {
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
   @JSExport
-  def parseStream(stream: String, env: AMFConfiguration): Future[AmfResult] = ???
+  def parseStream(stream: String, env: AMFConfiguration): Future[AMFResult] = ???
 //    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)), env)
 
   /**
@@ -49,7 +49,7 @@ private[amf] object AMFParser {
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
   @JSExport
-  def parseStream(stream: String, vendor: Vendor, env: AMFConfiguration): Future[AmfResult] = {
+  def parseStream(stream: String, vendor: Vendor, env: AMFConfiguration): Future[AMFResult] = {
     ???
 //    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)))
   }
@@ -71,7 +71,7 @@ private[amf] object AMFParser {
 
   private[amf] def parseAsync(url: String,
                               vendor: Option[Vendor],
-                              amfEnvironment: AMFConfiguration): Future[AmfResult] = {
+                              amfEnvironment: AMFConfiguration): Future[AMFResult] = {
 //    amfEnvironment.beforeParse().flatMap { _ =>
 //      val environment = {
 //        val e = internalEnv()

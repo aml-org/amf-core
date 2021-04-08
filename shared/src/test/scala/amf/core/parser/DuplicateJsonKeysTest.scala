@@ -12,20 +12,20 @@ import org.scalatest.{AsyncFunSuite, Matchers}
 
 import scala.concurrent.ExecutionContext
 
-trait DuplicateJsonKeysTest extends AsyncFunSuite with PlatformSecrets with NativeOps with Matchers{
+trait DuplicateJsonKeysTest extends AsyncFunSuite with PlatformSecrets with NativeOps with Matchers {
 
   override implicit def executionContext: ExecutionContext = ExecutionContext.Implicits.global
 
   test("Parsed JSON with duplicate keys has several warnings") {
     Core.init().asFuture.flatMap { _ =>
       val errorHandler = DefaultParserErrorHandler.withRun()
-      val url = "file://shared/src/test/resources/parser/duplicate-key.json"
-      val env = AMFConfiguration.predefined()
-      RuntimeCompiler(url, None, None, base = Context(platform), cache = Cache(), env, errorHandler = errorHandler).map {
+      val url          = "file://shared/src/test/resources/parser/duplicate-key.json"
+      RuntimeCompiler(url, None, None, base = Context(platform), cache = Cache(), errorHandler = errorHandler).map {
         _ =>
           val errors = errorHandler.getErrors
           errors.size should be(4)
-          val allAreDuplicateKeyWarnings = errors.forall(r => r.completeMessage.contains("Duplicate key") && r.level.contains("Warning"))
+          val allAreDuplicateKeyWarnings =
+            errors.forall(r => r.completeMessage.contains("Duplicate key") && r.level.contains("Warning"))
           allAreDuplicateKeyWarnings shouldBe true
       }
     }

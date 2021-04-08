@@ -5,8 +5,8 @@ import amf.core.model.document.BaseUnit
 
 private[remod] object AMFResolver {
 
-  def resolve(bu:BaseUnit, env: AMFConfiguration):AmfResult = ???
+  def resolve(bu: BaseUnit, env: AMFConfiguration): AMFResult = ???
 
-  def resolve(bu:BaseUnit, pipeline: AMFResolutionPipeline, env: AMFConfiguration):AmfResult = ???
+  def resolve(bu: BaseUnit, pipeline: AMFResolutionPipeline, env: AMFConfiguration): AMFResult = ???
 
 }
