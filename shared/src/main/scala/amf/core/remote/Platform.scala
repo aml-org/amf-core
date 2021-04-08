@@ -63,8 +63,8 @@ trait Platform extends FileMediaType {
   val wrappersRegistry: mutable.HashMap[String, (AmfObject) => AmfObjectWrapper]             = mutable.HashMap.empty
   val wrappersRegistryFn: mutable.HashMap[(Obj) => Boolean, (AmfObject) => AmfObjectWrapper] = mutable.HashMap.empty
 
-  val validations: mutable.Set[ValidationSpecification]     = mutable.Set.empty
-  val levels: mutable.Map[String, Map[ProfileName, String]] = mutable.Map.empty
+  val validations: mutable.Set[ValidationSpecification]                     = mutable.Set.empty
+  val securityLevelOverrides: mutable.Map[String, Map[ProfileName, String]] = mutable.Map.empty
 
   def registerWrapper(model: Obj)(builder: (AmfObject) => AmfObjectWrapper): Option[AmfObject => AmfObjectWrapper] =
     wrappersRegistry.put(model.`type`.head.iri(), builder)
@@ -75,7 +75,7 @@ trait Platform extends FileMediaType {
 
   def registerValidations(v: Seq[ValidationSpecification], l: Map[String, Map[ProfileName, String]]): Unit = {
     validations ++= v
-    levels ++= l
+    securityLevelOverrides ++= l
   }
 
   def wrap[T <: AmfObjectWrapper](entity: AmfObject): T = entity match {
@@ -141,8 +141,7 @@ trait Platform extends FileMediaType {
   def ensureFileAuthority(str: String): String =
     if (str.startsWith("file:")) {
       str
-    }
-    else {
+    } else {
       s"file://$str"
     }
 
@@ -176,7 +175,8 @@ trait Platform extends FileMediaType {
   def normalizePath(url: String): String
 
   /** Register an alias for a namespace */
-  def registerNamespace(alias: String, prefix: String): Option[Namespace] = Namespace.staticAliases.registerNamespace(alias, prefix)
+  def registerNamespace(alias: String, prefix: String): Option[Namespace] =
+    Namespace.staticAliases.registerNamespace(alias, prefix)
 
   // Optional RdfFramework
   var rdfFramework: Option[RdfFramework] = None
@@ -205,11 +205,9 @@ trait Platform extends FileMediaType {
   protected def fixFilePrefix(res: String): String = {
     if (res.startsWith("file://") || res.startsWith("file:///")) {
       res
-    }
-    else if (res.startsWith("file:/")) {
+    } else if (res.startsWith("file:/")) {
       res.replace("file:/", "file:///")
-    }
-    else {
+    } else {
       res
     }
   }
