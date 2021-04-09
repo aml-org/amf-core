@@ -29,20 +29,30 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
   def linkCopy(): Linkable
 
   def withLinkTarget(target: DomainElement): this.type = {
-    fields.setWithoutId(LinkableElementModel.Target, target,Annotations(Inferred()))
+    fields.setWithoutId(LinkableElementModel.Target, target, Annotations(Inferred()))
     set(LinkableElementModel.TargetId, AmfScalar(target.id), Annotations.synthesized())
   }
 
-  def withLinkLabel(label: String, annotations: Annotations = Annotations()): this.type              = set(LinkableElementModel.Label, AmfScalar(label, annotations), Annotations.inferred())
-  def withSupportsRecursion(recursive: Boolean): this.type = set(LinkableElementModel.SupportsRecursion, AmfScalar(recursive), Annotations.synthesized())
+  def withLinkLabel(label: String, annotations: Annotations = Annotations()): this.type =
+    set(LinkableElementModel.Label, AmfScalar(label, annotations), Annotations.inferred())
+  def withSupportsRecursion(recursive: Boolean): this.type =
+    set(LinkableElementModel.SupportsRecursion, AmfScalar(recursive), Annotations.synthesized())
 
   def link[T](label: String, annotations: Annotations = Annotations()): T = {
+    link(AmfScalar(label), annotations, Annotations())
+  }
+
+  private[amf] def link[T](label: amf.core.parser.ScalarNode, annotations: Annotations): T = {
+    link(label.text(), annotations, Annotations.inferred())
+  }
+
+  private def link[T](label: AmfScalar, annotations: Annotations, fieldAnn: Annotations): T = {
     val copied = linkCopy()
-    val hash   = buildLinkHash(label, annotations)
+    val hash   = buildLinkHash(label.value.toString, annotations)
     copied
       .withId(s"${copied.id}/link-$hash")
       .withLinkTarget(this)
-      .set(LinkableElementModel.Label, AmfScalar(label, annotations), Annotations.inferred())
+      .set(LinkableElementModel.Label, label, fieldAnn)
       .add(annotations)
       .asInstanceOf[T]
   }
@@ -101,17 +111,17 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
     refCtx match {
       case Some(ctx) =>
         ctx.futureDeclarations.futureRef(
-          id,
-          refName,
-          DeclarationPromise(
-            resolve,
-            () =>
-              if (unresolvedSeverity == "warning") {
-                ctx.eh.warning(UnresolvedReference, id, s"Unresolved reference '$refName'", refAst.get)
-              } else {
-                ctx.eh.violation(UnresolvedReference, id, s"Unresolved reference '$refName'", refAst.get)
-            }
-          )
+            id,
+            refName,
+            DeclarationPromise(
+                resolve,
+                () =>
+                  if (unresolvedSeverity == "warning") {
+                    ctx.eh.warning(UnresolvedReference, id, s"Unresolved reference '$refName'", refAst.get)
+                  } else {
+                    ctx.eh.violation(UnresolvedReference, id, s"Unresolved reference '$refName'", refAst.get)
+                }
+            )
         )
       case _ => throw new Exception("Cannot create unresolved reference with missing parsing context")
     }
