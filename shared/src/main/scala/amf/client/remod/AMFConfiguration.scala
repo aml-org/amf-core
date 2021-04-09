@@ -61,7 +61,7 @@ private[amf] class AMFConfiguration(
                      errorHandlerProvider: ErrorHandlerProvider = errorHandlerProvider,
                      registry: AMFRegistry = registry,
                      logger: AMFLogger = logger,
-                     listeners: List[AMFEventListener] = Nil,
+                     listeners: Set[AMFEventListener] = Set.empty,
                      options: AMFOptions = options): AMFConfiguration = {
     new AMFConfiguration(resolvers, errorHandlerProvider, registry, logger, listeners, options)
 

@@ -14,7 +14,7 @@ import amf.core.validation.AMFValidationReport
 import scala.concurrent.{ExecutionContext, Future}
 
 // client
-private[amf] class AMFClient(configuration: AMFConfiguration) {
+private[amf] class AMFClient(protected val configuration: AMFConfiguration) {
 
   implicit val exec: ExecutionContext = configuration.getExecutionContext
 
