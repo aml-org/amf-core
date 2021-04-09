@@ -4,10 +4,15 @@ import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.plugins.parse.AMFParsePlugin
 import amf.client.remod.amfcore.registry.AMFRegistry
+import amf.client.remod.amfcore.resolution.{PipelineInfo, PipelineName}
+import amf.core.remote.Amf
+import amf.core.resolution.pipelines.{BasicResolutionPipeline, ResolutionPipeline}
 import amf.core.validation.core.ValidationProfile
 import amf.internal.environment.Environment
 import amf.internal.reference.UnitCache
 import amf.internal.resource.ResourceLoader
+import amf.plugins.document.graph.AMFGraphPlugin.ID
+import amf.plugins.document.graph.{AMFGraphParsePlugin, AMFGraphRenderPlugin}
 
 import scala.concurrent.ExecutionContext
 // all constructors only visible from amf. Users should always use builders or defaults
@@ -49,12 +54,20 @@ private[amf] class AMFGraphConfiguration(
   def withValidationProfile(profile: ValidationProfile): AMFGraphConfiguration =
     copy(registry = registry.withConstraints(profile))
 
+  def withTransformationPipeline(name: String, pipeline: ResolutionPipeline): AMFGraphConfiguration =
+    copy(registry = registry.withTransformationPipeline(name, pipeline))
+
+  def withTransformationPipelines(pipelines: Map[String, ResolutionPipeline]): AMFGraphConfiguration =
+    copy(registry = registry.withTransformationPipelines(pipelines))
+
   /**
     * Merges two environments taking into account specific attributes that can be merged.
-    * This is currently limited to: registry plugins.
+    * This is currently limited to: registry plugins, registry transformation pipelines.
     */
   def merge(other: AMFGraphConfiguration): AMFGraphConfiguration = {
-    this.withPlugins(other.getRegistry.getAllPlugins())
+    this
+      .withPlugins(other.getRegistry.getAllPlugins())
+      .withTransformationPipelines(other.registry.transformationPipelines)
   }
 
   protected def copy(resolvers: AMFResolvers = resolvers,
@@ -84,7 +97,7 @@ private[amf] object AMFGraphConfiguration {
     * MutedLogger: {@link amf.client.remod.amfcore.config.MutedLogger}
     * Without Any listener
     */
-  def predefined(): AMFGraphConfiguration = {
+  def empty(): AMFGraphConfiguration = {
     new AMFGraphConfiguration(
         AMFResolvers.predefined(),
         DefaultErrorHandlerProvider,
@@ -94,6 +107,13 @@ private[amf] object AMFGraphConfiguration {
         AMFOptions.default()
     )
   }
+
+  def predefined(): AMFGraphConfiguration =
+    empty()
+      .withPlugins(List(AMFGraphParsePlugin, AMFGraphRenderPlugin))
+      // we might need to register editing pipeline as well because of legacy behaviour.
+      .withTransformationPipeline(PipelineName.from(Amf.name, ResolutionPipeline.DEFAULT_PIPELINE),
+                                  new BasicResolutionPipeline())
 
   def fromLegacy(base: AMFGraphConfiguration, legacy: Environment): AMFGraphConfiguration = {
     legacy.maxYamlReferences.foreach { maxValue =>

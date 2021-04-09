@@ -12,7 +12,7 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
                                          renderPlugins: List[AMFRenderPlugin],
                                          domainParsingFallback: DomainParsingFallback) {
 
-  lazy val allPlugins: List[AMFPlugin[_]] = parsePlugins ++ validatePlugins
+  lazy val allPlugins: List[AMFPlugin[_]] = parsePlugins ++ validatePlugins ++ renderPlugins
 
   def withPlugin(plugin: AMFPlugin[_]): PluginsRegistry = {
     plugin match {

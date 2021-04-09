@@ -1,12 +1,13 @@
 package amf.client.remod
 
-import amf.client.remod.amfcore.resolution.{AMFResolutionPipeline, PipelineName}
 import amf.core.model.document.BaseUnit
+import amf.core.resolution.pipelines.ResolutionPipeline
 
 private[remod] object AMFTransformer {
 
   def transform(bu: BaseUnit, conf: AMFGraphConfiguration): AMFResult = ???
 
-  def transform(bu: BaseUnit, pipeline: PipelineName, conf: AMFGraphConfiguration): AMFResult = ???
+  // PipelineName object should be used to form name given certain vendor and pipeline
+  def transform(bu: BaseUnit, pipelineName: String, conf: AMFGraphConfiguration): AMFResult = ???
 
 }

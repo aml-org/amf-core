@@ -1,26 +1,27 @@
 package amf.plugins.document.graph
 
 import amf.client.plugins.{AMFDocumentPlugin, AMFPlugin}
+import amf.client.remod.amfcore.config.RenderOptions
 import amf.client.remod.amfcore.plugins.parse.AMFParsePluginAdapter
 import amf.client.remod.amfcore.plugins.render.AMFRenderPluginAdapter
+import amf.client.remod.amfcore.resolution.{PipelineInfo, PipelineName}
 import amf.core.Root
 import amf.core.client.ParsingOptions
-import amf.client.remod.amfcore.config.RenderOptions
 import amf.core.errorhandling.ErrorHandler
+import amf.core.exception.UnsupportedParsedDocumentException
 import amf.core.metamodel.Obj
 import amf.core.metamodel.domain._
 import amf.core.model.document.BaseUnit
 import amf.core.model.domain.AnnotationGraphLoader
 import amf.core.parser._
 import amf.core.rdf.{RdfModelDocument, RdfModelParser}
-import amf.core.remote.{Amf, Platform}
+import amf.core.remote.Amf
 import amf.core.resolution.pipelines.{BasicResolutionPipeline, ResolutionPipeline}
 import amf.core.unsafe.PlatformSecrets
 import amf.plugins.document.graph.emitter.EmbeddedJsonLdEmitter
 import amf.plugins.document.graph.parser.{EmbeddedGraphParser, FlattenedGraphParser, GraphDependenciesReferenceHandler}
 import org.yaml.builder.DocBuilder
 import org.yaml.model.YDocument
-import amf.core.exception.UnsupportedParsedDocumentException
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -91,13 +92,11 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
 
   override def referenceHandler(eh: ErrorHandler): ReferenceHandler = GraphDependenciesReferenceHandler
 
-  /**
-    * Resolves the provided base unit model, according to the semantics of the domain of the document
-    */
-  override def resolve(unit: BaseUnit,
-                       errorHandler: ErrorHandler,
-                       pipelineId: String = ResolutionPipeline.DEFAULT_PIPELINE): BaseUnit =
-    new BasicResolutionPipeline(errorHandler).resolve(unit)
+  override val pipelines: Map[String, ResolutionPipeline] = Map(
+      PipelineName.from(ID, ResolutionPipeline.DEFAULT_PIPELINE) -> new BasicResolutionPipeline(),
+      PipelineName
+        .from(ID, ResolutionPipeline.EDITING_PIPELINE) -> new BasicResolutionPipeline() // hack to maintain compatibility with legacy behaviour
+  )
 
   /**
     * Does references in this type of documents be recursive?
