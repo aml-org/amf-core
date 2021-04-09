@@ -4,22 +4,20 @@ import amf.client.plugins._
 import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.plugins.parse.AMFParsePluginAdapter
 import amf.client.remod.amfcore.plugins.render.AMFRenderPluginAdapter
+import amf.core.resolution.pipelines.{BasicResolutionPipeline, ResolutionPipeline}
 import amf.core.validation.AMFPayloadValidationPlugin
 
 import scala.collection.mutable
 
 object AMFPluginsRegistry {
   // all static registries will end up here, and with a mayor version release the AmfEnvironment will not be static
-  private var staticCofiguration: AMFGraphConfiguration = AMFGraphConfiguration.predefined()
+  private var staticConfiguration: AMFGraphConfiguration = AMFGraphConfiguration.predefined()
 
-  private val syntaxPluginIDRegistry: mutable.HashMap[String, AMFSyntaxPlugin]               = mutable.HashMap()
-  private val syntaxPluginRegistry: mutable.HashMap[String, AMFSyntaxPlugin]                 = mutable.HashMap()
-  private val documentPluginRegistry: mutable.HashMap[String, Seq[AMFDocumentPlugin]]        = mutable.HashMap()
-  private val documentPluginIDRegistry: mutable.HashMap[String, AMFDocumentPlugin]           = mutable.HashMap()
-  private val documentPluginVendorsRegistry: mutable.HashMap[String, Seq[AMFDocumentPlugin]] = mutable.HashMap()
-  private val domainPluginRegistry: mutable.HashMap[String, AMFDomainPlugin]                 = mutable.HashMap()
-  private val featurePluginIDRegistry: mutable.HashMap[String, AMFFeaturePlugin]             = mutable.HashMap()
-  private val featurePlugin: mutable.HashMap[String, AMFFeaturePlugin]                       = mutable.HashMap()
+  private val syntaxPluginIDRegistry: mutable.HashMap[String, AMFSyntaxPlugin]     = mutable.HashMap()
+  private val syntaxPluginRegistry: mutable.HashMap[String, AMFSyntaxPlugin]       = mutable.HashMap()
+  private val documentPluginIDRegistry: mutable.HashMap[String, AMFDocumentPlugin] = mutable.HashMap()
+  private val domainPluginRegistry: mutable.HashMap[String, AMFDomainPlugin]       = mutable.HashMap()
+  private val featurePluginIDRegistry: mutable.HashMap[String, AMFFeaturePlugin]   = mutable.HashMap()
   private val payloadValidationPluginRegistry: mutable.HashMap[String, Seq[AMFPayloadValidationPlugin]] =
     mutable.HashMap()
   private val payloadValidationPluginIDRegistry: mutable.HashMap[String, AMFPayloadValidationPlugin] =
@@ -30,14 +28,36 @@ object AMFPluginsRegistry {
 
   def documentPlugins: Iterable[AMFDocumentPlugin] = documentPluginIDRegistry.values
 
-  def obtainStaticConfig(): AMFGraphConfiguration = staticCofiguration
+  def obtainStaticConfig(): AMFGraphConfiguration = staticConfiguration
 
-  private def registerPluginInEnv(plugin: AMFDocumentPlugin): Unit =
-    staticCofiguration =
-      staticCofiguration.withPlugins(List(AMFParsePluginAdapter(plugin), AMFRenderPluginAdapter(plugin)))
+  private def registerPluginInEnv(plugin: AMFDocumentPlugin): Unit = {
+    staticConfiguration =
+      staticConfiguration.withPlugins(List(AMFParsePluginAdapter(plugin), AMFRenderPluginAdapter(plugin)))
+    staticConfiguration = plugin.pipelines.foldRight(staticConfiguration) {
+      case ((a, b), env) => registerPipeline(a, b, env)
+    }
+  }
+
+  /**
+    * Ensure amf or aml pipeline is not replaced for implementation lower in hierarchy.
+    * Hack to ensure compatibility.
+    */
+  private def registerPipeline(name: String, pipeline: ResolutionPipeline, config: AMFGraphConfiguration): AMFGraphConfiguration = {
+    val pipelines = config.registry.transformationPipelines
+    pipelines.get(name) match {
+      case Some(prevPipeline) =>
+        val registeredPipelineName = prevPipeline.getClass.getName
+        if (registeredPipelineName.contains("UnifiedDefaultPipeline") || registeredPipelineName.contains(
+                "UnifiedEditingPipeline")
+            || pipeline.isInstanceOf[BasicResolutionPipeline]) {
+          config
+        } else config.withTransformationPipeline(name, pipeline)
+      case None => config.withTransformationPipeline(name, pipeline)
+    }
+  }
 
   private def unregisterPluginFromEnv(plugin: AMFDocumentPlugin): Unit =
-    staticCofiguration = staticCofiguration.removePlugin(plugin.ID)
+    staticConfiguration = staticConfiguration.removePlugin(plugin.ID)
 
   def registerSyntaxPlugin(syntaxPlugin: AMFSyntaxPlugin): Unit = {
     syntaxPluginIDRegistry.get(syntaxPlugin.ID) match {
@@ -95,16 +115,6 @@ object AMFPluginsRegistry {
             AMFDomainRegistry.registerAnnotation(name, unloader)
         }
 
-        documentPlugin.documentSyntaxes.foreach { mediaType =>
-          val plugins = documentPluginRegistry.getOrElse(mediaType, Seq())
-          documentPluginRegistry.put(mediaType, plugins ++ Seq(documentPlugin))
-        }
-
-        documentPlugin.vendors.foreach { vendor =>
-          val plugins = documentPluginVendorsRegistry.getOrElse(vendor, Seq())
-          documentPluginVendorsRegistry.put(vendor, plugins ++ Seq(documentPlugin))
-        }
-
         documentPlugin.modelEntities.foreach { entity =>
           AMFDomainRegistry.registerModelEntity(entity)
         }
@@ -116,19 +126,11 @@ object AMFPluginsRegistry {
     }
   }
 
-  def documentPluginForMediaType(mediaType: String): Seq[AMFDocumentPlugin] = {
-    documentPluginRegistry.getOrElse(mediaType, Seq()).sortBy(_.priority)
-  }
-
   def dataNodeValidatorPluginForMediaType(mediaType: String): Seq[AMFPayloadValidationPlugin] =
     payloadValidationPluginRegistry.getOrElse(mediaType, Nil)
 
   def documentPluginForID(ID: String): Option[AMFDocumentPlugin] = {
     documentPluginIDRegistry.get(ID)
-  }
-
-  def documentPluginForVendor(vendor: String): Seq[AMFDocumentPlugin] = {
-    documentPluginVendorsRegistry.getOrElse(vendor, Seq()).sortBy(_.priority)
   }
 
   def registerDomainPlugin(domainPlugin: AMFDomainPlugin): Unit = {
@@ -177,20 +179,6 @@ object AMFPluginsRegistry {
     documentPlugin.serializableAnnotations().foreach {
       case (name, _) =>
         AMFDomainRegistry.unregisterAnnotation(name)
-    }
-
-    documentPlugin.documentSyntaxes.foreach { mediaType =>
-      documentPluginRegistry.get(mediaType) match {
-        case Some(seq) => documentPluginRegistry.update(mediaType, seq.filterNot(_ == documentPlugin))
-        case _         => None
-      }
-    }
-
-    documentPlugin.vendors.foreach { vendor =>
-      documentPluginVendorsRegistry.get(vendor) match {
-        case Some(seq) => documentPluginVendorsRegistry.update(vendor, seq.filterNot(_ == documentPlugin))
-        case _         => None
-      }
     }
 
     documentPlugin.modelEntities.foreach { entity =>

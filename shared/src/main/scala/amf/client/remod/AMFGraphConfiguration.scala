@@ -4,10 +4,13 @@ import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.plugins.parse.AMFParsePlugin
 import amf.client.remod.amfcore.registry.AMFRegistry
+import amf.client.remod.amfcore.resolution.TransformationPipeline
+import amf.core.resolution.pipelines.{BasicResolutionPipeline, ResolutionPipeline}
 import amf.core.validation.core.ValidationProfile
 import amf.internal.environment.Environment
 import amf.internal.reference.UnitCache
 import amf.internal.resource.ResourceLoader
+import amf.plugins.document.graph.{AMFGraphParsePlugin, AMFGraphRenderPlugin}
 
 import scala.concurrent.ExecutionContext
 // all constructors only visible from amf. Users should always use builders or defaults
@@ -45,6 +48,12 @@ private[amf] class AMFGraphConfiguration(
 
   // //TODO: ARM - delete
   def removePlugin(id: String): AMFGraphConfiguration = copy(registry = registry.removePlugin(id))
+
+  def withTransformationPipeline(name: String, pipeline: ResolutionPipeline): AMFGraphConfiguration =
+    copy(registry = registry.withTransformationPipeline(name, pipeline))
+
+  def withTransformationPipelines(pipelines: Map[String, ResolutionPipeline]): AMFGraphConfiguration =
+    copy(registry = registry.withTransformationPipelines(pipelines))
 
   def withValidationProfile(profile: ValidationProfile): AMFGraphConfiguration =
     copy(registry = registry.withConstraints(profile))
@@ -92,7 +101,8 @@ private[amf] object AMFGraphConfiguration {
         MutedLogger,
         Set.empty,
         AMFOptions.default()
-    )
+    ).withPlugins(List(AMFGraphParsePlugin, AMFGraphRenderPlugin))
+      .withTransformationPipeline(TransformationPipeline.DEFAULT, new BasicResolutionPipeline()) // should we register this pipeline? does it have a use case?
   }
 
   def fromLegacy(base: AMFGraphConfiguration, legacy: Environment): AMFGraphConfiguration = {

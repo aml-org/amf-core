@@ -31,6 +31,8 @@ private[amf] class AMFGraphClient(protected val configuration: AMFGraphConfigura
 
   def transform(bu: BaseUnit): AMFResult = AMFTransformer.transform(bu, configuration) // clone? BaseUnit.resolved
 
+  def transform(bu: BaseUnit, pipeline: String): AMFResult = AMFTransformer.transform(bu, pipeline, configuration) // clone? BaseUnit.resolved
+
   def render(bu: BaseUnit): String = AMFRenderer.render(bu, configuration)
 
   def render(bu: BaseUnit, mediaType: String): String = AMFRenderer.render(bu, mediaType, configuration)

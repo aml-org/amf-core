@@ -1,19 +1,18 @@
 package amf.client.plugins
 
 import amf.client.remod.amfcore.config.RenderOptions
-import amf.core.{CompilerContext, Root}
+import amf.core.Root
 import amf.core.client.ParsingOptions
 import amf.core.errorhandling.{ErrorHandler, UnhandledErrorHandler}
 import amf.core.metamodel.Obj
 import amf.core.model.document.BaseUnit
 import amf.core.model.domain.AnnotationGraphLoader
-import amf.core.parser.{ParserContext, RefContainer, ReferenceHandler, ReferenceKind}
+import amf.core.parser.{ParserContext, ReferenceHandler}
 import amf.core.registries.AMFDomainEntityResolver
-import amf.core.remote.{Platform, Vendor}
 import amf.core.resolution.pipelines.ResolutionPipeline
 import amf.core.vocabulary.{Namespace, NamespaceAliases}
 import org.yaml.builder.{DocBuilder, YDocumentBuilder}
-import org.yaml.model.{YDocument, YNode}
+import org.yaml.model.YDocument
 
 object AMFDocumentPluginSettings {
   object PluginPriorities {
@@ -41,18 +40,7 @@ abstract class AMFDocumentPlugin extends AMFPlugin {
 
   def serializableAnnotations(): Map[String, AnnotationGraphLoader]
 
-  /**
-    * Resolves the provided base unit model, according to the semantics of the domain of the document
-    */
-  final def resolveWithHandle(unit: BaseUnit, pipelineId: String = ResolutionPipeline.DEFAULT_PIPELINE): BaseUnit =
-    resolve(unit, unit.errorHandler(), pipelineId)
-
-  /**
-    * Resolves the provided base unit model, according to the semantics of the domain of the document
-    */
-  def resolve(unit: BaseUnit,
-              errorHandler: ErrorHandler,
-              pipelineId: String = ResolutionPipeline.DEFAULT_PIPELINE): BaseUnit
+  def pipelines: Map[String, ResolutionPipeline] = Map()
 
   /**
     * List of media types used to encode serialisations of

@@ -8,36 +8,17 @@ import amf.core.resolution.stages.ResolutionStage
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
-abstract class ResolutionPipeline(val eh: ErrorHandler) {
+// TODO rename to TransformationPipeline
+trait ResolutionPipeline {
 
-//  val model: T
-  def profileName: ProfileName
-  implicit val errorHandler: ErrorHandler = eh
-  // todo: replace for actual context when remove static error collection
-  // default should be unhandled? or we need to provide a result at resolution??
-//  implicit val errorHandler: ErrorHandler = {
-//
-//    new ErrorHandler {
-//      override val parserCount: Int = {
-//        // this can get not set if the model has been created manually without parsing
-//        model.parserRun match {
-//          case Some(run) => run
-//          case None =>
-//            model.parserRun = Some(AMFCompilerRunCount.nextRun())
-//            model.parserRun.get
-//        }
-//      }
-//      override val currentFile: String = model.location().getOrElse(model.id)
-//    }
-//  }
-//
-//  def profileName: ProfileName
-  val steps: Seq[ResolutionStage]
+  def steps(model: BaseUnit, sourceVendor: String)(implicit errorHandler: ErrorHandler): Seq[ResolutionStage]
 
-  final def resolve[T <: BaseUnit](model: T): T = {
+  // sourceVendor is temporary to ensure no breaking changes.
+  // should be accessed through the base unit directly when needed
+  def transform[T <: BaseUnit](model: T, sourceVendor: String, errorHandler: ErrorHandler): T = {
     ExecutionLog.log(s"${this.getClass.getName}#resolve: resolving ${model.location().getOrElse("")}")
     var m = model
-    steps.foreach { s =>
+    steps(model, sourceVendor)(errorHandler).foreach { s =>
       m = step(m, s)
     }
     // TODO: should be unit metadata
