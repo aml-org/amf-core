@@ -36,11 +36,11 @@ private[amf] object AMFParser {
 
   /**
     * Asynchronously generate a BaseUnit from a given string.
-    * @param stream: The unit as a string
+    * @param content: The unit as a string
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
   @JSExport
-  def parseStream(stream: String, env: AMFConfiguration): Future[AMFResult] = ???
+  def parseContent(content: String, env: AMFConfiguration): Future[AMFResult] = ???
 //    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)), env)
 
   /**
@@ -49,7 +49,7 @@ private[amf] object AMFParser {
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
   @JSExport
-  def parseStream(stream: String, vendor: Vendor, env: AMFConfiguration): Future[AMFResult] = {
+  def parseContent(content: String, vendor: Vendor, env: AMFConfiguration): Future[AMFResult] = {
     ???
 //    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)))
   }
