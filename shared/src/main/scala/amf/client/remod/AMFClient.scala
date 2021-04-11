@@ -26,12 +26,14 @@ private[amf] class AMFClient(protected val configuration: AMFConfiguration) {
   // sync or async?
 
   // content type format, pendiente
-  def parse(url: String, vendor: Option[Vendor] = None): Future[AMFResult] = AMFParser.parse(url, configuration)
+  def parse(url: String): Future[AMFResult] = AMFParser.parse(url, configuration)
   // build parsing context?
 
-  def resolve(bu: BaseUnit): AMFResult = AMFResolver.resolve(bu, configuration) // clone? BaseUnit.resolved
+  def resolve(bu: BaseUnit): AMFResult = AMFTransformer.transform(bu, configuration) // clone? BaseUnit.resolved
 
-  def render(bu: BaseUnit, target: Vendor): String = AMFRenderer.render(bu, configuration)
+  def render(bu: BaseUnit): String = AMFRenderer.render(bu, configuration)
+
+  def render(bu: BaseUnit, target: String): String = AMFRenderer.render(bu, target, configuration)
   // bu.clone?
   def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport = ???
 
