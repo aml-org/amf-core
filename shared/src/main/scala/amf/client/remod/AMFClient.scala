@@ -29,7 +29,7 @@ private[amf] class AMFClient(protected val configuration: AMFConfiguration) {
   def parse(url: String): Future[AMFResult] = AMFParser.parse(url, configuration)
   // build parsing context?
 
-  def resolve(bu: BaseUnit): AMFResult = AMFTransformer.transform(bu, configuration) // clone? BaseUnit.resolved
+  def transform(bu: BaseUnit): AMFResult = AMFTransformer.transform(bu, configuration) // clone? BaseUnit.resolved
 
   def render(bu: BaseUnit): String = AMFRenderer.render(bu, configuration)
 
