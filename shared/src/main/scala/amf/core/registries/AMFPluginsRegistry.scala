@@ -5,6 +5,7 @@ import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.plugins.parse.AMFParsePluginAdapter
 import amf.client.remod.amfcore.plugins.render.AMFRenderPluginAdapter
 import amf.core.validation.AMFPayloadValidationPlugin
+import amf.core.validation.core.ValidationProfile
 
 import scala.collection.mutable
 
@@ -30,9 +31,18 @@ object AMFPluginsRegistry {
   def obtainStaticConfig(): AMFGraphConfiguration = staticCofiguration
 
   private def registerPluginInEnv(plugin: AMFDocumentPlugin): Unit = {
-    staticCofiguration =
-      staticCofiguration.withPlugins(List(AMFParsePluginAdapter(plugin), AMFRenderPluginAdapter(plugin)))
+    staticCofiguration = staticCofiguration.withPlugins(List(AMFParsePluginAdapter(plugin), AMFRenderPluginAdapter(plugin)))
     staticCofiguration = staticCofiguration.withTransformationPipelines(plugin.pipelines.values.toList)
+    plugin match {
+      case validationPlugin: AMFValidationPlugin =>
+        staticCofiguration = validationPlugin.domainValidationProfiles
+          .foldLeft(staticCofiguration) {(config, profile) => config.withValidationProfile(profile)}
+      case _ => // ignore
+    }
+  }
+
+  protected[amf] def registerValidationProfile(profile: ValidationProfile): Unit = {
+    staticCofiguration = staticCofiguration.withValidationProfile(profile)
   }
 
   private def unregisterPluginFromEnv(plugin: AMFDocumentPlugin): Unit =
@@ -57,11 +67,8 @@ object AMFPluginsRegistry {
   }
 
   def cleanMediaType(mediaType: String): String =
-    if (mediaType.contains(";")) {
-      mediaType.split(";").head
-    } else {
-      mediaType
-    }
+    if (mediaType.contains(";")) mediaType.split(";").head
+    else mediaType
 
   def syntaxPluginForMediaType(mediaType: String): Option[AMFSyntaxPlugin] = {
     val normalizedMediaType = cleanMediaType(mediaType)
