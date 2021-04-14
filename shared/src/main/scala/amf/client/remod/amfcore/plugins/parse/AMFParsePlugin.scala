@@ -13,14 +13,14 @@ private[amf] trait AMFParsePlugin extends AMFPlugin[ParsingInfo] {
   def parse(document: Root, ctx: ParserContext, options: ParsingOptions): BaseUnit
 
   /**
-    * vendors that are parsed by this plugin.
+    * media types which specifies vendors that are parsed by this plugin.
     */
-  def vendors: Seq[String]
+  def mediaTypes: Seq[String]
 
   /**
-    * vendors that may be referenced.
+    * media types which specifies vendors that may be referenced.
     */
-  def validVendorsToReference: Seq[String]
+  def validMediaTypesToReference: Seq[String]
 
   def referenceHandler(eh: ErrorHandler): ReferenceHandler
 

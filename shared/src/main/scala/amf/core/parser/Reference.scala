@@ -23,9 +23,8 @@ case class Reference(url: String, refs: Seq[RefContainer]) extends PlatformSecre
     copy(refs = refs :+ RefContainer(kind, ast, fragment))
   }
 
-  def resolve(compilerContext: CompilerContext, domainPlugin: AMFParsePlugin, allowRecursiveRefs: Boolean)(
+  def resolve(compilerContext: CompilerContext, allowedMediaTypes: Seq[String], allowRecursiveRefs: Boolean)(
       implicit executionContext: ExecutionContext): Future[ReferenceResolutionResult] = {
-
     // If there is any ReferenceResolver attached to the environment, then first try to get the cached reference if it exists. If not, load and parse as usual.
     try {
       compilerContext.configuration.getUnitsCache match {
@@ -34,24 +33,23 @@ case class Reference(url: String, refs: Seq[RefContainer]) extends PlatformSecre
           resolver.fetch(compilerContext.resolvePath(url)) flatMap { cachedReference =>
             Future(ReferenceResolutionResult(None, Some(cachedReference.content)))
           } recoverWith {
-            case _ => resolveReference(compilerContext, domainPlugin, allowRecursiveRefs)
+            case _ => resolveReference(compilerContext, allowedMediaTypes, allowRecursiveRefs)
           }
-        case None => resolveReference(compilerContext, domainPlugin, allowRecursiveRefs)
+        case None => resolveReference(compilerContext, allowedMediaTypes, allowRecursiveRefs)
       }
     } catch {
-      case _: Throwable => resolveReference(compilerContext, domainPlugin, allowRecursiveRefs)
+      case _: Throwable => resolveReference(compilerContext, allowedMediaTypes, allowRecursiveRefs)
     }
   }
 
   private def resolveReference(
       compilerContext: CompilerContext,
-      domainPlugin: AMFParsePlugin,
+      allowedMediaTypes: Seq[String],
       allowRecursiveRefs: Boolean)(implicit executionContext: ExecutionContext): Future[ReferenceResolutionResult] = {
     val kinds = refs.map(_.linkType).distinct
     val kind  = if (kinds.size > 1) UnspecifiedReference else kinds.head
     try {
-      val allowedVendors = Some(domainPlugin.validVendorsToReference ++ domainPlugin.vendors)
-      val context        = compilerContext.forReference(url, allowedVendors = allowedVendors)
+      val context = compilerContext.forReference(url, allowedMediaTypes = Some(allowedMediaTypes))
       val res: Future[Future[ReferenceResolutionResult]] = RuntimeCompiler.forContext(context, None, None, kind) map {
         eventualUnit =>
           Future(parser.ReferenceResolutionResult(None, Some(eventualUnit)))

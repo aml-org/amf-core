@@ -48,7 +48,7 @@ class CompilerContext(url: String,
                       val fileContext: Context,
                       cache: Cache,
                       val configuration: AMFGraphConfiguration,
-                      val allowedVendors: Option[Seq[String]])(implicit executionContext: ExecutionContext) {
+                      val allowedMediaTypes: Option[Seq[String]])(implicit executionContext: ExecutionContext) {
 
   /**
     * The resolved path that result to be the normalized url
@@ -68,7 +68,7 @@ class CompilerContext(url: String,
   def fetchContent()(implicit executionContext: ExecutionContext): Future[Content] =
     platform.fetchContent(location, configuration)
 
-  def forReference(url: String, withNormalizedUri: Boolean = true, allowedVendors: Option[Seq[String]] = None)(
+  def forReference(url: String, withNormalizedUri: Boolean = true, allowedMediaTypes: Option[Seq[String]] = None)(
       implicit executionContext: ExecutionContext): CompilerContext = {
     val builder = new CompilerContextBuilder(url, fileContext.platform, parserContext.eh)
       .withCache(cache)
@@ -76,7 +76,7 @@ class CompilerContext(url: String,
       .withFileContext(fileContext)
       .withNormalizedUri(withNormalizedUri)
       .withBaseEnvironment(configuration)
-    allowedVendors.foreach(builder.withAllowedVendors)
+    allowedMediaTypes.foreach(builder.withAllowedMediaTypes)
     builder.build()
   }
 
@@ -98,7 +98,7 @@ class CompilerContextBuilder(url: String,
   private var cache                               = Cache()
   private var normalizeUri: Boolean               = true
   private var env: AMFGraphConfiguration          = AMFPluginsRegistry.obtainStaticConfig()
-  private var allowedVendors: Option[Seq[String]] = None
+  private var allowedMediaTypes: Option[Seq[String]] = None
 
   def withBaseParserContext(parserContext: ParserContext): this.type = {
     givenContent = Some(parserContext)
@@ -131,8 +131,8 @@ class CompilerContextBuilder(url: String,
     this
   }
 
-  def withAllowedVendors(allowed: Seq[String]): CompilerContextBuilder = {
-    this.allowedVendors = Some(allowed)
+  def withAllowedMediaTypes(allowed: Seq[String]): CompilerContextBuilder = {
+    this.allowedMediaTypes = Some(allowed)
     this
   }
 
@@ -163,7 +163,7 @@ class CompilerContextBuilder(url: String,
 
   def build()(implicit executionContext: ExecutionContext): CompilerContext = {
     val fc = buildFileContext()
-    new CompilerContext(url, path, buildParserContext(fc), fc, cache, this.env, allowedVendors)
+    new CompilerContext(url, path, buildParserContext(fc), fc, cache, this.env, allowedMediaTypes)
   }
 }
 
@@ -318,7 +318,7 @@ class AMFCompiler(compilerContext: CompilerContext,
   }
 
   private def getDomainPluginFor(document: Root): Option[AMFParsePlugin] = {
-    val allowed = filterByAllowed(sortedParsePlugins, compilerContext.allowedVendors)
+    val allowed = filterByAllowed(sortedParsePlugins, compilerContext.allowedMediaTypes)
     allowed.find(_.applies(ParsingInfo(document, vendor)))
   }
 
@@ -327,20 +327,21 @@ class AMFCompiler(compilerContext: CompilerContext,
     */
   private def filterByAllowed(plugins: Seq[AMFParsePlugin], allowed: Option[Seq[String]]): Seq[AMFParsePlugin] =
     allowed match {
-      case Some(allowedList) => plugins.filter(_.vendors.exists(allowedList.contains(_)))
+      case Some(allowedList) => plugins.filter(_.mediaTypes.exists(allowedList.contains(_)))
       case None              => plugins
     }
 
   private def parseReferences(root: Root, domainPlugin: AMFParsePlugin)(
       implicit executionContext: ExecutionContext): Future[Root] = {
-    val handler = domainPlugin.referenceHandler(compilerContext.parserContext.eh)
-    val refs    = handler.collect(root.parsed, compilerContext.parserContext)
+    val handler           = domainPlugin.referenceHandler(compilerContext.parserContext.eh)
+    val allowedMediaTypes = domainPlugin.validMediaTypesToReference ++ domainPlugin.mediaTypes
+    val refs              = handler.collect(root.parsed, compilerContext.parserContext)
     compilerContext.logForFile(s"AMFCompiler#parseReferences: ${refs.toReferences.size} references found")
     val parsed: Seq[Future[Option[ParsedReference]]] = refs.toReferences
       .filter(_.isRemote)
       .map { link =>
         val nodes = link.refs.map(_.node)
-        link.resolve(compilerContext, domainPlugin, domainPlugin.allowRecursiveReferences) flatMap {
+        link.resolve(compilerContext, allowedMediaTypes, domainPlugin.allowRecursiveReferences) flatMap {
           case ReferenceResolutionResult(_, Some(unit)) =>
             val reference = ParsedReference(unit, link)
             handler.update(reference, compilerContext).map(Some(_))
