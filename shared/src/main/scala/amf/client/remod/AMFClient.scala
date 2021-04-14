@@ -18,7 +18,7 @@ private[amf] class AMFClient(protected val configuration: AMFConfiguration) {
 
   implicit val exec: ExecutionContext = configuration.getExecutionContext
 
-  def getEnvironment: AMFConfiguration = configuration
+  def getConfiguration: AMFConfiguration = configuration
   // how do we return the ErrorHandler that is created by the provider?
   // relation between EH vs BU? should the BU have an EH inside?
   // should parse always return error handler + base unit? (Amf result)

@@ -1,16 +1,6 @@
 package amf.client.remod
 
-import amf.{MessageStyle, ProfileName, RAMLStyle}
-import amf.client.convert.CoreClientConverters.{ClientFuture, platform}
-import amf.client.environment.DefaultEnvironment
-import amf.client.model.document.BaseUnit
-import amf.client.parse.DefaultParserErrorHandler
-import amf.client.validate.ValidationReport
-import amf.core.client.ParsingOptions
-import amf.core.errorhandling.UnhandledErrorHandler
-import amf.core.remote.{Aml, Cache, Context, Vendor}
-import amf.core.services.{RuntimeCompiler, RuntimeValidator}
-import amf.internal.environment
+import amf.client.convert.CoreClientConverters.platform
 import amf.internal.resource.{ResourceLoader, StringResourceLoader}
 
 import scala.concurrent.Future
