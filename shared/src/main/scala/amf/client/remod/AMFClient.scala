@@ -33,7 +33,7 @@ private[amf] class AMFClient(protected val configuration: AMFConfiguration) {
 
   def render(bu: BaseUnit): String = AMFRenderer.render(bu, configuration)
 
-  def render(bu: BaseUnit, target: String): String = AMFRenderer.render(bu, target, configuration)
+  def render(bu: BaseUnit, mediaType: String): String = AMFRenderer.render(bu, mediaType, configuration)
   // bu.clone?
   def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport = ???
 

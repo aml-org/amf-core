@@ -16,8 +16,8 @@ private[remod] object AMFRenderer {
     * @param env
     * @return
     */
-  def render(bu: BaseUnit, target: String, env: AMFConfiguration): String = ???
+  def render(bu: BaseUnit, mediaType: String, env: AMFConfiguration): String = ???
 
-  def buildAST(bu: BaseUnit, target: String, env: AMFConfiguration): YDocument = ???
+  def buildAST(bu: BaseUnit, mediaType: String, env: AMFConfiguration): YDocument = ???
 
 }

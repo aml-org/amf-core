@@ -32,7 +32,8 @@ private[amf] object AMFParser {
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
   // check Vendor , only param? ParseParams?
-  def parse(url: String, vendor: Vendor, env: AMFConfiguration): Future[AMFResult] = parseAsync(url, Some(vendor), env)
+  def parse(url: String, mediaType: String, env: AMFConfiguration): Future[AMFResult] =
+    parseAsync(url, Some(mediaType), env)
 
   /**
     * Asynchronously generate a BaseUnit from a given string.
@@ -49,7 +50,7 @@ private[amf] object AMFParser {
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
   @JSExport
-  def parseContent(content: String, vendor: Vendor, env: AMFConfiguration): Future[AMFResult] = {
+  def parseContent(content: String, mediaType: String, env: AMFConfiguration): Future[AMFResult] = {
     ???
 //    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)))
   }
@@ -70,7 +71,7 @@ private[amf] object AMFParser {
 //  }
 
   private[amf] def parseAsync(url: String,
-                              vendor: Option[Vendor],
+                              mediaType: Option[String],
                               amfEnvironment: AMFConfiguration): Future[AMFResult] = {
 //    amfEnvironment.beforeParse().flatMap { _ =>
 //      val environment = {
