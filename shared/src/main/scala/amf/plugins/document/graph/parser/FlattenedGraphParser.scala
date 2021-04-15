@@ -229,7 +229,6 @@ class FlattenedGraphParser()(implicit val ctx: GraphParserContext) extends Graph
           model        <- retrieveType(id, map)
           parsedObject <- parseNode(map, id, model)
         } yield {
-          cache(id) = parsedObject
           parsedObject
         }
       }
@@ -240,6 +239,7 @@ class FlattenedGraphParser()(implicit val ctx: GraphParserContext) extends Graph
       val transformedId: String = transformIdFromContext(id)
       buildType(transformedId, map, model)(annotations(nodes, sources, transformedId)) match {
         case Some(builder) =>
+          cache(id) = builder
           val fields = fieldsFrom(model)
           parseNodeFields(map, fields, sources, transformedId, builder)
         case _ => None
