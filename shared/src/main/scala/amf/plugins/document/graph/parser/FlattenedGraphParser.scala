@@ -24,6 +24,8 @@ import amf.plugins.features.validation.CoreValidations.{
   UnableToParseDocument,
   UnableToParseNode
 }
+import org.mulesoft.common.core.CachedFunction
+import org.mulesoft.common.functional.MonadInstances._
 import org.yaml.model._
 
 import scala.collection.mutable
@@ -573,20 +575,8 @@ object FlattenedGraphParser extends GraphContextHelper with GraphParserHelpers {
     */
   def canParse(document: SyamlParsedDocument): Boolean = {
     document.document.node.value match {
-      case m: YMap =>
-        implicit val ctx: GraphParserContext = new GraphParserContext(
-            eh = IgnoringErrorHandler()
-        )
-        m.key(JsonLdKeywords.Context).foreach(entry => JsonLdGraphContextParser(entry.value, ctx.graphContext).parse())
-        m.key(JsonLdKeywords.Graph) match {
-          case Some(graphEntry) =>
-            val graphYSeq = graphEntry.value.as[YSequence]
-            graphYSeq.nodes.exists { node =>
-              isRootNode(node)
-            }
-          case None => false
-        }
-      case _ => false
+      case m: YMap => findRootNode.runCached(m).isDefined
+      case _       => false
     }
   }
 
@@ -614,6 +604,21 @@ object FlattenedGraphParser extends GraphContextHelper with GraphParserHelpers {
         })
         isBaseUnit && isRoot
       case _ => false
+    }
+  }
+
+  private[amf] val findRootNode = CachedFunction.from(findRootNodeImpl)
+
+  private[amf] def findRootNodeImpl(m: YMap): Option[YNode] = {
+    implicit val ctx: GraphParserContext = new GraphParserContext(
+        eh = IgnoringErrorHandler()
+    )
+    m.key(JsonLdKeywords.Context).foreach(entry => JsonLdGraphContextParser(entry.value, ctx.graphContext).parse())
+    m.key(JsonLdKeywords.Graph).flatMap { graphEntry =>
+      val graphYSeq = graphEntry.value.as[YSequence]
+      graphYSeq.nodes.find { node =>
+        isRootNode(node)
+      }
     }
   }
 }

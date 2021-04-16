@@ -186,8 +186,15 @@ class AMFCompiler(compilerContext: CompilerContext,
       })
   }
 
-  private def compile()(implicit executionContext: ExecutionContext): Future[BaseUnit] =
-    fetchContent().map(parseSyntax).flatMap(parseDomain)
+  private def compile()(implicit executionContext: ExecutionContext): Future[BaseUnit] = {
+    for {
+      content <- fetchContent()
+      ast     <- Future.successful(parseSyntax(content))
+      parsed  <- parseDomain(ast)
+    } yield {
+      parsed
+    }
+  }
 
   def autodetectSyntax(stream: CharSequence): Option[String] = {
     if (stream.length() > 2 && stream.charAt(0) == '#' && stream.charAt(1) == '%') {
