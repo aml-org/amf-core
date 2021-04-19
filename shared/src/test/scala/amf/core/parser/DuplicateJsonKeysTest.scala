@@ -1,7 +1,7 @@
 package amf.core.parser
 
 import amf.Core
-import amf.client.remod.AMFConfiguration
+import amf.client.remod.AMFGraphConfiguration
 import amf.client.convert.NativeOps
 import amf.client.parse.DefaultParserErrorHandler
 import amf.core.registries.AMFPluginsRegistry

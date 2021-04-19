@@ -14,11 +14,11 @@ import amf.core.validation.AMFValidationReport
 import scala.concurrent.{ExecutionContext, Future}
 
 // client
-private[amf] class AMFClient(protected val configuration: AMFConfiguration) {
+private[amf] class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
 
   implicit val exec: ExecutionContext = configuration.getExecutionContext
 
-  def getConfiguration: AMFConfiguration = configuration
+  def getConfiguration: AMFGraphConfiguration = configuration
   // how do we return the ErrorHandler that is created by the provider?
   // relation between EH vs BU? should the BU have an EH inside?
   // should parse always return error handler + base unit? (Amf result)

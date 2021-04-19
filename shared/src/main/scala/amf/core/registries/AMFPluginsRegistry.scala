@@ -1,7 +1,7 @@
 package amf.core.registries
 
 import amf.client.plugins._
-import amf.client.remod.AMFConfiguration
+import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.plugins.parse.AMFParsePluginAdapter
 import amf.client.remod.amfcore.plugins.render.AMFRenderPluginAdapter
 import amf.core.validation.AMFPayloadValidationPlugin
@@ -10,7 +10,7 @@ import scala.collection.mutable
 
 object AMFPluginsRegistry {
   // all static registries will end up here, and with a mayor version release the AmfEnvironment will not be static
-  private var staticCofiguration: AMFConfiguration = AMFConfiguration.predefined()
+  private var staticCofiguration: AMFGraphConfiguration = AMFGraphConfiguration.predefined()
 
   private val syntaxPluginIDRegistry: mutable.HashMap[String, AMFSyntaxPlugin]               = mutable.HashMap()
   private val syntaxPluginRegistry: mutable.HashMap[String, AMFSyntaxPlugin]                 = mutable.HashMap()
@@ -30,7 +30,7 @@ object AMFPluginsRegistry {
 
   def documentPlugins: Iterable[AMFDocumentPlugin] = documentPluginIDRegistry.values
 
-  def obtainStaticConfig(): AMFConfiguration = staticCofiguration
+  def obtainStaticConfig(): AMFGraphConfiguration = staticCofiguration
 
   private def registerPluginInEnv(plugin: AMFDocumentPlugin): Unit =
     staticCofiguration =

@@ -1,7 +1,7 @@
 package amf.core
 
 import amf.client.parse.DefaultParserErrorHandler
-import amf.client.remod.AMFConfiguration
+import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.config.ParsingOptionsConverter
 import amf.client.remod.amfcore.plugins.parse.{AMFParsePlugin, ParsingInfo}
 import amf.client.remote.Content
@@ -47,7 +47,7 @@ class CompilerContext(url: String,
                       val parserContext: ParserContext,
                       val fileContext: Context,
                       cache: Cache,
-                      val configuration: AMFConfiguration)(implicit executionContext: ExecutionContext) {
+                      val configuration: AMFGraphConfiguration)(implicit executionContext: ExecutionContext) {
 
   /**
     * The resolved path that result to be the normalized url
@@ -95,7 +95,7 @@ class CompilerContextBuilder(url: String,
   private var givenContent: Option[ParserContext] = None
   private var cache                               = Cache()
   private var normalizeUri: Boolean               = true
-  private var env: AMFConfiguration               = AMFPluginsRegistry.obtainStaticConfig()
+  private var env: AMFGraphConfiguration          = AMFPluginsRegistry.obtainStaticConfig()
 
   def withBaseParserContext(parserContext: ParserContext): this.type = {
     givenContent = Some(parserContext)
@@ -113,12 +113,12 @@ class CompilerContextBuilder(url: String,
   }
 
   def withEnvironment(environment: Environment): CompilerContextBuilder = {
-    val newEnv = AMFConfiguration.fromLegacy(this.env, environment)
+    val newEnv = AMFGraphConfiguration.fromLegacy(this.env, environment)
     this.env = newEnv
     this
   }
 
-  def withBaseEnvironment(environment: AMFConfiguration): CompilerContextBuilder = {
+  def withBaseEnvironment(environment: AMFGraphConfiguration): CompilerContextBuilder = {
     this.env = environment
     this
   }

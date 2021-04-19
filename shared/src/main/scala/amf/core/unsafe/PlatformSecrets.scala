@@ -1,7 +1,7 @@
 package amf.core.unsafe
 
 import amf.client.execution.BaseExecutionEnvironment
-import amf.client.remod.AMFConfiguration
+import amf.client.remod.AMFGraphConfiguration
 import amf.client.remote.Content
 import amf.core.execution.ExecutionEnvironment
 import amf.core.model.document.BaseUnit
@@ -78,7 +78,7 @@ case class TrunkPlatform(content: String,
 
   override def tmpdir(): String = throw new Exception("Unsupported tmpdir operation")
 
-  override def fetchContent(url: String, env: AMFConfiguration)(
+  override def fetchContent(url: String, env: AMFGraphConfiguration)(
       implicit executionContext: ExecutionContext): Future[Content] =
     Future.successful(new Content(content, url, forcedMediaType))
 
@@ -88,11 +88,9 @@ case class TrunkPlatform(content: String,
     loaders()
   }
 
-
   /** Platform out of the box [ResourceLoader]s */
   override def loaders()(implicit executionContext: ExecutionContext): Seq[ResourceLoader] =
     wrappedPlatform.map(_.loaders()).getOrElse(Seq())
-
 
   override def findCharInCharSequence(s: CharSequence)(p: Char => Boolean): Option[Char] =
     wrappedPlatform.flatMap(_.findCharInCharSequence(s)(p))
@@ -117,5 +115,5 @@ case class TrunkPlatform(content: String,
   override def operativeSystem(): String = "trunk"
 
   override val defaultExecutionEnvironment: BaseExecutionEnvironment = new BaseExecutionEnvironment(
-    ExecutionEnvironment()) {}
+      ExecutionEnvironment()) {}
 }

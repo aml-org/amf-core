@@ -1,7 +1,7 @@
 package amf.core.services
 
 import amf.client.parse.DefaultParserErrorHandler
-import amf.client.remod.AMFConfiguration
+import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.config.ParsingOptionsConverter
 import amf.core.client.ParsingOptions
 import amf.core.model.document.BaseUnit
@@ -41,7 +41,7 @@ object RuntimeCompiler {
       implicit executionContext: ExecutionContext): Future[BaseUnit] = {
     val baseEnv =
       AMFPluginsRegistry.obtainStaticConfig().withParsingOptions(ParsingOptionsConverter.fromLegacy(parsingOptions))
-    val withValueOfLegacyEnv = AMFConfiguration.fromLegacy(baseEnv, env)
+    val withValueOfLegacyEnv = AMFGraphConfiguration.fromLegacy(baseEnv, env)
     val context = new CompilerContextBuilder(url, base.platform, errorHandler)
       .withCache(cache)
       .withFileContext(base)

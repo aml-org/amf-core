@@ -1,6 +1,6 @@
 package amf.client.remod.amfcore.plugins.render
 
-import amf.client.remod.AMFConfiguration
+import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.config.RenderOptions
 import amf.core.errorhandling.ErrorHandler
 
@@ -16,7 +16,7 @@ case class DefaultRenderConfiguration(renderPlugins: List[AMFRenderPlugin],
     extends RenderConfiguration
 
 object DefaultRenderConfiguration {
-  def apply(env: AMFConfiguration): RenderConfiguration = {
+  def apply(env: AMFGraphConfiguration): RenderConfiguration = {
     DefaultRenderConfiguration(env.registry.plugins.renderPlugins,
                                env.options.renderOptions,
                                env.errorHandlerProvider.errorHandler())

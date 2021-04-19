@@ -3,7 +3,7 @@ package amf.core.remote
 import amf.ProfileName
 import amf.client.execution.BaseExecutionEnvironment
 import amf.client.model.AmfObjectWrapper
-import amf.client.remod.AMFConfiguration
+import amf.client.remod.AMFGraphConfiguration
 import amf.client.remote.Content
 import amf.core.metamodel.Obj
 import amf.core.model.document.BaseUnit
@@ -126,7 +126,8 @@ trait Platform extends FileMediaType {
   }
 
   /** Resolve remote url. */
-  def fetchContent(url: String, env: AMFConfiguration)(implicit executionContext: ExecutionContext): Future[Content] =
+  def fetchContent(url: String, env: AMFGraphConfiguration)(
+      implicit executionContext: ExecutionContext): Future[Content] =
     loaderConcat(url, env.getResourceLoaders.filter(_.accepts(url)))
 
   /** Platform out of the box [ResourceLoader]s */

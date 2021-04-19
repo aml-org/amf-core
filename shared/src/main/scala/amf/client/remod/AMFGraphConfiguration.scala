@@ -12,7 +12,7 @@ import amf.internal.resource.ResourceLoader
 import scala.concurrent.ExecutionContext
 // all constructors only visible from amf. Users should always use builders or defaults
 //TODO: ARM - delete private[amf]
-private[amf] class AMFConfiguration(
+private[amf] class AMFGraphConfiguration(
     private[amf] val resolvers: AMFResolvers,
     private[amf] val errorHandlerProvider: ErrorHandlerProvider,
     private[amf] val registry: AMFRegistry,
@@ -20,40 +20,40 @@ private[amf] class AMFConfiguration(
     private[amf] val listeners: Set[AMFEventListener],
     private[amf] val options: AMFOptions) { // break platform into more specific classes?
 
-  def createClient(): AMFClient = new AMFClient(this)
+  def createClient(): AMFGraphClient = new AMFGraphClient(this)
 
-  def withParsingOptions(parsingOptions: ParsingOptions): AMFConfiguration =
+  def withParsingOptions(parsingOptions: ParsingOptions): AMFGraphConfiguration =
     copy(options = options.copy(parsingOptions = parsingOptions))
 
-  def withRenderOptions(renderOptions: RenderOptions): AMFConfiguration =
+  def withRenderOptions(renderOptions: RenderOptions): AMFGraphConfiguration =
     copy(options = options.copy(renderOptions = renderOptions))
 
-  def withErrorHandlerProvider(provider: ErrorHandlerProvider): AMFConfiguration =
+  def withErrorHandlerProvider(provider: ErrorHandlerProvider): AMFGraphConfiguration =
     copy(errorHandlerProvider = provider)
 
-  def withResourceLoader(rl: ResourceLoader): AMFConfiguration = copy(resolvers.withResourceLoader(rl))
+  def withResourceLoader(rl: ResourceLoader): AMFGraphConfiguration = copy(resolvers.withResourceLoader(rl))
 
-  def withResourceLoaders(rl: List[ResourceLoader]): AMFConfiguration =
+  def withResourceLoaders(rl: List[ResourceLoader]): AMFGraphConfiguration =
     copy(resolvers = resolvers.withResourceLoaders(rl))
 
-  def withUnitCache(cache: UnitCache): AMFConfiguration =
+  def withUnitCache(cache: UnitCache): AMFGraphConfiguration =
     copy(resolvers.withCache(cache))
 
-  def withPlugin(amfPlugin: AMFParsePlugin): AMFConfiguration = copy(registry = registry.withPlugin(amfPlugin))
+  def withPlugin(amfPlugin: AMFParsePlugin): AMFGraphConfiguration = copy(registry = registry.withPlugin(amfPlugin))
 
-  def withPlugins(plugins: List[AMFPlugin[_]]): AMFConfiguration = copy(registry = registry.withPlugins(plugins))
+  def withPlugins(plugins: List[AMFPlugin[_]]): AMFGraphConfiguration = copy(registry = registry.withPlugins(plugins))
 
   // //TODO: ARM - delete
-  def removePlugin(id: String): AMFConfiguration = copy(registry = registry.removePlugin(id))
+  def removePlugin(id: String): AMFGraphConfiguration = copy(registry = registry.removePlugin(id))
 
-  def withValidationProfile(profile: ValidationProfile): AMFConfiguration =
+  def withValidationProfile(profile: ValidationProfile): AMFGraphConfiguration =
     copy(registry = registry.withConstraints(profile))
 
   /**
     * Merges two environments taking into account specific attributes that can be merged.
     * This is currently limited to: registry plugins.
     */
-  def merge(other: AMFConfiguration): AMFConfiguration = {
+  def merge(other: AMFGraphConfiguration): AMFGraphConfiguration = {
     this.withPlugins(other.getRegistry.getAllPlugins())
   }
 
@@ -62,8 +62,8 @@ private[amf] class AMFConfiguration(
                      registry: AMFRegistry = registry,
                      logger: AMFLogger = logger,
                      listeners: Set[AMFEventListener] = Set.empty,
-                     options: AMFOptions = options): AMFConfiguration = {
-    new AMFConfiguration(resolvers, errorHandlerProvider, registry, logger, listeners, options)
+                     options: AMFOptions = options): AMFGraphConfiguration = {
+    new AMFGraphConfiguration(resolvers, errorHandlerProvider, registry, logger, listeners, options)
 
   }
 
@@ -74,7 +74,7 @@ private[amf] class AMFConfiguration(
   private[amf] def getExecutionContext: ExecutionContext    = resolvers.executionContext.executionContext
 }
 
-private[amf] object AMFConfiguration {
+private[amf] object AMFGraphConfiguration {
 
   /**
     * Predefined AMF core environment with
@@ -84,8 +84,8 @@ private[amf] object AMFConfiguration {
     * MutedLogger: {@link amf.client.remod.amfcore.config.MutedLogger}
     * Without Any listener
     */
-  def predefined(): AMFConfiguration = {
-    new AMFConfiguration(
+  def predefined(): AMFGraphConfiguration = {
+    new AMFGraphConfiguration(
         AMFResolvers.predefined(),
         DefaultErrorHandlerProvider,
         AMFRegistry.empty,
@@ -95,11 +95,11 @@ private[amf] object AMFConfiguration {
     )
   }
 
-  def fromLegacy(base: AMFConfiguration, legacy: Environment): AMFConfiguration = {
+  def fromLegacy(base: AMFGraphConfiguration, legacy: Environment): AMFGraphConfiguration = {
     legacy.maxYamlReferences.foreach { maxValue =>
       base.getParsingOptions.setMaxYamlReferences(maxValue)
     }
-    val withLoaders: AMFConfiguration = base.withResourceLoaders(legacy.loaders.toList)
+    val withLoaders: AMFGraphConfiguration = base.withResourceLoaders(legacy.loaders.toList)
     legacy.resolver.map(unitCache => withLoaders.withUnitCache(unitCache)).getOrElse(withLoaders)
   }
 }
