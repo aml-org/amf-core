@@ -31,8 +31,10 @@ pipeline {
     }
     stage('Publish') {
       when {
-        branch 'master'
-        branch 'hackathon-fixes'
+        anyOf {
+          branch 'master'
+          branch 'hackathon-fixes'
+        }
       }
       steps {
         wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
