@@ -385,8 +385,8 @@ class FlattenedGraphParser()(implicit val ctx: GraphParserContext) extends Graph
 
       val extensions = properties
         .flatMap { uri =>
-          map
-            .key(compactUriFromContext(uri))
+          map.entries
+            .find(entry => entry.key.asScalar.exists(s => s.text.endsWith(uri)))
             .map(entry => {
               val extension  = DomainExtension()
               val entryValue = entry.value
