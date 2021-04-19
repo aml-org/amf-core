@@ -32,7 +32,7 @@ pipeline {
     stage('Publish') {
       when {
         branch 'master'
-        branch 'hackathon-fixes-0'
+        branch 'hackathon-fixes'
       }
       steps {
         wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
