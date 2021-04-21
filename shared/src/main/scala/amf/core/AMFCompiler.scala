@@ -212,7 +212,7 @@ class AMFCompiler(compilerContext: CompilerContext,
     }
   }
 
-  private def parseSyntax(input: Content): Either[Content, Root] = {
+  private[amf] def parseSyntax(input: Content): Either[Content, Root] = {
     compilerContext.logForFile("AMFCompiler#parseSyntax: parsing syntax")
     val content = runPreDocumentParseHooks(input)
 
@@ -324,7 +324,7 @@ class AMFCompiler(compilerContext: CompilerContext,
 
   }
 
-  private def getDomainPluginFor(document: Root): Option[AMFParsePlugin] = {
+  private[amf] def getDomainPluginFor(document: Root): Option[AMFParsePlugin] = {
     val allowed = filterByAllowed(sortedParsePlugins, compilerContext.allowedMediaTypes)
     allowed.find(_.applies(ParsingInfo(document, vendor)))
   }
@@ -338,7 +338,7 @@ class AMFCompiler(compilerContext: CompilerContext,
       case None              => plugins
     }
 
-  private def parseReferences(root: Root, domainPlugin: AMFParsePlugin)(
+  private[amf] def parseReferences(root: Root, domainPlugin: AMFParsePlugin)(
       implicit executionContext: ExecutionContext): Future[Root] = {
     val handler           = domainPlugin.referenceHandler(compilerContext.parserContext.eh)
     val allowedMediaTypes = domainPlugin.validMediaTypesToReference ++ domainPlugin.mediaTypes
@@ -370,7 +370,7 @@ class AMFCompiler(compilerContext: CompilerContext,
     Future.sequence(parsed).map(rs => root.copy(references = rs.flatten))
   }
 
-  private def fetchContent()(implicit executionContext: ExecutionContext): Future[Content] =
+  private[amf] def fetchContent()(implicit executionContext: ExecutionContext): Future[Content] =
     compilerContext.fetchContent()
 
   def root()(implicit executionContext: ExecutionContext): Future[Root] = fetchContent().map(parseSyntax).flatMap {
