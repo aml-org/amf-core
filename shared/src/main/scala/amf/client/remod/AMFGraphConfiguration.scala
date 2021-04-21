@@ -39,7 +39,7 @@ private[amf] class AMFGraphConfiguration(
   def withUnitCache(cache: UnitCache): AMFGraphConfiguration =
     copy(resolvers.withCache(cache))
 
-  def withPlugin(amfPlugin: AMFParsePlugin): AMFGraphConfiguration = copy(registry = registry.withPlugin(amfPlugin))
+  def withPlugin(amfPlugin: AMFPlugin[_]): AMFGraphConfiguration = copy(registry = registry.withPlugin(amfPlugin))
 
   def withPlugins(plugins: List[AMFPlugin[_]]): AMFGraphConfiguration = copy(registry = registry.withPlugins(plugins))
 
