@@ -1,7 +1,7 @@
 package amf.core.validation
 
 import amf.core.validation.core.ValidationProfile.{SeverityLevel, ValidationIri}
-import amf.core.validation.core.{ProfileIndex, ValidationProfile, ValidationSpecification}
+import amf.core.validation.core.{ProfileIndex, ShaclSeverityUris, ValidationProfile, ValidationSpecification}
 import amf.core.vocabulary.Namespace
 
 import scala.collection.mutable
@@ -51,7 +51,8 @@ class EffectiveValidations(val effective: mutable.HashMap[String, ValidationSpec
     all.get(validationIri) match {
       case Some(validation) =>
         severityLevelIndex.update(validationIri, targetLevel)
-        effective += (validationIri -> validation)
+        val adjustedSpec = validation.copy(severity = ShaclSeverityUris.amfToShaclSeverity(targetLevel))
+        effective += (validationIri -> adjustedSpec)
       case None => // Ignore
     }
   }

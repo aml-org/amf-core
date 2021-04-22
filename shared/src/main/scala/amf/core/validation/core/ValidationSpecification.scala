@@ -39,7 +39,6 @@ case class NodeConstraint(constraint: String, value: String)
 
 case class PropertyConstraint(ramlPropertyId: String,
                               name: String,
-                              severity: String = ShaclSeverityUris.amfToShaclSeverity(SeverityLevels.VIOLATION),
                               // storing the constraint over a property path
                               path: Option[PropertyPath] = None,
                               // shacl:message
