@@ -29,7 +29,7 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
   def linkCopy(): Linkable
 
   def withLinkTarget(target: DomainElement): this.type = {
-    fields.setWithoutId(LinkableElementModel.Target, target, Annotations(Inferred()))
+    fields.setWithoutId(LinkableElementModel.Target, target, Annotations.synthesized())
     set(LinkableElementModel.TargetId, AmfScalar(target.id), Annotations.synthesized())
   }
 
