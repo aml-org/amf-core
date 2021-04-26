@@ -28,8 +28,7 @@ object ParserSideValidationProfiler {
     levels.foreach { level =>
       val validations = Validations.validations.toStream
         .filter { v =>
-          Validations
-            .severityLevelOf(v.id, profile) == level
+          Validations.severityLevelOf(v.id, profile) == level
         }
         .map(_.name)
       severityMapping.set(validations, level)

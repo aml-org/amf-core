@@ -12,7 +12,7 @@ case class ValidationProfile(name: ProfileName,
                              severities: SeverityMapping,
                              prefixes: mutable.Map[String, String] = mutable.Map.empty) {
 
-  def index: ProfileIndex = ProfileIndex(this)
+  def reverseNestedConstraintIndex: NestedToParentIndex = NestedToParentIndex(this)
 
   def validationsWith(severity: SeverityLevel): Seq[ValidationName] = {
     severity match {
@@ -60,19 +60,20 @@ object ValidationProfile {
   type SeverityLevel  = String
 }
 
-case class ProfileIndex(profile: ValidationProfile) {
+case class NestedToParentIndex(profile: ValidationProfile) {
 
-  val parents: Map[ValidationName, Seq[ValidationSpecification]] = {
+  val nestedToParentMap: Map[ValidationName, Seq[ValidationSpecification]] = {
     case class ParentChildPair(parent: ValidationSpecification, child: ValidationName)
-    profile.validations.toStream
+    val grouped = profile.validations.toStream
       .filter(_.nested.isDefined)
       .map { parent =>
         val child = parent.nested.get
         ParentChildPair(parent, child)
       }
       .groupBy(_.child)
-      .mapValues { pairs =>
-        pairs.map(_.parent)
-      }
+
+    grouped.mapValues { pairs =>
+      pairs.map(_.parent)
+    }
   }
 }

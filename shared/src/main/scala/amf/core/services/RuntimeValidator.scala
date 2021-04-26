@@ -5,7 +5,7 @@ import amf.core.emitter.RenderOptions
 import amf.core.errorhandling.ErrorHandler
 import amf.core.metamodel.Field
 import amf.core.model.document.BaseUnit
-import amf.core.model.domain.DomainElement
+import amf.core.model.domain.{AmfObject, DomainElement}
 import amf.core.parser.Annotations
 import amf.core.rdf.RdfModel
 import amf.core.services.RuntimeValidator.CustomShaclFunctions
@@ -54,10 +54,11 @@ trait RuntimeValidator extends PlatformSecrets {
   /**
     * Low level validation returning a SHACL validation report
     */
-  def shaclValidation(model: BaseUnit,
-                      validations: EffectiveValidations,
-                      customFunctions: CustomShaclFunctions, // used in customShaclValidator
-                      options: ValidationOptions)(implicit executionContext: ExecutionContext): Future[ValidationReport]
+  def shaclValidation(
+      model: BaseUnit,
+      validations: EffectiveValidations,
+      customFunctions: CustomShaclFunctions, // used in customShaclValidator
+      options: ValidationOptions)(implicit executionContext: ExecutionContext): Future[ValidationReport]
 
   /**
     * Generates a JSON-LD graph with the SHACL shapes for the requested profile name
@@ -113,7 +114,7 @@ object RuntimeValidator {
 
   type PropertyInfo = (Annotations, Field)
   // When no property info is provided violation is thrown in domain element level
-  type CustomShaclFunction  = (DomainElement, Option[PropertyInfo] => Unit) => Unit
+  type CustomShaclFunction  = (AmfObject, Option[PropertyInfo] => Unit) => Unit
   type CustomShaclFunctions = Map[String, CustomShaclFunction]
 
   def shaclValidation(

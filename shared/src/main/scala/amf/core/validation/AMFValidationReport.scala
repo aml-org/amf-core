@@ -10,8 +10,8 @@ case class AMFValidationReport(conforms: Boolean,
   private val DefaultMax = 30
 
   def toString(max: Int): String = {
-    val str = StringBuilder.newBuilder
-    val validations = results.take(max).sortWith((c1,c2) => c1.compare(c2) < 0).groupBy(_.level)
+    val str         = StringBuilder.newBuilder
+    val validations = results.take(max).sortWith((c1, c2) => c1.compare(c2) < 0).groupBy(_.severityLevel)
 
     str.append(s"Model: $model\n")
     str.append(s"Profile: ${profile.profile}\n")
@@ -25,7 +25,9 @@ case class AMFValidationReport(conforms: Boolean,
     str.toString
   }
 
-  private def appendValidations(str: StringBuilder, validations: Map[String, Seq[AMFValidationResult]], level: String): Unit =
+  private def appendValidations(str: StringBuilder,
+                                validations: Map[String, Seq[AMFValidationResult]],
+                                level: String): Unit =
     validations.get(level) match {
       case Some(l) =>
         str.append(s"\nLevel: $level\n")
@@ -37,12 +39,13 @@ case class AMFValidationReport(conforms: Boolean,
 
   override def toString: String = toString(DefaultMax)
 
-  def merge(report: AMFValidationReport): AMFValidationReport = AMFValidationReport(report.model, report.profile, results ++ report.results)
+  def merge(report: AMFValidationReport): AMFValidationReport =
+    AMFValidationReport(report.model, report.profile, results ++ report.results)
 }
 
 object AMFValidationReport {
   def apply(model: String, profile: ProfileName, results: Seq[AMFValidationResult]) =
-    new AMFValidationReport(!results.exists(_.level == SeverityLevels.VIOLATION), model, profile, results)
+    new AMFValidationReport(!results.exists(_.severityLevel == SeverityLevels.VIOLATION), model, profile, results)
 
   def empty(model: String, profileName: ProfileName) = apply(model, profileName, Seq())
 }

@@ -5,7 +5,7 @@ import amf.core.annotations.SourceVendor
 import amf.core.emitter.RenderOptions
 import amf.core.errorhandling.ErrorHandler
 import amf.core.metamodel.MetaModelTypeMapping
-import amf.core.metamodel.document.BaseUnitModel
+import amf.core.metamodel.document.{BaseUnitModel, FragmentModel}
 import amf.core.metamodel.document.BaseUnitModel.{Location, ModelVersion, Root, Usage}
 import amf.core.metamodel.document.DocumentModel.References
 import amf.core.model.document.FieldsFilter.Local
@@ -20,7 +20,13 @@ import amf.core.traversal.{
   TransformationData,
   TransformationTraversal
 }
-import amf.core.traversal.iterator.{AmfIterator, DomainElementStrategy, IdCollector, IteratorStrategy, VisitedCollector}
+import amf.core.traversal.iterator.{
+  AmfIterator,
+  DomainElementStrategy,
+  IdCollector,
+  IteratorStrategy,
+  VisitedCollector
+}
 import amf.core.unsafe.PlatformSecrets
 
 import scala.collection.mutable
@@ -94,8 +100,9 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
   /** Returns Unit iterator for specified strategy and scope. */
   def iterator(strategy: IteratorStrategy = DomainElementStrategy,
                fieldsFilter: FieldsFilter = Local,
-               visited: VisitedCollector = IdCollector()): AmfIterator =
+               visited: VisitedCollector = IdCollector()): AmfIterator = {
     strategy.iterator(fieldsFilter.filter(fields), visited)
+  }
 
   /**
     * Finds first domain element with the requested id

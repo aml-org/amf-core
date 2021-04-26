@@ -9,7 +9,7 @@ import amf.core.parser.{Annotations, Position}
 import amf.core.validation.core.ValidationResult
 
 case class AMFValidationResult(message: String,
-                               level: String,
+                               severityLevel: String,
                                targetNode: String,
                                targetProperty: Option[String],
                                validationId: String,
@@ -21,7 +21,7 @@ case class AMFValidationResult(message: String,
     val str = StringBuilder.newBuilder
     str.append(s"\n- Source: $validationId\n")
     str.append(s"  Message: $message\n")
-    str.append(s"  Level: $level\n")
+    str.append(s"  Level: $severityLevel\n")
     str.append(s"  Target: $targetNode\n")
     str.append(s"  Property: ${targetProperty.getOrElse("")}\n")
     str.append(s"  Position: $position\n")
@@ -30,11 +30,11 @@ case class AMFValidationResult(message: String,
   }
 
   override def equals(obj: Any): Boolean = obj match {
-    case other:AMFValidationResult =>
+    case other: AMFValidationResult =>
       other.message.equals(message) &&
-      other.validationId == validationId &&
-      other.location.getOrElse("") == location.getOrElse("") &&
-      samePosition(other.position)
+        other.validationId == validationId &&
+        other.location.getOrElse("") == location.getOrElse("") &&
+        samePosition(other.position)
     case _ => false
   }
 
@@ -42,13 +42,13 @@ case class AMFValidationResult(message: String,
     Objects.hash(message, validationId, location.getOrElse(""), position.map(_.range.toString).getOrElse(""))
   }
 
-  private def samePosition(otherPosition:Option[LexicalInformation]): Boolean = {
+  private def samePosition(otherPosition: Option[LexicalInformation]): Boolean = {
     otherPosition match {
       case Some(otherPos) if position.isDefined =>
         val pos = position.get
         otherPos.range.toString.equals(pos.range.toString)
       case None => position.isEmpty
-      case _ => false
+      case _    => false
     }
   }
 
@@ -114,40 +114,42 @@ object AMFValidationResult {
     model.findById(validation.focusNode) match {
       case None if validation.focusNode == model.id =>
         AMFValidationResult(
-          message = message,
-          level = level,
-          targetNode = model.id,
-          targetProperty = Option(validation.path),
-          validation.sourceShape,
-          position = Some(LexicalInformation.apply(amf.core.parser.Range.NONE)),
-          location = model.location(),
-          source = validation
+            message = message,
+            level = level,
+            targetNode = model.id,
+            targetProperty = Option(validation.path),
+            validation.sourceShape,
+            position = Some(LexicalInformation.apply(amf.core.parser.Range.NONE)),
+            location = model.location(),
+            source = validation
         )
       case None => throw new Exception(s"Cannot find node with validation error ${validation.focusNode}")
       case Some(node) =>
         val (pos, location) = findPositionAndLocation(node, validation)
         AMFValidationResult(
-          message = message,
-          level = level,
-          targetNode = node.id,
-          targetProperty = Option(validation.path),
-          validation.sourceShape,
-          position = pos,
-          location = location,
-          source = validation
+            message = message,
+            level = level,
+            targetNode = node.id,
+            targetProperty = Option(validation.path),
+            validation.sourceShape,
+            position = pos,
+            location = location,
+            source = validation
         )
     }
   }
 
   def withShapeId(shapeId: String, validation: AMFValidationResult): AMFValidationResult =
-    AMFValidationResult(validation.message,
-                        validation.level,
-                        validation.targetNode,
-                        validation.targetProperty,
-                        shapeId,
-                        validation.position,
-                        validation.location,
-                        validation.source)
+    AMFValidationResult(
+        validation.message,
+        validation.severityLevel,
+        validation.targetNode,
+        validation.targetProperty,
+        shapeId,
+        validation.position,
+        validation.location,
+        validation.source
+    )
 
   private def findPositionAndLocation(node: DomainElement,
                                       validation: ValidationResult): (Option[LexicalInformation], Option[String]) = {

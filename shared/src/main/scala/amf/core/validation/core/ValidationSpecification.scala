@@ -5,7 +5,7 @@ import amf.core.validation.SeverityLevels
 import amf.core.validation.SeverityLevels.VIOLATION
 import amf.core.validation.core.ValidationSpecification.PARSER_SIDE_VALIDATION
 import amf.core.validation.model.PropertyPath
-import amf.core.vocabulary.Namespace
+import amf.core.vocabulary.{Namespace, ValueType}
 import org.yaml.model.YDocument.EntryBuilder
 
 case class FunctionConstraintParameter(path: String, datatype: String)
@@ -27,11 +27,11 @@ case class FunctionConstraint(message: Option[String],
       .replace("-", "_")
       .replace(".", "_")
   }
-  def computeFunctionName(validationId: String): String = functionName match {
-    case Some(fnName) => fnName
-    case _ =>
-      val localName = validationId.split("/").last.split("#").last
-      s"${localName.replace("-", "_").replace(".", "_")}FnName"
+  def computeFunctionName(validationId: String): String = functionName.getOrElse(computeName(validationId))
+
+  private def computeName(validationId: String) = {
+    val localName = validationId.split("/").last.split("#").last
+    s"${localName.replace("-", "_").replace(".", "_")}FnName"
   }
 }
 

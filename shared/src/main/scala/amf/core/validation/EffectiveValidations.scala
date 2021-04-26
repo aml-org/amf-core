@@ -1,7 +1,7 @@
 package amf.core.validation
 
 import amf.core.validation.core.ValidationProfile.{SeverityLevel, ValidationIri}
-import amf.core.validation.core.{ProfileIndex, ShaclSeverityUris, ValidationProfile, ValidationSpecification}
+import amf.core.validation.core.{NestedToParentIndex, ShaclSeverityUris, ValidationProfile, ValidationSpecification}
 import amf.core.vocabulary.Namespace
 
 import scala.collection.mutable
@@ -15,7 +15,7 @@ class EffectiveValidations(val effective: mutable.HashMap[String, ValidationSpec
   def findSecurityLevelFor(id: ValidationIri): Option[SeverityLevel] = severityLevelIndex.get(id)
 
   def someEffective(profile: ValidationProfile): EffectiveValidations = {
-    val index = profile.index
+    val index = profile.reverseNestedConstraintIndex
     // we aggregate all of the validations to the total validations map
     profile.validations.foreach { update }
 
@@ -36,8 +36,8 @@ class EffectiveValidations(val effective: mutable.HashMap[String, ValidationSpec
     this
   }
 
-  private def indexedParentsOf(validation: String, index: ProfileIndex) =
-    index.parents.get(toIri(validation)).toSeq.flatten
+  private def indexedParentsOf(validation: String, index: NestedToParentIndex) =
+    index.nestedToParentMap.get(toIri(validation)).toSeq.flatten
 
   private def update(other: ValidationSpecification): Unit = {
     all.get(other.name) match {

@@ -22,17 +22,17 @@ class ValidationResult(private[amf] val _internal: InternalValidationResult) {
            position: Range,
            location: String) =
     this(
-      InternalValidationResult(message,
-                               level,
-                               targetNode,
-                               targetProperty.option,
-                               validationId,
-                               Some(LexicalInformation(position)),
-                               location.option,
-                               null))
+        InternalValidationResult(message,
+                                 level,
+                                 targetNode,
+                                 targetProperty.option,
+                                 validationId,
+                                 Some(LexicalInformation(position)),
+                                 location.option,
+                                 null))
 
   def message: String        = _internal.message
-  def level: String          = _internal.level
+  def level: String          = _internal.severityLevel
   def targetNode: String     = _internal.targetNode
   def targetProperty: String = _internal.targetProperty.orNull
   def validationId: String   = _internal.validationId
