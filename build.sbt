@@ -12,10 +12,10 @@ version in ThisBuild := {
   val major = 4
   val minor = 1
 
-  lazy val build  = sys.env.getOrElse("BUILD_NUMBER", "0")
+  lazy val build  = sys.env.getOrElse("BUILD_NUMBER", "0").toInt + 210
   lazy val branch = sys.env.get("BRANCH_NAME")
 
-  if (branch.contains("master")) s"$major.$minor.$build" else s"$major.${minor + 1}.0-SNAPSHOT"
+  if (branch.contains("master") || branch.contains("release")) s"$major.$minor.$build" else s"$major.${minor + 1}.0-SNAPSHOT"
 }
 
 publish := {}
