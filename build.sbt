@@ -18,6 +18,7 @@ version in ThisBuild := {
   if (branch.contains("master")) s"$major.$minor.$build" else s"$major.${minor + 1}.0-SNAPSHOT"
 }
 
+
 publish := {}
 
 jsEnv := new org.scalajs.jsenv.nodejs.NodeJSEnv()

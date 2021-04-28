@@ -3,10 +3,16 @@ package amf.core.model.domain
 import amf.core.annotations.Inferred
 import amf.core.metamodel.domain.LinkableElementModel
 import amf.core.model.{BoolField, StrField}
-import amf.core.parser.{Annotations, DeclarationPromise, Fields, ParserContext}
+import amf.core.parser.errorhandler.ParserErrorHandler
+import amf.core.parser.{Annotations, DeclarationPromise, Fields, FutureDeclarations, ParserContext}
 import amf.core.utils._
 import amf.plugins.features.validation.CoreValidations.UnresolvedReference
 import org.yaml.model.YPart
+
+trait FutureDeclarationComponents {
+  def futureDeclarations: FutureDeclarations
+  def eh: ParserErrorHandler
+}
 
 trait Linkable extends AmfObject { this: DomainElement with Linkable =>
 
@@ -93,13 +99,14 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
 
   // Unresolved references to things that can be linked
   // TODO: another trait?
-  var isUnresolved: Boolean         = false
-  var unresolvedSeverity: String    = "error"
-  var refName                       = ""
-  var refAst: Option[YPart]         = None
-  var refCtx: Option[ParserContext] = None
+  var isUnresolved: Boolean                       = false
+  var unresolvedSeverity: String                  = "error"
+  var refName                                     = ""
+  var refAst: Option[YPart]                       = None
+  var refCtx: Option[FutureDeclarationComponents] = None
 
-  def unresolved(refName: String, refAst: YPart, unresolvedSeverity: String = "error")(implicit ctx: ParserContext) = {
+  def unresolved(refName: String, refAst: YPart, unresolvedSeverity: String = "error")(
+      implicit ctx: FutureDeclarationComponents) = {
     isUnresolved = true
     this.refName = refName
     this.refAst = Some(refAst)

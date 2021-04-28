@@ -2,6 +2,7 @@ package amf.core.parser
 
 import amf.core.errorhandling.ErrorHandler
 import amf.core.model.document.BaseUnit
+import amf.core.model.domain.FutureDeclarationComponents
 import amf.core.parser.errorhandler.ParserErrorHandler
 import amf.core.plugin.PluginContext
 import amf.core.validation.core.ValidationSpecification
@@ -20,6 +21,7 @@ case class ParserContext(rootContextDocument: String = "",
                          eh: ParserErrorHandler,
                          plugins: PluginContext = PluginContext())
     extends ParseErrorHandler
+    with FutureDeclarationComponents
     with IllegalTypeHandler {
 
   var globalSpace: mutable.Map[String, Any] = mutable.Map()
@@ -44,7 +46,7 @@ case class ParserContext(rootContextDocument: String = "",
   private def getSonsParsedReferences: Seq[ParsedReference] =
     sonsReferences.values.map(u => ParsedReference(u, new Reference(u.location().getOrElse(u.id), Nil))).toSeq
 
-  def  copyWithSonsReferences(): ParserContext = {
+  def copyWithSonsReferences(): ParserContext = {
     val context = this.copy(refs = this.refs ++ getSonsParsedReferences)
     context.globalSpace = this.globalSpace
     context
