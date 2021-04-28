@@ -4,6 +4,8 @@ import amf.core.parser.errorhandler.ParserErrorHandler
 import amf.core.parser.{ParsedDocument, ParserContext, ReferenceHandler, _}
 import amf.core.vocabulary.Namespace
 import amf.plugins.document.graph.JsonLdKeywords
+import org.mulesoft.common.functional.MonadInstances._
+import amf.plugins.document.graph.parser.FlattenedGraphParser.isRootNode
 import org.yaml.model._
 
 object GraphDependenciesReferenceHandler extends ReferenceHandler {
@@ -15,15 +17,38 @@ object GraphDependenciesReferenceHandler extends ReferenceHandler {
 
     inputParsed match {
       case parsed: SyamlParsedDocument =>
-        val document  = parsed.document
-        val maybeMaps = document.node.toOption[Seq[YMap]]
-        maybeMaps.flatMap(s => s.headOption).fold[CompilerReferenceCollector](EmptyReferenceCollector) { map =>
-          map.entries.find(_.key.as[String] == graphDependenciesPredicate) match {
-            case Some(entry) => processDependencyEntry(entry)
-            case None        => EmptyReferenceCollector
-          }
+        val document = parsed.document
+        document.tagType match {
+          case YType.Map =>
+            collectFromFlattened(document)
+          case YType.Seq =>
+            collectFromEmbedded(document)
         }
       case _ => EmptyReferenceCollector
+    }
+  }
+
+  private def collectFromFlattened(document: YDocument) = {
+    val m        = document.as[YMap]
+    val rootNode = FlattenedGraphParser.findRootNode.runCached(m)
+    rootNode match {
+      case Some(rootNode) if rootNode.tagType == YType.Map =>
+        collectGraphDependenciesFrom(rootNode.as[YMap])
+      case _ => EmptyReferenceCollector
+    }
+  }
+
+  private def collectFromEmbedded(document: YDocument) = {
+    val maybeMaps = document.node.toOption[Seq[YMap]]
+    maybeMaps.flatMap(s => s.headOption).fold[CompilerReferenceCollector](EmptyReferenceCollector) { map =>
+      collectGraphDependenciesFrom(map)
+    }
+  }
+
+  private def collectGraphDependenciesFrom(map: YMap) = {
+    map.entries.find(_.key.as[String] == graphDependenciesPredicate) match {
+      case Some(entry) => processDependencyEntry(entry)
+      case None        => EmptyReferenceCollector
     }
   }
 

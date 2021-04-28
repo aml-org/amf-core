@@ -10,6 +10,14 @@ package object parser {
 
   implicit class YMapOps(map: YMap) {
 
+    def hasEntry(key: String, value: Any): Boolean = {
+      map.entries.exists { entry =>
+        val entryKey   = entry.key.asScalar
+        val entryValue = entry.value.asScalar
+        entryKey.exists(_.text == key) && entryValue.exists(_.text == String.valueOf(value))
+      }
+    }
+
     def key(keyword: String): Option[YMapEntry] =
       map.entries.find(entry => {
         entry.key.value match {
