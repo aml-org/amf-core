@@ -28,7 +28,7 @@ object GraphDependenciesReferenceHandler extends ReferenceHandler {
     }
   }
 
-  private def collectFromFlattened(document: YDocument) = {
+  private def collectFromFlattened(document: YDocument)(implicit errorHandler: IllegalTypeHandler) = {
     val m        = document.as[YMap]
     val rootNode = FlattenedGraphParser.findRootNode.runCached(m)
     rootNode match {
@@ -38,14 +38,14 @@ object GraphDependenciesReferenceHandler extends ReferenceHandler {
     }
   }
 
-  private def collectFromEmbedded(document: YDocument) = {
+  private def collectFromEmbedded(document: YDocument)(implicit errorHandler: IllegalTypeHandler) = {
     val maybeMaps = document.node.toOption[Seq[YMap]]
     maybeMaps.flatMap(s => s.headOption).fold[CompilerReferenceCollector](EmptyReferenceCollector) { map =>
       collectGraphDependenciesFrom(map)
     }
   }
 
-  private def collectGraphDependenciesFrom(map: YMap) = {
+  private def collectGraphDependenciesFrom(map: YMap)(implicit errorHandler: IllegalTypeHandler) = {
     map.entries.find(_.key.as[String] == graphDependenciesPredicate) match {
       case Some(entry) => processDependencyEntry(entry)
       case None        => EmptyReferenceCollector
