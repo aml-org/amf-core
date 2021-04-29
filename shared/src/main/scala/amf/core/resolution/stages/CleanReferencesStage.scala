@@ -5,8 +5,8 @@ import amf.core.errorhandling.ErrorHandler
 import amf.core.metamodel.document.BaseUnitModel
 import amf.core.model.document.{BaseUnit, Fragment, Module}
 
-class CleanReferencesStage()(override implicit val errorHandler: ErrorHandler) extends ResolutionStage() {
-  override def resolve[T <: BaseUnit](model: T): T = {
+class CleanReferencesStage() extends ResolutionStage {
+  override def resolve[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
     persistReferenceShapes(model)
 
     model.fields.removeField(BaseUnitModel.References)
@@ -16,7 +16,7 @@ class CleanReferencesStage()(override implicit val errorHandler: ErrorHandler) e
   private def persistReferenceShapes[T <: BaseUnit](model: T): Unit = {
     val referenceShapes = model.references.collect {
       case fragment: Fragment => Option(fragment.encodes).map(_.id).toList
-      case module: Module => module.declares.map(_.id)
+      case module: Module     => module.declares.map(_.id)
     }.flatten
     model.annotations += References(referenceShapes)
   }

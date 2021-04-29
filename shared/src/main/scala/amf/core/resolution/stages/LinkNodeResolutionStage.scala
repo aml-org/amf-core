@@ -8,16 +8,15 @@ import amf.core.resolution.stages.selectors.{KnownElementIdSelector, LinkNodeSel
 
 import scala.collection.mutable
 
-class LinkNodeResolutionStage(keepEditingInfo: Boolean, val visited: mutable.Set[String] = mutable.Set())(
-    override implicit val errorHandler: ErrorHandler)
+class LinkNodeResolutionStage(keepEditingInfo: Boolean, val visited: mutable.Set[String] = mutable.Set())
     extends ResolutionStage {
 
   var modelResolver: Option[ModelReferenceResolver] = None
 
-  override def resolve[T <: BaseUnit](model: T): T = {
+  override def resolve[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
     this.modelResolver = Some(new ModelReferenceResolver(model))
     val knownIdSelector = new KnownElementIdSelector(visited)
-    model.transform(knownIdSelector || LinkSelector || LinkNodeSelector, transformation).asInstanceOf[T]
+    model.transform(knownIdSelector || LinkSelector || LinkNodeSelector, transformation)(errorHandler).asInstanceOf[T]
   }
 
   private def transformation(element: DomainElement, cycle: Boolean): Option[DomainElement] = {

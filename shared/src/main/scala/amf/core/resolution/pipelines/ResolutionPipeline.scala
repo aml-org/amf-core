@@ -11,13 +11,13 @@ abstract class ResolutionPipeline() {
 
   val name: String
 
-  def steps(implicit errorHandler: ErrorHandler): Seq[ResolutionStage]
+  def steps: Seq[ResolutionStage]
 
   def transform[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
     ExecutionLog.log(s"${this.getClass.getName}#resolve: resolving ${model.location().getOrElse("")}")
     var m = model
-    steps(errorHandler).foreach { s =>
-      m = step(m, s)
+    steps.foreach { s =>
+      m = step(m, s, errorHandler)
     }
     // TODO: should be unit metadata
     m.resolved = true
@@ -25,9 +25,9 @@ abstract class ResolutionPipeline() {
     m
   }
 
-  protected def step[T <: BaseUnit](unit: T, stage: ResolutionStage): T = {
+  protected def step[T <: BaseUnit](unit: T, stage: ResolutionStage, errorHandler: ErrorHandler): T = {
     ExecutionLog.log(s"ResolutionPipeline#step: applying resolution stage ${stage.getClass.getName}")
-    val resolved = stage.resolve(unit)
+    val resolved = stage.resolve(unit, errorHandler)
     ExecutionLog.log(s"ResolutionPipeline#step: finished applying stage ${stage.getClass.getName}")
     resolved
   }

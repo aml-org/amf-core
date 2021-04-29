@@ -7,9 +7,9 @@ import amf.plugins.document.graph.AMFGraphPlugin.ID
 import amf.{AmfProfile, ProfileName}
 
 class BasicResolutionPipeline private (override val name: String) extends ResolutionPipeline() {
-  private def references(implicit eh: ErrorHandler) = new ReferenceResolutionStage(keepEditingInfo = false)
+  private def references = new ReferenceResolutionStage(keepEditingInfo = false)
 
-  override def steps(implicit eh: ErrorHandler): Seq[ResolutionStage] = Seq(references)
+  override def steps: Seq[ResolutionStage] = Seq(references)
 }
 
 object BasicResolutionPipeline {

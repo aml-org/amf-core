@@ -6,9 +6,9 @@ import amf.core.metamodel.document.DocumentModel
 import amf.core.model.document.{BaseUnit, DeclaresModel, EncodesModel}
 import amf.core.model.domain.AmfArray
 
-class DeclarationsRemovalStage()(override implicit val errorHandler: ErrorHandler) extends ResolutionStage() {
+class DeclarationsRemovalStage() extends ResolutionStage {
 
-  override def resolve[T <: BaseUnit](model: T): T = {
+  override def resolve[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
     model match {
       case doc: DeclaresModel with EncodesModel => removeAllDeclarationsButSecuritySchemes(doc)
       case _                                    => // ignore
