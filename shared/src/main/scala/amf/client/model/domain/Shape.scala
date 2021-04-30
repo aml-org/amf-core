@@ -3,6 +3,8 @@ package amf.client.model.domain
 import amf.client.convert.CoreClientConverters._
 import amf.client.model.{BoolField, StrField}
 import amf.core.model.domain.{Shape => InternalShape}
+import amf.core.parser.Annotations
+import org.yaml.model.IllegalTypeHandler
 
 import scala.scalajs.js.annotation.JSExportAll
 
@@ -33,7 +35,7 @@ trait Shape extends DomainElement with Linkable with NamedDomainElement {
   def thenShape: Shape                                          = _internal.thenShape
 
   def withName(name: String): this.type = {
-    _internal.withName(name)
+    _internal.withName(name, Annotations())
     this
   }
 

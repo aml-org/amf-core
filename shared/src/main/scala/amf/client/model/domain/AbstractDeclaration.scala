@@ -2,7 +2,9 @@ package amf.client.model.domain
 
 import amf.client.convert.CoreClientConverters._
 import amf.client.model.StrField
+import amf.core.errorhandling.UnhandledErrorHandler
 import amf.core.model.domain.templates.{AbstractDeclaration => InternalAbstractDeclaration}
+import org.yaml.model.IllegalTypeHandler
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 

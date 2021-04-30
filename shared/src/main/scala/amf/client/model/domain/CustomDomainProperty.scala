@@ -3,6 +3,8 @@ package amf.client.model.domain
 import amf.client.convert.CoreClientConverters._
 import amf.client.model.StrField
 import amf.core.model.domain.extensions.{CustomDomainProperty => InternalCustomDomainProperty}
+import amf.core.parser.Annotations
+import org.yaml.model.IllegalTypeHandler
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
@@ -25,7 +27,7 @@ case class CustomDomainProperty(private[amf] val _internal: InternalCustomDomain
   def schema: Shape = _internal.schema
 
   def withName(name: String): this.type = {
-    _internal.withName(name)
+    _internal.withName(name, Annotations())
     this
   }
 

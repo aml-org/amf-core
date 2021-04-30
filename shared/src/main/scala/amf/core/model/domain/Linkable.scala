@@ -7,7 +7,7 @@ import amf.core.parser.errorhandler.ParserErrorHandler
 import amf.core.parser.{Annotations, DeclarationPromise, Fields, FutureDeclarations, ParserContext}
 import amf.core.utils._
 import amf.plugins.features.validation.CoreValidations.UnresolvedReference
-import org.yaml.model.YPart
+import org.yaml.model.{IllegalTypeHandler, YPart}
 
 trait FutureDeclarationComponents {
   def futureDeclarations: FutureDeclarations
@@ -48,7 +48,8 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
     link(AmfScalar(label), annotations, Annotations())
   }
 
-  private[amf] def link[T](label: amf.core.parser.ScalarNode, annotations: Annotations): T = {
+  private[amf] def link[T](label: amf.core.parser.ScalarNode, annotations: Annotations)(
+      implicit iv: IllegalTypeHandler): T = {
     link(label.text(), annotations, Annotations.inferred())
   }
 

@@ -25,7 +25,7 @@ object Namespace {
   val Xsd: Namespace              = Namespace("http://www.w3.org/2001/XMLSchema#")
   val AnonShapes: Namespace       = Namespace("http://a.ml/vocabularies/shapes/anon#")
   val Rdf: Namespace              = Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-  val WihtoutNamespace: Namespace = Namespace("")
+  val WithoutNamespace: Namespace = Namespace("")
   val Meta: Namespace             = Namespace("http://a.ml/vocabularies/meta#")
   val Owl: Namespace              = Namespace("http://www.w3.org/2002/07/owl#")
   val Rdfs: Namespace             = Namespace("http://www.w3.org/2000/01/rdf-schema#")
@@ -49,7 +49,7 @@ object Namespace {
     case "http://www.w3.org/2001/XMLSchema"              => Some(Xsd)
     case "http://a.ml/vocabularies/shapes/anon"          => Some(AnonShapes)
     case "http://www.w3.org/1999/02/22-rdf-syntax-ns"    => Some(Rdf)
-    case ""                                              => Some(WihtoutNamespace)
+    case ""                                              => Some(WithoutNamespace)
     case "http://a.ml/vocabularies/meta"                 => Some(Meta)
     case "http://www.w3.org/2002/07/owl"                 => Some(Owl)
     case "http://www.w3.org/2000/01/rdf-schema"          => Some(Rdfs)
@@ -107,8 +107,7 @@ case class NamespaceAliases() {
   def uri(s: String): ValueType = {
     if (s.indexOf(":") > -1) {
       expand(s)
-    }
-    else {
+    } else {
       ns.values.find(n => s.indexOf(n.base) == 0) match {
         case Some(foundNs) => ValueType(foundNs, s.split(foundNs.base).last)
         case _             => ValueType(s)
@@ -121,8 +120,7 @@ case class NamespaceAliases() {
   def expand(uri: String): ValueType = {
     if (uri.startsWith("http://")) { // we have http: as  a valid prefix, we need to disambiguate
       ValueType(uri)
-    }
-    else {
+    } else {
       uri.split(":") match {
         case Array(prefix, postfix) =>
           resolve(prefix) match {

@@ -3,6 +3,7 @@ package amf.client.model.domain
 import amf.client.convert.CoreClientConverters._
 import amf.client.model.StrField
 import amf.core.model.domain.extensions.{DomainExtension => InternalDomainExtension}
+import amf.core.parser.Annotations
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
@@ -17,7 +18,7 @@ case class DomainExtension(private[amf] val _internal: InternalDomainExtension) 
   def extension: DataNode             = _internal.extension
 
   def withName(name: String): this.type = {
-    _internal.withName(name)
+    _internal.withName(name, Annotations())
     this
   }
 

@@ -3,6 +3,8 @@ package amf.client.model.domain
 import amf.client.convert.CoreClientConverters._
 import amf.client.model.StrField
 import amf.core.model.domain.templates.{VariableValue => InternalVariableValue}
+import amf.core.parser.Annotations
+import org.yaml.model.IllegalTypeHandler
 
 import scala.scalajs.js.annotation.JSExportAll
 
@@ -18,7 +20,7 @@ case class VariableValue private[amf] (private[amf] val _internal: InternalVaria
   def value: DataNode = _internal.value
 
   def withName(name: String): this.type = {
-    _internal.withName(name)
+    _internal.withName(name, Annotations())
     this
   }
 

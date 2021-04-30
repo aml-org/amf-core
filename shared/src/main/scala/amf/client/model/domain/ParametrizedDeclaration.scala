@@ -3,6 +3,7 @@ package amf.client.model.domain
 import amf.client.convert.CoreClientConverters._
 import amf.client.model.StrField
 import amf.core.model.domain.templates.{ParametrizedDeclaration => InternalParametrizedDeclaration}
+import amf.core.parser.Annotations
 
 import scala.scalajs.js.annotation.JSExportAll
 
@@ -20,7 +21,7 @@ trait ParametrizedDeclaration extends DomainElement with NamedDomainElement {
 
   /** Set name property. */
   def withName(name: String): this.type = {
-    _internal.withName(name)
+    _internal.withName(name, Annotations())
     this
   }
 

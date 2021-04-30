@@ -94,7 +94,7 @@ object RecursiveShape {
 
   def apply(shape: Shape): RecursiveShape =
     apply(Fields(), shape.annotations)
-      .withName(shape.name.option().getOrElse("default-recursion"))
+      .withName(shape.name.option().getOrElse("default-recursion"), Annotations())
       .adopted(shape.id)
       .withSupportsRecursion(shape.supportsRecursion.value())
       .withFixPoint(shape.id)

@@ -1,6 +1,5 @@
 package amf.core.parser
 
-import amf.core.errorhandling.ErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.model.domain.FutureDeclarationComponents
 import amf.core.parser.errorhandler.ParserErrorHandler
@@ -11,6 +10,13 @@ import org.yaml.model.{IllegalTypeHandler, ParseErrorHandler, SyamlException, YE
 
 import scala.collection.mutable
 
+abstract class ParserErrorHandling(val eh: ParserErrorHandler) extends ParseErrorHandler with IllegalTypeHandler {
+
+  override def handle(location: SourceLocation, e: SyamlException): Unit = eh.handle(location, e)
+
+  override def handle[T](error: YError, defaultValue: T): T = eh.handle(error, defaultValue)
+}
+
 object EmptyFutureDeclarations {
   def apply(): FutureDeclarations = new FutureDeclarations {}
 }
@@ -18,11 +24,10 @@ object EmptyFutureDeclarations {
 case class ParserContext(rootContextDocument: String = "",
                          refs: Seq[ParsedReference] = Seq.empty,
                          futureDeclarations: FutureDeclarations = EmptyFutureDeclarations(),
-                         eh: ParserErrorHandler,
+                         override val eh: ParserErrorHandler,
                          plugins: PluginContext = PluginContext())
-    extends ParseErrorHandler
-    with FutureDeclarationComponents
-    with IllegalTypeHandler {
+    extends ParserErrorHandling(eh)
+    with FutureDeclarationComponents {
 
   var globalSpace: mutable.Map[String, Any] = mutable.Map()
 
@@ -53,10 +58,6 @@ case class ParserContext(rootContextDocument: String = "",
   }
 
   val parserRun: Int = eh.parserRun
-
-  override def handle(location: SourceLocation, e: SyamlException): Unit = eh.handle(location, e)
-
-  override def handle[T](error: YError, defaultValue: T): T = eh.handle(error, defaultValue)
 
   def violation(violationId: ValidationSpecification, node: String, message: String): Unit =
     eh.violation(violationId, node, message, rootContextDocument)
