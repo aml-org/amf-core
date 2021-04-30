@@ -8,21 +8,21 @@ trait TypedNode {
   type Element <: AmfElement
 
   /** Returns string AmfScalar of string node. */
-  def string()(implicit iv: IllegalTypeHandler): Element
+  def string(): Element
 
   /** Returns string AmfScalar of any scalar node. */
-  def text()(implicit iv: IllegalTypeHandler): Element
+  def text(): Element
 
   /** Returns integer AmfScalar of integer node. */
-  def integer()(implicit iv: IllegalTypeHandler): Element
+  def integer(): Element
 
   /** Returns boolean AmfScalar of boolean node. */
-  def boolean()(implicit iv: IllegalTypeHandler): Element
+  def boolean(): Element
 
-  def double()(implicit iv: IllegalTypeHandler): Element
+  def double(): Element
 
   /** Returns negated boolean AmfScalar of boolean node. */
-  def negated()(implicit iv: IllegalTypeHandler): Element
+  def negated(): Element
 }
 
 /** Scalar node. */
@@ -31,7 +31,7 @@ trait ScalarNode extends TypedNode {
 }
 
 object ScalarNode {
-  def apply(node: YNode): ScalarNode = DefaultScalarNode(node)
+  def apply(node: YNode)(implicit iv: IllegalTypeHandler): ScalarNode = DefaultScalarNode(node)
 }
 
 /** Array node. */
@@ -46,28 +46,28 @@ object ArrayNode {
 }
 
 /** Default scalar node. */
-case class DefaultScalarNode(node: YNode) extends ScalarNode {
+case class DefaultScalarNode(node: YNode)(implicit iv: IllegalTypeHandler) extends ScalarNode {
 
-  override def string()(implicit iv: IllegalTypeHandler): AmfScalar  = scalar(_.as[String])
-  override def text()(implicit iv: IllegalTypeHandler): AmfScalar    = scalar(_.as[YScalar].text)
-  override def integer()(implicit iv: IllegalTypeHandler): AmfScalar = scalar(_.as[Int])
-  override def double()(implicit iv: IllegalTypeHandler): AmfScalar  = scalar(_.as[Double])
-  override def boolean()(implicit iv: IllegalTypeHandler): AmfScalar = scalar(_.as[Boolean])
-  override def negated()(implicit iv: IllegalTypeHandler): AmfScalar = scalar(!_.as[Boolean])
-  private def scalar(fn: YNode => Any)                               = AmfScalar(fn(node), Annotations.valueNode(node))
+  override def string(): AmfScalar     = scalar(_.as[String])
+  override def text(): AmfScalar       = scalar(_.as[YScalar].text)
+  override def integer(): AmfScalar    = scalar(_.as[Int])
+  override def double(): AmfScalar     = scalar(_.as[Double])
+  override def boolean(): AmfScalar    = scalar(_.as[Boolean])
+  override def negated(): AmfScalar    = scalar(!_.as[Boolean])
+  private def scalar(fn: YNode => Any) = AmfScalar(fn(node), Annotations.valueNode(node))
 }
 
 trait BaseArrayNode extends ArrayNode {
 
   implicit val iv: IllegalTypeHandler
 
-  override def string()(implicit iv: IllegalTypeHandler): AmfArray  = array(scalar(_.as[String]))
-  override def text()(implicit iv: IllegalTypeHandler): AmfArray    = array(scalar(_.as[YScalar].text))
-  override def integer()(implicit iv: IllegalTypeHandler): AmfArray = array(scalar(_.as[Int]))
-  override def double()(implicit iv: IllegalTypeHandler): AmfArray  = array(scalar(_.as[Double]))
-  override def boolean()(implicit iv: IllegalTypeHandler): AmfArray = array(scalar(_.as[Boolean]))
-  override def negated()(implicit iv: IllegalTypeHandler): AmfArray = array(scalar(!_.as[Boolean]))
-  override def obj(fn: YNode => AmfElement): AmfArray               = array(fn)
+  override def string(): AmfArray                     = array(scalar(_.as[String]))
+  override def text(): AmfArray                       = array(scalar(_.as[YScalar].text))
+  override def integer(): AmfArray                    = array(scalar(_.as[Int]))
+  override def double(): AmfArray                     = array(scalar(_.as[Double]))
+  override def boolean(): AmfArray                    = array(scalar(_.as[Boolean]))
+  override def negated(): AmfArray                    = array(scalar(!_.as[Boolean]))
+  override def obj(fn: YNode => AmfElement): AmfArray = array(fn)
 
   private def array(fn: YNode => AmfElement) = {
     nodes match {
