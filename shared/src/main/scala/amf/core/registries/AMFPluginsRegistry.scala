@@ -32,7 +32,7 @@ object AMFPluginsRegistry {
   private def registerPluginInEnv(plugin: AMFDocumentPlugin): Unit = {
     staticCofiguration =
       staticCofiguration.withPlugins(List(AMFParsePluginAdapter(plugin), AMFRenderPluginAdapter(plugin)))
-    staticCofiguration = staticCofiguration.withTransformationPipelines(plugin.pipelines)
+    staticCofiguration = staticCofiguration.withTransformationPipelines(plugin.pipelines.values.toList)
   }
 
   private def unregisterPluginFromEnv(plugin: AMFDocumentPlugin): Unit =

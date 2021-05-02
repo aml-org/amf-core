@@ -21,11 +21,11 @@ private[amf] case class AMFRegistry(plugins: PluginsRegistry,
   def withConstraints(profile: ValidationProfile): AMFRegistry =
     copy(constraintsRules = constraintsRules + (profile.name -> profile))
 
-  def withTransformationPipeline(name: String, pipeline: ResolutionPipeline): AMFRegistry =
-    copy(transformationPipelines = transformationPipelines + (name -> pipeline))
+  def withTransformationPipeline(pipeline: ResolutionPipeline): AMFRegistry =
+    copy(transformationPipelines = transformationPipelines + (pipeline.name -> pipeline))
 
-  def withTransformationPipelines(pipelines: Map[String, ResolutionPipeline]): AMFRegistry =
-    copy(transformationPipelines = transformationPipelines ++ pipelines)
+  def withTransformationPipelines(pipelines: List[ResolutionPipeline]): AMFRegistry =
+    copy(transformationPipelines = transformationPipelines ++ pipelines.map(p => p.name -> p))
 
   private[amf] def getAllPlugins(): List[AMFPlugin[_]] = plugins.allPlugins
 
