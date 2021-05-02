@@ -1,6 +1,6 @@
 package amf.core.services
 
-import amf.client.remod.amfcore.resolution.{PipelineInfo, PipelineName}
+import amf.client.remod.amfcore.resolution.PipelineName
 import amf.core.errorhandling.ErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.registries.AMFPluginsRegistry

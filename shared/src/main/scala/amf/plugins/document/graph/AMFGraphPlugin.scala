@@ -4,7 +4,6 @@ import amf.client.plugins.{AMFDocumentPlugin, AMFPlugin}
 import amf.client.remod.amfcore.config.RenderOptions
 import amf.client.remod.amfcore.plugins.parse.AMFParsePluginAdapter
 import amf.client.remod.amfcore.plugins.render.AMFRenderPluginAdapter
-import amf.client.remod.amfcore.resolution.{PipelineInfo, PipelineName}
 import amf.core.Root
 import amf.core.client.ParsingOptions
 import amf.core.errorhandling.ErrorHandler
@@ -16,7 +15,7 @@ import amf.core.model.domain.AnnotationGraphLoader
 import amf.core.parser._
 import amf.core.rdf.{RdfModelDocument, RdfModelParser}
 import amf.core.remote.Amf
-import amf.core.resolution.pipelines.{BasicResolutionPipeline, ResolutionPipeline}
+import amf.core.resolution.pipelines.{BasicEditingResolutionPipeline, BasicResolutionPipeline, ResolutionPipeline}
 import amf.core.unsafe.PlatformSecrets
 import amf.plugins.document.graph.emitter.EmbeddedJsonLdEmitter
 import amf.plugins.document.graph.parser.{EmbeddedGraphParser, FlattenedGraphParser, GraphDependenciesReferenceHandler}
@@ -93,9 +92,8 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
   override def referenceHandler(eh: ErrorHandler): ReferenceHandler = GraphDependenciesReferenceHandler
 
   override val pipelines: Map[String, ResolutionPipeline] = Map(
-      PipelineName.from(ID, ResolutionPipeline.DEFAULT_PIPELINE) -> new BasicResolutionPipeline(),
-      PipelineName
-        .from(ID, ResolutionPipeline.EDITING_PIPELINE) -> new BasicResolutionPipeline() // hack to maintain compatibility with legacy behaviour
+      BasicResolutionPipeline.name        -> BasicResolutionPipeline(),
+      BasicEditingResolutionPipeline.name -> BasicEditingResolutionPipeline() // hack to maintain compatibility with legacy behaviour
   )
 
   /**

@@ -1,7 +1,6 @@
 package amf.client.plugins
 
 import amf.client.remod.amfcore.config.RenderOptions
-import amf.client.remod.amfcore.resolution.PipelineInfo
 import amf.core.Root
 import amf.core.client.ParsingOptions
 import amf.core.errorhandling.{ErrorHandler, UnhandledErrorHandler}
