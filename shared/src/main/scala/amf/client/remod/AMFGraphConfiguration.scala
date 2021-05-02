@@ -96,15 +96,15 @@ private[amf] class AMFGraphConfiguration(override private[amf] val resolvers: AM
   def withValidationProfile(profile: ValidationProfile): AMFGraphConfiguration =
     super._withValidationProfile(profile)
 
-  def withTransformationPipeline(name: String, pipeline: ResolutionPipeline): AMFGraphConfiguration =
-    super._withTransformationPipeline(name, pipeline)
+  def withTransformationPipeline(pipeline: ResolutionPipeline): AMFGraphConfiguration =
+    super._withTransformationPipeline(pipeline)
 
   /**
     * AMF internal method just to facilitate the construction
     * @param pipelines
     * @return
     */
-  private[amf] def withTransformationPipelines(pipelines: Map[String, ResolutionPipeline]): AMFGraphConfiguration =
+  private[amf] def withTransformationPipelines(pipelines: List[ResolutionPipeline]): AMFGraphConfiguration =
     super._withTransformationPipelines(pipelines)
 
   /**
@@ -165,17 +165,17 @@ sealed abstract class BaseAMFConfigurationSetter(private[amf] val resolvers: AMF
   protected def _withValidationProfile[T](profile: ValidationProfile): T =
     copy(registry = registry.withConstraints(profile)).asInstanceOf[T]
 
-  protected def _withTransformationPipeline[T](name: String, pipeline: ResolutionPipeline): T =
-    copy(registry = registry.withTransformationPipeline(name, pipeline)).asInstanceOf[T]
+  protected def _withTransformationPipeline[T](pipeline: ResolutionPipeline): T =
+    copy(registry = registry.withTransformationPipeline(pipeline)).asInstanceOf[T]
 
-  protected def _withTransformationPipelines[T](pipelines: Map[String, ResolutionPipeline]): T =
+  protected def _withTransformationPipelines[T](pipelines: List[ResolutionPipeline]): T =
     copy(registry = registry.withTransformationPipelines(pipelines)).asInstanceOf[T]
 
   protected def _merge[T <: BaseAMFConfigurationSetter](other: T): T = {
     this
       ._withPlugins(other.registry.getAllPlugins())
       .asInstanceOf[T]
-      ._withTransformationPipelines(other.registry.transformationPipelines)
+      ._withTransformationPipelines(other.registry.transformationPipelines.values.toList)
       .asInstanceOf[T]
   }
 

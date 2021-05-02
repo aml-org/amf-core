@@ -9,6 +9,8 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 abstract class ResolutionPipeline() {
 
+  val name: String
+
   def steps(implicit errorHandler: ErrorHandler): Seq[ResolutionStage]
 
   def transform[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
