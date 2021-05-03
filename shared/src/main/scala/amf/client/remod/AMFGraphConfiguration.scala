@@ -3,11 +3,12 @@ package amf.client.remod
 import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.registry.AMFRegistry
-import amf.core.resolution.pipelines.ResolutionPipeline
+import amf.core.resolution.pipelines.{BasicResolutionPipeline, ResolutionPipeline}
 import amf.core.validation.core.ValidationProfile
 import amf.internal.environment.Environment
 import amf.internal.reference.UnitCache
 import amf.internal.resource.ResourceLoader
+import amf.plugins.document.graph.{AMFGraphParsePlugin, AMFGraphRenderPlugin}
 
 import scala.concurrent.ExecutionContext
 // all constructors only visible from amf. Users should always use builders or defaults
@@ -41,7 +42,9 @@ private[amf] object AMFGraphConfiguration {
         MutedLogger,
         Set.empty,
         AMFOptions.default()
-    )
+    ).withPlugins(List(AMFGraphParsePlugin, AMFGraphRenderPlugin))
+      // we might need to register editing pipeline as well because of legacy behaviour.
+      .withTransformationPipeline(BasicResolutionPipeline())
   }
 
   def fromLegacy(base: AMFGraphConfiguration, legacy: Environment): AMFGraphConfiguration = {
