@@ -7,17 +7,21 @@ case class Hint(vendor: Vendor, syntax: Syntax, kind: ReferenceKind = Unspecifie
   def +(k: ReferenceKind): Hint = copy(kind = k)
 }
 
-object RamlYamlHint extends Hint(Raml, Yaml)
+object Raml10YamlHint extends Hint(Raml10, Yaml)
+
+object Raml08YamlHint extends Hint(Raml08, Yaml)
 
 object VocabularyYamlHint extends Hint(Aml, Yaml)
 
 object VocabularyJsonHint extends Hint(Aml, Json)
 
-object RamlJsonHint extends Hint(Raml, Json)
+object Oas20YamlHint extends Hint(Oas20, Yaml)
 
-object OasYamlHint extends Hint(Oas, Yaml)
+object Oas20JsonHint extends Hint(Oas20, Json)
 
-object OasJsonHint extends Hint(Oas, Json)
+object Oas30YamlHint extends Hint(Oas30, Yaml)
+
+object Oas30JsonHint extends Hint(Oas30, Json)
 
 object AsyncYamlHint extends Hint(AsyncApi, Yaml)
 

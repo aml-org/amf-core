@@ -3,8 +3,8 @@ package amf.core.annotations
 import amf.core.model.domain._
 import amf.core.remote._
 
-trait BaseSourceVendor extends SerializableAnnotation{
-  val vendor:Vendor
+trait BaseSourceVendor extends SerializableAnnotation {
+  val vendor: Vendor
   override val value: String = vendor.name
 }
 
@@ -14,12 +14,10 @@ case class SourceVendor(override val vendor: Vendor) extends BaseSourceVendor wi
 
 object SourceVendor extends AnnotationGraphLoader {
   def parse(vendor: String): Option[SourceVendor] = vendor match {
-    case Raml.name   => Some(SourceVendor(Raml))
     case Raml08.name => Some(SourceVendor(Raml08))
     case Raml10.name => Some(SourceVendor(Raml10))
     case Amf.name    => Some(SourceVendor(Amf))
-    case Oas.name    => Some(SourceVendor(Oas))
-    case Oas20.name  => Some(SourceVendor(Oas))
+    case Oas20.name  => Some(SourceVendor(Oas20))
     case Oas30.name  => Some(SourceVendor(Oas30))
     case _           => None
   }
@@ -34,12 +32,10 @@ case class DefinedByVendor(override val vendor: Vendor) extends BaseSourceVendor
 
 object DefinedByVendor extends AnnotationGraphLoader {
   def parse(vendor: String): Option[DefinedByVendor] = vendor match {
-    case Raml.name   => Some(DefinedByVendor(Raml))
     case Raml08.name => Some(DefinedByVendor(Raml08))
     case Raml10.name => Some(DefinedByVendor(Raml10))
     case Amf.name    => Some(DefinedByVendor(Amf))
-    case Oas.name    => Some(DefinedByVendor(Oas))
-    case Oas20.name  => Some(DefinedByVendor(Oas))
+    case Oas20.name  => Some(DefinedByVendor(Oas20))
     case Oas30.name  => Some(DefinedByVendor(Oas30))
     case _           => None
   }

@@ -8,10 +8,8 @@ object Vendor {
     name match {
       case Raml10.name     => Some(Raml10)
       case Raml08.name     => Some(Raml08)
-      case Raml.name       => Some(Raml)
       case Oas20.name      => Some(Oas20)
       case Oas30.name      => Some(Oas30)
-      case Oas.name        => Some(Oas)
       case AsyncApi.name   => Some(AsyncApi)
       case AsyncApi20.name => Some(AsyncApi20)
       case Amf.name        => Some(Amf)
@@ -28,10 +26,8 @@ object Vendor {
     case _              => new UnknowVendor(name)
   }
 
-  @JSExport val RAML: Vendor       = Raml
   @JSExport val RAML08: Vendor     = Raml08
   @JSExport val RAML10: Vendor     = Raml10
-  @JSExport val OAS: Vendor        = Oas
   @JSExport val OAS20: Vendor      = Oas20
   @JSExport val OAS30: Vendor      = Oas30
   @JSExport val ASYNC: Vendor      = AsyncApi
@@ -45,8 +41,8 @@ object Vendor {
 trait Vendor {
   val name: String
 
-  def isRaml: Boolean  = this == Raml || this == Raml10 || this == Raml08
-  def isOas: Boolean   = this == Oas || this == Oas20 || this == Oas30
+  def isRaml: Boolean  = this == Raml10 || this == Raml08
+  def isOas: Boolean   = this == Oas20 || this == Oas30
   def isAsync: Boolean = this == AsyncApi || this == AsyncApi20
 }
 
@@ -83,20 +79,12 @@ object Aml extends Vendor {
   override def toString: String = name.trim
 }
 
-object Oas extends Oas {
-  override def version: String = ""
-}
-
 object Oas20 extends Oas {
   override def version: String = "2.0"
 }
 
 object Oas30 extends Oas {
   override def version: String = "3.0"
-}
-
-object Raml extends Raml {
-  override def version: String = ""
 }
 
 object Raml08 extends Raml {
