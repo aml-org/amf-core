@@ -3,15 +3,15 @@ package amf.core.resolution.pipelines
 import amf.core.benchmark.ExecutionLog
 import amf.core.errorhandling.ErrorHandler
 import amf.core.model.document.BaseUnit
-import amf.core.resolution.stages.ResolutionStage
+import amf.core.resolution.stages.TransformationStep
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
-abstract class ResolutionPipeline() {
+trait TransformationPipeline {
 
   val name: String
 
-  def steps: Seq[ResolutionStage]
+  def steps: Seq[TransformationStep]
 
   def transform[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
     ExecutionLog.log(s"${this.getClass.getName}#resolve: resolving ${model.location().getOrElse("")}")
@@ -25,17 +25,17 @@ abstract class ResolutionPipeline() {
     m
   }
 
-  protected def step[T <: BaseUnit](unit: T, stage: ResolutionStage, errorHandler: ErrorHandler): T = {
-    ExecutionLog.log(s"ResolutionPipeline#step: applying resolution stage ${stage.getClass.getName}")
-    val resolved = stage.resolve(unit, errorHandler)
-    ExecutionLog.log(s"ResolutionPipeline#step: finished applying stage ${stage.getClass.getName}")
+  protected def step[T <: BaseUnit](unit: T, step: TransformationStep, errorHandler: ErrorHandler): T = {
+    ExecutionLog.log(s"ResolutionPipeline#step: applying resolution stage ${step.getClass.getName}")
+    val resolved = step.apply(unit, errorHandler)
+    ExecutionLog.log(s"ResolutionPipeline#step: finished applying stage ${step.getClass.getName}")
     resolved
   }
 }
 
 @JSExportTopLevel("ResolutionPipeline")
 @JSExportAll
-object ResolutionPipeline {
+object TransformationPipeline {
   val DEFAULT_PIPELINE       = "default"
   val EDITING_PIPELINE       = "editing"
   val COMPATIBILITY_PIPELINE = "compatibility"

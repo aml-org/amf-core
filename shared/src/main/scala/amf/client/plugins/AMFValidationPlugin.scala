@@ -5,7 +5,7 @@ import amf.client.execution.BaseExecutionEnvironment
 import amf.client.remod.amfcore.plugins.validate.AMFValidatePlugin
 import amf.core.model.document.BaseUnit
 import amf.core.remote.Platform
-import amf.core.resolution.pipelines.ResolutionPipeline
+import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.unsafe.PlatformSecrets
 import amf.core.validation.core.ValidationProfile
 import amf.core.validation.{AMFValidationReport, EffectiveValidations}

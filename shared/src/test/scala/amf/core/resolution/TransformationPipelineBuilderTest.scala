@@ -6,15 +6,15 @@ import amf.client.remod.amfcore.resolution.{PipelineName, TransformationPipeline
 import amf.core.errorhandling.{ErrorHandler, UnhandledErrorHandler}
 import amf.core.model.document.{BaseUnit, Document}
 import amf.core.remote.Amf
-import amf.core.resolution.pipelines.ResolutionPipeline
-import amf.core.resolution.stages.ResolutionStage
+import amf.core.resolution.pipelines.TransformationPipeline
+import amf.core.resolution.stages.TransformationStep
 import amf.plugins.features.validation.CoreValidations
 import org.scalatest.{FunSuite, Matchers}
 
 class TransformationPipelineBuilderTest extends FunSuite with Matchers {
 
-  private case class AddToIdCustomStage(content: String) extends ResolutionStage {
-    override def resolve[T <: BaseUnit](baseUnit: T, errorHandler: ErrorHandler): T = {
+  private case class AddToIdCustomStage(content: String) extends TransformationStep {
+    override def apply[T <: BaseUnit](baseUnit: T, errorHandler: ErrorHandler): T = {
       baseUnit.withId(baseUnit.id + content)
     }
   }
@@ -28,9 +28,9 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
   }
 
   test("Prepend and append to existing pipeline") {
-    val createdPipeline: ResolutionPipeline = new ResolutionPipeline {
-      override val name: String                = "some-pipeline"
-      override val steps: Seq[ResolutionStage] = Seq(AddToIdCustomStage(" middle "))
+    val createdPipeline: TransformationPipeline = new TransformationPipeline {
+      override val name: String                   = "some-pipeline"
+      override val steps: Seq[TransformationStep] = Seq(AddToIdCustomStage(" middle "))
     }
     val builder = TransformationPipelineBuilder
       .fromPipeline(createdPipeline)
@@ -42,12 +42,12 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
   }
 
   test("Pipeline builder name setter will override base pipeline name") {
-    val basePipeline: ResolutionPipeline = new ResolutionPipeline {
-      override val name: String                = "originalName"
-      override val steps: Seq[ResolutionStage] = Nil
+    val basePipeline: TransformationPipeline = new TransformationPipeline {
+      override val name: String                   = "originalName"
+      override val steps: Seq[TransformationStep] = Nil
     }
     val newName = "otherName"
-    val createdPipeline: ResolutionPipeline =
+    val createdPipeline: TransformationPipeline =
       TransformationPipelineBuilder.fromPipeline(basePipeline).withName(newName).build()
     createdPipeline.name should be(newName)
   }
@@ -55,7 +55,7 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
   test("Create builder from pipeline name and config") {
     val config = AMFGraphConfiguration.predefined()
     val builder =
-      TransformationPipelineBuilder.fromPipeline(PipelineName.from(Amf.name, ResolutionPipeline.DEFAULT_PIPELINE),
+      TransformationPipelineBuilder.fromPipeline(PipelineName.from(Amf.name, TransformationPipeline.DEFAULT_PIPELINE),
                                                  config)
     val pipeline = builder.get.build()
     pipeline.steps should not be empty
@@ -64,8 +64,8 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
   test("Verify use of error handler in client stage") {
     val builder = TransformationPipelineBuilder.empty()
     val pipeline = builder
-      .append(new ResolutionStage {
-        override def resolve[T <: BaseUnit](baseUnit: T, errorHandler: ErrorHandler): T = {
+      .append(new TransformationStep {
+        override def apply[T <: BaseUnit](baseUnit: T, errorHandler: ErrorHandler): T = {
           errorHandler.violation(CoreValidations.ResolutionValidation, "node", "some error")
           baseUnit
         }

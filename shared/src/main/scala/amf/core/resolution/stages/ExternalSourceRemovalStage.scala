@@ -8,9 +8,9 @@ import amf.core.resolution.stages.selectors.{ExternalSourceElementSelector, Know
 
 import scala.collection.mutable
 
-class ExternalSourceRemovalStage(val visited: mutable.Set[String] = mutable.Set()) extends ResolutionStage {
+class ExternalSourceRemovalStage(val visited: mutable.Set[String] = mutable.Set()) extends TransformationStep {
 
-  override def resolve[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
+  override def apply[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
     val knownIdSelector = new KnownElementIdSelector(visited)
     model.transform(knownIdSelector || ExternalSourceElementSelector, transformation)(errorHandler).asInstanceOf[T]
   }

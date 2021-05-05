@@ -3,7 +3,7 @@ package amf.client.remod
 import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.registry.AMFRegistry
-import amf.core.resolution.pipelines.{BasicResolutionPipeline, ResolutionPipeline}
+import amf.core.resolution.pipelines.{BasicResolutionPipeline, TransformationPipeline}
 import amf.core.validation.core.ValidationProfile
 import amf.internal.environment.Environment
 import amf.internal.reference.UnitCache
@@ -94,7 +94,7 @@ private[amf] class AMFGraphConfiguration(override private[amf] val resolvers: AM
   def withValidationProfile(profile: ValidationProfile): AMFGraphConfiguration =
     super._withValidationProfile(profile)
 
-  def withTransformationPipeline(pipeline: ResolutionPipeline): AMFGraphConfiguration =
+  def withTransformationPipeline(pipeline: TransformationPipeline): AMFGraphConfiguration =
     super._withTransformationPipeline(pipeline)
 
   /**
@@ -102,7 +102,7 @@ private[amf] class AMFGraphConfiguration(override private[amf] val resolvers: AM
     * @param pipelines
     * @return
     */
-  private[amf] def withTransformationPipelines(pipelines: List[ResolutionPipeline]): AMFGraphConfiguration =
+  private[amf] def withTransformationPipelines(pipelines: List[TransformationPipeline]): AMFGraphConfiguration =
     super._withTransformationPipelines(pipelines)
 
   /**
@@ -163,10 +163,10 @@ sealed abstract class BaseAMFConfigurationSetter(private[amf] val resolvers: AMF
   protected def _withValidationProfile[T](profile: ValidationProfile): T =
     copy(registry = registry.withConstraints(profile)).asInstanceOf[T]
 
-  protected def _withTransformationPipeline[T](pipeline: ResolutionPipeline): T =
+  protected def _withTransformationPipeline[T](pipeline: TransformationPipeline): T =
     copy(registry = registry.withTransformationPipeline(pipeline)).asInstanceOf[T]
 
-  protected def _withTransformationPipelines[T](pipelines: List[ResolutionPipeline]): T =
+  protected def _withTransformationPipelines[T](pipelines: List[TransformationPipeline]): T =
     copy(registry = registry.withTransformationPipelines(pipelines)).asInstanceOf[T]
 
   protected def _merge[T <: BaseAMFConfigurationSetter](other: T): T = {

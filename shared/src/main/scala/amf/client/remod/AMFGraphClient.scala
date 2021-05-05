@@ -7,7 +7,7 @@ import amf.core.client.ParsingOptions
 import amf.core.errorhandling.ErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.remote.{Cache, Context, Vendor}
-import amf.core.resolution.pipelines.ResolutionPipeline
+import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.services.RuntimeCompiler
 import amf.core.validation.AMFValidationReport
 

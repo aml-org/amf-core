@@ -9,9 +9,9 @@ import amf.core.vocabulary.Namespace
 
 import scala.collection.mutable
 
-class UrlShortenerStage() extends ResolutionStage {
+class UrlShortenerStage() extends TransformationStep {
 
-  override def resolve[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
+  override def apply[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
     val ids: Set[String] = Set(model.id) ++ obtainNestedReferenceIds(model)
     shorten(model, ids)
     model.withId(base)

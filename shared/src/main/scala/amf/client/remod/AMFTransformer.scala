@@ -1,7 +1,7 @@
 package amf.client.remod
 
 import amf.core.model.document.BaseUnit
-import amf.core.resolution.pipelines.ResolutionPipeline
+import amf.core.resolution.pipelines.TransformationPipeline
 
 private[remod] object AMFTransformer {
 

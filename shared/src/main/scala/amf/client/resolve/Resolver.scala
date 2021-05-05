@@ -4,7 +4,7 @@ import amf.client.convert.CoreClientConverters._
 import amf.client.model.document.BaseUnit
 import amf.client.parse.DefaultErrorHandler
 import amf.client.resolve.ClientErrorHandlerConverter._
-import amf.core.resolution.pipelines.ResolutionPipeline
+import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.services.RuntimeResolver
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
@@ -13,7 +13,7 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 @JSExportAll
 class Resolver(vendor: String) {
 
-  def resolve(unit: BaseUnit): BaseUnit = resolve(unit, ResolutionPipeline.DEFAULT_PIPELINE)
+  def resolve(unit: BaseUnit): BaseUnit = resolve(unit, TransformationPipeline.DEFAULT_PIPELINE)
 
   def resolve(unit: BaseUnit, pipeline: String): BaseUnit =
     RuntimeResolver.resolve(vendor, unit, pipeline)

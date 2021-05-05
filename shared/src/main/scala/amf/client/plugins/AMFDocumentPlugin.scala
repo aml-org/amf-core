@@ -9,7 +9,7 @@ import amf.core.model.document.BaseUnit
 import amf.core.model.domain.AnnotationGraphLoader
 import amf.core.parser.{ParserContext, ReferenceHandler}
 import amf.core.registries.AMFDomainEntityResolver
-import amf.core.resolution.pipelines.ResolutionPipeline
+import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.vocabulary.{Namespace, NamespaceAliases}
 import org.yaml.builder.{DocBuilder, YDocumentBuilder}
 import org.yaml.model.YDocument
@@ -42,7 +42,7 @@ abstract class AMFDocumentPlugin extends AMFPlugin {
 
   def serializableAnnotations(): Map[String, AnnotationGraphLoader]
 
-  val pipelines: Map[String, ResolutionPipeline] = Map()
+  val pipelines: Map[String, TransformationPipeline] = Map()
 
   /**
     * List of media types used to encode serialisations of
