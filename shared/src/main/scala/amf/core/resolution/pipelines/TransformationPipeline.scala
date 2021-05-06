@@ -1,29 +1,46 @@
 package amf.core.resolution.pipelines
 
+import amf.client.remod.amfcore.config.{
+  AMFEvent,
+  AMFEventListener,
+  FinishedTransformationEvent,
+  FinishedTransformationStepEvent,
+  StartingTransformationEvent
+}
 import amf.core.benchmark.ExecutionLog
 import amf.core.errorhandling.ErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.resolution.stages.TransformationStep
 
 trait TransformationPipeline {
-
   val name: String
-
   def steps: Seq[TransformationStep]
+}
 
-  def transform[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
+// transformation pipelines can only run internally within amf.
+private[amf] case class TransformationPipelineRunner(errorHandler: ErrorHandler,
+                                                     listeners: Seq[AMFEventListener] = Nil) {
+
+  private def notifyEvent(e: AMFEvent): Unit = listeners.foreach(_.notifyEvent(e))
+
+  def run[T <: BaseUnit](model: T, pipeline: TransformationPipeline): T = {
     ExecutionLog.log(s"${this.getClass.getName}#resolve: resolving ${model.location().getOrElse("")}")
-    var m = model
-    steps.foreach { s =>
-      m = step(m, s, errorHandler)
+    notifyEvent(StartingTransformationEvent(pipeline))
+    var m     = model
+    val steps = pipeline.steps
+    steps.zipWithIndex foreach {
+      case (s, index) =>
+        m = step(m, s, errorHandler)
+        notifyEvent(FinishedTransformationStepEvent(s, index))
     }
     // TODO: should be unit metadata
     m.resolved = true
+    notifyEvent(FinishedTransformationEvent(m))
     ExecutionLog.log(s"${this.getClass.getName}#resolve: resolved model ${m.location().getOrElse("")}")
     m
   }
 
-  protected def step[T <: BaseUnit](unit: T, step: TransformationStep, errorHandler: ErrorHandler): T = {
+  private def step[T <: BaseUnit](unit: T, step: TransformationStep, errorHandler: ErrorHandler): T = {
     ExecutionLog.log(s"ResolutionPipeline#step: applying resolution stage ${step.getClass.getName}")
     val resolved = step.transform(unit, errorHandler)
     ExecutionLog.log(s"ResolutionPipeline#step: finished applying stage ${step.getClass.getName}")

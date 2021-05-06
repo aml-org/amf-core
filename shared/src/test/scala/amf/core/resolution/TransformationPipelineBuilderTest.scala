@@ -6,7 +6,7 @@ import amf.client.remod.amfcore.resolution.{PipelineName, TransformationPipeline
 import amf.core.errorhandling.{ErrorHandler, UnhandledErrorHandler}
 import amf.core.model.document.{BaseUnit, Document}
 import amf.core.remote.Amf
-import amf.core.resolution.pipelines.TransformationPipeline
+import amf.core.resolution.pipelines.{TransformationPipeline, TransformationPipelineRunner}
 import amf.core.resolution.stages.TransformationStep
 import amf.plugins.features.validation.CoreValidations
 import org.scalatest.{FunSuite, Matchers}
@@ -20,10 +20,10 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
   }
 
   test("Create builder from empty pipeline and append stage") {
-    val pipeline = TransformationPipelineBuilder.empty().append(AddToIdCustomStage("modified")).build()
+    val pipeline = TransformationPipelineBuilder.empty("defaultName").append(AddToIdCustomStage("modified")).build()
 
     val unit = Document().withId("")
-    pipeline.transform(unit, UnhandledErrorHandler)
+    TransformationPipelineRunner(UnhandledErrorHandler).run(unit, pipeline)
     unit.id should be("modified")
   }
 
@@ -36,8 +36,9 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
       .fromPipeline(createdPipeline)
       .prepend(AddToIdCustomStage("first"))
       .append(AddToIdCustomStage("last"))
-    val unit = Document().withId("")
-    builder.build().transform(unit, UnhandledErrorHandler)
+    val unit     = Document().withId("")
+    val pipeline = builder.build()
+    TransformationPipelineRunner(UnhandledErrorHandler).run(unit, pipeline)
     unit.id should be("first middle last")
   }
 
@@ -62,7 +63,7 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
   }
 
   test("Verify use of error handler in client stage") {
-    val builder = TransformationPipelineBuilder.empty()
+    val builder = TransformationPipelineBuilder.empty("defaultName")
     val pipeline = builder
       .append(new TransformationStep {
         override def transform[T <: BaseUnit](baseUnit: T, errorHandler: ErrorHandler): T = {
@@ -73,7 +74,7 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
       .build()
 
     val eh = DefaultErrorHandler()
-    pipeline.transform(Document(), eh)
+    TransformationPipelineRunner(eh).run(Document(), pipeline)
     eh.getErrors.size should be(1)
   }
 

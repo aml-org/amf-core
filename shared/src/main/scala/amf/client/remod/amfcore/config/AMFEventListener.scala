@@ -5,7 +5,8 @@ import amf.client.remod.amfcore.plugins.render.AMFRenderPlugin
 import amf.client.remod.amfcore.plugins.validate.{AMFValidatePlugin, ValidationResult}
 import amf.client.remote.Content
 import amf.core.model.document.BaseUnit
-import amf.core.parser.{ParsedDocument, ReferenceKind}
+import amf.core.parser.ParsedDocument
+import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.resolution.stages.TransformationStep
 import amf.core.validation.AMFValidationReport
 
@@ -86,13 +87,11 @@ case class FinishedParsingEvent(url: String, unit: BaseUnit) extends AMFEvent {
 }
 
 // Resolution Events
-// TODO missing invocation
 
-case class StartingTransformationEvent(pipeline: String, totalSteps: Int) extends AMFEvent {
+case class StartingTransformationEvent(pipeline: TransformationPipeline) extends AMFEvent {
   override val name: String = STARTING_TRANSFORMATION
 }
 
-// this event may be impossible to invoke
 case class FinishedTransformationStepEvent(stage: TransformationStep, index: Int) extends AMFEvent {
   override val name: String = FINISHED_TRANSFORMATION_STEP
 }

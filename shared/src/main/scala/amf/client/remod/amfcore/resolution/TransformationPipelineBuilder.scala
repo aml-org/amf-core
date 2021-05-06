@@ -1,14 +1,10 @@
 package amf.client.remod.amfcore.resolution
 
 import amf.client.remod.AMFGraphConfiguration
-import amf.client.remod.amfcore.resolution.TransformationPipelineBuilder.StepsProvider
-import amf.core.errorhandling.ErrorHandler
-import amf.core.model.document.BaseUnit
 import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.resolution.stages.TransformationStep
 
-case class TransformationPipelineBuilder private (builderName: String = "defaultBuilderName",
-                                                  builderSteps: Seq[TransformationStep] = Nil) {
+case class TransformationPipelineBuilder private (builderName: String, builderSteps: Seq[TransformationStep] = Nil) {
 
   def build(): TransformationPipeline = new TransformationPipeline {
     override val name: String                   = builderName
@@ -38,12 +34,10 @@ case class TransformationPipelineBuilder private (builderName: String = "default
 
 object TransformationPipelineBuilder {
 
-  type StepsProvider = ((ErrorHandler) => Seq[TransformationStep])
-
-  def empty(): TransformationPipelineBuilder = new TransformationPipelineBuilder()
+  def empty(pipelineName: String): TransformationPipelineBuilder = new TransformationPipelineBuilder(pipelineName)
 
   def fromPipeline(pipeline: TransformationPipeline): TransformationPipelineBuilder = {
-    new TransformationPipelineBuilder(builderSteps = pipeline.steps)
+    new TransformationPipelineBuilder(pipeline.name, builderSteps = pipeline.steps)
   }
 
   def fromPipeline(pipelineName: String, conf: AMFGraphConfiguration): Option[TransformationPipelineBuilder] =
