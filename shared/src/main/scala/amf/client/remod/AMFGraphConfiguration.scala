@@ -3,7 +3,7 @@ package amf.client.remod
 import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.registry.AMFRegistry
-import amf.core.resolution.pipelines.{BasicResolutionPipeline, TransformationPipeline}
+import amf.core.resolution.pipelines.{BasicTransformationPipeline, TransformationPipeline}
 import amf.core.validation.core.ValidationProfile
 import amf.internal.environment.Environment
 import amf.internal.reference.UnitCache
@@ -44,7 +44,7 @@ private[amf] object AMFGraphConfiguration {
         AMFOptions.default()
     ).withPlugins(List(AMFGraphParsePlugin, AMFGraphRenderPlugin))
       // we might need to register editing pipeline as well because of legacy behaviour.
-      .withTransformationPipeline(BasicResolutionPipeline())
+      .withTransformationPipeline(BasicTransformationPipeline())
   }
 
   def fromLegacy(base: AMFGraphConfiguration, legacy: Environment): AMFGraphConfiguration = {

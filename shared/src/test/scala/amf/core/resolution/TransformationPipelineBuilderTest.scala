@@ -14,7 +14,7 @@ import org.scalatest.{FunSuite, Matchers}
 class TransformationPipelineBuilderTest extends FunSuite with Matchers {
 
   private case class AddToIdCustomStage(content: String) extends TransformationStep {
-    override def apply[T <: BaseUnit](baseUnit: T, errorHandler: ErrorHandler): T = {
+    override def transform[T <: BaseUnit](baseUnit: T, errorHandler: ErrorHandler): T = {
       baseUnit.withId(baseUnit.id + content)
     }
   }
@@ -65,7 +65,7 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
     val builder = TransformationPipelineBuilder.empty()
     val pipeline = builder
       .append(new TransformationStep {
-        override def apply[T <: BaseUnit](baseUnit: T, errorHandler: ErrorHandler): T = {
+        override def transform[T <: BaseUnit](baseUnit: T, errorHandler: ErrorHandler): T = {
           errorHandler.violation(CoreValidations.ResolutionValidation, "node", "some error")
           baseUnit
         }

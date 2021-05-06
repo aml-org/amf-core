@@ -5,8 +5,6 @@ import amf.core.errorhandling.ErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.resolution.stages.TransformationStep
 
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
-
 trait TransformationPipeline {
 
   val name: String
@@ -27,14 +25,13 @@ trait TransformationPipeline {
 
   protected def step[T <: BaseUnit](unit: T, step: TransformationStep, errorHandler: ErrorHandler): T = {
     ExecutionLog.log(s"ResolutionPipeline#step: applying resolution stage ${step.getClass.getName}")
-    val resolved = step.apply(unit, errorHandler)
+    val resolved = step.transform(unit, errorHandler)
     ExecutionLog.log(s"ResolutionPipeline#step: finished applying stage ${step.getClass.getName}")
     resolved
   }
 }
 
-@JSExportTopLevel("ResolutionPipeline")
-@JSExportAll
+//TODO: this should be modified to include full pipeline names
 object TransformationPipeline {
   val DEFAULT_PIPELINE       = "default"
   val EDITING_PIPELINE       = "editing"

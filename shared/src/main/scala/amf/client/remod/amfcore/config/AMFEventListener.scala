@@ -6,7 +6,7 @@ import amf.client.remod.amfcore.plugins.validate.{AMFValidatePlugin, ValidationR
 import amf.client.remote.Content
 import amf.core.model.document.BaseUnit
 import amf.core.parser.{ParsedDocument, ReferenceKind}
-import amf.core.resolution.stages.ResolutionStage
+import amf.core.resolution.stages.TransformationStep
 import amf.core.validation.AMFValidationReport
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
@@ -21,20 +21,20 @@ sealed trait AMFEvent {
 @JSExportTopLevel("EventNames")
 @JSExportAll
 object AMFEventNames {
-  val STARTING_PARSING              = "StartingParsing"
-  val STARTING_CONTENT_PARSING      = "StartingContentParsing"
-  val PARSED_SYNTAX                 = "ParsedSyntax"
-  val PARSED_MODEL                  = "ParsedModel"
-  val FINISHED_PARSING              = "FinishedParsing"
-  val STARTING_TRANSFORMATION       = "StartingTransformation"
-  val FINISHED_TRANSFORMATION_STAGE = "FinishedTransformationStage"
-  val FINISHED_TRANSFORMATION       = "FinishedTransformation"
-  val STARTING_VALIDATION           = "StartingValidation"
-  val FINISHED_VALIDATION_PLUGIN    = "FinishedValidationPlugin"
-  val FINISHED_VALIDATION           = "FinishedValidation"
-  val STARTING_RENDERING            = "StartingRendering"
-  val FINISHED_RENDERING_AST        = "FinishedRenderingAST"
-  val FINISHED_RENDERING_SYNTAX     = "FinishedRenderingSyntax"
+  val STARTING_PARSING             = "StartingParsing"
+  val STARTING_CONTENT_PARSING     = "StartingContentParsing"
+  val PARSED_SYNTAX                = "ParsedSyntax"
+  val PARSED_MODEL                 = "ParsedModel"
+  val FINISHED_PARSING             = "FinishedParsing"
+  val STARTING_TRANSFORMATION      = "StartingTransformation"
+  val FINISHED_TRANSFORMATION_STEP = "FinishedTransformationStep"
+  val FINISHED_TRANSFORMATION      = "FinishedTransformation"
+  val STARTING_VALIDATION          = "StartingValidation"
+  val FINISHED_VALIDATION_PLUGIN   = "FinishedValidationPlugin"
+  val FINISHED_VALIDATION          = "FinishedValidation"
+  val STARTING_RENDERING           = "StartingRendering"
+  val FINISHED_RENDERING_AST       = "FinishedRenderingAST"
+  val FINISHED_RENDERING_SYNTAX    = "FinishedRenderingSyntax"
 }
 
 // Parsing Events
@@ -93,8 +93,8 @@ case class StartingTransformationEvent(pipeline: String, totalSteps: Int) extend
 }
 
 // this event may be impossible to invoke
-case class FinishedTransformationStageEvent(stage: ResolutionStage, index: Int) extends AMFEvent {
-  override val name: String = FINISHED_TRANSFORMATION_STAGE
+case class FinishedTransformationStepEvent(stage: TransformationStep, index: Int) extends AMFEvent {
+  override val name: String = FINISHED_TRANSFORMATION_STEP
 }
 
 case class FinishedTransformationEvent(unit: BaseUnit) extends AMFEvent {

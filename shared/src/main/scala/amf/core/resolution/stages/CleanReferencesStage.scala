@@ -6,7 +6,7 @@ import amf.core.metamodel.document.BaseUnitModel
 import amf.core.model.document.{BaseUnit, Fragment, Module}
 
 class CleanReferencesStage() extends TransformationStep {
-  override def apply[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
+  override def transform[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
     persistReferenceShapes(model)
 
     model.fields.removeField(BaseUnitModel.References)

@@ -10,7 +10,7 @@ import scala.collection.mutable
 
 class ExternalSourceRemovalStage(val visited: mutable.Set[String] = mutable.Set()) extends TransformationStep {
 
-  override def apply[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
+  override def transform[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
     val knownIdSelector = new KnownElementIdSelector(visited)
     model.transform(knownIdSelector || ExternalSourceElementSelector, transformation)(errorHandler).asInstanceOf[T]
   }

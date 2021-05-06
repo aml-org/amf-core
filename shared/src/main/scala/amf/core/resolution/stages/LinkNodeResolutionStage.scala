@@ -13,7 +13,7 @@ class LinkNodeResolutionStage(keepEditingInfo: Boolean, val visited: mutable.Set
 
   var modelResolver: Option[ModelReferenceResolver] = None
 
-  override def apply[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
+  override def transform[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
     this.modelResolver = Some(new ModelReferenceResolver(model))
     val knownIdSelector = new KnownElementIdSelector(visited)
     model.transform(knownIdSelector || LinkSelector || LinkNodeSelector, transformation)(errorHandler).asInstanceOf[T]

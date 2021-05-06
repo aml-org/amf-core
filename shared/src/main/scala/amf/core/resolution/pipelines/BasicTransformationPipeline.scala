@@ -6,20 +6,20 @@ import amf.core.resolution.stages.{ReferenceResolutionStage, TransformationStep}
 import amf.plugins.document.graph.AMFGraphPlugin.ID
 import amf.{AmfProfile, ProfileName}
 
-class BasicResolutionPipeline private (override val name: String) extends TransformationPipeline() {
+class BasicTransformationPipeline private(override val name: String) extends TransformationPipeline() {
   private def references = new ReferenceResolutionStage(keepEditingInfo = false)
 
   override def steps: Seq[TransformationStep] = Seq(references)
 }
 
-object BasicResolutionPipeline {
+object BasicTransformationPipeline {
   val name: String           = PipelineName.from(ID, TransformationPipeline.DEFAULT_PIPELINE)
-  def apply()                = new BasicResolutionPipeline(name)
-  private[amf] def editing() = new BasicResolutionPipeline(BasicEditingResolutionPipeline.name)
+  def apply()                = new BasicTransformationPipeline(name)
+  private[amf] def editing() = new BasicTransformationPipeline(BasicEditingTransformationPipeline.name)
 }
 
-object BasicEditingResolutionPipeline {
+object BasicEditingTransformationPipeline {
   val name: String = PipelineName
     .from(ID, TransformationPipeline.EDITING_PIPELINE)
-  def apply(): BasicResolutionPipeline = BasicResolutionPipeline.editing()
+  def apply(): BasicTransformationPipeline = BasicTransformationPipeline.editing()
 }

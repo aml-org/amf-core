@@ -160,7 +160,7 @@ class ReferenceResolution(errorHandler: ErrorHandler,
   private def innerLinkNodeResolution(target: DomainElement): DomainElement = {
     val nested = Document()
     nested.fields.setWithoutId(DocumentModel.Encodes, target)
-    val result = new LinkNodeResolutionStage(keepEditingInfo).apply(nested, errorHandler)
+    val result = new LinkNodeResolutionStage(keepEditingInfo).transform(nested, errorHandler)
     result.asInstanceOf[Document].encodes
   }
 
