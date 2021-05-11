@@ -305,12 +305,12 @@ class AMFCompiler(compilerContext: CompilerContext,
       case None =>
         Future.successful { domainFallback.chooseFallback(ParsingInfo(document, vendor), sortedParsePlugins) }
     }
-    futureDocument foreach { unit =>
+    futureDocument map { unit =>
       // we setup the run for the parsed unit
       unit.withRunNumber(compilerContext.parserRun)
       parsedModelEvent(unit)
+      unit
     }
-    futureDocument
   }
 
   private def parsedModelEvent(baseUnit: BaseUnit): Unit = {
