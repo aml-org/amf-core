@@ -77,6 +77,8 @@ case class RenderOptions private[amf] (
   /** Exclude FlattenedJsonLd when rendering to graph. */
   def withoutFlattenedJsonLd: RenderOptions = copy(flattenedJsonLd = false)
 
+  def withShapeRenderOptions(s: ShapeRenderOptions): RenderOptions = copy(shapeRenderOptions = s)
+
   def isFlattenedJsonLd: Boolean = flattenedJsonLd
 
   def isWithCompactedEmission: Boolean   = compactedEmission

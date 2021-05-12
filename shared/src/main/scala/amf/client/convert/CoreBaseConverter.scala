@@ -28,6 +28,12 @@ import amf.client.model.{
   StrField => ClientStrField
 }
 import amf.client.reference.{CachedReference => ClientCachedReference, ReferenceResolver => ClientReferenceResolver}
+import amf.client.remod.amfcore.config.{ParsingOptions, RenderOptions, ShapeRenderOptions}
+import amf.client.interface.config.{ParsingOptions => ClientParsingOptions}
+import amf.client.interface.config.{ShapeRenderOptions => ClientShapeRenderOptions}
+import amf.client.interface.config.{RenderOptions => ClientRenderOptions}
+import amf.client.remod.AMFGraphConfiguration
+import amf.client.interface.{AMFGraphConfiguration => ClientAMFGraphConfiguration}
 import amf.client.remote.Content
 import amf.client.resource.{ResourceLoader => ClientResourceLoader}
 import amf.client.validate.{
@@ -76,9 +82,14 @@ trait CoreBaseConverter
     with PayloadFragmentConverter
     with CachedReferenceConverter
     with ReferenceResolverConverter
-    with PayloadValidatorConverter {
+    with PayloadValidatorConverter
+    with ParsingOptionsConverter
+    with ShapeRenderOptionsConverter
+    with RenderOptionsConverter
+    with AMFGraphConfigurationConverter {
 
-  implicit def asClient[Internal, Client](from: Internal)(implicit m: InternalClientMatcher[Internal, Client]): Client =
+  implicit def asClient[Internal, Client](from: Internal)(
+      implicit m: InternalClientMatcher[Internal, Client]): Client =
     m.asClient(from)
 
   implicit def asInternal[Internal, Client](from: Client)(
@@ -87,6 +98,7 @@ trait CoreBaseConverter
   implicit object StringMatcher      extends IdentityMatcher[String]
   implicit object BooleanMatcher     extends IdentityMatcher[Boolean]
   implicit object IntMatcher         extends IdentityMatcher[Int]
+  implicit object LongMatcher        extends IdentityMatcher[Long]
   implicit object DoubleMatcher      extends IdentityMatcher[Double]
   implicit object FloatMatcher       extends IdentityMatcher[Float]
   implicit object AnyMatcher         extends IdentityMatcher[Any]
@@ -250,9 +262,9 @@ trait CollectionConverter {
   private[convert] def asClientList[Internal, Client](from: Seq[Internal],
                                                       m: InternalClientMatcher[Internal, Client]): ClientList[Client]
 
-  private[convert] def asClientListWithEC[Internal, Client](
-      from: Seq[Internal],
-      m: InternalClientMatcherWithEC[Internal, Client])(implicit executionContext: ExecutionContext): ClientList[Client]
+  private[convert] def asClientListWithEC[Internal, Client](from: Seq[Internal],
+                                                            m: InternalClientMatcherWithEC[Internal, Client])(
+      implicit executionContext: ExecutionContext): ClientList[Client]
 
   protected def asClientMap[Internal, Client](from: mutable.Map[String, Internal],
                                               m: InternalClientMatcher[Internal, Client]): ClientMap[Client]
@@ -490,15 +502,14 @@ trait ResourceLoaderConverter {
 trait ReferenceResolverConverter {
   type ClientReference <: ClientReferenceResolver
 
-  implicit object ReferenceResolverMatcher
-      extends BidirectionalMatcherWithEC[UnitCache, ClientReferenceResolver] {
-    override def asInternal(from: ClientReferenceResolver)(
-        implicit executionContext: ExecutionContext): UnitCache = UnitCacheAdapter(from)
+  implicit object ReferenceResolverMatcher extends BidirectionalMatcherWithEC[UnitCache, ClientReferenceResolver] {
+    override def asInternal(from: ClientReferenceResolver)(implicit executionContext: ExecutionContext): UnitCache =
+      UnitCacheAdapter(from)
 
-    override def asClient(from: UnitCache)(
-        implicit executionContext: ExecutionContext): ClientReferenceResolver = from match {
-      case UnitCacheAdapter(adaptee) => adaptee
-    }
+    override def asClient(from: UnitCache)(implicit executionContext: ExecutionContext): ClientReferenceResolver =
+      from match {
+        case UnitCacheAdapter(adaptee) => adaptee
+      }
   }
 
 }
@@ -525,7 +536,8 @@ trait ValidationCandidateConverter {
 
 trait ValidationShapeSetConverter {
 
-  implicit object ValidationShapeSetMatcher extends BidirectionalMatcher[ValidationShapeSet, ClientValidationShapeSet] {
+  implicit object ValidationShapeSetMatcher
+      extends BidirectionalMatcher[ValidationShapeSet, ClientValidationShapeSet] {
     override def asClient(from: ValidationShapeSet): ClientValidationShapeSet = ClientValidationShapeSet(from)
 
     override def asInternal(from: ClientValidationShapeSet): ValidationShapeSet = from._internal
@@ -540,5 +552,36 @@ trait PayloadValidatorConverter {
       new ClientInternalPayloadValidator(from)
 
     override def asInternal(from: ClientInternalPayloadValidator): PayloadValidator = from._internal
+  }
+}
+
+trait ParsingOptionsConverter {
+  implicit object ParsingOptionsMatcher extends BidirectionalMatcher[ParsingOptions, ClientParsingOptions] {
+    override def asClient(from: ParsingOptions): ClientParsingOptions   = ClientParsingOptions(from)
+    override def asInternal(from: ClientParsingOptions): ParsingOptions = from._internal
+  }
+}
+
+trait ShapeRenderOptionsConverter {
+  implicit object ShapeRenderOptionsMatcher
+      extends BidirectionalMatcher[ShapeRenderOptions, ClientShapeRenderOptions] {
+    override def asClient(from: ShapeRenderOptions): ClientShapeRenderOptions   = ClientShapeRenderOptions(from)
+    override def asInternal(from: ClientShapeRenderOptions): ShapeRenderOptions = from._internal
+  }
+}
+
+trait RenderOptionsConverter {
+  implicit object RenderOptionsMatcher extends BidirectionalMatcher[RenderOptions, ClientRenderOptions] {
+    override def asClient(from: RenderOptions): ClientRenderOptions   = ClientRenderOptions(from)
+    override def asInternal(from: ClientRenderOptions): RenderOptions = from._internal
+  }
+}
+
+trait AMFGraphConfigurationConverter {
+  implicit object AMFGraphConfigurationMatcher
+      extends BidirectionalMatcher[AMFGraphConfiguration, ClientAMFGraphConfiguration] {
+    override def asClient(from: AMFGraphConfiguration): ClientAMFGraphConfiguration =
+      new ClientAMFGraphConfiguration(from)
+    override def asInternal(from: ClientAMFGraphConfiguration): AMFGraphConfiguration = from._internal
   }
 }
