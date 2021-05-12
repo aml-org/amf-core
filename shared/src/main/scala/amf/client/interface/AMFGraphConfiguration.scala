@@ -4,6 +4,7 @@ import amf.client.remod.{AMFGraphConfiguration => InternalGraphConfiguration}
 import amf.client.resolve.ClientErrorHandlerConverter._
 import amf.client.convert.CoreClientConverters._
 import amf.client.reference.UnitCache
+import amf.client.remod.amfcore.config.{AMFEventListener, AMFLogger}
 import amf.client.resource.ResourceLoader
 
 import scala.concurrent.ExecutionContext
@@ -43,6 +44,9 @@ class AMFGraphConfiguration(private[amf] val _internal: InternalGraphConfigurati
 //  def withTransformationPipeline(pipeline: TransformationPipeline): AMFGraphConfiguration =
 //    super._withTransformationPipeline(pipeline)
 
+  def withEventListener(listener: AMFEventListener): AMFGraphConfiguration = _internal.withEventListener(listener)
+
+  def withLogger(logger: AMFLogger): AMFGraphConfiguration = _internal.withLogger(logger)
 }
 
 @JSExportAll

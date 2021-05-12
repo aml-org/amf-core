@@ -120,6 +120,10 @@ class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: A
   private[amf] def withTransformationPipelines(pipelines: List[TransformationPipeline]): AMFGraphConfiguration =
     super._withTransformationPipelines(pipelines)
 
+  def withEventListener(listener: AMFEventListener): AMFGraphConfiguration = super._withEventListener(listener)
+
+  def withLogger(logger: AMFLogger): AMFGraphConfiguration = super._withLogger(logger)
+
   /**
     * Merges two environments taking into account specific attributes that can be merged.
     * This is currently limited to: registry plugins, registry transformation pipelines.
@@ -174,6 +178,12 @@ sealed abstract class BaseAMFConfigurationSetter(private[amf] val resolvers: AMF
 
   // //TODO: ARM - delete
   protected def _removePlugin[T](id: String): T = copy(registry = registry.removePlugin(id)).asInstanceOf[T]
+
+  protected def _withEventListener[T](listener: AMFEventListener): T =
+    copy(listeners = listeners + listener).asInstanceOf[T]
+
+  protected def _withLogger[T](logger: AMFLogger): T =
+    copy(logger = logger).asInstanceOf[T]
 
   // TODO - ARM: Should be erased as configuration should be incremental, not decremental
   protected def _removeValidationProfile[T](name: ProfileName): T =

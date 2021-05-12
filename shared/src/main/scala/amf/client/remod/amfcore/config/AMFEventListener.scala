@@ -15,9 +15,11 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 /**
   * Defines an event listener linked to a specific {@link amf.client.remod.amfcore.config.EventKind}
   */
-private[amf] trait AMFEventListener {
+@JSExportAll
+trait AMFEventListener {
   def notifyEvent(event: AMFEvent)
 }
+@JSExportAll
 sealed trait AMFEvent {
   val name: String
 }

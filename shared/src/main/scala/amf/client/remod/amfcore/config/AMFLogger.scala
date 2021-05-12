@@ -1,21 +1,31 @@
 package amf.client.remod.amfcore.config
 
+import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
+
 /**
-  * AMF Logger object
+  * AMF Logger
   */
-private[amf] class AMFLogger {
+trait AMFLogger {
 
-  private def log(message: String, severity: LogSeverity, source: String) = {}
+  @JSExport
+  def log(message: String, severity: LogSeverity, source: String)
 
-  def logViolation(message: String, source: String) = log(message, ViolationSeverity, source)
+//  def logViolation(message: String, source: String) = log(message, ViolationSeverity, source)
 
-  //....
 }
 
-private[remod] object MutedLogger extends AMFLogger {}
-private[remod] sealed case class LogSeverity(severity: String)
+@JSExportAll
+sealed case class LogSeverity(severity: String)
 
-object ViolationSeverity extends LogSeverity("VIOLATION")
-object WarningSeverity   extends LogSeverity("WARNING")
-object DebugSeverity     extends LogSeverity("DEBUG")
-object InfoSeverity      extends LogSeverity("INFO")
+@JSExportTopLevel("LogViolationSeverity")
+object LogViolationSeverity extends LogSeverity("VIOLATION")
+@JSExportTopLevel("LogWarningSeverity")
+object LogWarningSeverity extends LogSeverity("WARNING")
+@JSExportTopLevel("LogDebugSeverity")
+object LogDebugSeverity extends LogSeverity("DEBUG")
+@JSExportTopLevel("LogInfoSeverity")
+object LogInfoSeverity extends LogSeverity("INFO")
+
+private[remod] object MutedLogger extends AMFLogger {
+  override def log(message: String, severity: LogSeverity, source: String): Unit = {}
+}
