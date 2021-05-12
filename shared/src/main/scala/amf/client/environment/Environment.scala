@@ -4,7 +4,7 @@ import amf.client.convert.CoreClientConverters._
 import amf.client.execution.BaseExecutionEnvironment
 import amf.client.remote.Content
 import amf.client.resource.{ClientResourceLoader, ResourceLoader}
-import amf.client.reference.{CachedReference, ClientReferenceResolver, ReferenceResolver}
+import amf.client.reference.{CachedReference, ClientUnitCache, UnitCache}
 import amf.core.unsafe.PlatformSecrets
 import amf.internal.environment.{Environment => InternalEnvironment}
 
@@ -18,8 +18,8 @@ case class Environment private (private[amf] val _internal: InternalEnvironment,
 
   private implicit val executionContext: ExecutionContext = executionEnvironment.executionContext
 
-  def loaders: ClientList[ResourceLoader]        = _internal.loaders.asClient
-  def reference: ClientOption[ReferenceResolver] = _internal.resolver.asClient
+  def loaders: ClientList[ResourceLoader] = _internal.loaders.asClient
+  def reference: ClientOption[UnitCache]  = _internal.resolver.asClient
   protected[amf] def executionEnvironment: BaseExecutionEnvironment =
     exec.getOrElse(platform.defaultExecutionEnvironment)
 
@@ -40,8 +40,8 @@ case class Environment private (private[amf] val _internal: InternalEnvironment,
     Environment(_internal.add(ResourceLoaderMatcher.asInternal(l)), exec)
   }
 
-  def withClientResolver(resolver: ClientReferenceResolver): Environment = {
-    val r = new ReferenceResolver {
+  def withClientResolver(resolver: ClientUnitCache): Environment = {
+    val r = new UnitCache {
       override def fetch(url: String): ClientFuture[CachedReference] = resolver.fetch(url)
     }
     Environment(_internal.withResolver(ReferenceResolverMatcher.asInternal(r)), exec)

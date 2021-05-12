@@ -3,9 +3,8 @@ import amf.client.interface.config.{ParsingOptions, RenderOptions}
 import amf.client.remod.{AMFGraphConfiguration => InternalGraphConfiguration}
 import amf.client.resolve.ClientErrorHandlerConverter._
 import amf.client.convert.CoreClientConverters._
-import amf.client.reference.ReferenceResolver
+import amf.client.reference.UnitCache
 import amf.client.resource.ResourceLoader
-import amf.internal.reference.UnitCache
 
 import scala.concurrent.ExecutionContext
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
@@ -31,7 +30,7 @@ class AMFGraphConfiguration(private[amf] val _internal: InternalGraphConfigurati
   def withResourceLoaders(rl: ClientList[ResourceLoader]): AMFGraphConfiguration =
     _internal.withResourceLoaders(rl.asInternal.toList)
 
-  def withUnitCache(cache: ReferenceResolver): AMFGraphConfiguration =
+  def withUnitCache(cache: UnitCache): AMFGraphConfiguration =
     _internal.withUnitCache(ReferenceResolverMatcher.asInternal(cache))
 //
 //  def withPlugin(amfPlugin: AMFPlugin[_]): AMFGraphConfiguration = super._withPlugin(amfPlugin)

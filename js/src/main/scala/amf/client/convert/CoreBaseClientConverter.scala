@@ -1,7 +1,7 @@
 package amf.client.convert
 
 import amf.client.resource.{ClientResourceLoader, ResourceLoader}
-import amf.client.reference.{ClientReferenceResolver, ReferenceResolver}
+import amf.client.reference.{ClientUnitCache, UnitCache}
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,15 +20,16 @@ trait CoreBaseClientConverter extends CoreBaseConverter {
   override type ClientLoader = ClientResourceLoader with ResourceLoader
   override type Loader       = ClientResourceLoader
 
-  override type ClientReference = ClientReferenceResolver with ReferenceResolver
+  override type ClientReference = ClientUnitCache with UnitCache
 
   override protected def asClientOption[Internal, Client](
       from: Option[Internal],
       matcher: InternalClientMatcher[Internal, Client]): UndefOr[Client] =
     from.map(matcher.asClient).orUndefined
 
-  override protected def asClientOptionWithEC[Internal, Client](from: Option[Internal],
-                                                                matcher: InternalClientMatcherWithEC[Internal, Client])(
+  override protected def asClientOptionWithEC[Internal, Client](
+      from: Option[Internal],
+      matcher: InternalClientMatcherWithEC[Internal, Client])(
       implicit executionContext: ExecutionContext): ClientOption[Client] =
     from.map(matcher.asClient).orUndefined
 
@@ -70,9 +71,9 @@ trait CoreBaseClientConverter extends CoreBaseConverter {
   override protected def asClientFuture[T](from: Future[T])(implicit executionContext: ExecutionContext): Promise[T] =
     from.toJSPromise
 
-  override protected def asInternalFuture[Client, Internal](
-      from: js.Promise[Client],
-      matcher: ClientInternalMatcher[Client, Internal])(implicit executionContext: ExecutionContext): Future[Internal] =
+  override protected def asInternalFuture[Client, Internal](from: js.Promise[Client],
+                                                            matcher: ClientInternalMatcher[Client, Internal])(
+      implicit executionContext: ExecutionContext): Future[Internal] =
     from.toFuture.map(matcher.asInternal)
 
   override protected def toScalaOption[E](from: UndefOr[E]): Option[E] = from.toOption
@@ -85,11 +86,13 @@ trait CoreBaseClientConverter extends CoreBaseConverter {
 //  override protected def toClientOptionWithEC[E](from: Option[E])(
 //      implicit executionContext: ExecutionContext): ClientOption[E] = from.orUndefined
 
+  override protected def asInternalMap[Client, Internal](
+      from: ClientMap[Client],
+      m: ClientInternalMatcher[Client, Internal]): Map[String, Internal] = {
 
-  override protected def asInternalMap[Client, Internal](from: ClientMap[Client], m: ClientInternalMatcher[Client, Internal]): Map[String, Internal] = {
-
-    from.toMap.foldLeft(Map[String,Internal]()) { case (acc, (e,i)) =>
-      acc + (e -> m.asInternal(i))
+    from.toMap.foldLeft(Map[String, Internal]()) {
+      case (acc, (e, i)) =>
+        acc + (e -> m.asInternal(i))
     }
 
   }

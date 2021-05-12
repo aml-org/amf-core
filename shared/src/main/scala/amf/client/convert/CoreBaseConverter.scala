@@ -27,7 +27,7 @@ import amf.client.model.{
   IntField => ClientIntField,
   StrField => ClientStrField
 }
-import amf.client.reference.{CachedReference => ClientCachedReference, ReferenceResolver => ClientReferenceResolver}
+import amf.client.reference.{CachedReference => ClientCachedReference, UnitCache => ClientUnitCache}
 import amf.client.remod.amfcore.config.{ParsingOptions, RenderOptions, ShapeRenderOptions}
 import amf.client.interface.config.{ParsingOptions => ClientParsingOptions}
 import amf.client.interface.config.{ShapeRenderOptions => ClientShapeRenderOptions}
@@ -81,7 +81,7 @@ trait CoreBaseConverter
     with ValidationShapeSetConverter
     with PayloadFragmentConverter
     with CachedReferenceConverter
-    with ReferenceResolverConverter
+    with UnitCacheConverter
     with PayloadValidatorConverter
     with ParsingOptionsConverter
     with ShapeRenderOptionsConverter
@@ -499,14 +499,14 @@ trait ResourceLoaderConverter {
 
 }
 
-trait ReferenceResolverConverter {
-  type ClientReference <: ClientReferenceResolver
+trait UnitCacheConverter {
+  type ClientReference <: ClientUnitCache
 
-  implicit object ReferenceResolverMatcher extends BidirectionalMatcherWithEC[UnitCache, ClientReferenceResolver] {
-    override def asInternal(from: ClientReferenceResolver)(implicit executionContext: ExecutionContext): UnitCache =
+  implicit object ReferenceResolverMatcher extends BidirectionalMatcherWithEC[UnitCache, ClientUnitCache] {
+    override def asInternal(from: ClientUnitCache)(implicit executionContext: ExecutionContext): UnitCache =
       UnitCacheAdapter(from)
 
-    override def asClient(from: UnitCache)(implicit executionContext: ExecutionContext): ClientReferenceResolver =
+    override def asClient(from: UnitCache)(implicit executionContext: ExecutionContext): ClientUnitCache =
       from match {
         case UnitCacheAdapter(adaptee) => adaptee
       }
