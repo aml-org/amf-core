@@ -11,9 +11,7 @@ import amf.core.utils.AmfStrings
 import amf.core.validation.PayloadValidator
 import amf.internal.environment.Environment
 
-class RecursiveShape(override val fields: Fields, override val annotations: Annotations)
-    extends Shape
-    with ValidatorAware {
+class RecursiveShape(override val fields: Fields, override val annotations: Annotations) extends Shape {
 
   private var internalFixpointTarget: Option[Shape] = None
 
@@ -57,23 +55,6 @@ class RecursiveShape(override val fields: Fields, override val annotations: Anno
     val copy = super.copyShape().withId(id)
     fixpointTarget.foreach(copy.withFixpointTarget)
     copy
-  }
-
-  override def payloadValidator(mediaType: String, exec: BaseExecutionEnvironment): Option[PayloadValidator] =
-    internalFixpointTarget.flatMap(asValidatorAware).flatMap(_.payloadValidator(mediaType, exec))
-
-  override def payloadValidator(mediaType: String, env: Environment = Environment()): Option[PayloadValidator] =
-    internalFixpointTarget.flatMap(asValidatorAware).flatMap(_.payloadValidator(mediaType, env))
-
-  override def parameterValidator(mediaType: String, exec: BaseExecutionEnvironment): Option[PayloadValidator] =
-    internalFixpointTarget.flatMap(asValidatorAware).flatMap(_.parameterValidator(mediaType, exec))
-
-  override def parameterValidator(mediaType: String, env: Environment = Environment()): Option[PayloadValidator] =
-    internalFixpointTarget.flatMap(asValidatorAware).flatMap(_.parameterValidator(mediaType, env))
-
-  private def asValidatorAware(s: Shape): Option[ValidatorAware] = s match {
-    case aware: ValidatorAware => Some(aware)
-    case _                     => None
   }
 }
 
