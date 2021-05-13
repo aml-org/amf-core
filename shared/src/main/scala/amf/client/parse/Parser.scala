@@ -5,7 +5,7 @@ import amf.client.environment.{DefaultEnvironment, Environment}
 import amf.client.execution.BaseExecutionEnvironment
 import amf.client.model.document.BaseUnit
 import amf.client.remod.amfcore.registry.PluginsRegistry
-import amf.client.validate.ValidationReport
+import amf.client.validate.AMFValidationReport
 import amf.core.client.ParsingOptions
 import amf.core.errorhandling.UnhandledErrorHandler
 import amf.core.model.document.{BaseUnit => InternalBaseUnit}
@@ -24,10 +24,10 @@ import scala.scalajs.js.annotation.JSExport
   */
 class Parser(vendor: String, mediaType: String, private val env: Option[Environment] = None) {
 
-  private var parsedModel: Option[InternalBaseUnit]       = None
+  private var parsedModel: Option[InternalBaseUnit] = None
   private val executionEnvironment: BaseExecutionEnvironment = env match {
     case Some(environment) => environment.executionEnvironment
-    case None => platform.defaultExecutionEnvironment
+    case None              => platform.defaultExecutionEnvironment
   }
 
   private implicit val executionContext: ExecutionContext = executionEnvironment.executionContext
@@ -84,11 +84,11 @@ class Parser(vendor: String, mediaType: String, private val env: Option[Environm
     * @return the AMF validation report
     */
   @JSExport
-  def reportValidation(profile: ProfileName, messageStyle: MessageStyle): ClientFuture[ValidationReport] =
+  def reportValidation(profile: ProfileName, messageStyle: MessageStyle): ClientFuture[AMFValidationReport] =
     report(profile, messageStyle)
 
   @JSExport
-  def reportValidation(profile: ProfileName): ClientFuture[ValidationReport] = report(profile)
+  def reportValidation(profile: ProfileName): ClientFuture[AMFValidationReport] = report(profile)
 
   /**
     * Generates a custom validation profile as specified in the input validation profile file
@@ -97,7 +97,7 @@ class Parser(vendor: String, mediaType: String, private val env: Option[Environm
     * @return the AMF validation report
     */
   @JSExport
-  def reportCustomValidation(profile: ProfileName, customProfilePath: String): ClientFuture[ValidationReport] =
+  def reportCustomValidation(profile: ProfileName, customProfilePath: String): ClientFuture[AMFValidationReport] =
     reportCustomValidationImplementation(profile, customProfilePath)
 
   private[amf] def parseAsync(url: String,
@@ -110,21 +110,22 @@ class Parser(vendor: String, mediaType: String, private val env: Option[Environm
     }
 
     RuntimeCompiler(
-      url,
-      Option(mediaType),
-      Some(vendor),
-      Context(platform),
-      env = environment,
-      cache = Cache(),
-      parsingOptions = parsingOptions,
-      errorHandler = DefaultParserErrorHandler.withRun()
+        url,
+        Option(mediaType),
+        Some(vendor),
+        Context(platform),
+        env = environment,
+        cache = Cache(),
+        parsingOptions = parsingOptions,
+        errorHandler = DefaultParserErrorHandler.withRun()
     ) map { model =>
       parsedModel = Some(model)
       model
     }
   }
 
-  private def internalEnv(): environment.Environment = env.getOrElse(DefaultEnvironment(executionEnvironment))._internal
+  private def internalEnv(): environment.Environment =
+    env.getOrElse(DefaultEnvironment(executionEnvironment))._internal
 
   /**
     * Generates the validation report for the last parsed model.
@@ -134,10 +135,10 @@ class Parser(vendor: String, mediaType: String, private val env: Option[Environm
     * @return the AMF validation report
     */
   private def report(profileName: ProfileName,
-                     messageStyle: MessageStyle = RAMLStyle): ClientFuture[ValidationReport] = {
+                     messageStyle: MessageStyle = RAMLStyle): ClientFuture[AMFValidationReport] = {
 
     val result = parsedModel.map(
-      RuntimeValidator(_, profileName, messageStyle, internalEnv(), resolved = false, executionEnvironment)) match {
+        RuntimeValidator(_, profileName, messageStyle, internalEnv(), resolved = false, executionEnvironment)) match {
       case Some(validation) => validation
       case None             => Future.failed(new Exception("No parsed model or current validation found, cannot validate"))
     }
@@ -152,7 +153,7 @@ class Parser(vendor: String, mediaType: String, private val env: Option[Environm
     * @return the AMF validation report
     */
   private def reportCustomValidationImplementation(profileName: ProfileName,
-                                                   customProfilePath: String): ClientFuture[ValidationReport] = {
+                                                   customProfilePath: String): ClientFuture[AMFValidationReport] = {
     val result = parsedModel match {
       case Some(model) =>
         for {

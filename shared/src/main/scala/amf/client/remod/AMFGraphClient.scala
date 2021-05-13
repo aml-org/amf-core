@@ -10,33 +10,32 @@ import amf.core.remote.{Cache, Context, Vendor}
 import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.services.RuntimeCompiler
 import amf.core.validation.AMFValidationReport
+import org.yaml.model.YDocument
 
 import scala.concurrent.{ExecutionContext, Future}
 
-// client
-private[amf] class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
+class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
 
   implicit val exec: ExecutionContext = configuration.getExecutionContext
 
   def getConfiguration: AMFGraphConfiguration = configuration
-  // how do we return the ErrorHandler that is created by the provider?
-  // relation between EH vs BU? should the BU have an EH inside?
-  // should parse always return error handler + base unit? (Amf result)
 
-  // sync or async?
+  def parse(url: String): Future[AMFResult]                    = AMFParser.parse(url, configuration)
+  def parse(url: String, mediaType: String): Future[AMFResult] = AMFParser.parse(url, mediaType, configuration)
+  def parseContent(content: String): Future[AMFResult]         = AMFParser.parseContent(content, configuration)
+  def parseContent(content: String, mediaType: String): Future[AMFResult] =
+    AMFParser.parseContent(content, mediaType, configuration)
 
-  // content type format, pendiente
-  def parse(url: String): Future[AMFResult] = AMFParser.parse(url, configuration)
-  // build parsing context?
+  def transform(bu: BaseUnit): AMFResult = AMFTransformer.transform(bu, configuration)
+  def transform(bu: BaseUnit, pipelineName: String): AMFResult =
+    AMFTransformer.transform(bu, pipelineName, configuration)
 
-  def transform(bu: BaseUnit): AMFResult = AMFTransformer.transform(bu, configuration) // clone? BaseUnit.resolved
+  def render(bu: BaseUnit): String                          = AMFRenderer.render(bu, configuration)
+  def renderAST(bu: BaseUnit): YDocument                    = AMFRenderer.renderAST(bu, configuration)
+  def render(bu: BaseUnit, mediaType: String): String       = AMFRenderer.render(bu, mediaType, configuration)
+  def renderAST(bu: BaseUnit, mediaType: String): YDocument = AMFRenderer.renderAST(bu, mediaType, configuration)
 
-  def render(bu: BaseUnit): String = AMFRenderer.render(bu, configuration)
-
-  def render(bu: BaseUnit, mediaType: String): String = AMFRenderer.render(bu, mediaType, configuration)
-  // bu.clone?
-  def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport = ???
-
-  // render
-
+  def validate(bu: BaseUnit): AMFValidationReport = AMFValidator.validate(bu, configuration)
+  def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport =
+    AMFValidator.validate(bu, profileName, configuration)
 }

@@ -2,16 +2,16 @@ package amf.client.validate
 
 import amf.ProfileName
 import amf.client.convert.CoreClientConverters._
-import amf.core.validation.{AMFValidationReport => InternalValidatorReport}
+import amf.core.validation.{AMFValidationReport => InternalValidationReport}
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportAll
-class ValidationReport(private[amf] val _internal: InternalValidatorReport) {
+class AMFValidationReport(private[amf] val _internal: InternalValidationReport) {
 
-  @JSExportTopLevel("client.validate.ValidationReport")
+  @JSExportTopLevel("client.validate.AMFValidationReport")
   def this(conforms: Boolean, model: String, profile: ProfileName, results: ClientList[ValidationResult]) =
-    this(InternalValidatorReport(conforms, model, profile, results.asInternal))
+    this(InternalValidationReport(conforms, model, profile, results.asInternal))
 
   def conforms: Boolean                     = _internal.conforms
   def model: String                         = _internal.model

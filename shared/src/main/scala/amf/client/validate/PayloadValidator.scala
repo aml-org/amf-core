@@ -17,11 +17,11 @@ class PayloadValidator(private[amf] val _internal: InternalPayloadValidator,
 
   def isValid(mediaType: String, payload: String): ClientFuture[Boolean] =
     _internal.isValid(mediaType, payload).asClient
-  def validate(mediaType: String, payload: String): ClientFuture[ValidationReport] =
+  def validate(mediaType: String, payload: String): ClientFuture[AMFValidationReport] =
     _internal.validate(mediaType, payload).asClient
-  def validate(payloadFragment: PayloadFragment): ClientFuture[ValidationReport] =
+  def validate(payloadFragment: PayloadFragment): ClientFuture[AMFValidationReport] =
     _internal.validate(payloadFragment).asClient
 
-  def syncValidate(mediaType: String, payload: String): ValidationReport =
+  def syncValidate(mediaType: String, payload: String): AMFValidationReport =
     _internal.syncValidate(mediaType, payload)
- }
+}

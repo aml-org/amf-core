@@ -9,7 +9,7 @@ import amf.client.parse.Parser
 import amf.client.plugins.AMFPlugin
 import amf.client.render.Renderer
 import amf.client.resolve.Resolver
-import amf.client.validate.{ValidationReport, Validator}
+import amf.client.validate.{AMFValidationReport, Validator}
 import amf.core.AMF
 import amf.core.unsafe.PlatformSecrets
 
@@ -41,21 +41,23 @@ object Core extends PlatformSecrets {
   def validate(model: BaseUnit,
                profileName: ProfileName,
                messageStyle: MessageStyle,
-               env: Environment): ClientFuture[ValidationReport] =
+               env: Environment): ClientFuture[AMFValidationReport] =
     Validator.validate(model, profileName, messageStyle, env, resolved = false)
 
-  def validate(model: BaseUnit, profileName: ProfileName, messageStyle: MessageStyle): ClientFuture[ValidationReport] =
+  def validate(model: BaseUnit,
+               profileName: ProfileName,
+               messageStyle: MessageStyle): ClientFuture[AMFValidationReport] =
     validate(model, profileName, messageStyle, DefaultEnvironment())
 
   def validateResolved(model: BaseUnit,
                        profileName: ProfileName,
                        messageStyle: MessageStyle,
-                       env: Environment): ClientFuture[ValidationReport] =
+                       env: Environment): ClientFuture[AMFValidationReport] =
     Validator.validate(model, profileName, messageStyle, env, resolved = true)
 
   def validateResolved(model: BaseUnit,
                        profileName: ProfileName,
-                       messageStyle: MessageStyle): ClientFuture[ValidationReport] =
+                       messageStyle: MessageStyle): ClientFuture[AMFValidationReport] =
     validateResolved(model, profileName, messageStyle, DefaultEnvironment())
 
   def loadValidationProfile(url: String, env: Environment): ClientFuture[ProfileName] =

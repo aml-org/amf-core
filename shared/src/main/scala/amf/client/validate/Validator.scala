@@ -17,7 +17,7 @@ object Validator {
                profileName: ProfileName,
                messageStyle: MessageStyle = AMFStyle,
                env: Environment = DefaultEnvironment(),
-               resolved: Boolean = false): ClientFuture[ValidationReport] = {
+               resolved: Boolean = false): ClientFuture[AMFValidationReport] = {
     implicit val executionContext: ExecutionContext = env.executionEnvironment.executionContext
     RuntimeValidator(
         model._internal,
@@ -32,7 +32,9 @@ object Validator {
   @JSExport
   def loadValidationProfile(url: String, env: Environment = DefaultEnvironment()): ClientFuture[ProfileName] = {
     implicit val executionContext: ExecutionContext = env.executionEnvironment.executionContext
-    RuntimeValidator.loadValidationProfile(url, env._internal, UnhandledErrorHandler, env.executionEnvironment).asClient
+    RuntimeValidator
+      .loadValidationProfile(url, env._internal, UnhandledErrorHandler, env.executionEnvironment)
+      .asClient
   }
 
   @JSExport

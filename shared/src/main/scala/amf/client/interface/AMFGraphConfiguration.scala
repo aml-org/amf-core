@@ -13,10 +13,10 @@ import scala.concurrent.ExecutionContext
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportAll
-class AMFGraphConfiguration(private[amf] val _internal: InternalGraphConfiguration) {
-  private implicit val ec: ExecutionContext = _internal.resolvers.executionContext.executionContext
+class AMFGraphConfiguration private[amf] (private[amf] val _internal: InternalGraphConfiguration) {
+  private implicit val ec: ExecutionContext = _internal.getExecutionContext
 
-//  def createClient(): AMFGraphClient = new AMFGraphClient(this)
+  def createClient(): AMFGraphClient = new AMFGraphClient(this)
 
   def withParsingOptions(parsingOptions: ParsingOptions): AMFGraphConfiguration =
     _internal.withParsingOptions(parsingOptions)

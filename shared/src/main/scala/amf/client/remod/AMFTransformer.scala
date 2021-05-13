@@ -1,13 +1,33 @@
 package amf.client.remod
 
 import amf.core.model.document.BaseUnit
-import amf.core.resolution.pipelines.TransformationPipeline
 
-private[remod] object AMFTransformer {
+object AMFTransformer {
 
-  def transform(bu: BaseUnit, conf: AMFGraphConfiguration): AMFResult = ???
+  def transform(unit: BaseUnit, conf: AMFGraphConfiguration): AMFResult = ???
 
-  // PipelineName object should be used to form name given certain vendor and pipeline
-  def transform(bu: BaseUnit, pipelineName: String, conf: AMFGraphConfiguration): AMFResult = ???
+  def transform(unit: BaseUnit, pipelineName: String, conf: AMFGraphConfiguration): AMFResult = ???
+//  {
+//    val pipelines = conf.registry.transformationPipelines
+//    val pipeline  = pipelines.get(pipelineName)
+//
+//    val handler = DefaultErrorHandler() // what about the error handler provider?
+//    pipeline match {
+//      case Some(pipeline) =>
+//        val runner = TransformationPipelineRunner(handler, conf.listeners.toList)
+//        val result = runner.run(unit, pipeline)
+//        AMFResult(result, handler.getErrors)
+//      case None =>
+//        handler.violation(
+//          ResolutionValidation,
+//          unit.id,
+//          None,
+//          s"Cannot find transformation pipeline with name $pipelineName",
+//          unit.position(),
+//          unit.location()
+//        )
+//        unit
+//    }
+//  }
 
 }

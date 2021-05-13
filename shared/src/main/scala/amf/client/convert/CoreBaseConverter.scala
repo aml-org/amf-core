@@ -32,15 +32,16 @@ import amf.client.remod.amfcore.config.{ParsingOptions, RenderOptions, ShapeRend
 import amf.client.interface.config.{ParsingOptions => ClientParsingOptions}
 import amf.client.interface.config.{ShapeRenderOptions => ClientShapeRenderOptions}
 import amf.client.interface.config.{RenderOptions => ClientRenderOptions}
-import amf.client.remod.AMFGraphConfiguration
+import amf.client.remod.{AMFGraphConfiguration, AMFResult}
+import amf.client.interface.{AMFResult => ClientAMFResult}
 import amf.client.interface.{AMFGraphConfiguration => ClientAMFGraphConfiguration}
 import amf.client.interface.resolve.{TransformationPipelineBuilder => ClientTransformationPipelineBuilder}
 import amf.client.remote.Content
 import amf.client.resource.{ResourceLoader => ClientResourceLoader}
 import amf.client.validate.{
+  AMFValidationReport => ClientValidatorReport,
   PayloadValidator => ClientInternalPayloadValidator,
   ValidationCandidate => ClientValidationCandidate,
-  ValidationReport => ClientValidatorReport,
   ValidationResult => ClientValidationResult,
   ValidationShapeSet => ClientValidationShapeSet
 }
@@ -94,7 +95,8 @@ trait CoreBaseConverter
     with RenderOptionsConverter
     with AMFGraphConfigurationConverter
     with TransformationStepConverter
-    with TransformationPipelineBuilderConverter {
+    with TransformationPipelineBuilderConverter
+    with AMFResultConverter {
 
   implicit def asClient[Internal, Client](from: Internal)(
       implicit m: InternalClientMatcher[Internal, Client]): Client =
@@ -622,5 +624,13 @@ trait TransformationPipelineBuilderConverter {
     override def asClient(from: TransformationPipelineBuilder): ClientTransformationPipelineBuilder =
       ClientTransformationPipelineBuilder(from)
     override def asInternal(from: ClientTransformationPipelineBuilder): TransformationPipelineBuilder = from._internal
+  }
+}
+
+trait AMFResultConverter {
+  implicit object AMFResultMatcher extends BidirectionalMatcher[AMFResult, ClientAMFResult] {
+    override def asClient(from: AMFResult): ClientAMFResult =
+      ClientAMFResult(from)
+    override def asInternal(from: ClientAMFResult): AMFResult = from._internal
   }
 }

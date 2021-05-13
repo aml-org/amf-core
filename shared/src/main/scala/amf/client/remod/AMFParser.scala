@@ -4,9 +4,8 @@ import amf.client.convert.CoreClientConverters.platform
 import amf.internal.resource.{ResourceLoader, StringResourceLoader}
 
 import scala.concurrent.Future
-import scala.scalajs.js.annotation.JSExport
 
-private[amf] object AMFParser {
+object AMFParser {
 
   /**
     * Asynchronously generate a BaseUnit from the unit located in the given url.
@@ -30,7 +29,6 @@ private[amf] object AMFParser {
     * @param content: The unit as a string
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
-  @JSExport
   def parseContent(content: String, env: AMFGraphConfiguration): Future[AMFResult] = ???
 //    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)), env)
 
@@ -39,52 +37,12 @@ private[amf] object AMFParser {
     * @param stream: The unit as a string
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
-  @JSExport
-  def parseContent(content: String, mediaType: String, env: AMFGraphConfiguration): Future[AMFResult] = {
-    ???
+  def parseContent(content: String, mediaType: String, env: AMFGraphConfiguration): Future[AMFResult] = ???
 //    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)))
-  }
-
-  // should be in object specific to AML
-//  def parseInstance(url: String, definedBy: String, env:AmfEnvironment): Future[AmfResult] = {
-//    parse(definedBy, env).map { d =>
-//      d.bu  match {
-//        case d:Dialect => parseInstance(url, d, env)
-//        case _ => throw Exception //?
-//      }
-//    }
-//  }
-//
-//  def parseInstance(url:String, definedBy:Dialect, env:AmfEnvironment)= {
-//    env.registry.withDialect(d).getInstance().parse(url, Some(Aml))
-//
-//  }
 
   private[amf] def parseAsync(url: String,
                               mediaType: Option[String],
-                              amfEnvironment: AMFGraphConfiguration): Future[AMFResult] = {
-//    amfEnvironment.beforeParse().flatMap { _ =>
-//      val environment = {
-//        val e = internalEnv()
-//        loader.map(e.add).getOrElse(e)
-//      }
-//
-//      RuntimeCompiler(
-//        url,
-//        Option(mediaType),
-//        Some(vendor),
-//        Context(platform),
-//        env = environment,
-//        cache = Cache(),
-//        parsingOptions = parsingOptions,
-//        errorHandler = DefaultParserErrorHandler.withRun()
-//      ) map { model =>
-//        parsedModel = Some(model)
-//        model
-//      }
-//    }
-    ???
-  }
+                              amfEnvironment: AMFGraphConfiguration): Future[AMFResult] = ???
 
   private def fromStream(url: String, stream: String): ResourceLoader =
     StringResourceLoader(platform.resolvePath(url), stream)
