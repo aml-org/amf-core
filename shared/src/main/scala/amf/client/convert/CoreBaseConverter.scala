@@ -34,6 +34,7 @@ import amf.client.interface.config.{ShapeRenderOptions => ClientShapeRenderOptio
 import amf.client.interface.config.{RenderOptions => ClientRenderOptions}
 import amf.client.remod.AMFGraphConfiguration
 import amf.client.interface.{AMFGraphConfiguration => ClientAMFGraphConfiguration}
+import amf.client.interface.resolve.{TransformationPipelineBuilder => ClientTransformationPipelineBuilder}
 import amf.client.remote.Content
 import amf.client.resource.{ResourceLoader => ClientResourceLoader}
 import amf.client.validate.{
@@ -52,10 +53,9 @@ import amf.core.parser.Annotations
 import amf.core.remote.Vendor
 import amf.core.resolution.stages.TransformationStep
 import amf.client.interface.resolve.{TransformationStep => ClientTransformationStep}
-import amf.client.interface.resolve.{TransformationPipeline => ClientTransformationPipeline}
+import amf.client.remod.amfcore.resolution.TransformationPipelineBuilder
 import amf.client.resolve.{ClientErrorHandler, ClientErrorHandlerConverter}
 import amf.core.errorhandling.ErrorHandler
-import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.unsafe.PlatformSecrets
 import amf.core.validation._
 import amf.internal.reference.{CachedReference, UnitCache, UnitCacheAdapter}
@@ -94,8 +94,7 @@ trait CoreBaseConverter
     with RenderOptionsConverter
     with AMFGraphConfigurationConverter
     with TransformationStepConverter
-//    with TransformationPipelineConverter
-    {
+    with TransformationPipelineBuilderConverter {
 
   implicit def asClient[Internal, Client](from: Internal)(
       implicit m: InternalClientMatcher[Internal, Client]): Client =
@@ -616,20 +615,12 @@ trait TransformationStepConverter extends BaseUnitConverter {
     }
   }
 }
-//
-//trait TransformationPipelineConverter extends TransformationStepConverter with CollectionConverter {
-//  implicit object TransformationPipelineMatcher extends BidirectionalMatcher[TransformationPipeline, ClientTransformationPipeline] {
-//    override def asClient(from: TransformationPipeline): ClientTransformationPipeline = {
-//      new ClientTransformationPipeline {
-//        override val name: String = from.name
-//        override def steps: ClientList[ClientTransformationStep] = InternalSeqOps(from.steps).asClient
-//      }
-//    }
-//    override def asInternal(from: ClientTransformationPipeline): TransformationPipeline = {
-//      new TransformationPipeline {
-//        override val name: String = from.name
-//        override def steps: Seq[TransformationStep] = ClientListOps(from.steps).asInternal
-//      }
-//    }
-//  }
-//}
+
+trait TransformationPipelineBuilderConverter {
+  implicit object TransformationPipelineBuilderMatcher
+      extends BidirectionalMatcher[TransformationPipelineBuilder, ClientTransformationPipelineBuilder] {
+    override def asClient(from: TransformationPipelineBuilder): ClientTransformationPipelineBuilder =
+      ClientTransformationPipelineBuilder(from)
+    override def asInternal(from: ClientTransformationPipelineBuilder): TransformationPipelineBuilder = from._internal
+  }
+}
