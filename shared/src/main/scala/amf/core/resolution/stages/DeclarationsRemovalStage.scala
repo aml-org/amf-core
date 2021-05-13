@@ -8,12 +8,12 @@ import amf.core.model.domain.AmfArray
 
 class DeclarationsRemovalStage() extends TransformationStep {
 
-  override def transform[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
+  override def transform(model: BaseUnit, errorHandler: ErrorHandler): BaseUnit = {
     model match {
       case doc: DeclaresModel with EncodesModel => removeAllDeclarationsButSecuritySchemes(doc)
       case _                                    => // ignore
     }
-    model.asInstanceOf[T]
+    model
   }
 
   private def removeAllDeclarationsButSecuritySchemes(doc: DeclaresModel) = {

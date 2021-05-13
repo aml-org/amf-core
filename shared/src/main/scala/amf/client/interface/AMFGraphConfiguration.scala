@@ -1,11 +1,14 @@
 package amf.client.interface
 import amf.client.interface.config.{ParsingOptions, RenderOptions}
 import amf.client.remod.{AMFGraphConfiguration => InternalGraphConfiguration}
+import amf.core.resolution.pipelines.{TransformationPipeline => InternalTransformationPipeline}
 import amf.client.resolve.ClientErrorHandlerConverter._
 import amf.client.convert.CoreClientConverters._
+import amf.client.interface.resolve.TransformationPipeline
 import amf.client.reference.UnitCache
 import amf.client.remod.amfcore.config.{AMFEventListener, AMFLogger}
 import amf.client.resource.ResourceLoader
+import amf.core.resolution.stages.TransformationStep
 
 import scala.concurrent.ExecutionContext
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
@@ -33,16 +36,15 @@ class AMFGraphConfiguration(private[amf] val _internal: InternalGraphConfigurati
 
   def withUnitCache(cache: UnitCache): AMFGraphConfiguration =
     _internal.withUnitCache(ReferenceResolverMatcher.asInternal(cache))
-//
-//  def withPlugin(amfPlugin: AMFPlugin[_]): AMFGraphConfiguration = super._withPlugin(amfPlugin)
-//
-//  def withPlugins(plugins: List[AMFPlugin[_]]): AMFGraphConfiguration = super._withPlugins(plugins)
 
 //  def withValidationProfile(profile: ValidationProfile): AMFGraphConfiguration =
 //    super._withValidationProfile(profile)
 
-//  def withTransformationPipeline(pipeline: TransformationPipeline): AMFGraphConfiguration =
-//    super._withTransformationPipeline(pipeline)
+  def withTransformationPipeline(pipeline: TransformationPipeline): AMFGraphConfiguration =
+    _internal.withTransformationPipeline(new InternalTransformationPipeline {
+      override val name: String                   = pipeline.name
+      override def steps: Seq[TransformationStep] = pipeline.steps.asInternal
+    })
 
   def withEventListener(listener: AMFEventListener): AMFGraphConfiguration = _internal.withEventListener(listener)
 

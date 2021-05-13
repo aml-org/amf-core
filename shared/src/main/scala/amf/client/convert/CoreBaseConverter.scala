@@ -50,6 +50,12 @@ import amf.core.model.domain.extensions.{CustomDomainProperty, DomainExtension, 
 import amf.core.model.domain.templates.{AbstractDeclaration, ParametrizedDeclaration, VariableValue}
 import amf.core.parser.Annotations
 import amf.core.remote.Vendor
+import amf.core.resolution.stages.TransformationStep
+import amf.client.interface.resolve.{TransformationStep => ClientTransformationStep}
+import amf.client.interface.resolve.{TransformationPipeline => ClientTransformationPipeline}
+import amf.client.resolve.{ClientErrorHandler, ClientErrorHandlerConverter}
+import amf.core.errorhandling.ErrorHandler
+import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.unsafe.PlatformSecrets
 import amf.core.validation._
 import amf.internal.reference.{CachedReference, UnitCache, UnitCacheAdapter}
@@ -86,7 +92,10 @@ trait CoreBaseConverter
     with ParsingOptionsConverter
     with ShapeRenderOptionsConverter
     with RenderOptionsConverter
-    with AMFGraphConfigurationConverter {
+    with AMFGraphConfigurationConverter
+    with TransformationStepConverter
+//    with TransformationPipelineConverter
+    {
 
   implicit def asClient[Internal, Client](from: Internal)(
       implicit m: InternalClientMatcher[Internal, Client]): Client =
@@ -585,3 +594,42 @@ trait AMFGraphConfigurationConverter {
     override def asInternal(from: ClientAMFGraphConfiguration): AMFGraphConfiguration = from._internal
   }
 }
+
+trait TransformationStepConverter extends BaseUnitConverter {
+  implicit object TransformationStepMatcher
+      extends BidirectionalMatcher[TransformationStep, ClientTransformationStep] {
+    override def asClient(from: TransformationStep): ClientTransformationStep = {
+      (model: ClientBaseUnit, errorHandler: ClientErrorHandler) =>
+        {
+          val result: BaseUnit =
+            from.transform(BaseUnitMatcher.asInternal(model), ClientErrorHandlerConverter.convert(errorHandler))
+          BaseUnitMatcher.asClient(result)
+        }
+    }
+    override def asInternal(from: ClientTransformationStep): TransformationStep = {
+      (model: BaseUnit, errorHandler: ErrorHandler) =>
+        {
+          val result: ClientBaseUnit =
+            from.transform(BaseUnitMatcher.asClient(model), ClientErrorHandlerConverter.convertToClient(errorHandler))
+          BaseUnitMatcher.asInternal(result)
+        }
+    }
+  }
+}
+//
+//trait TransformationPipelineConverter extends TransformationStepConverter with CollectionConverter {
+//  implicit object TransformationPipelineMatcher extends BidirectionalMatcher[TransformationPipeline, ClientTransformationPipeline] {
+//    override def asClient(from: TransformationPipeline): ClientTransformationPipeline = {
+//      new ClientTransformationPipeline {
+//        override val name: String = from.name
+//        override def steps: ClientList[ClientTransformationStep] = InternalSeqOps(from.steps).asClient
+//      }
+//    }
+//    override def asInternal(from: ClientTransformationPipeline): TransformationPipeline = {
+//      new TransformationPipeline {
+//        override val name: String = from.name
+//        override def steps: Seq[TransformationStep] = ClientListOps(from.steps).asInternal
+//      }
+//    }
+//  }
+//}

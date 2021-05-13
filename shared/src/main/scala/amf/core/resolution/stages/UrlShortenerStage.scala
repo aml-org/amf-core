@@ -11,7 +11,7 @@ import scala.collection.mutable
 
 class UrlShortenerStage() extends TransformationStep {
 
-  override def transform[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
+  override def transform(model: BaseUnit, errorHandler: ErrorHandler): BaseUnit = {
     val ids: Set[String] = Set(model.id) ++ obtainNestedReferenceIds(model)
     shorten(model, ids)
     model.withId(base)

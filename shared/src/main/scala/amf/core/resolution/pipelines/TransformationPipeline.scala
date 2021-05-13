@@ -23,7 +23,7 @@ private[amf] case class TransformationPipelineRunner(errorHandler: ErrorHandler,
 
   private def notifyEvent(e: AMFEvent): Unit = listeners.foreach(_.notifyEvent(e))
 
-  def run[T <: BaseUnit](model: T, pipeline: TransformationPipeline): T = {
+  def run(model: BaseUnit, pipeline: TransformationPipeline): BaseUnit = {
     ExecutionLog.log(s"${this.getClass.getName}#resolve: resolving ${model.location().getOrElse("")}")
     notifyEvent(StartingTransformationEvent(pipeline))
     var m     = model
@@ -40,7 +40,7 @@ private[amf] case class TransformationPipelineRunner(errorHandler: ErrorHandler,
     m
   }
 
-  private def step[T <: BaseUnit](unit: T, step: TransformationStep, errorHandler: ErrorHandler): T = {
+  private def step(unit: BaseUnit, step: TransformationStep, errorHandler: ErrorHandler): BaseUnit = {
     ExecutionLog.log(s"ResolutionPipeline#step: applying resolution stage ${step.getClass.getName}")
     val resolved = step.transform(unit, errorHandler)
     ExecutionLog.log(s"ResolutionPipeline#step: finished applying stage ${step.getClass.getName}")
