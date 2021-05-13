@@ -12,26 +12,23 @@ trait AMFPayloadValidationPlugin extends AMFPlugin {
 
   def canValidate(shape: Shape, env: Environment): Boolean
 
-  def validator(s: Shape, env: Environment, validationMode: ValidationMode = StrictValidationMode): PayloadValidator
+  def validator(s: Shape,
+                mediaType: String,
+                env: Environment,
+                validationMode: ValidationMode = StrictValidationMode): PayloadValidator
 
 }
 
 trait PayloadValidator {
 
-  val shape: Shape
-  val defaultSeverity: String
-  val validationMode: ValidationMode
-  val env: Environment
-
-  def validate(mediaType: String, payload: String)(
-      implicit executionContext: ExecutionContext): Future[AMFValidationReport]
+  def validate(payload: String)(implicit executionContext: ExecutionContext): Future[AMFValidationReport]
 
   def validate(payloadFragment: PayloadFragment)(
       implicit executionContext: ExecutionContext): Future[AMFValidationReport]
 
-  def syncValidate(mediaType: String, payload: String): AMFValidationReport
+  def syncValidate(payload: String): AMFValidationReport
 
-  def isValid(mediaType: String, payload: String)(implicit executionContext: ExecutionContext): Future[Boolean]
+  def isValid(payload: String)(implicit executionContext: ExecutionContext): Future[Boolean]
 }
 
 case class PayloadParsingResult(fragment: PayloadFragment, results: List[AMFValidationResult]) {

@@ -16,6 +16,7 @@ trait ClientAMFPayloadValidationPlugin extends ClientAMFPlugin {
   def canValidate(shape: Shape, env: Environment): Boolean = js.native
 
   def validator(s: Shape,
+                mediaType: String,
                 env: Environment,
                 validationMode: ValidationMode = StrictValidationMode): ClientPayloadValidator
 }
@@ -23,16 +24,11 @@ trait ClientAMFPayloadValidationPlugin extends ClientAMFPlugin {
 @js.native
 trait ClientPayloadValidator extends js.Object {
 
-  val shape: Shape
-  val defaultSeverity: String
-  val validationMode: ValidationMode
-  val env: Environment
-
-  def validate(payload: String, mediaType: String): ClientFuture[ValidationReport] = js.native
+  def validate(payload: String): ClientFuture[ValidationReport] = js.native
 
   def validate(payloadFragment: PayloadFragment): ClientFuture[ValidationReport] = js.native
 
-  def syncValidate(payload: String, mediaType: String): ValidationReport = js.native
+  def syncValidate(payload: String): ValidationReport = js.native
 
-  def isValid(payload: String, mediaType: String): ClientFuture[Boolean] = js.native
+  def isValid(payload: String): ClientFuture[Boolean] = js.native
 }

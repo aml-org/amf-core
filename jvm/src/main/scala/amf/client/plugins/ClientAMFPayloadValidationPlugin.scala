@@ -23,18 +23,12 @@ trait ClientAMFPayloadValidationPlugin extends ClientAMFPlugin {
 
 trait ClientPayloadValidator {
 
-  val shape: Shape
-  val defaultSeverity: String
-  val validationMode: ValidationMode
-  val env: Environment
-
-  def validate(payload: String, mediaType: String)(
-      implicit executionContext: ExecutionContext): ClientFuture[ValidationReport]
+  def validate(payload: String)(implicit executionContext: ExecutionContext): ClientFuture[ValidationReport]
 
   def validate(payloadFragment: PayloadFragment)(
       implicit executionContext: ExecutionContext): ClientFuture[ValidationReport]
 
-  def syncValidate(mediaType: String, payload: String): ValidationReport
+  def syncValidate(payload: String): ValidationReport
 
-  def isValid(payload: String, mediaType: String)(implicit executionContext: ExecutionContext): ClientFuture[Boolean]
+  def isValid(payload: String)(implicit executionContext: ExecutionContext): ClientFuture[Boolean]
 }

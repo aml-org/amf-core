@@ -15,13 +15,13 @@ class PayloadValidator(private[amf] val _internal: InternalPayloadValidator,
 
   private implicit val executionContext: ExecutionContext = exec.executionContext
 
-  def isValid(mediaType: String, payload: String): ClientFuture[Boolean] =
-    _internal.isValid(mediaType, payload).asClient
-  def validate(mediaType: String, payload: String): ClientFuture[ValidationReport] =
-    _internal.validate(mediaType, payload).asClient
+  def isValid(payload: String): ClientFuture[Boolean] =
+    _internal.isValid(payload).asClient
+  def validate(payload: String): ClientFuture[ValidationReport] =
+    _internal.validate(payload).asClient
   def validate(payloadFragment: PayloadFragment): ClientFuture[ValidationReport] =
     _internal.validate(payloadFragment).asClient
 
-  def syncValidate(mediaType: String, payload: String): ValidationReport =
-    _internal.syncValidate(mediaType, payload)
- }
+  def syncValidate(payload: String): ValidationReport =
+    _internal.syncValidate(payload)
+}
