@@ -1,6 +1,7 @@
 package amf.client.remod
 
 import amf.ProfileName
+import amf.client.interface.config.AMFEventListener
 import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.registry.AMFRegistry

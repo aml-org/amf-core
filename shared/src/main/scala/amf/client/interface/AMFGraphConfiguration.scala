@@ -1,12 +1,13 @@
 package amf.client.interface
-import amf.client.interface.config.{ParsingOptions, RenderOptions}
+import amf.client.interface.config.{AMFEventListenerClientConverter, ParsingOptions, RenderOptions}
 import amf.client.remod.{AMFGraphConfiguration => InternalGraphConfiguration}
 import amf.client.resolve.ClientErrorHandlerConverter._
 import amf.client.convert.CoreClientConverters._
 import amf.client.convert.TransformationPipelineConverter._
 import amf.client.interface.resolve.TransformationPipeline
+import amf.client.interface.config.AMFEventListener
 import amf.client.reference.UnitCache
-import amf.client.remod.amfcore.config.{AMFEventListener, AMFLogger}
+import amf.client.remod.amfcore.config.AMFLogger
 import amf.client.resource.ResourceLoader
 
 import scala.concurrent.ExecutionContext
@@ -39,7 +40,8 @@ class AMFGraphConfiguration private[amf] (private[amf] val _internal: InternalGr
   def withTransformationPipeline(pipeline: TransformationPipeline): AMFGraphConfiguration =
     _internal.withTransformationPipeline(pipeline)
 
-  def withEventListener(listener: AMFEventListener): AMFGraphConfiguration = _internal.withEventListener(listener)
+  def withEventListener(listener: AMFEventListener): AMFGraphConfiguration =
+    _internal.withEventListener(AMFEventListenerClientConverter(listener))
 
   def withLogger(logger: AMFLogger): AMFGraphConfiguration = _internal.withLogger(logger)
 

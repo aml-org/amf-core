@@ -1,7 +1,7 @@
 package amf.core
 
+import amf.client.interface.config.AMFEvent
 import amf.client.remod.amfcore.config.{
-  AMFEvent,
   FinishedRenderingASTEvent,
   FinishedRenderingSyntaxEvent,
   StartingRenderingEvent
