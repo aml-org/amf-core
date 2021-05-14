@@ -1,4 +1,4 @@
-package amf.client.interface.resolve
+package amf.client.exported.transform
 
 import amf.client.model.document.BaseUnit
 import amf.client.resolve.ClientErrorHandler

@@ -1,9 +1,9 @@
-package amf.client.interface.config
+package amf.client.exported.config
 
 import scala.scalajs.js.annotation.JSExportAll
 
 /**
-  * Defines an event listener linked to a specific {@link amf.client.interface.config.AMFEvent}
+  * Defines an event listener linked to a specific {@link AMFEvent}
   */
 @JSExportAll
 trait AMFEventListener {

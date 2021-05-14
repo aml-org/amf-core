@@ -1,4 +1,5 @@
-package amf.client.interface.resolve
+package amf.client.exported.transform
+
 import amf.client.convert.CoreClientConverters.ClientList
 import scala.scalajs.js.annotation.JSExportAll
 

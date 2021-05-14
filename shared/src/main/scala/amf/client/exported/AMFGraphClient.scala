@@ -1,4 +1,4 @@
-package amf.client.interface
+package amf.client.exported
 
 import amf.ProfileName
 import amf.client.convert.CoreClientConverters._

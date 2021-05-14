@@ -1,6 +1,6 @@
 package amf.client.remod.amfcore.plugins.render
 
-import amf.client.interface.config.AMFEventListener
+import amf.client.exported.config.AMFEventListener
 import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.config.RenderOptions
 import amf.core.errorhandling.ErrorHandler

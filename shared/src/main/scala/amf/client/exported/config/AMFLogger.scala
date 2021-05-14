@@ -1,4 +1,4 @@
-package amf.client.remod.amfcore.config
+package amf.client.exported.config
 
 import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
 
@@ -10,7 +10,7 @@ trait AMFLogger {
   @JSExport
   def log(message: String, severity: LogSeverity, source: String)
 
-//  def logViolation(message: String, source: String) = log(message, ViolationSeverity, source)
+  //  def logViolation(message: String, source: String) = log(message, ViolationSeverity, source)
 
 }
 
@@ -26,6 +26,6 @@ object LogDebugSeverity extends LogSeverity("DEBUG")
 @JSExportTopLevel("LogInfoSeverity")
 object LogInfoSeverity extends LogSeverity("INFO")
 
-private[remod] object MutedLogger extends AMFLogger {
+private[amf] object MutedLogger extends AMFLogger {
   override def log(message: String, severity: LogSeverity, source: String): Unit = {}
 }

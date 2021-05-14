@@ -1,4 +1,4 @@
-package amf.client.interface
+package amf.client.exported
 
 import amf.client.resolve.ClientErrorHandler
 import scala.scalajs.js.annotation.JSExportAll

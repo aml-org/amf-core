@@ -1,6 +1,6 @@
 package amf.core
 
-import amf.client.interface.config.AMFEvent
+import amf.client.exported.config.AMFEvent
 import amf.client.parse.DefaultParserErrorHandler
 import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.config.{

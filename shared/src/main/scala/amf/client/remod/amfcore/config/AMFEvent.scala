@@ -1,7 +1,7 @@
 package amf.client.remod.amfcore.config
 
-import amf.client.interface.config.AMFEvent
-import amf.client.interface.config.AMFEventNames._
+import amf.client.exported.config.AMFEvent
+import amf.client.exported.config.AMFEventNames._
 import amf.client.remod.amfcore.plugins.render.AMFRenderPlugin
 import amf.client.remod.amfcore.plugins.validate.{AMFValidatePlugin, ValidationResult}
 import amf.client.remote.Content

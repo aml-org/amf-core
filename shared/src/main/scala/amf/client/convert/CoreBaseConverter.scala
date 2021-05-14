@@ -1,6 +1,8 @@
 package amf.client.convert
 
 import amf.ProfileName
+import amf.client.exported
+import amf.client.exported.{config, transform}
 import amf.client.model.document.{BaseUnit => ClientBaseUnit, PayloadFragment => ClientPayloadFragment}
 import amf.client.model.domain.{
   AbstractDeclaration => ClientAbstractDeclaration,
@@ -29,13 +31,13 @@ import amf.client.model.{
 }
 import amf.client.reference.{CachedReference => ClientCachedReference, UnitCache => ClientUnitCache}
 import amf.client.remod.amfcore.config.{ParsingOptions, RenderOptions, ShapeRenderOptions}
-import amf.client.interface.config.{ParsingOptions => ClientParsingOptions}
-import amf.client.interface.config.{ShapeRenderOptions => ClientShapeRenderOptions}
-import amf.client.interface.config.{RenderOptions => ClientRenderOptions}
+import amf.client.exported.config.{ParsingOptions => ClientParsingOptions}
+import amf.client.exported.config.{ShapeRenderOptions => ClientShapeRenderOptions}
+import amf.client.exported.config.{RenderOptions => ClientRenderOptions}
 import amf.client.remod.{AMFGraphConfiguration, AMFResult}
-import amf.client.interface.{AMFResult => ClientAMFResult}
-import amf.client.interface.{AMFGraphConfiguration => ClientAMFGraphConfiguration}
-import amf.client.interface.resolve.{TransformationPipelineBuilder => ClientTransformationPipelineBuilder}
+import amf.client.exported.{AMFResult => ClientAMFResult}
+import amf.client.exported.{AMFGraphConfiguration => ClientAMFGraphConfiguration}
+import amf.client.exported.transform.{TransformationPipelineBuilder => ClientTransformationPipelineBuilder}
 import amf.client.remote.Content
 import amf.client.resource.{ResourceLoader => ClientResourceLoader}
 import amf.client.validate.{
@@ -53,7 +55,7 @@ import amf.core.model.domain.templates.{AbstractDeclaration, ParametrizedDeclara
 import amf.core.parser.Annotations
 import amf.core.remote.Vendor
 import amf.core.resolution.stages.TransformationStep
-import amf.client.interface.resolve.{TransformationStep => ClientTransformationStep}
+import amf.client.exported.transform.{TransformationStep => ClientTransformationStep}
 import amf.client.remod.amfcore.resolution.TransformationPipelineBuilder
 import amf.client.resolve.{ClientErrorHandler, ClientErrorHandlerConverter}
 import amf.core.errorhandling.ErrorHandler
@@ -566,40 +568,40 @@ trait PayloadValidatorConverter {
 }
 
 trait ParsingOptionsConverter {
-  implicit object ParsingOptionsMatcher extends BidirectionalMatcher[ParsingOptions, ClientParsingOptions] {
-    override def asClient(from: ParsingOptions): ClientParsingOptions   = ClientParsingOptions(from)
-    override def asInternal(from: ClientParsingOptions): ParsingOptions = from._internal
+  implicit object ParsingOptionsMatcher extends BidirectionalMatcher[ParsingOptions, config.ParsingOptions] {
+    override def asClient(from: ParsingOptions): config.ParsingOptions   = ClientParsingOptions(from)
+    override def asInternal(from: config.ParsingOptions): ParsingOptions = from._internal
   }
 }
 
 trait ShapeRenderOptionsConverter {
   implicit object ShapeRenderOptionsMatcher
-      extends BidirectionalMatcher[ShapeRenderOptions, ClientShapeRenderOptions] {
-    override def asClient(from: ShapeRenderOptions): ClientShapeRenderOptions   = ClientShapeRenderOptions(from)
-    override def asInternal(from: ClientShapeRenderOptions): ShapeRenderOptions = from._internal
+      extends BidirectionalMatcher[ShapeRenderOptions, config.ShapeRenderOptions] {
+    override def asClient(from: ShapeRenderOptions): config.ShapeRenderOptions   = ClientShapeRenderOptions(from)
+    override def asInternal(from: config.ShapeRenderOptions): ShapeRenderOptions = from._internal
   }
 }
 
 trait RenderOptionsConverter {
-  implicit object RenderOptionsMatcher extends BidirectionalMatcher[RenderOptions, ClientRenderOptions] {
-    override def asClient(from: RenderOptions): ClientRenderOptions   = ClientRenderOptions(from)
-    override def asInternal(from: ClientRenderOptions): RenderOptions = from._internal
+  implicit object RenderOptionsMatcher extends BidirectionalMatcher[RenderOptions, config.RenderOptions] {
+    override def asClient(from: RenderOptions): config.RenderOptions   = ClientRenderOptions(from)
+    override def asInternal(from: config.RenderOptions): RenderOptions = from._internal
   }
 }
 
 trait AMFGraphConfigurationConverter {
   implicit object AMFGraphConfigurationMatcher
-      extends BidirectionalMatcher[AMFGraphConfiguration, ClientAMFGraphConfiguration] {
-    override def asClient(from: AMFGraphConfiguration): ClientAMFGraphConfiguration =
-      new ClientAMFGraphConfiguration(from)
-    override def asInternal(from: ClientAMFGraphConfiguration): AMFGraphConfiguration = from._internal
+      extends BidirectionalMatcher[AMFGraphConfiguration, exported.AMFGraphConfiguration] {
+    override def asClient(from: AMFGraphConfiguration): exported.AMFGraphConfiguration =
+      new exported.AMFGraphConfiguration(from)
+    override def asInternal(from: exported.AMFGraphConfiguration): AMFGraphConfiguration = from._internal
   }
 }
 
 trait TransformationStepConverter extends BaseUnitConverter {
   implicit object TransformationStepMatcher
-      extends BidirectionalMatcher[TransformationStep, ClientTransformationStep] {
-    override def asClient(from: TransformationStep): ClientTransformationStep = {
+      extends BidirectionalMatcher[TransformationStep, transform.TransformationStep] {
+    override def asClient(from: TransformationStep): transform.TransformationStep = {
       (model: ClientBaseUnit, errorHandler: ClientErrorHandler) =>
         {
           val result: BaseUnit =
@@ -607,7 +609,7 @@ trait TransformationStepConverter extends BaseUnitConverter {
           BaseUnitMatcher.asClient(result)
         }
     }
-    override def asInternal(from: ClientTransformationStep): TransformationStep = {
+    override def asInternal(from: transform.TransformationStep): TransformationStep = {
       (model: BaseUnit, errorHandler: ErrorHandler) =>
         {
           val result: ClientBaseUnit =
@@ -620,17 +622,18 @@ trait TransformationStepConverter extends BaseUnitConverter {
 
 trait TransformationPipelineBuilderConverter {
   implicit object TransformationPipelineBuilderMatcher
-      extends BidirectionalMatcher[TransformationPipelineBuilder, ClientTransformationPipelineBuilder] {
-    override def asClient(from: TransformationPipelineBuilder): ClientTransformationPipelineBuilder =
+      extends BidirectionalMatcher[TransformationPipelineBuilder, transform.TransformationPipelineBuilder] {
+    override def asClient(from: TransformationPipelineBuilder): transform.TransformationPipelineBuilder =
       ClientTransformationPipelineBuilder(from)
-    override def asInternal(from: ClientTransformationPipelineBuilder): TransformationPipelineBuilder = from._internal
+    override def asInternal(from: transform.TransformationPipelineBuilder): TransformationPipelineBuilder =
+      from._internal
   }
 }
 
 trait AMFResultConverter {
-  implicit object AMFResultMatcher extends BidirectionalMatcher[AMFResult, ClientAMFResult] {
-    override def asClient(from: AMFResult): ClientAMFResult =
+  implicit object AMFResultMatcher extends BidirectionalMatcher[AMFResult, exported.AMFResult] {
+    override def asClient(from: AMFResult): exported.AMFResult =
       ClientAMFResult(from)
-    override def asInternal(from: ClientAMFResult): AMFResult = from._internal
+    override def asInternal(from: exported.AMFResult): AMFResult = from._internal
   }
 }

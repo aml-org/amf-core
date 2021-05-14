@@ -1,27 +1,12 @@
-package amf.client.interface.config
+package amf.client.exported.config
 
 import amf.client.model.document.BaseUnit
-import amf.client.remod.amfcore.config.{
-  FinishedParsingEvent => InternalFinishedParsingEvent,
-  FinishedRenderingASTEvent => InternalFinishedRenderingASTEvent,
-  FinishedRenderingSyntaxEvent => InternalFinishedRenderingSyntaxEvent,
-  FinishedTransformationEvent => InternalFinishedTransformationEvent,
-  FinishedTransformationStepEvent => InternalFinishedTransformationStepEvent,
-  FinishedValidationEvent => InternalFinishedValidationEvent,
-  FinishedValidationPluginEvent => InternalFinishedValidationPluginEvent,
-  ParsedModelEvent => InternalParsedModelEvent,
-  ParsedSyntaxEvent => InternalParsedSyntaxEvent,
-  StartingContentParsingEvent => InternalStartingContentParsingEvent,
-  StartingParsingEvent => InternalStartingParsingEvent,
-  StartingRenderingEvent => InternalStartingRenderingEvent,
-  StartingTransformationEvent => InternalStartingTransformationEvent,
-  StartingValidationEvent => InternalStartingValidationEvent
-}
+import amf.client.remod.amfcore.config.{FinishedParsingEvent => InternalFinishedParsingEvent, FinishedRenderingASTEvent => InternalFinishedRenderingASTEvent, FinishedRenderingSyntaxEvent => InternalFinishedRenderingSyntaxEvent, FinishedTransformationEvent => InternalFinishedTransformationEvent, FinishedTransformationStepEvent => InternalFinishedTransformationStepEvent, FinishedValidationEvent => InternalFinishedValidationEvent, FinishedValidationPluginEvent => InternalFinishedValidationPluginEvent, ParsedModelEvent => InternalParsedModelEvent, ParsedSyntaxEvent => InternalParsedSyntaxEvent, StartingContentParsingEvent => InternalStartingContentParsingEvent, StartingParsingEvent => InternalStartingParsingEvent, StartingRenderingEvent => InternalStartingRenderingEvent, StartingTransformationEvent => InternalStartingTransformationEvent, StartingValidationEvent => InternalStartingValidationEvent}
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 import amf.client.convert.CoreClientConverters._
 import amf.client.convert.TransformationPipelineConverter._
-import amf.client.interface.resolve.{TransformationPipeline, TransformationStep}
+import amf.client.exported.transform.{TransformationPipeline, TransformationStep}
 import amf.client.remote.Content
 import amf.client.validate.AMFValidationReport
 

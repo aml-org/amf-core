@@ -1,4 +1,4 @@
-package amf.client.interface.config
+package amf.client.exported.config
 
 import amf.client.render.JSONSchemaVersion
 import amf.client.convert.CoreClientConverters._

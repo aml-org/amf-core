@@ -1,13 +1,12 @@
-package amf.client.interface
-import amf.client.interface.config.{AMFEventListenerClientConverter, ParsingOptions, RenderOptions}
+package amf.client.exported
+
 import amf.client.remod.{AMFGraphConfiguration => InternalGraphConfiguration}
 import amf.client.resolve.ClientErrorHandlerConverter._
 import amf.client.convert.CoreClientConverters._
 import amf.client.convert.TransformationPipelineConverter._
-import amf.client.interface.resolve.TransformationPipeline
-import amf.client.interface.config.AMFEventListener
+import amf.client.exported.config.{AMFEventListener, AMFEventListenerClientConverter, AMFLogger, ParsingOptions, RenderOptions}
+import amf.client.exported.transform.TransformationPipeline
 import amf.client.reference.UnitCache
-import amf.client.remod.amfcore.config.AMFLogger
 import amf.client.resource.ResourceLoader
 
 import scala.concurrent.ExecutionContext

@@ -1,4 +1,5 @@
-package amf.client.interface.config
+package amf.client.exported.config
+
 import amf.client.remod.amfcore.config.{RenderOptions => InternalRenderOptions}
 import amf.client.convert.CoreClientConverters._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}

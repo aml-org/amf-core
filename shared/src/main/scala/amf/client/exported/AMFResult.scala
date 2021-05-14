@@ -1,4 +1,4 @@
-package amf.client.interface
+package amf.client.exported
 
 import amf.client.model.document.{BaseUnit, Document}
 import amf.client.remod.{AMFResult => InternalAMFResult}
