@@ -2,8 +2,8 @@ package amf.client.resolve
 
 import amf.client.convert.CoreClientConverters._
 import amf.client.model.document.BaseUnit
-import amf.client.parse.DefaultErrorHandler
 import amf.client.resolve.ClientErrorHandlerConverter._
+import amf.client.validate.ValidationResult
 import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.services.RuntimeResolver
 
@@ -32,4 +32,6 @@ trait ClientErrorHandler {
                        range: ClientOption[amf.core.parser.Range],
                        level: String,
                        location: ClientOption[String]): Unit
+
+  def results(): ClientList[ValidationResult]
 }
