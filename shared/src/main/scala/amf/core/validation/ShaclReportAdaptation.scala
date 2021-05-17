@@ -13,10 +13,9 @@ trait ShaclReportAdaptation {
   protected def adaptToAmfReport(model: BaseUnit,
                                  profile: ProfileName,
                                  report: ValidationReport,
-                                 messageStyle: MessageStyle,
                                  validations: EffectiveValidations): AMFValidationReport = {
     val amfResults = report.results.flatMap { r =>
-      adaptToAmfResult(model, r, messageStyle, validations)
+      adaptToAmfResult(model, r, profile.messageStyle, validations)
     }
     AMFValidationReport(model.id, profile, amfResults)
   }

@@ -3,19 +3,20 @@ import amf.core.validation.AMFValidationResult
 
 import scala.collection.mutable
 
-object StaticErrorCollector{
+object StaticErrorCollector {
 
-  private val errorsForUnitCount: mutable.Map[Int, Seq[AMFValidationResult]] = mutable.Map.empty
+  private val errorsForUnitCount: mutable.Map[String, Seq[AMFValidationResult]] = mutable.Map.empty
 
-  def collect(result: AMFValidationResult, parserRun:Int): Unit = synchronized {
-    errorsForUnitCount.get(parserRun) match {
-      case Some(seq) => errorsForUnitCount.update(parserRun,  result +: seq)
-      case None => errorsForUnitCount.put(parserRun,Seq(result))
+  // TODO: ARM remove this when test be fixed
+  def collect(result: AMFValidationResult, id: String): Unit = synchronized {
+    errorsForUnitCount.get(id) match {
+      case Some(seq) => errorsForUnitCount.update(id, result +: seq)
+      case None      => errorsForUnitCount.put(id, Seq(result))
     }
   }
 
   def clean(): Unit = errorsForUnitCount.clear()
 
-  def getRun(parserRun:Int): Seq[AMFValidationResult] = errorsForUnitCount.getOrElse(parserRun, Nil)
+  def getRun(id: String): Seq[AMFValidationResult] = errorsForUnitCount.getOrElse(id, Nil)
 
 }

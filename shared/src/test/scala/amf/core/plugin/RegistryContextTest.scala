@@ -5,7 +5,7 @@ import amf.core.parser.Annotations
 import amf.core.registries.AMFDomainRegistry.defaultIri
 import org.scalatest.{FunSuite, Matchers}
 
-class PluginContextTest extends FunSuite with Matchers {
+class RegistryContextTest extends FunSuite with Matchers {
 
 
   test("Test types without blacklist") {

@@ -7,11 +7,11 @@ trait ErrorCollector extends AmfResultErrorHandler {
   private val errors: mutable.LinkedHashSet[AMFValidationResult] = mutable.LinkedHashSet()
 
   override def handlerAmfResult(result: AMFValidationResult): Boolean = synchronized {
-    if(!errors.contains(result)) {
+    if (!errors.contains(result)) {
       errors += result
       true
-    }else false
+    } else false
   }
 
-  def getErrors: List[AMFValidationResult] =  errors.toList
+  override def results: List[AMFValidationResult] = errors.toList
 }

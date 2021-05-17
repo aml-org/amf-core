@@ -6,7 +6,7 @@ import amf.core.Root
 import amf.core.client.ParsingOptions
 import amf.core.errorhandling.ErrorHandler
 import amf.core.model.document.BaseUnit
-import amf.core.parser.{ParserContext, ReferenceHandler}
+import amf.core.parser.{ParserContext, ReferenceHandler, SyamlParsedDocument}
 
 private[amf] case class AMFParsePluginAdapter(plugin: AMFDocumentPlugin) extends AMFParsePlugin {
   override def parse(document: Root, ctx: ParserContext, options: ParsingOptions): BaseUnit =
@@ -22,15 +22,7 @@ private[amf] case class AMFParsePluginAdapter(plugin: AMFDocumentPlugin) extends
 
   override def mediaTypes: Seq[String] = plugin.vendors
 
-  override def applies(element: ParsingInfo): Boolean = {
-    val syntaxCondition = element.vendor match {
-      case Some(definedVendor) =>
-        plugin.vendors.contains(definedVendor)
-      case None =>
-        plugin.documentSyntaxes.contains(element.parsed.mediatype)
-    }
-    syntaxCondition && plugin.canParse(element.parsed)
-  }
+  override def applies(root: Root): Boolean = plugin.canParse(root)
 
   override def priority: PluginPriority = PluginPriority(plugin.priority)
 }

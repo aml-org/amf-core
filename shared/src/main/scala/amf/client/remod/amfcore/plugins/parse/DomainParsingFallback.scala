@@ -1,28 +1,28 @@
 package amf.client.remod.amfcore.plugins.parse
 
+import amf.core.Root
 import amf.core.exception.UnsupportedVendorException
 import amf.core.model.document.{BaseUnit, ExternalFragment}
 import amf.core.model.domain.ExternalDomainElement
 
 trait DomainParsingFallback {
 
-  def chooseFallback(element: ParsingInfo, availablePlugins: Seq[AMFParsePlugin]): BaseUnit
+  def chooseFallback(root: Root, mediaType: Option[String], availablePlugins: Seq[AMFParsePlugin]): BaseUnit
 }
 
 object ExternalFragmentDomainFallback extends DomainParsingFallback {
-  override def chooseFallback(element: ParsingInfo, availablePlugins: Seq[AMFParsePlugin]): BaseUnit = {
-    element.vendor match {
+  override def chooseFallback(root: Root, mediaType: Option[String], availablePlugins: Seq[AMFParsePlugin]): BaseUnit = {
+    mediaType match {
       case Some(definedVendor) =>
         throw new UnsupportedVendorException(definedVendor)
       case None =>
-        val document = element.parsed
         ExternalFragment()
-          .withId(document.location)
-          .withLocation(document.location)
+          .withId(root.location)
+          .withLocation(root.location)
           .withEncodes(
               ExternalDomainElement()
-                .withRaw(document.raw)
-                .withMediaType(document.mediatype))
+                .withRaw(root.raw)
+                .withMediaType(root.mediatype))
     }
 
   }

@@ -1,31 +1,24 @@
 package amf.core.model.document
 
-import amf.client.parse.DefaultParserErrorHandler
+import amf.client.remod.AMFGraphConfiguration
 import amf.core.annotations.SourceVendor
 import amf.core.emitter.RenderOptions
 import amf.core.errorhandling.ErrorHandler
 import amf.core.metamodel.MetaModelTypeMapping
-import amf.core.metamodel.document.{BaseUnitModel, FragmentModel}
+import amf.core.metamodel.document.BaseUnitModel
 import amf.core.metamodel.document.BaseUnitModel.{Location, ModelVersion, Root, Usage}
 import amf.core.metamodel.document.DocumentModel.References
 import amf.core.model.document.FieldsFilter.Local
 import amf.core.model.domain._
 import amf.core.model.{BoolField, StrField}
-import amf.core.parser.ParserContext
 import amf.core.rdf.{RdfModel, RdfModelParser}
-import amf.core.remote.Vendor
+import amf.core.remote.{Amf, Vendor}
+import amf.core.traversal.iterator._
 import amf.core.traversal.{
   DomainElementSelectorAdapter,
   DomainElementTransformationAdapter,
   TransformationData,
   TransformationTraversal
-}
-import amf.core.traversal.iterator.{
-  AmfIterator,
-  DomainElementStrategy,
-  IdCollector,
-  IteratorStrategy,
-  VisitedCollector
 }
 import amf.core.unsafe.PlatformSecrets
 
@@ -52,8 +45,6 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
       this
     }
   }
-
-  def parserRun: Option[Int] = run
 
   /** Raw text  used to generated this unit */
   var raw: Option[String] = None
@@ -137,12 +128,14 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
     }
   }
 
-  def sourceVendor: Option[Vendor] = this match {
+  private[amf] def sourceVendor: Option[Vendor] = this match {
     case e: EncodesModel if Option(e.encodes).isDefined =>
       e.encodes.annotations.find(classOf[SourceVendor]).map(a => a.vendor)
     case d: DeclaresModel => d.annotations.find(classOf[SourceVendor]).map(a => a.vendor)
     case _                => None
   }
+
+  def sourceMediaType: String = sourceVendor.map(_.mediaType).getOrElse(Amf.mediaType)
 
   def cloneUnit(): BaseUnit = cloneElement(mutable.Map.empty).asInstanceOf[BaseUnit]
 
@@ -152,22 +145,10 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
     cloned.raw = raw
     cloned
   }
-
-  private[amf] def errorHandler(): ErrorHandler = {
-    run match {
-      case Some(num) => new DefaultParserErrorHandler(num)
-      case _ =>
-        val eh = DefaultParserErrorHandler.withRun()
-        run = Some(eh.parserRun)
-        eh
-
-    }
-  }
 }
 
 object BaseUnit extends PlatformSecrets {
-  def fromNativeRdfModel(id: String,
-                         rdfModel: RdfModel,
-                         ctx: ParserContext = ParserContext(eh = DefaultParserErrorHandler.withRun())): BaseUnit =
-    RdfModelParser(ctx.eh, ctx.plugins).parse(rdfModel, id)
+  def fromNativeRdfModel(id: String, rdfModel: RdfModel, conf: AMFGraphConfiguration): BaseUnit = {
+    RdfModelParser(conf).parse(rdfModel, id)
+  }
 }

@@ -1,6 +1,7 @@
 package amf.core.validation
 
-import amf.ProfileName
+import amf.{AmfProfile, ProfileName}
+import amf.core.model.document.BaseUnit
 
 case class AMFValidationReport(conforms: Boolean,
                                model: String,
@@ -14,7 +15,7 @@ case class AMFValidationReport(conforms: Boolean,
     val validations = results.take(max).sortWith((c1, c2) => c1.compare(c2) < 0).groupBy(_.severityLevel)
 
     str.append(s"Model: $model\n")
-    str.append(s"Profile: ${profile.profile}\n")
+    str.append(s"Profile: ${profile}\n")
     str.append(s"Conforms? $conforms\n")
     str.append(s"Number of results: ${results.length}\n")
 
@@ -47,5 +48,14 @@ object AMFValidationReport {
   def apply(model: String, profile: ProfileName, results: Seq[AMFValidationResult]) =
     new AMFValidationReport(!results.exists(_.severityLevel == SeverityLevels.VIOLATION), model, profile, results)
 
-  def empty(model: String, profileName: ProfileName) = apply(model, profileName, Seq())
+  def empty(model: String, profileName: ProfileName): AMFValidationReport = apply(model, profileName, Seq())
+
+  def forModel(model: BaseUnit, results: List[AMFValidationResult]): AMFValidationReport = {
+    new AMFValidationReport(
+        !results.exists(r => r.severityLevel == SeverityLevels.VIOLATION),
+        model.location().getOrElse(model.id),
+        model.sourceVendor.map(v => ProfileName.apply(v.name)).getOrElse(AmfProfile),
+        results
+    )
+  }
 }

@@ -1,11 +1,13 @@
 package amf.client.validate
 
+import amf.ProfileName
 import amf.client.convert.CoreClientConverters._
 import amf.client.environment.{DefaultEnvironment, Environment}
 import amf.client.model.document.BaseUnit
+import amf.client.remod.AMFGraphConfiguration
+import amf.client.remod.amfcore.plugins.validate.ValidationConfiguration
 import amf.core.errorhandling.UnhandledErrorHandler
 import amf.core.services.RuntimeValidator
-import amf.{AMFStyle, MessageStyle, ProfileName}
 
 import scala.concurrent.ExecutionContext
 import scala.scalajs.js.annotation.JSExport
@@ -15,17 +17,15 @@ object Validator {
   @JSExport
   def validate(model: BaseUnit,
                profileName: ProfileName,
-               messageStyle: MessageStyle = AMFStyle,
-               env: Environment = DefaultEnvironment(),
+               config: AMFGraphConfiguration,
                resolved: Boolean = false): ClientFuture[AMFValidationReport] = {
-    implicit val executionContext: ExecutionContext = env.executionEnvironment.executionContext
+    val validationConfiguration                     = new ValidationConfiguration(config)
+    implicit val executionContext: ExecutionContext = validationConfiguration.executionContext
     RuntimeValidator(
         model._internal,
         profileName,
-        messageStyle,
-        env._internal,
         resolved,
-        env.executionEnvironment
+        validationConfiguration
     ).map(report => report).asClient
   }
 

@@ -168,7 +168,6 @@ object RenderOptions {
     opts.sources = client.isWithSourceMaps
     opts.amfJsonLdSerialization = client.isAmfJsonLdSerilization
     opts.compactUris = client.isWithCompactUris
-    opts.withErrorHandler(ErrorHandlerConverter.asInternal(client.errorHandler))
     opts.prettyPrint = client.isPrettyPrint
     opts.flattenedJsonLd = client.isFlattenedJsonLd
     opts
@@ -193,17 +192,17 @@ object RenderOptions {
 
   def toImmutable(options: RenderOptions, shapeRenderOptions: ImmutableShapeRenderOptions): ImmutableRenderOptions =
     ImmutableRenderOptions(
-      options.compactedEmission,
-      options.sources,
-      options.compactUris,
-      options.rawSourceMaps,
-      options.validating,
-      options.filterFields,
-      options.amfJsonLdSerialization,
-      options.useJsonLdEmitter,
-      options.flattenedJsonLd,
-      options.prettyPrint,
-      options.emitNodeIds,
-      shapeRenderOptions
+        options.compactedEmission,
+        options.sources,
+        options.compactUris,
+        options.rawSourceMaps,
+        options.validating,
+        options.filterFields,
+        options.amfJsonLdSerialization,
+        options.useJsonLdEmitter,
+        options.flattenedJsonLd,
+        options.prettyPrint,
+        options.emitNodeIds,
+        shapeRenderOptions
     )
 }

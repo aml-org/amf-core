@@ -1,5 +1,6 @@
 package amf.core.validation
 import amf.client.plugins.{AMFPlugin, StrictValidationMode, ValidationMode}
+import amf.client.remod.amfcore.plugins.validate.ValidationConfiguration
 import amf.core.model.document.PayloadFragment
 import amf.core.model.domain.Shape
 import amf.internal.environment.Environment
@@ -10,9 +11,12 @@ trait AMFPayloadValidationPlugin extends AMFPlugin {
 
   val payloadMediaType: Seq[String]
 
-  def canValidate(shape: Shape, env: Environment): Boolean
+  def canValidate(shape: Shape, config: ValidationConfiguration): Boolean
 
-  def validator(s: Shape, env: Environment, validationMode: ValidationMode = StrictValidationMode): PayloadValidator
+  // TODO ARM we can remove the validation mode and handle it on different plugins, o we can put the mode into the options
+  def validator(s: Shape,
+                config: ValidationConfiguration,
+                validationMode: ValidationMode = StrictValidationMode): PayloadValidator
 
 }
 
@@ -21,7 +25,7 @@ trait PayloadValidator {
   val shape: Shape
   val defaultSeverity: String
   val validationMode: ValidationMode
-  val env: Environment
+  val config: ValidationConfiguration
 
   def validate(mediaType: String, payload: String)(
       implicit executionContext: ExecutionContext): Future[AMFValidationReport]

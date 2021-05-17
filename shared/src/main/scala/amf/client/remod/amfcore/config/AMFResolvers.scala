@@ -53,8 +53,8 @@ private[amf] case class AMFResolvers(resourceLoaders: List[ResourceLoader],
     * @param executionContext
     * @return
     */
-  def resolveContent(url: String)(implicit executionContext: ExecutionContext): Future[Content] = {
-    loaderConcat(url, resourceLoaders.filter(_.accepts(url)))
+  def resolveContent(url: String): Future[Content] = {
+    loaderConcat(url, resourceLoaders.filter(_.accepts(url)))(executionContext.executionContext)
   }
 
   private def loaderConcat(url: String, loaders: Seq[ResourceLoader])(
