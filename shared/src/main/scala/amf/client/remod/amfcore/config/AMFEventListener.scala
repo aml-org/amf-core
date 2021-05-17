@@ -1,6 +1,5 @@
 package amf.client.remod.amfcore.config
 
-import amf.client.exported.config.AMFEvent
 import amf.client.exported.config.AMFEventNames._
 import amf.client.remod.amfcore.plugins.render.AMFRenderPlugin
 import amf.client.remod.amfcore.plugins.validate.{AMFValidatePlugin, ValidationResult}
@@ -10,6 +9,16 @@ import amf.core.parser.ParsedDocument
 import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.resolution.stages.TransformationStep
 import amf.core.validation.AMFValidationReport
+
+// interface is duplicated in exported package to maintain separate hierarchy of AMFEvents
+
+trait AMFEventListener {
+  def notifyEvent(event: AMFEvent)
+}
+
+sealed trait AMFEvent {
+  val name: String
+}
 
 // Parsing Events
 

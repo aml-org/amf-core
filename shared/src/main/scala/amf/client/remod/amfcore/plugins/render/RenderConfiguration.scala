@@ -1,8 +1,7 @@
 package amf.client.remod.amfcore.plugins.render
 
-import amf.client.exported.config.AMFEventListener
 import amf.client.remod.AMFGraphConfiguration
-import amf.client.remod.amfcore.config.RenderOptions
+import amf.client.remod.amfcore.config.{AMFEventListener, RenderOptions}
 import amf.core.errorhandling.ErrorHandler
 
 trait RenderConfiguration {

@@ -1,7 +1,8 @@
 package amf.core.resolution.pipelines
 
-import amf.client.exported.config.{AMFEvent, AMFEventListener}
 import amf.client.remod.amfcore.config.{
+  AMFEvent,
+  AMFEventListener,
   FinishedTransformationEvent,
   FinishedTransformationStepEvent,
   StartingTransformationEvent

@@ -35,10 +35,15 @@ import amf.client.model.{
   StrField => ClientStrField
 }
 import amf.client.reference.{CachedReference => ClientCachedReference, UnitCache => ClientUnitCache}
-import amf.client.remod.amfcore.config.{ParsingOptions, RenderOptions, ShapeRenderOptions}
-import amf.client.exported.config.{ParsingOptions => ClientParsingOptions}
-import amf.client.exported.config.{ShapeRenderOptions => ClientShapeRenderOptions}
-import amf.client.exported.config.{RenderOptions => ClientRenderOptions}
+import amf.client.remod.amfcore.config.{AMFEvent, AMFEventListener, ParsingOptions, RenderOptions, ShapeRenderOptions}
+import amf.client.exported.config.{
+  AMFEventConverter,
+  AMFEvent => ClientAMFEvent,
+  AMFEventListener => ClientAMFEventListener,
+  ParsingOptions => ClientParsingOptions,
+  RenderOptions => ClientRenderOptions,
+  ShapeRenderOptions => ClientShapeRenderOptions
+}
 import amf.client.remod.{AMFGraphConfiguration, AMFResult}
 import amf.client.exported.{AMFResult => ClientAMFResult}
 import amf.client.exported.transform.{TransformationPipelineBuilder => ClientTransformationPipelineBuilder}
@@ -103,7 +108,8 @@ trait CoreBaseConverter
     with AMFGraphConfigurationConverter
     with TransformationStepConverter
     with TransformationPipelineBuilderConverter
-    with AMFResultConverter {
+    with AMFResultConverter
+    with AMFEventListenerConverter {
 
   implicit def asClient[Internal, Client](from: Internal)(
       implicit m: InternalClientMatcher[Internal, Client]): Client =
@@ -656,5 +662,16 @@ trait AMFResultConverter {
     override def asClient(from: AMFResult): exported.AMFResult =
       ClientAMFResult(from)
     override def asInternal(from: exported.AMFResult): AMFResult = from._internal
+  }
+}
+
+trait AMFEventListenerConverter {
+  implicit object AMFEventListenerMatcher extends ClientInternalMatcher[ClientAMFEventListener, AMFEventListener] {
+    override def asInternal(from: ClientAMFEventListener): AMFEventListener = { (event: AMFEvent) =>
+      {
+        val clientEvent = AMFEventConverter.asClient(event)
+        from.notifyEvent(clientEvent)
+      }
+    }
   }
 }

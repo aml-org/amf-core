@@ -1,7 +1,7 @@
 package amf.client.remod
 
 import amf.ProfileName
-import amf.client.exported.config.{AMFEventListener, AMFLogger, MutedLogger}
+import amf.client.exported.config.{AMFLogger, MutedLogger}
 import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.registry.AMFRegistry
