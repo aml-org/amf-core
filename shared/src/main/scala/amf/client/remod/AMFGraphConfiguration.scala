@@ -5,7 +5,7 @@ import amf.client.exported.config.{AMFLogger, MutedLogger}
 import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.registry.AMFRegistry
-import amf.core.errorhandling.AmfResultErrorHandler
+import amf.core.errorhandling.{AmfResultErrorHandler, ErrorHandler}
 import amf.core.parser.ParserContext
 import amf.core.parser.errorhandler.AmfParserErrorHandler
 import amf.core.resolution.pipelines.{BasicTransformationPipeline, TransformationPipeline}
@@ -64,9 +64,11 @@ object AMFGraphConfiguration {
     legacy.resolver.map(unitCache => withLoaders.withUnitCache(unitCache)).getOrElse(withLoaders)
   }
   //TODO: ARM remove
-  private[amf] def fromParseCtx(ctx: ParserContext) = {
+  private[amf] def fromParseCtx(ctx: ParserContext) = fromEH(ctx.eh)
+
+  private[amf] def fromEH(eh: ErrorHandler) = {
     val peh = new AmfParserErrorHandler {
-      private val wrapped = ctx.eh
+      private val wrapped = eh
       override def handlerAmfResult(result: AMFValidationResult): Boolean = {
         wrapped.reportConstraint(result.validationId,
                                  result.targetNode,
@@ -82,6 +84,7 @@ object AMFGraphConfiguration {
     }
 
     AMFGraphConfiguration.predefined().withErrorHandlerProvider(() => peh)
+
   }
 }
 

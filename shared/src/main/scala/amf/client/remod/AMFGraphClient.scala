@@ -1,14 +1,7 @@
 package amf.client.remod
 
 import amf.ProfileName
-import amf.client.convert.CoreClientConverters.platform
-import amf.client.parse.DefaultParserErrorHandler
-import amf.core.client.ParsingOptions
-import amf.core.errorhandling.ErrorHandler
 import amf.core.model.document.BaseUnit
-import amf.core.remote.{Cache, Context, Vendor}
-import amf.core.resolution.pipelines.TransformationPipeline
-import amf.core.services.RuntimeCompiler
 import amf.core.validation.AMFValidationReport
 import org.yaml.model.YDocument
 
@@ -26,9 +19,9 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
   def parseContent(content: String, mediaType: String): Future[AMFResult] =
     AMFParser.parseContent(content, mediaType, configuration)
 
-  def transform(bu: BaseUnit): AMFResult = AMFTransformer.transform(bu, configuration)
+  def transform(bu: BaseUnit): AMFResult = AMFTransformer.transform(bu, configuration) // clone? BaseUnit.resolved
   def transform(bu: BaseUnit, pipelineName: String): AMFResult =
-    AMFTransformer.transform(bu, pipelineName, configuration)
+    AMFTransformer.transform(bu, pipelineName, configuration) // clone? BaseUnit.resolved
 
   def render(bu: BaseUnit): String                          = AMFRenderer.render(bu, configuration)
   def renderAST(bu: BaseUnit): YDocument                    = AMFRenderer.renderAST(bu, configuration)
