@@ -10,7 +10,6 @@ import amf.core.client.ParsingOptions
 import amf.core.errorhandling.ErrorHandler
 import amf.core.exception.UnsupportedParsedDocumentException
 import amf.core.metamodel.Obj
-import amf.core.metamodel.domain._
 import amf.core.model.document.BaseUnit
 import amf.core.model.domain.AnnotationGraphLoader
 import amf.core.parser._
@@ -23,6 +22,7 @@ import amf.core.resolution.pipelines.{
 }
 import amf.core.unsafe.PlatformSecrets
 import amf.plugins.document.graph.emitter.EmbeddedJsonLdEmitter
+import amf.plugins.document.graph.entities.AMFGraphEntities
 import amf.plugins.document.graph.parser.{EmbeddedGraphParser, FlattenedGraphParser, GraphDependenciesReferenceHandler}
 import org.yaml.builder.DocBuilder
 import org.yaml.model.YDocument
@@ -43,13 +43,7 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
 
   val vendors: Seq[String] = Seq(Amf.name)
 
-  override def modelEntities: Seq[Obj] = Seq(
-      ObjectNodeModel,
-      ScalarNodeModel,
-      ArrayNodeModel,
-      LinkNodeModel,
-      RecursiveShapeModel
-  )
+  override def modelEntities: Seq[Obj] = AMFGraphEntities.entities.values.toSeq
 
   override def serializableAnnotations(): Map[String, AnnotationGraphLoader] = Map.empty
 

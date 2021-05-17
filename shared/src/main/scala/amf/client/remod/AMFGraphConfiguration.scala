@@ -5,7 +5,9 @@ import amf.client.exported.config.{AMFLogger, MutedLogger}
 import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.registry.AMFRegistry
-import amf.core.errorhandling.{AmfResultErrorHandler, ErrorHandler}
+import amf.core.annotations.serializable.CoreSerializableAnnotations
+import amf.core.entities.CoreEntities
+import amf.core.errorhandling.ErrorHandler
 import amf.core.parser.ParserContext
 import amf.core.parser.errorhandler.AmfParserErrorHandler
 import amf.core.resolution.pipelines.{BasicTransformationPipeline, TransformationPipeline}
@@ -14,9 +16,9 @@ import amf.core.validation.core.ValidationProfile
 import amf.internal.environment.Environment
 import amf.internal.reference.UnitCache
 import amf.internal.resource.ResourceLoader
+import amf.plugins.document.graph.entities.AMFGraphEntities
 import amf.plugins.document.graph.{AMFGraphParsePlugin, AMFGraphRenderPlugin}
 
-import java.rmi.registry.LocateRegistry.getRegistry
 import scala.concurrent.ExecutionContext
 // all constructors only visible from amf. Users should always use builders or defaults
 
@@ -47,7 +49,9 @@ object AMFGraphConfiguration {
     new AMFGraphConfiguration(
         AMFResolvers.predefined(),
         DefaultErrorHandlerProvider,
-        AMFRegistry.empty,
+        AMFRegistry.empty
+          .withEntities(CoreEntities.entities ++ AMFGraphEntities.entities)
+          .withAnnotations(CoreSerializableAnnotations.annotations),
         MutedLogger,
         Set.empty,
         AMFOptions.default()
