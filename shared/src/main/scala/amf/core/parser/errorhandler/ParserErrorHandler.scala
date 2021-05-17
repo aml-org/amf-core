@@ -4,9 +4,7 @@ import amf.plugins.features.validation.CoreValidations.SyamlError
 import org.mulesoft.lexer.SourceLocation
 import org.yaml.model._
 
-trait ParserErrorHandler extends IllegalTypeHandler with ParseErrorHandler with ErrorHandler{
-
-  private[amf] val parserRun: Int
+trait ParserErrorHandler extends IllegalTypeHandler with ParseErrorHandler with ErrorHandler {
 
   override def handle[T](error: YError, defaultValue: T): T = {
     violation(SyamlError, "", error.error, part(error))
@@ -25,8 +23,7 @@ trait ParserErrorHandler extends IllegalTypeHandler with ParseErrorHandler with 
   final def handle(node: YPart, e: SyamlException): Unit = handle(node.location, e)
 
   override def handle(location: SourceLocation, e: SyamlException): Unit =
-      violation(SyamlError, "", e.getMessage, location)
+    violation(SyamlError, "", e.getMessage, location)
 }
-
 
 trait AmfParserErrorHandler extends AmfResultErrorHandler with ParserErrorHandler {}

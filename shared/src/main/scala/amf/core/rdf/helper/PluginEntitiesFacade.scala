@@ -1,5 +1,6 @@
 package amf.core.rdf.helper
 
+import amf.client.remod.ParseConfiguration
 import amf.core.metamodel.Obj
 import amf.core.metamodel.document.{BaseUnitModel, DocumentModel}
 import amf.core.model.document.{DeclaresModel, EncodesModel}
@@ -12,7 +13,7 @@ import org.mulesoft.common.functional.MonadInstances._
 
 import scala.collection.mutable
 
-class PluginEntitiesFacade(ctx: ParserContext) {
+class PluginEntitiesFacade private[amf] (parserConfig: ParseConfiguration) {
   private val sorter = new DefaultNodeClassSorter()
 
   private def isUnitModel(typeModel: Obj): Boolean =
@@ -42,17 +43,17 @@ class PluginEntitiesFacade(ctx: ParserContext) {
     foundType match {
       case Some(t) => findType(t)
       case None =>
-        ctx.eh.violation(UnableToParseNode,
-                         id,
-                         s"Error parsing JSON-LD node, unknown @types $types",
-                         ctx.rootContextDocument)
+        parserConfig.eh.violation(UnableToParseNode,
+                                  id,
+                                  s"Error parsing JSON-LD node, unknown @types $types",
+                                  parserConfig.parserContext.rootContextDocument)
         None
     }
   }
 
-  private val findType = CachedFunction.fromMonadic(ctx.plugins.findType)
+  private val findType = CachedFunction.fromMonadic(parserConfig.registryContext.findType)
 
-  private val buildType = CachedFunction.from(ctx.plugins.buildType)
+  private val buildType = CachedFunction.from(parserConfig.registryContext.buildType)
 
   private def findType(`type`: String): Option[Obj] = findType.runCached(`type`)
 

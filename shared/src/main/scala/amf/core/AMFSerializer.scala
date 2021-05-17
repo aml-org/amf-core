@@ -6,8 +6,6 @@ import amf.client.remod.amfcore.config.{
   FinishedRenderingSyntaxEvent,
   StartingRenderingEvent
 }
-
-import java.io.StringWriter
 import amf.client.remod.amfcore.plugins.render.{
   AMFRenderPlugin,
   DefaultRenderConfiguration,
@@ -24,20 +22,15 @@ import amf.core.remote.{Platform, Vendor}
 import amf.core.services.RuntimeSerializer
 import amf.core.vocabulary.{Namespace, NamespaceAliases}
 import amf.plugins.document.graph.AMFGraphPlugin.platform
-import amf.plugins.document.graph.{
-  EmbeddedForm,
-  FlattenedForm,
-  JsonLdDocumentForm,
-  JsonLdSerialization,
-  RdfSerialization
-}
 import amf.plugins.document.graph.emitter.{EmbeddedJsonLdEmitter, FlattenedJsonLdEmitter}
+import amf.plugins.document.graph._
 import amf.plugins.syntax.RdfSyntaxPlugin
 import org.mulesoft.common.io.Output
 import org.mulesoft.common.io.Output._
 import org.yaml.builder.{DocBuilder, JsonOutputBuilder, YDocumentBuilder}
 import org.yaml.model.YDocument
 
+import java.io.StringWriter
 import scala.concurrent.{ExecutionContext, Future}
 
 class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, config: RenderConfiguration) {
@@ -166,11 +159,10 @@ object AMFSerializer {
                                 shapeOptions: ShapeRenderOptions): RenderConfiguration = {
     val renderOptions    = options.getOrElse(RenderOptions())
     val immutableOptions = RenderOptions.toImmutable(renderOptions, ShapeRenderOptions.toImmutable(shapeOptions))
-    val errorHandler     = options.map(_.errorHandler).getOrElse(shapeOptions.errorHandler)
+
     val env = AMFPluginsRegistry
       .obtainStaticConfig()
       .withRenderOptions(immutableOptions)
-      .withErrorHandlerProvider(() => errorHandler)
     DefaultRenderConfiguration(env)
   }
 

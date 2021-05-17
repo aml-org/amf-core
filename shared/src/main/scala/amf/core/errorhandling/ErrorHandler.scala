@@ -3,11 +3,11 @@ import amf.core.annotations.{LexicalInformation, SourceLocation => AmfSourceLoca
 import amf.core.model.domain.AmfObject
 import amf.core.parser.{Annotations, Range}
 import amf.core.utils.AmfStrings
+import amf.core.validation.{AMFValidationReport, AMFValidationResult}
 import amf.core.validation.SeverityLevels.{VIOLATION, WARNING}
 import amf.core.validation.core.ValidationSpecification
 import org.mulesoft.lexer.{InputRange, SourceLocation}
 import org.yaml.model.YPart
-
 
 trait ErrorHandler {
 
@@ -23,7 +23,11 @@ trait ErrorHandler {
                        level: String,
                        location: Option[String]): Unit
 
-  def reportConstraint(specification: ValidationSpecification, node: String, message: String, ast: YPart, level: String): Unit =
+  def reportConstraint(specification: ValidationSpecification,
+                       node: String,
+                       message: String,
+                       ast: YPart,
+                       level: String): Unit =
     reportConstraint(specification.id, node, None, message, lexical(ast.location), level, ast.sourceName.option)
 
   /** Report constraint failure of severity violation. */
@@ -41,11 +45,11 @@ trait ErrorHandler {
                 message: String,
                 annotations: Annotations): Unit = {
     violation(specification,
-      node,
-      None,
-      message,
-      annotations.find(classOf[LexicalInformation]),
-      annotations.find(classOf[AmfSourceLocation]).map(_.location))
+              node,
+              None,
+              message,
+              annotations.find(classOf[LexicalInformation]),
+              annotations.find(classOf[AmfSourceLocation]).map(_.location))
   }
 
   /** Report constraint failure of severity violation for the given amf object. */
@@ -115,12 +119,11 @@ trait ErrorHandler {
   /** Report constraint failure of severity warning. */
   def warning(specification: ValidationSpecification, node: String, message: String, annotations: Annotations): Unit =
     warning(specification,
-      node,
-      None,
-      message,
-      annotations.find(classOf[LexicalInformation]),
-      annotations.find(classOf[AmfSourceLocation]).map(_.location))
-
+            node,
+            None,
+            message,
+            annotations.find(classOf[LexicalInformation]),
+            annotations.find(classOf[AmfSourceLocation]).map(_.location))
 
   private def lexical(loc: SourceLocation): Option[LexicalInformation] = {
     loc.inputRange match {
@@ -129,5 +132,5 @@ trait ErrorHandler {
     }
   }
 
-
+  def results(): List[AMFValidationResult]
 }

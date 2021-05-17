@@ -14,36 +14,3 @@ class AmfReportBuilder(model: BaseUnit, profileName: ProfileName) {
     )
   }
 }
-
-class AmfStaticReportBuilder(model: BaseUnit, profileName: ProfileName)
-    extends AmfReportBuilder(model, profileName)
-    with ShaclReportAdaptation {
-
-  val validations: EffectiveValidations =
-    EffectiveValidations().someEffective(ParserSideValidationProfiler.parserSideValidationsProfile(profileName))
-
-  def buildFromStatic(): AMFValidationReport = {
-    val results =
-      model.parserRun.map(StaticErrorCollector.getRun).getOrElse(Nil).map(processAggregatedResult(_, validations))
-    super.buildReport(results)
-  }
-
-  private def processAggregatedResult(result: AMFValidationResult,
-                                      validations: EffectiveValidations): AMFValidationResult = {
-    val mappedMessage: String = result.message match {
-      case ""   => "Constraint violation"
-      case some => some
-    }
-
-    val mappedSeverity = findLevel(result.validationId, validations, result.severityLevel)
-
-    new AMFValidationResult(mappedMessage,
-                            mappedSeverity,
-                            result.targetNode,
-                            result.targetProperty,
-                            result.validationId,
-                            result.position,
-                            result.location,
-                            result.source)
-  }
-}

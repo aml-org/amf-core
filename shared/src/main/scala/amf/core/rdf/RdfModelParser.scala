@@ -1,22 +1,21 @@
 package amf.core.rdf
 
+import amf.client.remod.{AMFGraphConfiguration, ParseConfiguration}
 import amf.core.metamodel.document.BaseUnitModel
 import amf.core.model.document._
 import amf.core.model.domain._
-import amf.core.parser.errorhandler.ParserErrorHandler
-import amf.core.plugin.PluginContext
 import amf.core.rdf.graph.NodeFinder
-import amf.core.rdf.helper.PluginEntitiesFacade
 import amf.core.rdf.parsers._
 import amf.plugins.features.validation.CoreValidations.UnableToParseRdfDocument
 
 object RdfModelParser {
-  def apply(errorHandler: ParserErrorHandler, plugins: PluginContext = PluginContext()): RdfModelParser =
-    new RdfModelParser()(new RdfParserContext(eh = errorHandler, plugins = plugins))
+  def apply(amfConfig: AMFGraphConfiguration): RdfModelParser =
+    new RdfModelParser(new ParseConfiguration(amfConfig, ""))
 }
 
-class RdfModelParser()(implicit val ctx: RdfParserContext) extends RdfParserCommon {
+class RdfModelParser(parserConfig: ParseConfiguration) extends RdfParserCommon {
 
+  override implicit val ctx: RdfParserContext = new RdfParserContext(eh = parserConfig.eh)
   def parse(model: RdfModel, location: String): BaseUnit = {
     val unit = model.findNode(location) match {
       case Some(rootNode) =>
@@ -24,13 +23,12 @@ class RdfModelParser()(implicit val ctx: RdfParserContext) extends RdfParserComm
         val nodeFinder = new NodeFinder(model)
         val parser = new ObjectParser(location,
                                       new RecursionControl(),
-                                      new PluginEntitiesFacade(ctx),
+                                      parserConfig.entitiesFacade,
                                       nodeFinder,
                                       new SourcesRetriever(nodeFinder))
         parser.parse(rootNode, findBaseUnit = true) match {
           case Some(unit: BaseUnit) =>
             unit.set(BaseUnitModel.Location, location.split("#").head)
-            unit.withRunNumber(ctx.parserRun)
             unit
           case _ =>
             ctx.eh.violation(UnableToParseRdfDocument,

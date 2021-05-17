@@ -23,7 +23,7 @@ object Vendor {
   @JSExport("apply")
   def apply(name: String): Vendor = name match {
     case Vendor(vendor) => vendor
-    case _              => new UnknowVendor(name)
+    case _              => new UnknownVendor(name)
   }
 
   @JSExport val RAML08: Vendor     = Raml08
@@ -44,9 +44,13 @@ trait Vendor {
   def isRaml: Boolean  = this == Raml10 || this == Raml08
   def isOas: Boolean   = this == Oas20 || this == Oas30
   def isAsync: Boolean = this == AsyncApi || this == AsyncApi20
+
+  val mediaType: String
 }
 
-class UnknowVendor(override val name: String) extends Vendor
+class UnknownVendor(override val name: String) extends Vendor {
+  override val mediaType: String = "application/unknown"
+}
 
 trait Raml extends Vendor {
   def version: String
@@ -77,42 +81,63 @@ object Aml extends Vendor {
   override val name: String = "AML 1.0"
 
   override def toString: String = name.trim
+
+  override val mediaType: String = "application/aml"
 }
 
 object Oas20 extends Oas {
   override def version: String = "2.0"
+
+  override val mediaType: String = "application/oas20"
 }
 
 object Oas30 extends Oas {
   override def version: String = "3.0"
+
+  override val mediaType: String = "application/openapi30"
 }
 
 object Raml08 extends Raml {
-  override def version: String = "0.8"
+  override def version: String   = "0.8"
+  override val mediaType: String = "application/raml08+yaml"
 }
 
 object Raml10 extends Raml {
   override def version: String = "1.0"
+
+  override val mediaType: String = "application/raml10+yaml"
 }
 
 object AsyncApi extends Async {
   override def version: String = ""
+
+  override val mediaType: String = "application/asyncapi"
 }
 
 object AsyncApi20 extends Async {
   override def version: String = "2.0"
+
+  override val mediaType: String = "application/asyncapi20"
+
 }
 
 object Amf extends Vendor {
   override val name: String = "AMF Graph"
+
+  override val mediaType: String = "application/graph"
+
 }
 
 object Payload extends Vendor {
   override val name: String = "AMF Payload"
+
+  override val mediaType: String = "application/amf-payload"
 }
 
 object JsonSchema extends Vendor {
   override val name: String = "JSON Schema"
+
+  override val mediaType: String = "application/schema+json"
 
   override def toString: String = name.trim
 }
