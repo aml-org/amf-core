@@ -3,7 +3,12 @@ package amf.client.convert
 import amf.ProfileName
 import amf.client.exported
 import amf.client.exported.{config, transform}
-import amf.client.model.document.{BaseUnit => ClientBaseUnit, PayloadFragment => ClientPayloadFragment}
+import amf.client.model.document.{
+  BaseUnit => ClientBaseUnit,
+  Document => ClientDocument,
+  Module => ClientModule,
+  PayloadFragment => ClientPayloadFragment
+}
 import amf.client.model.domain.{
   AbstractDeclaration => ClientAbstractDeclaration,
   ArrayNode => ClientArrayNode,
@@ -36,7 +41,6 @@ import amf.client.exported.config.{ShapeRenderOptions => ClientShapeRenderOption
 import amf.client.exported.config.{RenderOptions => ClientRenderOptions}
 import amf.client.remod.{AMFGraphConfiguration, AMFResult}
 import amf.client.exported.{AMFResult => ClientAMFResult}
-import amf.client.exported.{AMFGraphConfiguration => ClientAMFGraphConfiguration}
 import amf.client.exported.transform.{TransformationPipelineBuilder => ClientTransformationPipelineBuilder}
 import amf.client.remote.Content
 import amf.client.resource.{ResourceLoader => ClientResourceLoader}
@@ -48,14 +52,13 @@ import amf.client.validate.{
   ValidationShapeSet => ClientValidationShapeSet
 }
 import amf.core.model._
-import amf.core.model.document.{BaseUnit, PayloadFragment}
+import amf.core.model.document.{BaseUnit, Document, Module, PayloadFragment}
 import amf.core.model.domain._
 import amf.core.model.domain.extensions.{CustomDomainProperty, DomainExtension, PropertyShape, ShapeExtension}
 import amf.core.model.domain.templates.{AbstractDeclaration, ParametrizedDeclaration, VariableValue}
 import amf.core.parser.Annotations
 import amf.core.remote.Vendor
 import amf.core.resolution.stages.TransformationStep
-import amf.client.exported.transform.{TransformationStep => ClientTransformationStep}
 import amf.client.remod.amfcore.resolution.TransformationPipelineBuilder
 import amf.client.resolve.{ClientErrorHandler, ClientErrorHandlerConverter}
 import amf.core.errorhandling.ErrorHandler
@@ -79,6 +82,8 @@ trait CoreBaseConverter
     with ShapeExtensionConverter
     with DataNodeConverter
     with DomainExtensionConverter
+    with DocumentConverter
+    with ModuleConverter
     with DeclarationsConverter
     with VariableValueConverter
     with ValidationConverter
@@ -418,6 +423,22 @@ trait ShapeExtensionConverter extends PlatformSecrets {
     override def asInternal(from: ClientShapeExtension): ShapeExtension = from._internal
   }
 
+}
+
+trait DocumentConverter extends PlatformSecrets {
+  implicit object DocumentMatcher extends BidirectionalMatcher[Document, ClientDocument] {
+    override def asClient(from: Document): ClientDocument = new ClientDocument(from)
+
+    override def asInternal(from: ClientDocument): Document = from._internal
+  }
+}
+
+trait ModuleConverter extends PlatformSecrets {
+  implicit object ModuleMatcher extends BidirectionalMatcher[Module, ClientModule] {
+    override def asClient(from: Module): ClientModule = ClientModule(from)
+
+    override def asInternal(from: ClientModule): Module = from._internal
+  }
 }
 
 trait VariableValueConverter {

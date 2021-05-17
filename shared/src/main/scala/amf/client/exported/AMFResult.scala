@@ -21,6 +21,4 @@ case class AMFResult(private[amf] val _internal: InternalAMFResult) {
     * @return baseUnit {@link amf.client.model.document.BaseUnit} returned from AMF parse or transform
     */
   def baseUnit: BaseUnit = _internal.bu
-
-  def asDocument: Document = new Document(_internal.asDocument)
 }
