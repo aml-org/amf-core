@@ -3,13 +3,15 @@ import amf.core.annotations.{LexicalInformation, SourceLocation => AmfSourceLoca
 import amf.core.model.domain.AmfObject
 import amf.core.parser.{Annotations, Range}
 import amf.core.utils.AmfStrings
-import amf.core.validation.{AMFValidationReport, AMFValidationResult}
+import amf.core.validation.AMFValidationResult
 import amf.core.validation.SeverityLevels.{VIOLATION, WARNING}
 import amf.core.validation.core.ValidationSpecification
 import org.mulesoft.lexer.{InputRange, SourceLocation}
 import org.yaml.model.YPart
 
 trait ErrorHandler {
+
+  def results(): List[AMFValidationResult]
 
   def guiKey(message: String, location: Option[String], lexical: Option[LexicalInformation]): String = {
     message ++ location.getOrElse("") ++ lexical.map(_.value).getOrElse("")
@@ -131,6 +133,4 @@ trait ErrorHandler {
       case range           => Some(LexicalInformation(Range(range)))
     }
   }
-
-  def results(): List[AMFValidationResult]
 }
