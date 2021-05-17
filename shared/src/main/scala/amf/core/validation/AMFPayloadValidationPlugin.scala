@@ -25,7 +25,7 @@ trait PayloadValidator {
   val shape: Shape
   val defaultSeverity: String
   val validationMode: ValidationMode
-  val config: ValidationConfiguration
+  val configuration: ValidationConfiguration
 
   def validate(mediaType: String, payload: String)(
       implicit executionContext: ExecutionContext): Future[AMFValidationReport]

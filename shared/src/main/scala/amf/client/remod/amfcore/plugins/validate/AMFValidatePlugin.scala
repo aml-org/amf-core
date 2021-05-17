@@ -7,7 +7,6 @@ import amf.core.errorhandling.AmfResultErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.unsafe.PlatformSecrets
 import amf.core.validation.{AMFValidationReport, EffectiveValidations}
-import amf.internal.environment.Environment
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -16,11 +15,15 @@ import scala.concurrent.{ExecutionContext, Future}
   * TODO: environment is only there for the AMFPayloadValidationPlugin -> canValidate(Shape, Environment). The Environment is never used (checked XML also).
   */
 class ValidationConfiguration(amfConfig: AMFGraphConfiguration) {
+
   val eh: AmfResultErrorHandler          = amfConfig.errorHandlerProvider.errorHandler()
   val executionContext: ExecutionContext = amfConfig.getExecutionContext
+  val maxYamlReferences: Option[Long]    = amfConfig.options.parsingOptions.maxYamlReferences
 
-  val maxYamlReferences: Option[Long] = amfConfig.ma
+}
 
+object ValidationConfiguration {
+  def predefined(): ValidationConfiguration = new ValidationConfiguration(AMFGraphConfiguration.predefined())
 }
 
 class ValidationOptions(var profileName: ProfileName,
