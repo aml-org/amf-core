@@ -55,7 +55,7 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
     * @param bu [[BaseUnit]] to transform
     * @return An [[AMFResult]] with the transformed BaseUnit and it's report
     */
-  def transform(bu: BaseUnit): AMFResult = AMFTransformer.transform(bu, configuration)
+  def transform(bu: BaseUnit): AMFResult = AMFTransformer.transform(bu, configuration) // clone? BaseUnit.resolved
 
   /**
     * Transforms a [[BaseUnit]] with a specific pipeline
@@ -64,7 +64,7 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
     * @return An [[AMFResult]] with the transformed BaseUnit and it's report
     */
   def transform(bu: BaseUnit, pipelineName: String): AMFResult =
-    AMFTransformer.transform(bu, pipelineName, configuration)
+    AMFTransformer.transform(bu, pipelineName, configuration) // clone? BaseUnit.resolved
 
   /**
     * Render a [[BaseUnit]] to its default type
