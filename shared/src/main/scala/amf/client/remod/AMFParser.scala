@@ -1,9 +1,12 @@
 package amf.client.remod
 
 import amf.client.convert.CoreClientConverters.platform
+import amf.core.remote.{Cache, Context}
+import amf.core.services.RuntimeCompiler
+import amf.core.validation.AMFValidationReport
 import amf.internal.resource.{ResourceLoader, StringResourceLoader}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object AMFParser {
 
@@ -50,7 +53,19 @@ object AMFParser {
 
   private[amf] def parseAsync(url: String,
                               mediaType: Option[String],
-                              configuration: AMFGraphConfiguration): Future[AMFResult] = ???
+                              configuration: AMFGraphConfiguration): Future[AMFResult] = {
+    val parseConfig                                 = new ParseConfiguration(configuration, url)
+    implicit val executionContext: ExecutionContext = parseConfig.executionContext
+    RuntimeCompiler(
+        mediaType,
+        Context(platform),
+        cache = Cache(),
+        parseConfig
+    ) map { model =>
+      val results = parseConfig.eh.results()
+      AMFResult(model, AMFValidationReport.forModel(model, results))
+    }
+  }
 
   private def fromStream(url: String, stream: String): ResourceLoader =
     StringResourceLoader(platform.resolvePath(url), stream)

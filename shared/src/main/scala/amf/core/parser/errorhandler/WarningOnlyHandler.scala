@@ -1,10 +1,11 @@
 package amf.core.parser.errorhandler
+import amf.core.validation.AMFValidationResult
 import amf.plugins.features.validation.CoreValidations.SyamlWarning
 import org.mulesoft.lexer.SourceLocation
 import org.yaml.model.{SyamlException, YError}
 
-case class WarningOnlyHandler(parent:ParserErrorHandler) extends RuntimeWrapperErrorHandler(parent: ParserErrorHandler) {
-
+case class WarningOnlyHandler(parent: ParserErrorHandler)
+    extends RuntimeWrapperErrorHandler(parent: ParserErrorHandler) {
 
   override def handle(location: SourceLocation, e: SyamlException): Unit = {
     warning(SyamlWarning, "", e.getMessage, location)
@@ -20,5 +21,6 @@ case class WarningOnlyHandler(parent:ParserErrorHandler) extends RuntimeWrapperE
   private var warningRegister: Boolean = false
 
   def hasRegister: Boolean = warningRegister
-  override  val parserRun: Int = parent.parserRun
+
+  override def results(): List[AMFValidationResult] = parent.results()
 }

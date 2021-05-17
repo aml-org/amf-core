@@ -1,6 +1,7 @@
 package amf.plugins.document.graph
 
 import amf.client.plugins.{AMFDocumentPlugin, AMFPlugin}
+import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.config.RenderOptions
 import amf.client.remod.amfcore.plugins.parse.AMFParsePluginAdapter
 import amf.client.remod.amfcore.plugins.render.AMFRenderPluginAdapter
@@ -75,7 +76,8 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
       case parsed: SyamlParsedDocument if EmbeddedGraphParser.canParse(parsed) =>
         EmbeddedGraphParser(ctx.eh).parse(parsed.document, effectiveUnitUrl(root.location, options))
       case parsed: RdfModelDocument =>
-        RdfModelParser(ctx.eh).parse(parsed.model, effectiveUnitUrl(root.location, options))
+        RdfModelParser(AMFGraphConfiguration.fromParseCtx(ctx))
+          .parse(parsed.model, effectiveUnitUrl(root.location, options))
       case _ =>
         throw UnsupportedParsedDocumentException
     }

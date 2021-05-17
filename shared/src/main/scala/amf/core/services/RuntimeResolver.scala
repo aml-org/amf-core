@@ -1,5 +1,6 @@
 package amf.core.services
 
+import amf.client.parse.DefaultErrorHandler
 import amf.client.remod.amfcore.resolution.PipelineName
 import amf.core.errorhandling.ErrorHandler
 import amf.core.model.document.BaseUnit
@@ -10,7 +11,7 @@ import amf.plugins.features.validation.CoreValidations.ResolutionValidation
 object RuntimeResolver {
 
   def resolve(vendor: String, unit: BaseUnit, pipelineId: String): BaseUnit =
-    resolve(vendor, unit, pipelineId, unit.errorHandler())
+    resolve(vendor, unit, pipelineId, DefaultErrorHandler())
 
   /**
     * interface used by amf service

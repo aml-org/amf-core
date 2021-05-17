@@ -1,11 +1,13 @@
 package amf.core.services
 
 import amf.client.execution.BaseExecutionEnvironment
+import amf.client.remod.AMFGraphConfiguration
+import amf.client.remod.amfcore.plugins.validate.ValidationConfiguration
 import amf.core.emitter.RenderOptions
 import amf.core.errorhandling.ErrorHandler
 import amf.core.metamodel.Field
 import amf.core.model.document.BaseUnit
-import amf.core.model.domain.{AmfObject, DomainElement}
+import amf.core.model.domain.AmfObject
 import amf.core.parser.Annotations
 import amf.core.rdf.RdfModel
 import amf.core.services.RuntimeValidator.CustomShaclFunctions
@@ -79,11 +81,9 @@ trait RuntimeValidator extends PlatformSecrets {
     * for validations in the profile to domain elements in the model
     */
   def validate(model: BaseUnit,
-               profileName: ProfileName,
-               messageStyle: MessageStyle,
-               env: Environment,
+               givenProfile: ProfileName,
                resolved: Boolean,
-               exec: BaseExecutionEnvironment = platform.defaultExecutionEnvironment): Future[AMFValidationReport]
+               validationConfig: ValidationConfiguration): Future[AMFValidationReport]
 
 }
 
@@ -134,18 +134,9 @@ object RuntimeValidator {
 
   def apply(model: BaseUnit,
             profileName: ProfileName,
-            messageStyle: MessageStyle = AMFStyle,
-            env: Environment = Environment(),
-            resolved: Boolean = false): Future[AMFValidationReport] =
-    validator.validate(model, profileName, messageStyle, env, resolved)
-
-  def apply(model: BaseUnit,
-            profileName: ProfileName,
-            messageStyle: MessageStyle,
-            env: Environment,
             resolved: Boolean,
-            executionEnvironment: BaseExecutionEnvironment): Future[AMFValidationReport] =
-    validator.validate(model, profileName, messageStyle, env, resolved, executionEnvironment)
+            config: ValidationConfiguration): Future[AMFValidationReport] =
+    validator.validate(model, profileName, resolved, config)
 
 }
 

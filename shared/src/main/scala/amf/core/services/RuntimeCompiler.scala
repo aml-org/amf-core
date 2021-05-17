@@ -1,23 +1,17 @@
 package amf.core.services
 
-import amf.client.parse.DefaultParserErrorHandler
-import amf.client.remod.AMFGraphConfiguration
-import amf.client.remod.amfcore.config.{FinishedParsingEvent, ParsingOptionsConverter, StartingParsingEvent}
-import amf.core.client.ParsingOptions
+import amf.client.remod.ParseConfiguration
+import amf.client.remod.amfcore.config.{FinishedParsingEvent, StartingParsingEvent}
 import amf.core.model.document.BaseUnit
-import amf.core.parser.errorhandler.AmfParserErrorHandler
-import amf.core.parser.{ParserContext, ReferenceKind, UnspecifiedReference}
-import amf.core.registries.AMFPluginsRegistry
+import amf.core.parser.{ReferenceKind, UnspecifiedReference}
 import amf.core.remote.{Cache, Context}
 import amf.core.{CompilerContext, CompilerContextBuilder}
-import amf.internal.environment.Environment
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait RuntimeCompiler {
   def build(compilerContext: CompilerContext,
             mediaType: Option[String],
-            vendor: Option[String],
             referenceKind: ReferenceKind): Future[BaseUnit]
 }
 
@@ -28,32 +22,23 @@ object RuntimeCompiler {
   }
 
   // interface used by amf-service
-  def apply(url: String,
-            mediaType: Option[String],
-            vendor: Option[String],
+  def apply(mediaType: Option[String],
             base: Context,
             cache: Cache,
-            referenceKind: ReferenceKind = UnspecifiedReference,
-            ctx: Option[ParserContext] = None,
-            env: Environment = Environment(),
-            parsingOptions: ParsingOptions = ParsingOptions(),
-            errorHandler: AmfParserErrorHandler = DefaultParserErrorHandler.withRun())(
-      implicit executionContext: ExecutionContext): Future[BaseUnit] = {
-    val baseEnv =
-      AMFPluginsRegistry.obtainStaticConfig().withParsingOptions(ParsingOptionsConverter.fromLegacy(parsingOptions))
-    val withValueOfLegacyEnv = AMFGraphConfiguration.fromLegacy(baseEnv, env)
-    val context = new CompilerContextBuilder(url, base.platform, errorHandler)
+            parserConfig: ParseConfiguration,
+            referenceKind: ReferenceKind = UnspecifiedReference): Future[BaseUnit] = {
+    val context = new CompilerContextBuilder(base.platform, parserConfig)
       .withCache(cache)
       .withFileContext(base)
-      .withBaseEnvironment(withValueOfLegacyEnv)
       .build()
     compiler match {
       case Some(runtimeCompiler) =>
-        val startingParsingEvent = StartingParsingEvent(url, mediaType)
-        baseEnv.listeners.foreach(_.notifyEvent(startingParsingEvent))
-        runtimeCompiler.build(context, mediaType, vendor, referenceKind) map { parsedUnit =>
-          val finishedParsingEvent = FinishedParsingEvent(url, parsedUnit)
-          baseEnv.listeners.foreach(_.notifyEvent(finishedParsingEvent))
+        val startingParsingEvent = StartingParsingEvent(parserConfig.path, mediaType)
+        parserConfig.notifyEvent(startingParsingEvent)
+        implicit val executionContext: ExecutionContext = parserConfig.executionContext
+        runtimeCompiler.build(context, mediaType, referenceKind) map { parsedUnit =>
+          val finishedParsingEvent = FinishedParsingEvent(parserConfig.path, parsedUnit)
+          parserConfig.notifyEvent(finishedParsingEvent)
           parsedUnit
         }
       case _ => throw new Exception("No registered runtime compiler")
@@ -63,11 +48,10 @@ object RuntimeCompiler {
   // could not add new environment in this method as it forces breaking changes in ReferenceHandler
   def forContext(compilerContext: CompilerContext,
                  mediaType: Option[String],
-                 vendor: Option[String],
                  referenceKind: ReferenceKind = UnspecifiedReference)(
       implicit executionContext: ExecutionContext): Future[BaseUnit] = {
     compiler match {
-      case Some(runtimeCompiler) => runtimeCompiler.build(compilerContext, mediaType, vendor, referenceKind)
+      case Some(runtimeCompiler) => runtimeCompiler.build(compilerContext, mediaType, referenceKind)
       case _                     => throw new Exception("No registered runtime compiler")
     }
   }
