@@ -1,6 +1,6 @@
 package amf.core.rdf.converter
 
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.DataType
 import amf.core.model.domain.AmfScalar
 import amf.core.rdf.{Literal, PropertyObject, Uri}
@@ -18,7 +18,7 @@ object AnyTypeConverter extends Converter {
   private val xsdDateTime: String = DataType.DateTime
   private val xsdDate: String     = DataType.Date
 
-  def tryConvert(property: PropertyObject)(implicit errorHandler: ErrorHandler): Option[AmfScalar] = {
+  def tryConvert(property: PropertyObject)(implicit errorHandler: AMFErrorHandler): Option[AmfScalar] = {
     property match {
       case Literal(v, typed) =>
         typed match {

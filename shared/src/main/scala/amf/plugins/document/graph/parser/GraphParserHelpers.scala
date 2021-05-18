@@ -1,5 +1,6 @@
 package amf.plugins.document.graph.parser
 
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.Type._
 import amf.core.metamodel.document.{ExtensionLikeModel, SourceMapModel}
 import amf.core.metamodel.domain.{
@@ -12,10 +13,9 @@ import amf.core.metamodel.{Field, Obj, Type}
 import amf.core.model.DataType
 import amf.core.model.document.SourceMap
 import amf.core.model.domain.{AmfElement, AmfScalar, Annotation}
-import amf.core.parser.errorhandler.ParserErrorHandler
 import amf.core.parser.{Annotations, _}
 import amf.core.vocabulary.Namespace.SourceMaps
-import amf.core.vocabulary.{AbsoluteIri, IriClassification, Namespace, RelativeIri, ValueType}
+import amf.core.vocabulary._
 import amf.plugins.document.graph.JsonLdKeywords
 import amf.plugins.document.graph.context.{ExpandedTermDefinition, GraphContextOperations, TermDefinition}
 import amf.plugins.features.validation.CoreValidations.{MissingIdInNode, MissingTypeInNode}
@@ -197,15 +197,15 @@ trait GraphParserHelpers extends GraphContextHelper {
   // declared so they can be referenced from the retrieveType* functions
   val amlDocumentIris: Seq[ValueType] =
     asIris(
-      Namespace.Meta,
-      Seq("DialectInstance",
-          "DialectInstanceFragment",
-          "DialectInstanceLibrary",
-          "DialectInstancePatch",
-          "DialectLibrary",
-          "DialectFragment",
-          "Dialect",
-          "Vocabulary")
+        Namespace.Meta,
+        Seq("DialectInstance",
+            "DialectInstanceFragment",
+            "DialectInstanceLibrary",
+            "DialectInstancePatch",
+            "DialectLibrary",
+            "DialectFragment",
+            "Dialect",
+            "Vocabulary")
     )
 
   val coreDocumentIris: Seq[ValueType] =
@@ -240,7 +240,7 @@ trait GraphParserHelpers extends GraphContextHelper {
   }
 
   protected def retrieveId(map: YMap, ctx: ParserContext): Option[String] = {
-    implicit val errorHandler: ParserErrorHandler = ctx.eh
+    implicit val errorHandler: AMFErrorHandler = ctx.eh
 
     map.key(JsonLdKeywords.Id) match {
       case Some(entry) => Some(entry.value.as[YScalar].text)

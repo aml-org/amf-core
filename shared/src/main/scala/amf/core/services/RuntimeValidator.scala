@@ -4,7 +4,7 @@ import amf.client.execution.BaseExecutionEnvironment
 import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.plugins.validate.ValidationConfiguration
 import amf.core.emitter.RenderOptions
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.Field
 import amf.core.model.document.BaseUnit
 import amf.core.model.domain.AmfObject
@@ -45,11 +45,11 @@ trait RuntimeValidator extends PlatformSecrets {
     */
   def loadValidationProfile(validationProfilePath: String,
                             env: Environment = Environment(),
-                            errorHandler: ErrorHandler,
+                            errorHandler: AMFErrorHandler,
                             exec: BaseExecutionEnvironment = platform.defaultExecutionEnvironment): Future[ProfileName]
 
   def loadValidationProfile(validationProfilePath: String,
-                            errorHandler: ErrorHandler,
+                            errorHandler: AMFErrorHandler,
                             exec: BaseExecutionEnvironment): Future[ProfileName] =
     loadValidationProfile(validationProfilePath, Environment(exec), errorHandler, exec)
 
@@ -103,12 +103,12 @@ object RuntimeValidator {
 
   def loadValidationProfile(validationProfilePath: String,
                             env: Environment = Environment(),
-                            errorHandler: ErrorHandler): Future[ProfileName] =
+                            errorHandler: AMFErrorHandler): Future[ProfileName] =
     validator.loadValidationProfile(validationProfilePath, env, errorHandler)
 
   def loadValidationProfile(validationProfilePath: String,
                             env: Environment,
-                            errorHandler: ErrorHandler,
+                            errorHandler: AMFErrorHandler,
                             executionEnvironment: BaseExecutionEnvironment): Future[ProfileName] =
     validator.loadValidationProfile(validationProfilePath, env, errorHandler, executionEnvironment)
 

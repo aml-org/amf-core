@@ -1,7 +1,7 @@
 package amf.core.model.domain
 
 import amf.client.execution.BaseExecutionEnvironment
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.domain.RecursiveShapeModel
 import amf.core.metamodel.domain.RecursiveShapeModel._
 import amf.core.model.StrField
@@ -26,7 +26,7 @@ class RecursiveShape(override val fields: Fields, override val annotations: Anno
   def withFixPoint(shapeId: String): this.type = set(FixPoint, shapeId)
 
   override def cloneShape(
-      recursionErrorHandler: Option[ErrorHandler],
+      recursionErrorHandler: Option[AMFErrorHandler],
       recursionBase: Option[String],
       traversal: ModelTraversalRegistry = ModelTraversalRegistry(),
       cloneExamples: Boolean = false

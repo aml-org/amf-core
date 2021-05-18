@@ -1,6 +1,6 @@
 package amf.core.model.domain.extensions
 
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.domain.ShapeModel
 import amf.core.metamodel.domain.extensions.PropertyShapeModel
 import amf.core.metamodel.domain.extensions.PropertyShapeModel._
@@ -24,9 +24,9 @@ case class PropertyShape(fields: Fields, annotations: Annotations) extends Shape
   def withPath(path: String): this.type  = set(Path, path)
   def withRange(range: Shape): this.type = set(Range, range)
 
-  def withMinCount(min: Int): this.type              = set(MinCount, min)
-  def withMaxCount(max: Int): this.type              = set(MaxCount, max)
-  def withPatternName(pattern: String): this.type    = set(PatternName, pattern)
+  def withMinCount(min: Int): this.type           = set(MinCount, min)
+  def withMaxCount(max: Int): this.type           = set(MaxCount, max)
+  def withPatternName(pattern: String): this.type = set(PatternName, pattern)
 
   override def adopted(parent: String, cycle: Seq[String] = Seq()): this.type = {
     simpleAdoption(parent)
@@ -39,7 +39,7 @@ case class PropertyShape(fields: Fields, annotations: Annotations) extends Shape
 
   override def meta: ShapeModel = PropertyShapeModel
 
-  override def cloneShape(recursionErrorHandler: Option[ErrorHandler],
+  override def cloneShape(recursionErrorHandler: Option[AMFErrorHandler],
                           withRecursionBase: Option[String],
                           traversal: ModelTraversalRegistry,
                           cloneExamples: Boolean = false): PropertyShape = {

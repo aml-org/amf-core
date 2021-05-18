@@ -8,7 +8,7 @@ import amf.client.remod.amfcore.config.{
   StartingTransformationEvent
 }
 import amf.core.benchmark.ExecutionLog
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.resolution.stages.TransformationStep
 
@@ -18,7 +18,7 @@ trait TransformationPipeline {
 }
 
 // transformation pipelines can only run internally within amf.
-private[amf] case class TransformationPipelineRunner(errorHandler: ErrorHandler,
+private[amf] case class TransformationPipelineRunner(errorHandler: AMFErrorHandler,
                                                      listeners: Seq[AMFEventListener] = Nil) {
 
   private def notifyEvent(e: AMFEvent): Unit = listeners.foreach(_.notifyEvent(e))
@@ -40,7 +40,7 @@ private[amf] case class TransformationPipelineRunner(errorHandler: ErrorHandler,
     m
   }
 
-  private def step(unit: BaseUnit, step: TransformationStep, errorHandler: ErrorHandler): BaseUnit = {
+  private def step(unit: BaseUnit, step: TransformationStep, errorHandler: AMFErrorHandler): BaseUnit = {
     ExecutionLog.log(s"ResolutionPipeline#step: applying resolution stage ${step.getClass.getName}")
     val resolved = step.transform(unit, errorHandler)
     ExecutionLog.log(s"ResolutionPipeline#step: finished applying stage ${step.getClass.getName}")

@@ -2,7 +2,7 @@ package amf.core.services
 
 import amf.client.parse.DefaultErrorHandler
 import amf.client.remod.amfcore.resolution.PipelineName
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.registries.AMFPluginsRegistry
 import amf.core.resolution.pipelines.TransformationPipelineRunner
@@ -16,7 +16,7 @@ object RuntimeResolver {
   /**
     * interface used by amf service
     */
-  def resolve(vendor: String, unit: BaseUnit, pipelineId: String, errorHandler: ErrorHandler): BaseUnit = {
+  def resolve(vendor: String, unit: BaseUnit, pipelineId: String, errorHandler: AMFErrorHandler): BaseUnit = {
     val config    = AMFPluginsRegistry.obtainStaticConfig()
     val pipelines = config.registry.transformationPipelines
     val pipeline  = pipelines.get(PipelineName.from(vendor, pipelineId))

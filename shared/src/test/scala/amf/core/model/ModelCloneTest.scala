@@ -66,15 +66,6 @@ class ModelCloneTest extends FunSuite with ElementsFixture with Matchers {
     cloned.annotations.contains(classOf[SourceVendor]) should be(true)
   }
 
-  test("Test clone document and reference (parserRun)") {
-    documentWithRef.withRunNumber(1)
-    module.withRunNumber(1)
-    val cloned: Document = documentWithRef.cloneUnit().asInstanceOf[Document]
-    cloned.parserRun.get should be(1)
-
-    cloned.references.head.parserRun.get should be(1)
-  }
-
   test("Test clone document with duplicated ids") {
     val localNode = ObjectNode()
       .withId(objectNode.id)

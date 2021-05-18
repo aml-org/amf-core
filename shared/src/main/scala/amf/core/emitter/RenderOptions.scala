@@ -4,7 +4,7 @@ import amf.client.remod.amfcore.config.{RenderOptions => ImmutableRenderOptions}
 import amf.client.remod.amfcore.config.{ShapeRenderOptions => ImmutableShapeRenderOptions}
 import amf.client.render.{RenderOptions => ClientRenderOptions}
 import amf.client.resolve.ClientErrorHandlerConverter._
-import amf.core.errorhandling.{ErrorHandler, UnhandledErrorHandler}
+import amf.core.errorhandling.{AMFErrorHandler, UnhandledErrorHandler}
 import amf.core.metamodel.Field
 import amf.plugins.document.graph.{
   EmbeddedForm,
@@ -28,7 +28,7 @@ class RenderOptions {
   private var amfJsonLdSerialization         = true
   private var useJsonLdEmitter               = false
   private var flattenedJsonLd                = false
-  private var eh: ErrorHandler               = UnhandledErrorHandler
+  private var eh: AMFErrorHandler            = UnhandledErrorHandler
   private var prettyPrint                    = false
   private var emitNodeIds                    = false
 
@@ -118,7 +118,7 @@ class RenderOptions {
     this
   }
 
-  def withErrorHandler(errorHandler: ErrorHandler): RenderOptions = {
+  def withErrorHandler(errorHandler: AMFErrorHandler): RenderOptions = {
     eh = errorHandler
     this
   }
@@ -142,7 +142,7 @@ class RenderOptions {
   def isAmfJsonLdSerilization: Boolean   = amfJsonLdSerialization
   def isValidation: Boolean              = validating
   def renderField(field: Field): Boolean = !filterFields(field)
-  def errorHandler: ErrorHandler         = eh
+  def errorHandler: AMFErrorHandler      = eh
   def isPrettyPrint: Boolean             = prettyPrint
   def isEmitNodeIds: Boolean             = emitNodeIds
 
@@ -173,7 +173,7 @@ object RenderOptions {
     opts
   }
 
-  def fromImmutable(opts: ImmutableRenderOptions, eh: ErrorHandler): RenderOptions = {
+  def fromImmutable(opts: ImmutableRenderOptions, eh: AMFErrorHandler): RenderOptions = {
     val newOptions = new RenderOptions()
     newOptions.compactedEmission = opts.compactedEmission
     newOptions.sources = opts.sources

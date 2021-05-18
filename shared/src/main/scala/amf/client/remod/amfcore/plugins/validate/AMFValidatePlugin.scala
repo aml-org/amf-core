@@ -3,7 +3,7 @@ package amf.client.remod.amfcore.plugins.validate
 import amf.ProfileName
 import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.plugins.AMFPlugin
-import amf.core.errorhandling.AmfResultErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.unsafe.PlatformSecrets
 import amf.core.validation.{AMFValidationReport, EffectiveValidations}
@@ -16,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 class ValidationConfiguration(amfConfig: AMFGraphConfiguration) {
 
-  val eh: AmfResultErrorHandler          = amfConfig.errorHandlerProvider.errorHandler()
+  val eh: AMFErrorHandler                = amfConfig.errorHandlerProvider.errorHandler()
   val executionContext: ExecutionContext = amfConfig.getExecutionContext
   val maxYamlReferences: Option[Long]    = amfConfig.options.parsingOptions.maxYamlReferences
 

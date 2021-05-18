@@ -1,9 +1,9 @@
 package amf.core.resolution
 
-import amf.client.parse.{DefaultErrorHandler, DefaultParserErrorHandler}
+import amf.client.parse.DefaultErrorHandler
 import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.resolution.{PipelineName, TransformationPipelineBuilder}
-import amf.core.errorhandling.{ErrorHandler, UnhandledErrorHandler}
+import amf.core.errorhandling.{AMFErrorHandler, UnhandledErrorHandler}
 import amf.core.model.document.{BaseUnit, Document}
 import amf.core.remote.Amf
 import amf.core.resolution.pipelines.{TransformationPipeline, TransformationPipelineRunner}
@@ -14,7 +14,7 @@ import org.scalatest.{FunSuite, Matchers}
 class TransformationPipelineBuilderTest extends FunSuite with Matchers {
 
   private case class AddToIdCustomStage(content: String) extends TransformationStep {
-    override def transform(baseUnit: BaseUnit, errorHandler: ErrorHandler): BaseUnit = {
+    override def transform(baseUnit: BaseUnit, errorHandler: AMFErrorHandler): BaseUnit = {
       baseUnit.withId(baseUnit.id + content)
     }
   }
@@ -66,7 +66,7 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
     val builder = TransformationPipelineBuilder.empty("defaultName")
     val pipeline = builder
       .append(new TransformationStep {
-        override def transform(baseUnit: BaseUnit, errorHandler: ErrorHandler): BaseUnit = {
+        override def transform(baseUnit: BaseUnit, errorHandler: AMFErrorHandler): BaseUnit = {
           errorHandler.violation(CoreValidations.ResolutionValidation, "node", "some error")
           baseUnit
         }
@@ -75,7 +75,7 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
 
     val eh = DefaultErrorHandler()
     TransformationPipelineRunner(eh).run(Document(), pipeline)
-    eh.getErrors.size should be(1)
+    eh.getResults.size should be(1)
   }
 
 }
