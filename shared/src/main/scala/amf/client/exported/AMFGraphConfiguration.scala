@@ -24,8 +24,9 @@ class AMFGraphConfiguration private[amf] (private[amf] val _internal: InternalGr
   def withRenderOptions(renderOptions: RenderOptions): AMFGraphConfiguration =
     _internal.withRenderOptions(renderOptions)
 
-  def withErrorHandlerProvider(provider: ErrorHandlerProvider): AMFGraphConfiguration =
-    _internal.withErrorHandlerProvider(() => provider.errorHandler())
+  //TODO FIX EH
+//  def withErrorHandlerProvider(provider: ErrorHandlerProvider): AMFGraphConfiguration =
+//    _internal.withErrorHandlerProvider(() => provider.errorHandler())
 
   def withResourceLoader(rl: ResourceLoader): AMFGraphConfiguration =
     _internal.withResourceLoader(ResourceLoaderMatcher.asInternal(rl))
