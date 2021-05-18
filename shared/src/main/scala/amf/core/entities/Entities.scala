@@ -6,7 +6,7 @@ private[amf] trait Entities {
 
   protected val innerEntities: Seq[Obj]
 
-  val entities: Map[String, Obj] = innerEntities.map(mapElement).toMap
+  def entities: Map[String, Obj] = innerEntities.map(mapElement).toMap
 
   private def mapElement(element: Obj): (String, Obj) = defaultIri(element) -> element
 
