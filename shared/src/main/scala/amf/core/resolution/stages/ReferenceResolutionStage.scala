@@ -15,7 +15,7 @@ import amf.core.resolution.stages.selectors.{LinkNodeSelector, LinkSelector}
 import scala.collection.mutable
 
 class ReferenceResolutionStage(keepEditingInfo: Boolean) extends TransformationStep {
-  override def transform(model: BaseUnit, errorHandler: ErrorHandler): BaseUnit = {
+  override def transform[T <: BaseUnit](model: T, errorHandler: ErrorHandler): T = {
     new ReferenceResolutionInnerClass()(errorHandler).resolve(model)
   }
 
@@ -27,8 +27,7 @@ class ReferenceResolutionStage(keepEditingInfo: Boolean) extends TransformationS
     } else {
       doc.withEncodes(element)
     }
-    transform(doc, errorHandler)
-    doc.encodes.asInstanceOf[T]
+    transform(doc, errorHandler).encodes.asInstanceOf[T]
   }
 
   // TODO should be in an Adapter specific for ExtendsResolution
@@ -36,8 +35,7 @@ class ReferenceResolutionStage(keepEditingInfo: Boolean) extends TransformationS
     val doc = Document().withId("http://resolutionstage.com/test#")
 
     doc.withDeclares(elements)
-    transform(doc, errorHandler)
-    doc.declares
+    transform(doc, errorHandler).declares
   }
 
   protected def customDomainElementTransformation: (DomainElement, Linkable) => DomainElement =

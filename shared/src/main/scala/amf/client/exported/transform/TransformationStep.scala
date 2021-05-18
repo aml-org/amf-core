@@ -7,5 +7,5 @@ import scala.scalajs.js.annotation.JSExportAll
 
 @JSExportAll
 trait TransformationStep {
-  def transform(model: BaseUnit, errorHandler: ClientErrorHandler): BaseUnit
+  def transform[T <: BaseUnit](model: T, errorHandler: ClientErrorHandler): T
 }

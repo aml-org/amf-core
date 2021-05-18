@@ -1,20 +1,28 @@
 package amf.core.resolution
 
+import amf.Core
+import amf.client.convert.CoreRegister
 import amf.client.parse.{DefaultErrorHandler, DefaultParserErrorHandler}
 import amf.client.remod.AMFGraphConfiguration
+import amf.client.exported.transform.{
+  TransformationPipeline => ClientTransformationPipeline,
+  TransformationPipelineBuilder => ClientTransformationPipelineBuilder,
+  TransformationStep => ClientTransformationStep
+}
 import amf.client.remod.amfcore.resolution.{PipelineName, TransformationPipelineBuilder}
 import amf.core.errorhandling.{ErrorHandler, UnhandledErrorHandler}
 import amf.core.model.document.{BaseUnit, Document}
 import amf.core.remote.Amf
 import amf.core.resolution.pipelines.{TransformationPipeline, TransformationPipelineRunner}
 import amf.core.resolution.stages.TransformationStep
+import amf.core.unsafe.PlatformSecrets
 import amf.plugins.features.validation.CoreValidations
 import org.scalatest.{FunSuite, Matchers}
 
-class TransformationPipelineBuilderTest extends FunSuite with Matchers {
+class TransformationPipelineBuilderTest extends FunSuite with Matchers with PlatformSecrets {
 
   private case class AddToIdCustomStage(content: String) extends TransformationStep {
-    override def transform(baseUnit: BaseUnit, errorHandler: ErrorHandler): BaseUnit = {
+    override def transform[T <: BaseUnit](baseUnit: T, errorHandler: ErrorHandler): T = {
       baseUnit.withId(baseUnit.id + content)
     }
   }
@@ -24,6 +32,18 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
 
     val unit = Document().withId("")
     TransformationPipelineRunner(UnhandledErrorHandler).run(unit, pipeline)
+    unit.id should be("modified")
+  }
+
+  test("[Exported interface] Create builder from empty pipeline and append stage") {
+    import amf.client.convert.CoreClientConverters.TransformationStepMatcher
+    import amf.client.convert.TransformationPipelineConverter.TransformationPipelineMatcher
+    CoreRegister.register(platform)
+    val clientStep = TransformationStepMatcher.asClient(AddToIdCustomStage("modified"))
+    val pipeline   = ClientTransformationPipelineBuilder.empty("defaultName").append(clientStep).build()
+
+    val unit = Document().withId("")
+    TransformationPipelineRunner(UnhandledErrorHandler).run(unit, TransformationPipelineMatcher.asInternal(pipeline))
     unit.id should be("modified")
   }
 
@@ -66,7 +86,7 @@ class TransformationPipelineBuilderTest extends FunSuite with Matchers {
     val builder = TransformationPipelineBuilder.empty("defaultName")
     val pipeline = builder
       .append(new TransformationStep {
-        override def transform(baseUnit: BaseUnit, errorHandler: ErrorHandler): BaseUnit = {
+        override def transform[T <: BaseUnit](baseUnit: T, errorHandler: ErrorHandler): T = {
           errorHandler.violation(CoreValidations.ResolutionValidation, "node", "some error")
           baseUnit
         }
