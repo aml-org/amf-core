@@ -6,6 +6,7 @@ import amf.client.resolve.ClientErrorHandlerConverter._
 import amf.client.validate.ValidationResult
 import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.services.RuntimeResolver
+import amf.core.validation.AMFValidationResult
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
@@ -25,13 +26,7 @@ class Resolver(vendor: String) {
 @JSExportAll
 trait ClientErrorHandler {
 
-  def reportConstraint(id: String,
-                       node: String,
-                       property: ClientOption[String],
-                       message: String,
-                       range: ClientOption[amf.core.parser.Range],
-                       level: String,
-                       location: ClientOption[String]): Unit
+  def getResults: ClientList[ValidationResult]
 
-  def results(): ClientList[ValidationResult]
+  def report(result: ValidationResult): Unit
 }

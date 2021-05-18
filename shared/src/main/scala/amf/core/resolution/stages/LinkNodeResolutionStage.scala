@@ -1,6 +1,6 @@
 package amf.core.resolution.stages
 
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.model.domain.{DomainElement, LinkNode}
 import amf.core.resolution.stages.helpers.{LinkNodeResolver, ModelReferenceResolver}
@@ -13,7 +13,7 @@ class LinkNodeResolutionStage(keepEditingInfo: Boolean, val visited: mutable.Set
 
   var modelResolver: Option[ModelReferenceResolver] = None
 
-  override def transform(model: BaseUnit, errorHandler: ErrorHandler): BaseUnit = {
+  override def transform(model: BaseUnit, errorHandler: AMFErrorHandler): BaseUnit = {
     this.modelResolver = Some(new ModelReferenceResolver(model))
     val knownIdSelector = new KnownElementIdSelector(visited)
     model.transform(knownIdSelector || LinkSelector || LinkNodeSelector, transformation)(errorHandler)

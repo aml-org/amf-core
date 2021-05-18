@@ -1,5 +1,5 @@
 package amf.core.resolution.stages
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.Type.Iri
 import amf.core.metamodel.domain.LinkableElementModel
 import amf.core.model.document.BaseUnit
@@ -11,7 +11,7 @@ import scala.collection.mutable
 
 class UrlShortenerStage() extends TransformationStep {
 
-  override def transform(model: BaseUnit, errorHandler: ErrorHandler): BaseUnit = {
+  override def transform(model: BaseUnit, errorHandler: AMFErrorHandler): BaseUnit = {
     val ids: Set[String] = Set(model.id) ++ obtainNestedReferenceIds(model)
     shorten(model, ids)
     model.withId(base)

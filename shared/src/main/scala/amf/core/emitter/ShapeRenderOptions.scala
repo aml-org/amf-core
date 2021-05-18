@@ -2,7 +2,7 @@ package amf.core.emitter
 
 import amf.client.render.{JSONSchemaVersion, JSONSchemaVersions, ShapeRenderOptions => ClientShapeRenderOptions}
 import amf.client.resolve.ClientErrorHandlerConverter._
-import amf.core.errorhandling.{ErrorHandler, UnhandledErrorHandler}
+import amf.core.errorhandling.{AMFErrorHandler, UnhandledErrorHandler}
 import amf.client.remod.amfcore.config.{ShapeRenderOptions => ImmutableShapeRenderOptions}
 
 /**
@@ -10,12 +10,12 @@ import amf.client.remod.amfcore.config.{ShapeRenderOptions => ImmutableShapeRend
   */
 class ShapeRenderOptions {
 
-  private var documentation: Boolean = true
-  private var compactedEmission: Boolean = false
+  private var documentation: Boolean                             = true
+  private var compactedEmission: Boolean                         = false
   private var emitWarningForUnsupportedValidationFacets: Boolean = false
-  private var schema: JSONSchemaVersion = JSONSchemaVersions.UNSPECIFIED
+  private var schema: JSONSchemaVersion                          = JSONSchemaVersions.UNSPECIFIED
 
-  private var eh: ErrorHandler       = UnhandledErrorHandler
+  private var eh: AMFErrorHandler = UnhandledErrorHandler
 
   /** Remove documentation info as examples, descriptions, display names, etc. */
   def withoutDocumentation: ShapeRenderOptions = {
@@ -34,7 +34,7 @@ class ShapeRenderOptions {
     this
   }
 
-  def withErrorHandler(errorHandler: ErrorHandler): ShapeRenderOptions = {
+  def withErrorHandler(errorHandler: AMFErrorHandler): ShapeRenderOptions = {
     eh = errorHandler
     this
   }
@@ -44,11 +44,11 @@ class ShapeRenderOptions {
     this
   }
 
-  def isWithDocumentation: Boolean = documentation
-  def isWithCompactedEmission: Boolean = compactedEmission
+  def isWithDocumentation: Boolean                             = documentation
+  def isWithCompactedEmission: Boolean                         = compactedEmission
   def shouldEmitWarningForUnsupportedValidationFacets: Boolean = emitWarningForUnsupportedValidationFacets
-  def errorHandler: ErrorHandler   = eh
-  def schemaVersion: JSONSchemaVersion = schema
+  def errorHandler: AMFErrorHandler                            = eh
+  def schemaVersion: JSONSchemaVersion                         = schema
 }
 
 object ShapeRenderOptions {
@@ -63,7 +63,7 @@ object ShapeRenderOptions {
     opts
   }
 
-  def fromImmutable(opts: ImmutableShapeRenderOptions, eh: ErrorHandler): ShapeRenderOptions = {
+  def fromImmutable(opts: ImmutableShapeRenderOptions, eh: AMFErrorHandler): ShapeRenderOptions = {
     val newOptions = new ShapeRenderOptions()
     newOptions.documentation = opts.documentation
     newOptions.compactedEmission = opts.compactedEmission
@@ -75,9 +75,9 @@ object ShapeRenderOptions {
 
   def toImmutable(options: ShapeRenderOptions): ImmutableShapeRenderOptions =
     ImmutableShapeRenderOptions(
-      options.documentation,
-      options.compactedEmission,
-      options.emitWarningForUnsupportedValidationFacets,
-      options.schema
+        options.documentation,
+        options.compactedEmission,
+        options.emitWarningForUnsupportedValidationFacets,
+        options.schema
     )
 }

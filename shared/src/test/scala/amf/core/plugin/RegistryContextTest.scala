@@ -1,5 +1,6 @@
 package amf.core.plugin
 
+import amf.client.remod.amfcore.registry.AMFRegistry
 import amf.core.metamodel.document.SourceMapModel
 import amf.core.parser.Annotations
 import amf.core.registries.AMFDomainRegistry.defaultIri
@@ -7,9 +8,8 @@ import org.scalatest.{FunSuite, Matchers}
 
 class RegistryContextTest extends FunSuite with Matchers {
 
-
   test("Test types without blacklist") {
-    val ctx = PluginContext()
+    val ctx = RegistryContext(AMFRegistry.empty)
 
     CorePlugin.modelEntities.foreach { `type` =>
       val iri = defaultIri(`type`)
@@ -17,14 +17,14 @@ class RegistryContextTest extends FunSuite with Matchers {
     }
 
     CorePlugin.modelEntities.filterNot(_ == SourceMapModel).foreach { `type` =>
-      val builder = ctx.buildType(`type`)
+      val builder  = ctx.buildType(`type`)
       val instance = builder(Annotations())
       instance.meta should be(`type`)
     }
   }
 
   test("Test types with blacklist") {
-    val ctx = PluginContext(Seq(CorePlugin))
+    val ctx = RegistryContext(AMFRegistry.empty)
 
     CorePlugin.modelEntities.foreach { `type` =>
       val iri = defaultIri(`type`)

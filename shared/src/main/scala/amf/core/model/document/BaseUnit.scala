@@ -3,7 +3,7 @@ package amf.core.model.document
 import amf.client.remod.AMFGraphConfiguration
 import amf.core.annotations.SourceVendor
 import amf.core.emitter.RenderOptions
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.MetaModelTypeMapping
 import amf.core.metamodel.document.BaseUnitModel
 import amf.core.metamodel.document.BaseUnitModel.{Location, ModelVersion, Root, Usage}
@@ -112,7 +112,7 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
   }
 
   def transform(selector: DomainElement => Boolean, transformation: (DomainElement, Boolean) => Option[DomainElement])(
-      implicit errorHandler: ErrorHandler): BaseUnit = {
+      implicit errorHandler: AMFErrorHandler): BaseUnit = {
     val domainElementAdapter  = new DomainElementSelectorAdapter(selector)
     val transformationAdapter = new DomainElementTransformationAdapter(transformation)
     new TransformationTraversal(TransformationData(domainElementAdapter, transformationAdapter)).traverse(this)

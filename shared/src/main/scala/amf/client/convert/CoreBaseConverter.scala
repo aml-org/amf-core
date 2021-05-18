@@ -2,7 +2,15 @@ package amf.client.convert
 
 import amf.ProfileName
 import amf.client.exported
-import amf.client.exported.{config, transform}
+import amf.client.exported.config.{
+  AMFEventConverter,
+  AMFEventListener => ClientAMFEventListener,
+  ParsingOptions => ClientParsingOptions,
+  RenderOptions => ClientRenderOptions,
+  ShapeRenderOptions => ClientShapeRenderOptions
+}
+import amf.client.exported.transform.{TransformationPipelineBuilder => ClientTransformationPipelineBuilder}
+import amf.client.exported.{config, transform, AMFResult => ClientAMFResult}
 import amf.client.model.document.{
   BaseUnit => ClientBaseUnit,
   Document => ClientDocument,
@@ -35,19 +43,11 @@ import amf.client.model.{
   StrField => ClientStrField
 }
 import amf.client.reference.{CachedReference => ClientCachedReference, UnitCache => ClientUnitCache}
-import amf.client.remod.amfcore.config.{AMFEvent, AMFEventListener, ParsingOptions, RenderOptions, ShapeRenderOptions}
-import amf.client.exported.config.{
-  AMFEventConverter,
-  AMFEvent => ClientAMFEvent,
-  AMFEventListener => ClientAMFEventListener,
-  ParsingOptions => ClientParsingOptions,
-  RenderOptions => ClientRenderOptions,
-  ShapeRenderOptions => ClientShapeRenderOptions
-}
+import amf.client.remod.amfcore.config._
+import amf.client.remod.amfcore.resolution.TransformationPipelineBuilder
 import amf.client.remod.{AMFGraphConfiguration, AMFResult}
-import amf.client.exported.{AMFResult => ClientAMFResult}
-import amf.client.exported.transform.{TransformationPipelineBuilder => ClientTransformationPipelineBuilder}
 import amf.client.remote.Content
+import amf.client.resolve.{ClientErrorHandler, ClientErrorHandlerConverter}
 import amf.client.resource.{ResourceLoader => ClientResourceLoader}
 import amf.client.validate.{
   AMFValidationReport => ClientValidatorReport,
@@ -56,6 +56,7 @@ import amf.client.validate.{
   ValidationResult => ClientValidationResult,
   ValidationShapeSet => ClientValidationShapeSet
 }
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model._
 import amf.core.model.document.{BaseUnit, Document, Module, PayloadFragment}
 import amf.core.model.domain._
@@ -64,9 +65,6 @@ import amf.core.model.domain.templates.{AbstractDeclaration, ParametrizedDeclara
 import amf.core.parser.Annotations
 import amf.core.remote.Vendor
 import amf.core.resolution.stages.TransformationStep
-import amf.client.remod.amfcore.resolution.TransformationPipelineBuilder
-import amf.client.resolve.{ClientErrorHandler, ClientErrorHandlerConverter}
-import amf.core.errorhandling.ErrorHandler
 import amf.core.unsafe.PlatformSecrets
 import amf.core.validation._
 import amf.internal.reference.{CachedReference, UnitCache, UnitCacheAdapter}
@@ -637,7 +635,7 @@ trait TransformationStepConverter extends BaseUnitConverter {
         }
     }
     override def asInternal(from: transform.TransformationStep): TransformationStep = {
-      (model: BaseUnit, errorHandler: ErrorHandler) =>
+      (model: BaseUnit, errorHandler: AMFErrorHandler) =>
         {
           val result: ClientBaseUnit =
             from.transform(BaseUnitMatcher.asClient(model), ClientErrorHandlerConverter.convertToClient(errorHandler))

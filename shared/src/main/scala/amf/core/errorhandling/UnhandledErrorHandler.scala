@@ -2,7 +2,7 @@ package amf.core.errorhandling
 import amf.core.annotations.LexicalInformation
 import amf.core.validation.AMFValidationResult
 
-trait UnhandledErrorHandler extends ErrorHandler {
+trait UnhandledErrorHandler extends AMFErrorHandler {
 
   override def reportConstraint(id: String,
                                 node: String,
@@ -14,7 +14,6 @@ trait UnhandledErrorHandler extends ErrorHandler {
     throw new Exception(
         s"  Message: $message\n  Target: $node\nProperty: ${property.getOrElse("")}\n  Position: $lexical\n at location: $location")
   }
-
-  override def results(): List[AMFValidationResult] = List.empty
 }
+
 object UnhandledErrorHandler extends UnhandledErrorHandler {}

@@ -4,16 +4,10 @@ import amf.client.remod.amfcore.config.{AMFEvent, ParsingOptions}
 import amf.client.remod.amfcore.plugins.parse.{AMFParsePlugin, DomainParsingFallback}
 import amf.client.remote.Content
 import amf.core.Root
-import amf.core.annotations.LexicalInformation
-import amf.core.errorhandling.ErrorCollector
-import amf.core.metamodel.ModelDefaultBuilder
 import amf.core.model.document.BaseUnit
-import amf.core.model.domain.DomainElement
-import amf.core.parser.{Annotations, ParserContext}
-import amf.core.parser.errorhandler.ParserErrorHandler
+import amf.core.parser.ParserContext
 import amf.core.plugin.RegistryContext
 import amf.core.rdf.helper.PluginEntitiesFacade
-import amf.core.registries.AMFDomainRegistry.defaultIri
 import amf.core.remote.PathResolutionError
 import amf.core.utils.AmfStrings
 import amf.internal.reference.UnitCache
@@ -24,18 +18,7 @@ import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
 class ParseConfiguration(config: AMFGraphConfiguration, val url: String) {
-
-  val eh: ParserErrorHandler = new ErrorCollector with ParserErrorHandler {
-    private val errorHandler = config.errorHandlerProvider.errorHandler()
-    override def reportConstraint(id: String,
-                                  node: String,
-                                  property: Option[String],
-                                  message: String,
-                                  lexical: Option[LexicalInformation],
-                                  level: String,
-                                  location: Option[String]): Unit =
-      errorHandler.reportConstraint(id, node, property, message, lexical, level, location)
-  }
+  val eh = config.errorHandlerProvider.errorHandler()
 
   val executionContext: ExecutionContext           = config.resolvers.executionContext.executionContext
   def resolveContent(url: String): Future[Content] = config.resolvers.resolveContent(url)

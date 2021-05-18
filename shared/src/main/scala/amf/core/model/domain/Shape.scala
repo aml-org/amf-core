@@ -1,6 +1,6 @@
 package amf.core.model.domain
 
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.Field
 import amf.core.metamodel.domain.ShapeModel._
 import amf.core.model.domain.extensions.{PropertyShape, ShapeExtension}
@@ -39,13 +39,14 @@ abstract class Shape extends DomainElement with Linkable with NamedDomainElement
 
   def withDisplayName(name: String): this.type        = set(DisplayName, name)
   def withDescription(description: String): this.type = set(Description, description)
-  def withDefault(default: DataNode, annotations: Annotations = Annotations()): this.type       = set(Default, default, annotations)
-  def withValues(values: Seq[DataNode]): this.type    = setArray(Values, values)
-  def withInherits(inherits: Seq[Shape]): this.type   = setArray(Inherits, inherits)
-  def withOr(subShapes: Seq[Shape]): this.type        = setArray(Or, subShapes)
-  def withAnd(subShapes: Seq[Shape]): this.type       = setArray(And, subShapes)
-  def withXone(subShapes: Seq[Shape]): this.type      = setArray(Xone, subShapes)
-  def withNot(shape: Shape): this.type                = set(Not, shape)
+  def withDefault(default: DataNode, annotations: Annotations = Annotations()): this.type =
+    set(Default, default, annotations)
+  def withValues(values: Seq[DataNode]): this.type  = setArray(Values, values)
+  def withInherits(inherits: Seq[Shape]): this.type = setArray(Inherits, inherits)
+  def withOr(subShapes: Seq[Shape]): this.type      = setArray(Or, subShapes)
+  def withAnd(subShapes: Seq[Shape]): this.type     = setArray(And, subShapes)
+  def withXone(subShapes: Seq[Shape]): this.type    = setArray(Xone, subShapes)
+  def withNot(shape: Shape): this.type              = set(Not, shape)
   def withCustomShapeProperties(properties: Seq[ShapeExtension]): this.type =
     setArray(CustomShapeProperties, properties)
   def withCustomShapePropertyDefinitions(propertyDefinitions: Seq[PropertyShape]): this.type =
@@ -119,13 +120,13 @@ abstract class Shape extends DomainElement with Linkable with NamedDomainElement
     }
   }
 
-  def cloneShape(recursionErrorHandler: Option[ErrorHandler],
+  def cloneShape(recursionErrorHandler: Option[AMFErrorHandler],
                  recursionBase: Option[String] = None,
                  traversed: ModelTraversalRegistry = ModelTraversalRegistry(),
                  cloneExample: Boolean = false): Shape
 
   // Copy fields into a cloned shape
-  protected def copyFields(recursionErrorHandler: Option[ErrorHandler],
+  protected def copyFields(recursionErrorHandler: Option[AMFErrorHandler],
                            cloned: Shape,
                            recursionBase: Option[String],
                            traversal: ModelTraversalRegistry): Unit = {
@@ -133,21 +134,22 @@ abstract class Shape extends DomainElement with Linkable with NamedDomainElement
       case (f, v) =>
         val clonedValue = v.value match {
           case s: Shape if s.id != this.id && traversal.canTraverse(s.id) =>
-            traversal.runNested(
-              (t: ModelTraversalRegistry) => { s.cloneShape(recursionErrorHandler, recursionBase, t) })
+            traversal.runNested((t: ModelTraversalRegistry) => {
+              s.cloneShape(recursionErrorHandler, recursionBase, t)
+            })
           case s: Shape if s.id == this.id => s
           case a: AmfArray =>
             AmfArray(
-              a.values.map {
-                case e: Shape if e.id != this.id && traversal.canTraverse(e.id) =>
-                  traversal.runNested((t: ModelTraversalRegistry) => {
-                    e.cloneShape(recursionErrorHandler, recursionBase, t)
-                  })
+                a.values.map {
+                  case e: Shape if e.id != this.id && traversal.canTraverse(e.id) =>
+                    traversal.runNested((t: ModelTraversalRegistry) => {
+                      e.cloneShape(recursionErrorHandler, recursionBase, t)
+                    })
 //                e.cloneShape(recursionErrorHandler, recursionBase, traversed.push(prevBaseId),Some(prevBaseId))
-                case e: Shape if e.id == this.id => e
-                case o                           => o
-              },
-              a.annotations
+                  case e: Shape if e.id == this.id => e
+                  case o                           => o
+                },
+                a.annotations
             )
           case o => o
         }

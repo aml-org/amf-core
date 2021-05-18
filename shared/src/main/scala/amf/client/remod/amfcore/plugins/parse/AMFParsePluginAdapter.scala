@@ -4,7 +4,7 @@ import amf.client.plugins.AMFDocumentPlugin
 import amf.client.remod.amfcore.plugins.PluginPriority
 import amf.core.Root
 import amf.core.client.ParsingOptions
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.parser.{ParserContext, ReferenceHandler, SyamlParsedDocument}
 
@@ -14,7 +14,7 @@ private[amf] case class AMFParsePluginAdapter(plugin: AMFDocumentPlugin) extends
 
   override def validMediaTypesToReference: Seq[String] = plugin.validVendorsToReference
 
-  override def referenceHandler(eh: ErrorHandler): ReferenceHandler = plugin.referenceHandler(eh)
+  override def referenceHandler(eh: AMFErrorHandler): ReferenceHandler = plugin.referenceHandler(eh)
 
   override def allowRecursiveReferences: Boolean = plugin.allowRecursiveReferences
 

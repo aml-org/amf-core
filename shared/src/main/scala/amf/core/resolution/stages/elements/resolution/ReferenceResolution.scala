@@ -1,6 +1,6 @@
 package amf.core.resolution.stages.elements.resolution
 import amf.core.annotations._
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.document.DocumentModel
 import amf.core.model.document.Document
 import amf.core.model.domain.{AmfObject, DomainElement, LinkNode, Linkable, NamedDomainElement}
@@ -19,7 +19,7 @@ import amf.core.vocabulary.Namespace
 
 import scala.collection.mutable
 
-class ReferenceResolution(errorHandler: ErrorHandler,
+class ReferenceResolution(errorHandler: AMFErrorHandler,
                           keepEditingInfo: Boolean = false,
                           modelResolver: Option[ModelReferenceResolver] = None,
                           cache: mutable.Map[String, DomainElement] = mutable.Map(),

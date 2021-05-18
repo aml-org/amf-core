@@ -6,12 +6,23 @@ import amf.core.utils.AmfStrings
 import amf.core.validation.AMFValidationResult
 import amf.core.validation.SeverityLevels.{VIOLATION, WARNING}
 import amf.core.validation.core.ValidationSpecification
+import amf.plugins.features.validation.CoreValidations.SyamlError
 import org.mulesoft.lexer.{InputRange, SourceLocation}
-import org.yaml.model.YPart
+import org.yaml.model._
 
-trait ErrorHandler {
+import scala.collection.mutable
 
-  def results(): List[AMFValidationResult]
+trait AMFErrorHandler extends IllegalTypeHandler with ParseErrorHandler{
+  protected val results :mutable.LinkedHashSet[AMFValidationResult] = mutable.LinkedHashSet()
+
+  def getResults: List[AMFValidationResult] = results.toList
+
+  def report(result:AMFValidationResult):Unit = synchronized {
+    if (results.contains(result)) { // TODO ARM check this assertion
+      results += result
+      true
+    } else false
+  }
 
   def guiKey(message: String, location: Option[String], lexical: Option[LexicalInformation]): String = {
     message ++ location.getOrElse("") ++ lexical.map(_.value).getOrElse("")
@@ -23,7 +34,7 @@ trait ErrorHandler {
                        message: String,
                        lexical: Option[LexicalInformation],
                        level: String,
-                       location: Option[String]): Unit
+                       location: Option[String]): Unit = report(AMFValidationResult(message, level, node, property, id, lexical, location, this))
 
   def reportConstraint(specification: ValidationSpecification,
                        node: String,
@@ -131,6 +142,25 @@ trait ErrorHandler {
     loc.inputRange match {
       case InputRange.Zero => None
       case range           => Some(LexicalInformation(Range(range)))
+    }
+  }
+
+  override def handle[T](error: YError, defaultValue: T): T = {
+    violation(SyamlError, "", error.error, part(error))
+    defaultValue
+  }
+
+  final def handle(node: YPart, e: SyamlException): Unit = handle(node.location, e)
+
+  override def handle(location: SourceLocation, e: SyamlException): Unit =
+    violation(SyamlError, "", e.getMessage, location)
+
+  protected def part(error: YError): YPart = {
+    error.node match {
+      case d: YDocument => d
+      case n: YNode     => n
+      case s: YSuccess  => s.node
+      case f: YFail     => part(f.error)
     }
   }
 }

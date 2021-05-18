@@ -1,6 +1,7 @@
 package amf.plugins.document.graph.parser
 
 import amf.core.annotations.DomainExtensionAnnotation
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.Type.{Array, Bool, Iri, LiteralUri, RegExp, SortedArray, Str}
 import amf.core.metamodel._
 import amf.core.metamodel.document.BaseUnitModel.Location
@@ -9,7 +10,6 @@ import amf.core.metamodel.domain.extensions.DomainExtensionModel
 import amf.core.model.document._
 import amf.core.model.domain._
 import amf.core.model.domain.extensions.{CustomDomainProperty, DomainExtension}
-import amf.core.parser.errorhandler.ParserErrorHandler
 import amf.core.parser.{Annotations, _}
 import amf.core.registries.AMFDomainRegistry
 import amf.core.vocabulary.Namespace
@@ -357,7 +357,7 @@ class EmbeddedGraphParser()(implicit val ctx: GraphParserContext) extends GraphP
 }
 
 object EmbeddedGraphParser {
-  def apply(errorHandler: ParserErrorHandler): EmbeddedGraphParser =
+  def apply(errorHandler: AMFErrorHandler): EmbeddedGraphParser =
     new EmbeddedGraphParser()(new GraphParserContext(eh = errorHandler))
 
   def canParse(document: SyamlParsedDocument): Boolean = {
