@@ -7,11 +7,9 @@ import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.registry.AMFRegistry
 import amf.core.annotations.serializable.CoreSerializableAnnotations
 import amf.core.entities.CoreEntities
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.parser.ParserContext
-import amf.core.parser.errorhandler.AmfParserErrorHandler
 import amf.core.resolution.pipelines.{BasicTransformationPipeline, TransformationPipeline}
-import amf.core.validation.AMFValidationResult
 import amf.core.validation.core.ValidationProfile
 import amf.internal.environment.Environment
 import amf.internal.reference.UnitCache
@@ -38,7 +36,7 @@ object AMFGraphConfiguration {
   /**
     * Predefined AMF core environment with:
     *   - AMF Resolvers [[amf.client.remod.amfcore.config.AMFResolvers.predefined predefined]]
-    *   - Default error handler provider that will create a [[amf.client.parse.DefaultParserErrorHandler]]
+    *   - Default error handler provider that will create a [[amf.client.parse.DefaultErrorHandler]]
     *   - Empty [[amf.client.remod.amfcore.registry.AMFRegistry]]
     *   - MutedLogger: [[amf.client.exported.config.MutedLogger]]
     *   - Without Any listener
@@ -68,25 +66,8 @@ object AMFGraphConfiguration {
   //TODO: ARM remove
   private[amf] def fromParseCtx(ctx: ParserContext) = fromEH(ctx.eh)
 
-  private[amf] def fromEH(eh: ErrorHandler) = {
-    val peh = new AmfParserErrorHandler {
-      private val wrapped = eh
-      override def handlerAmfResult(result: AMFValidationResult): Boolean = {
-        wrapped.reportConstraint(result.validationId,
-                                 result.targetNode,
-                                 result.targetProperty,
-                                 result.message,
-                                 result.position,
-                                 result.severityLevel,
-                                 result.location)
-        true
-      }
-
-      override def results(): List[AMFValidationResult] = wrapped.results()
-    }
-
-    AMFGraphConfiguration.predefined().withErrorHandlerProvider(() => peh)
-
+  private[amf] def fromEH(eh: AMFErrorHandler) = {
+    AMFGraphConfiguration.predefined().withErrorHandlerProvider(() => eh)
   }
 }
 

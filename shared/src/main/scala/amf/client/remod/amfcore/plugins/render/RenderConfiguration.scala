@@ -2,21 +2,21 @@ package amf.client.remod.amfcore.plugins.render
 
 import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.config.{AMFEventListener, RenderOptions}
+import amf.core.errorhandling.AMFErrorHandler
 import amf.client.remod.amfcore.plugins.namespace.NamespaceAliasesPlugin
-import amf.core.errorhandling.ErrorHandler
 
 trait RenderConfiguration {
   def renderPlugins: List[AMFRenderPlugin]
   def namespacePlugins: List[NamespaceAliasesPlugin]
   def renderOptions: RenderOptions
-  def errorHandler: ErrorHandler
+  def errorHandler: AMFErrorHandler
   def listeners: Set[AMFEventListener]
 }
 
 case class DefaultRenderConfiguration(renderPlugins: List[AMFRenderPlugin],
                                       namespacePlugins: List[NamespaceAliasesPlugin],
                                       renderOptions: RenderOptions,
-                                      errorHandler: ErrorHandler,
+                                      errorHandler: AMFErrorHandler,
                                       listeners: Set[AMFEventListener])
     extends RenderConfiguration
 

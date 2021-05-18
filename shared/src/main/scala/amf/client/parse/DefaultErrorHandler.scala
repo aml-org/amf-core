@@ -1,4 +1,4 @@
 package amf.client.parse
-import amf.core.errorhandling.ErrorCollector
+import amf.core.errorhandling.AMFErrorHandler
 
-case class DefaultErrorHandler() extends ErrorCollector {}
+case class DefaultErrorHandler() extends AMFErrorHandler {}

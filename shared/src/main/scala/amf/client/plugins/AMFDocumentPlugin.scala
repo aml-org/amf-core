@@ -3,7 +3,7 @@ package amf.client.plugins
 import amf.client.remod.amfcore.config.RenderOptions
 import amf.core.Root
 import amf.core.client.ParsingOptions
-import amf.core.errorhandling.{ErrorHandler, UnhandledErrorHandler}
+import amf.core.errorhandling.{AMFErrorHandler, UnhandledErrorHandler}
 import amf.core.metamodel.Obj
 import amf.core.model.document.BaseUnit
 import amf.core.model.domain.AnnotationGraphLoader
@@ -64,7 +64,7 @@ abstract class AMFDocumentPlugin extends AMFPlugin {
   def emit[T](unit: BaseUnit,
               builder: DocBuilder[T],
               renderOptions: RenderOptions = RenderOptions(),
-              errorHandler: ErrorHandler = UnhandledErrorHandler): Boolean =
+              errorHandler: AMFErrorHandler = UnhandledErrorHandler): Boolean =
     builder match {
       case sb: YDocumentBuilder =>
         unparseAsYDocument(unit, renderOptions, errorHandler) exists { doc =>
@@ -76,7 +76,7 @@ abstract class AMFDocumentPlugin extends AMFPlugin {
 
   protected def unparseAsYDocument(unit: BaseUnit,
                                    renderOptions: RenderOptions,
-                                   errorHandler: ErrorHandler): Option[YDocument]
+                                   errorHandler: AMFErrorHandler): Option[YDocument]
 
   /**
     * Decides if this plugin can parse the provided document instance.
@@ -94,5 +94,5 @@ abstract class AMFDocumentPlugin extends AMFPlugin {
     */
   def canUnparse(unit: BaseUnit): Boolean
 
-  def referenceHandler(eh: ErrorHandler): ReferenceHandler
+  def referenceHandler(eh: AMFErrorHandler): ReferenceHandler
 }

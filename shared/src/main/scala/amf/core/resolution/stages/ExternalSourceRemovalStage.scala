@@ -1,6 +1,6 @@
 package amf.core.resolution.stages
 
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.domain.ExternalSourceElementModel
 import amf.core.model.document.BaseUnit
 import amf.core.model.domain.{DomainElement, ExternalSourceElement}
@@ -10,7 +10,7 @@ import scala.collection.mutable
 
 class ExternalSourceRemovalStage(val visited: mutable.Set[String] = mutable.Set()) extends TransformationStep {
 
-  override def transform(model: BaseUnit, errorHandler: ErrorHandler): BaseUnit = {
+  override def transform(model: BaseUnit, errorHandler: AMFErrorHandler): BaseUnit = {
     val knownIdSelector = new KnownElementIdSelector(visited)
     model.transform(knownIdSelector || ExternalSourceElementSelector, transformation)(errorHandler)
   }

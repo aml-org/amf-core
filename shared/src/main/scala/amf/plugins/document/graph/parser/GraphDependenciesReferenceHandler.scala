@@ -1,11 +1,10 @@
 package amf.plugins.document.graph.parser
 
-import amf.core.parser.errorhandler.ParserErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.parser.{ParsedDocument, ParserContext, ReferenceHandler, _}
 import amf.core.vocabulary.Namespace
 import amf.plugins.document.graph.JsonLdKeywords
 import org.mulesoft.common.functional.MonadInstances._
-import amf.plugins.document.graph.parser.FlattenedGraphParser.isRootNode
 import org.yaml.model._
 
 object GraphDependenciesReferenceHandler extends ReferenceHandler {
@@ -13,7 +12,7 @@ object GraphDependenciesReferenceHandler extends ReferenceHandler {
   val graphDependenciesPredicate: String = (Namespace.Document + "graphDependencies").iri()
 
   override def collect(inputParsed: ParsedDocument, ctx: ParserContext): CompilerReferenceCollector = {
-    implicit val errorHandler: ParserErrorHandler = ctx.eh
+    implicit val errorHandler: AMFErrorHandler = ctx.eh
 
     inputParsed match {
       case parsed: SyamlParsedDocument =>

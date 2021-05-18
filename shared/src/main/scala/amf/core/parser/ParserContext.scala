@@ -1,11 +1,7 @@
 package amf.core.parser
 
-import amf.client.remod.ParseConfiguration
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit
-import amf.core.model.domain.extensions.CustomDomainProperty
-import amf.core.parser.errorhandler.ParserErrorHandler
-import amf.core.plugin.RegistryContext
 import amf.core.validation.core.ValidationSpecification
 import org.mulesoft.lexer.SourceLocation
 import org.yaml.model.{IllegalTypeHandler, ParseErrorHandler, SyamlException, YError}
@@ -20,7 +16,7 @@ import scala.collection.mutable
 //
 //}
 
-abstract class ErrorHandlingContext(implicit val eh: ParserErrorHandler)
+abstract class ErrorHandlingContext(implicit val eh: AMFErrorHandler)
     extends ParseErrorHandler
     with IllegalTypeHandler {
   override def handle(location: SourceLocation, e: SyamlException): Unit = eh.handle(location, e)
@@ -32,7 +28,7 @@ abstract class ErrorHandlingContext(implicit val eh: ParserErrorHandler)
 
 trait UnresolvedComponents {
   def futureDeclarations: FutureDeclarations
-  def eh: ParserErrorHandler
+  def eh: AMFErrorHandler
 }
 
 object EmptyFutureDeclarations {
@@ -42,7 +38,7 @@ object EmptyFutureDeclarations {
 case class ParserContext(rootContextDocument: String = "",
                          refs: Seq[ParsedReference] = Seq.empty,
                          futureDeclarations: FutureDeclarations = EmptyFutureDeclarations(),
-                         override val eh: ParserErrorHandler)
+                         override val eh: AMFErrorHandler)
     extends ErrorHandlingContext()(eh)
     with UnresolvedComponents
     with IllegalTypeHandler {

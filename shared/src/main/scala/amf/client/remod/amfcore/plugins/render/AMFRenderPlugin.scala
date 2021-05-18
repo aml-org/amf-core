@@ -3,7 +3,7 @@ package amf.client.remod.amfcore.plugins.render
 import amf.client.plugins.AMFDocumentPlugin
 import amf.client.remod.amfcore.config.RenderOptions
 import amf.client.remod.amfcore.plugins.{AMFPlugin, PluginPriority}
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit
 import org.yaml.builder.DocBuilder
 
@@ -11,7 +11,7 @@ trait AMFRenderPlugin extends AMFPlugin[RenderInfo] {
   def emit[T](unit: BaseUnit,
               builder: DocBuilder[T],
               renderOptions: RenderOptions,
-              errorHandler: ErrorHandler): Boolean
+              errorHandler: AMFErrorHandler): Boolean
 }
 
 private[amf] case class AMFRenderPluginAdapter(plugin: AMFDocumentPlugin) extends AMFRenderPlugin {
@@ -19,7 +19,7 @@ private[amf] case class AMFRenderPluginAdapter(plugin: AMFDocumentPlugin) extend
   override def emit[T](unit: BaseUnit,
                        builder: DocBuilder[T],
                        renderOptions: RenderOptions,
-                       errorHandler: ErrorHandler): Boolean =
+                       errorHandler: AMFErrorHandler): Boolean =
     plugin.emit(unit, builder, renderOptions, errorHandler)
 
   override val id: String = plugin.ID

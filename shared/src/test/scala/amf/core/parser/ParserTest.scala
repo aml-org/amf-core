@@ -1,8 +1,8 @@
 package amf.core.parser
 
 import amf.core.client.ParsingOptions
+import amf.core.errorhandling.UnhandledErrorHandler
 import amf.core.model.document.BaseUnit
-import amf.core.parser.errorhandler.UnhandledParserErrorHandler
 import amf.core.rdf.RdfModel
 import amf.core.services.ValidationOptions
 import amf.core.validation.core.{SHACLValidator, ValidationReport, ValidationSpecification}
@@ -87,8 +87,8 @@ class ParserTest extends FunSuite {
   }
 
   test("Test empty YAML with comment") {
-    val context = ParserContext("", Seq.empty, eh = UnhandledParserErrorHandler)
-    val parsed = SYamlSyntaxPlugin.parse("application/yaml", "#%Header", context, ParsingOptions())
+    val context = ParserContext("", Seq.empty, eh = UnhandledErrorHandler)
+    val parsed  = SYamlSyntaxPlugin.parse("application/yaml", "#%Header", context, ParsingOptions())
     parsed.isDefined shouldBe true
     parsed.get match {
       case p: SyamlParsedDocument =>
@@ -149,7 +149,8 @@ class ParserTest extends FunSuite {
 
     class TestValidator extends SHACLValidator {
       override def validate(data: String, dataMediaType: String, shapes: String, shapesMediaType: String)(
-          implicit executionContext: ExecutionContext): Future[String] = throw new Exception("Validation not supported")
+          implicit executionContext: ExecutionContext): Future[String] =
+        throw new Exception("Validation not supported")
 
       override def report(data: String, dataMediaType: String, shapes: String, shapesMediaType: String)(
           implicit executionContext: ExecutionContext): Future[ValidationReport] =

@@ -1,7 +1,8 @@
 package amf.plugins.document.graph.parser
 import amf.client.parse.IgnoringErrorHandler
 import amf.core.annotations.DomainExtensionAnnotation
-import amf.core.metamodel.Type.{Array, Bool, Iri, LiteralUri, RegExp, Scalar, SortedArray, Str}
+import amf.core.errorhandling.AMFErrorHandler
+import amf.core.metamodel.Type.{Array, Bool, Iri, LiteralUri, RegExp, SortedArray, Str}
 import amf.core.metamodel.document.BaseUnitModel
 import amf.core.metamodel.domain.extensions.DomainExtensionModel
 import amf.core.metamodel.domain.{DomainElementModel, ExternalSourceElementModel, LinkableElementModel}
@@ -10,7 +11,6 @@ import amf.core.model.document._
 import amf.core.model.domain._
 import amf.core.model.domain.extensions.{CustomDomainProperty, DomainExtension}
 import amf.core.parser._
-import amf.core.parser.errorhandler.ParserErrorHandler
 import amf.core.registries.AMFDomainRegistry
 import amf.core.vocabulary.Namespace.XsdTypes.xsdBoolean
 import amf.core.vocabulary.{Namespace, ValueType}
@@ -395,7 +395,7 @@ class FlattenedGraphParser()(implicit val ctx: GraphParserContext) extends Graph
               val obj        = contentOfNode(entryValue).getOrElse(entryValue.as[YMap])
 
               parseScalarProperty(obj, DomainExtensionModel.Name)
-                .map(s => extension.set(DomainExtensionModel.Name,s))
+                .map(s => extension.set(DomainExtensionModel.Name, s))
               parseScalarProperty(obj, DomainExtensionModel.Element)
                 .map(extension.withElement)
 
@@ -563,7 +563,7 @@ class FlattenedGraphParser()(implicit val ctx: GraphParserContext) extends Graph
 }
 
 object FlattenedGraphParser extends GraphContextHelper with GraphParserHelpers {
-  def apply(errorHandler: ParserErrorHandler): FlattenedGraphParser =
+  def apply(errorHandler: AMFErrorHandler): FlattenedGraphParser =
     new FlattenedGraphParser()(new GraphParserContext(eh = errorHandler))
 
   /**

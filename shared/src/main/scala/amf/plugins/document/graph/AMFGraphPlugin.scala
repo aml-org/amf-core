@@ -7,7 +7,7 @@ import amf.client.remod.amfcore.plugins.parse.AMFParsePluginAdapter
 import amf.client.remod.amfcore.plugins.render.AMFRenderPluginAdapter
 import amf.core.Root
 import amf.core.client.ParsingOptions
-import amf.core.errorhandling.ErrorHandler
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.exception.UnsupportedParsedDocumentException
 import amf.core.metamodel.Obj
 import amf.core.model.document.BaseUnit
@@ -81,15 +81,15 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
   override def emit[T](unit: BaseUnit,
                        builder: DocBuilder[T],
                        renderOptions: RenderOptions,
-                       errorHandler: ErrorHandler): Boolean =
+                       errorHandler: AMFErrorHandler): Boolean =
     EmbeddedJsonLdEmitter.emit(unit, builder, renderOptions)
 
   override protected def unparseAsYDocument(unit: BaseUnit,
                                             renderOptions: RenderOptions,
-                                            errorHandler: ErrorHandler): Option[YDocument] =
+                                            errorHandler: AMFErrorHandler): Option[YDocument] =
     throw new IllegalStateException("Unreachable")
 
-  override def referenceHandler(eh: ErrorHandler): ReferenceHandler = GraphDependenciesReferenceHandler
+  override def referenceHandler(eh: AMFErrorHandler): ReferenceHandler = GraphDependenciesReferenceHandler
 
   override val pipelines: Map[String, TransformationPipeline] = Map(
       BasicTransformationPipeline.name        -> BasicTransformationPipeline(),
