@@ -93,9 +93,5 @@ abstract class AMFDocumentPlugin extends AMFPlugin {
     */
   def canUnparse(unit: BaseUnit): Boolean
 
-  def canGenerateNamespaceAliases(unit: BaseUnit): Boolean = false
-
-  def generateNamespaceAliases(unit: BaseUnit): NamespaceAliases = Namespace.staticAliases
-
   def referenceHandler(eh: ErrorHandler): ReferenceHandler
 }

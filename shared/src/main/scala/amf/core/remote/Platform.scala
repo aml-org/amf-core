@@ -175,10 +175,6 @@ trait Platform extends FileMediaType {
   /** normalize path method for file fetching in amf compiler */
   def normalizePath(url: String): String
 
-  /** Register an alias for a namespace */
-  def registerNamespace(alias: String, prefix: String): Option[Namespace] =
-    Namespace.staticAliases.registerNamespace(alias, prefix)
-
   // Optional RdfFramework
   var rdfFramework: Option[RdfFramework] = None
 

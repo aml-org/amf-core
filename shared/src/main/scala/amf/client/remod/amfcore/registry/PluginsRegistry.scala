@@ -2,6 +2,7 @@ package amf.client.remod.amfcore.registry
 
 import amf.ProfileName
 import amf.client.remod.amfcore.plugins.AMFPlugin
+import amf.client.remod.amfcore.plugins.namespace.NamespaceAliasesPlugin
 import amf.client.remod.amfcore.plugins.parse.{AMFParsePlugin, DomainParsingFallback, ExternalFragmentDomainFallback}
 import amf.client.remod.amfcore.plugins.render.AMFRenderPlugin
 import amf.client.remod.amfcore.plugins.validate.AMFValidatePlugin
@@ -17,6 +18,7 @@ import amf.core.model.document.BaseUnit
 case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
                                          validatePlugins: List[AMFValidatePlugin],
                                          renderPlugins: List[AMFRenderPlugin],
+                                         namespacePlugins: List[NamespaceAliasesPlugin],
                                          domainParsingFallback: DomainParsingFallback) {
 
   lazy val allPlugins: List[AMFPlugin[_]] = parsePlugins ++ validatePlugins ++ renderPlugins
@@ -29,6 +31,8 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
         copy(validatePlugins = validatePlugins :+ v)
       case r: AMFRenderPlugin if !renderPlugins.exists(_.id == r.id) =>
         copy(renderPlugins = renderPlugins :+ r)
+      case r: NamespaceAliasesPlugin if !namespacePlugins.exists(_.id == r.id) =>
+        copy(namespacePlugins = namespacePlugins :+ r)
       case _ => this
     }
   }
@@ -38,14 +42,17 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
   }
 
   def removePlugin(id: String): PluginsRegistry =
-    copy(parsePlugins = parsePlugins.filterNot(_.id == id),
-         validatePlugins = validatePlugins.filterNot(_.id == id),
-         renderPlugins = renderPlugins.filterNot(_.id == id))
+    copy(
+        parsePlugins = parsePlugins.filterNot(_.id == id),
+        validatePlugins = validatePlugins.filterNot(_.id == id),
+        renderPlugins = renderPlugins.filterNot(_.id == id),
+        namespacePlugins = namespacePlugins.filterNot(_.id == id)
+    )
 
 }
 
 object PluginsRegistry {
 
   /** Creates an empty PluginsRegistry */
-  val empty: PluginsRegistry = PluginsRegistry(Nil, Nil, Nil, ExternalFragmentDomainFallback)
+  val empty: PluginsRegistry = PluginsRegistry(Nil, Nil, Nil, Nil, ExternalFragmentDomainFallback)
 }

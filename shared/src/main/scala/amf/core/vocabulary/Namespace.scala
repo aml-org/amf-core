@@ -2,6 +2,7 @@ package amf.core.vocabulary
 
 import amf.core.annotations.Aliases
 
+import scala.collection.immutable.ListMap
 import scala.collection.mutable
 
 /**
@@ -74,41 +75,12 @@ object Namespace {
   val staticAliases: NamespaceAliases = NamespaceAliases()
 }
 
-case class NamespaceAliases() {
-  private val knownAliases: mutable.HashMap[String, Namespace] = mutable.HashMap(
-      "rdf"            -> Namespace.Rdf,
-      "sh"             -> Namespace.Shacl,
-      "shacl"          -> Namespace.Shacl,
-      "security"       -> Namespace.Security,
-      "core"           -> Namespace.Core,
-      "raml-doc"       -> Namespace.Document,
-      "doc"            -> Namespace.Document,
-      "xsd"            -> Namespace.Xsd,
-      "amf-parser"     -> Namespace.AmfParser,
-      "amf-core"       -> Namespace.AmfCore,
-      "apiContract"    -> Namespace.ApiContract,
-      "apiBinding"     -> Namespace.ApiBinding,
-      "amf-resolution" -> Namespace.AmfResolution,
-      "amf-validation" -> Namespace.AmfValidation,
-      "amf-render"     -> Namespace.AmfRender,
-      "raml-shapes"    -> Namespace.Shapes,
-      "shapes"         -> Namespace.Shapes,
-      "data"           -> Namespace.Data,
-      "sourcemaps"     -> Namespace.SourceMaps,
-      "meta"           -> Namespace.Meta,
-      "owl"            -> Namespace.Owl,
-      "rdfs"           -> Namespace.Rdfs
-  )
-
-  def reset(): Unit = ns = knownAliases
-
-  var ns: mutable.HashMap[Aliases.Alias, Namespace] = knownAliases
+case class NamespaceAliases private (ns: Map[Aliases.Alias, Namespace]) {
 
   def uri(s: String): ValueType = {
     if (s.indexOf(":") > -1) {
       expand(s)
-    }
-    else {
+    } else {
       ns.values.find(n => s.indexOf(n.base) == 0) match {
         case Some(foundNs) => ValueType(foundNs, s.split(foundNs.base).last)
         case _             => ValueType(s)
@@ -116,13 +88,10 @@ case class NamespaceAliases() {
     }
   }
 
-  def registerNamespace(alias: String, prefix: String): Option[Namespace] = ns.put(alias, Namespace(prefix))
-
   def expand(uri: String): ValueType = {
     if (uri.startsWith("http://")) { // we have http: as  a valid prefix, we need to disambiguate
       ValueType(uri)
-    }
-    else {
+    } else {
       uri.split(":") match {
         case Array(prefix, postfix) =>
           resolve(prefix) match {
@@ -158,4 +127,34 @@ case class NamespaceAliases() {
   }
 
   private def resolve(prefix: String): Option[Namespace] = ns.get(prefix)
+}
+
+object NamespaceAliases {
+  def apply(): NamespaceAliases                                       = NamespaceAliases(knownAliases)
+  def withCustomAliases(ns: Map[String, Namespace]): NamespaceAliases = NamespaceAliases(knownAliases ++ ns)
+
+  private val knownAliases: Map[String, Namespace] = ListMap(
+      "shacl"          -> Namespace.Shacl,
+      "sh"             -> Namespace.Shacl,
+      "raml-shapes"    -> Namespace.Shapes,
+      "shapes"         -> Namespace.Shapes,
+      "doc"            -> Namespace.Document,
+      "raml-doc"       -> Namespace.Document,
+      "rdf"            -> Namespace.Rdf,
+      "security"       -> Namespace.Security,
+      "core"           -> Namespace.Core,
+      "xsd"            -> Namespace.Xsd,
+      "amf-parser"     -> Namespace.AmfParser,
+      "amf-core"       -> Namespace.AmfCore,
+      "apiContract"    -> Namespace.ApiContract,
+      "apiBinding"     -> Namespace.ApiBinding,
+      "amf-resolution" -> Namespace.AmfResolution,
+      "amf-validation" -> Namespace.AmfValidation,
+      "amf-render"     -> Namespace.AmfRender,
+      "data"           -> Namespace.Data,
+      "sourcemaps"     -> Namespace.SourceMaps,
+      "meta"           -> Namespace.Meta,
+      "owl"            -> Namespace.Owl,
+      "rdfs"           -> Namespace.Rdfs
+  )
 }

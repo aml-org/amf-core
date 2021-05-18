@@ -22,7 +22,7 @@ import amf.core.rdf.RdfModelDocument
 import amf.core.registries.AMFPluginsRegistry
 import amf.core.remote.{Platform, Vendor}
 import amf.core.services.RuntimeSerializer
-import amf.core.vocabulary.Namespace
+import amf.core.vocabulary.{Namespace, NamespaceAliases}
 import amf.plugins.document.graph.AMFGraphPlugin.platform
 import amf.plugins.document.graph.{
   EmbeddedForm,
@@ -90,12 +90,11 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, config: R
     }
   }
 
-  private def generateNamespaceAliasesFromPlugins[T] = {
-    AMFPluginsRegistry.documentPlugins
-      .find(_.canGenerateNamespaceAliases(unit))
-      .map(_.generateNamespaceAliases(unit))
+  private def generateNamespaceAliasesFromPlugins: NamespaceAliases =
+    config.namespacePlugins.sorted
+      .find(_.applies(unit))
+      .map(_.aliases(unit))
       .getOrElse(Namespace.staticAliases)
-  }
 
   /** Print ast to writer. */
   def renderToWriter[W: Output](writer: W)(implicit executor: ExecutionContext): Future[Unit] = Future(render(writer))
