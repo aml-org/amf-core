@@ -156,11 +156,11 @@ class AMFCompiler(compilerContext: CompilerContext,
   private[amf] def parseSyntax(input: Content): Either[Content, Root] = {
     compilerContext.logForFile("AMFCompiler#parseSyntax: parsing syntax")
     notifyEvent(StartingContentParsingEvent(compilerContext.parseConfiguration.path, input))
-
-    val parsed: Option[(String, ParsedDocument)] = mediaType
+    val contentType = mediaType.flatMap(mt => new MediaTypeParser(mt).getSyntaxExp)
+    val parsed: Option[(String, ParsedDocument)] = contentType
       .flatMap(mime => parseSyntaxForMediaType(input, mime))
       .orElse {
-        mediaType match {
+        contentType match {
           case None =>
             input.mime
               .flatMap(mime => parseSyntaxForMediaType(input, mime))
