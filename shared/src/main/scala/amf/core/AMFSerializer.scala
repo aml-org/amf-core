@@ -94,7 +94,7 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, config: R
     config.namespacePlugins.sorted
       .find(_.applies(unit))
       .map(_.aliases(unit))
-      .getOrElse(Namespace.staticAliases)
+      .getOrElse(Namespace.defaultAliases)
 
   /** Print ast to writer. */
   def renderToWriter[W: Output](writer: W)(implicit executor: ExecutionContext): Future[Unit] = Future(render(writer))

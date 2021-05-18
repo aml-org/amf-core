@@ -19,7 +19,7 @@ case class Graph(e: DomainElement) {
 
   def scalarByProperty(propertyId: String): Seq[Any] = {
     e.fields.fields().find { f: FieldEntry =>
-      f.field.value.iri() == Namespace.staticAliases.uri(propertyId).iri()
+      f.field.value.iri() == Namespace.defaultAliases.uri(propertyId).iri()
     } match {
       case Some(fieldEntry) =>
         fieldEntry.element match {
@@ -33,7 +33,7 @@ case class Graph(e: DomainElement) {
 
   def getObjectByPropertyId(propertyId: String): Seq[DomainElement] = {
     e.fields.fields().find { f: FieldEntry =>
-      f.field.value.iri() == Namespace.staticAliases.uri(propertyId).iri()
+      f.field.value.iri() == Namespace.defaultAliases.uri(propertyId).iri()
     } match {
       case Some(fieldEntry) =>
         fieldEntry.element match {
@@ -46,9 +46,10 @@ case class Graph(e: DomainElement) {
     }
   }
 
-  def containsField(f:Field): Boolean = properties().contains(f.toString)
+  def containsField(f: Field): Boolean = properties().contains(f.toString)
 
-  def annotationsForValue(f:Field): Annotations = e.fields.getValueAsOption(f).map(_.annotations).getOrElse(Annotations())
+  def annotationsForValue(f: Field): Annotations =
+    e.fields.getValueAsOption(f).map(_.annotations).getOrElse(Annotations())
 
   def patchField(patchField: Field, patchValue: Value): Unit = {
     e.set(patchField, patchValue.value, annotationsForValue(patchField))

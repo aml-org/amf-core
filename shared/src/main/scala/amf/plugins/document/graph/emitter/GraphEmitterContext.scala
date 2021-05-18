@@ -15,7 +15,7 @@ class GraphEmitterContext(val prefixes: mutable.Map[String, String],
                           val options: RenderOptions,
                           var emittingDeclarations: Boolean = false,
                           var emittingReferences: Boolean = false,
-                          val namespaceAliases: NamespaceAliases = Namespace.staticAliases) {
+                          val namespaceAliases: NamespaceAliases = Namespace.defaultAliases) {
   var counter: Int = 1
 
   private val declarations: mutable.LinkedHashSet[AmfElement] = mutable.LinkedHashSet.empty
@@ -99,8 +99,7 @@ class GraphEmitterContext(val prefixes: mutable.Map[String, String],
       if (uri.startsWith(base)) uri.replace(base, "")
       else if (uri.startsWith(baseParent)) uri.replace(s"$baseParent/", "./")
       else uri
-    }
-    else uri
+    } else uri
   }
 
   private def baseParent: String = {
@@ -113,18 +112,15 @@ class GraphEmitterContext(val prefixes: mutable.Map[String, String],
       base = if (location.replace("://", "").contains("/")) {
         val basePre = if (location.contains("#")) {
           location.split("#").head
-        }
-        else {
+        } else {
           location
         }
         val parts = basePre.split("/").dropRight(1)
         parts.mkString("/")
-      }
-      else {
+      } else {
         location.split("#").head
       }
-    }
-    else {
+    } else {
       base = ""
     }
   }
@@ -142,7 +138,7 @@ class GraphEmitterContext(val prefixes: mutable.Map[String, String],
 }
 
 object GraphEmitterContext {
-  def apply(unit: BaseUnit, options: RenderOptions, namespaceAliases: NamespaceAliases = Namespace.staticAliases) =
+  def apply(unit: BaseUnit, options: RenderOptions, namespaceAliases: NamespaceAliases = Namespace.defaultAliases) =
     new GraphEmitterContext(mutable.Map(), unit.id, options, namespaceAliases = namespaceAliases)
 }
 
@@ -150,12 +146,12 @@ class FlattenedGraphEmitterContext(prefixes: mutable.Map[String, String],
                                    base: String,
                                    options: RenderOptions,
                                    emittingDeclarations: Boolean = false,
-                                   namespaceAliases: NamespaceAliases = Namespace.staticAliases)
+                                   namespaceAliases: NamespaceAliases = Namespace.defaultAliases)
     extends GraphEmitterContext(prefixes, base, options, emittingDeclarations, namespaceAliases = namespaceAliases) {
   override def canGenerateLink(e: AmfElement): Boolean = false
 }
 
 object FlattenedGraphEmitterContext {
-  def apply(unit: BaseUnit, options: RenderOptions, namespaceAliases: NamespaceAliases = Namespace.staticAliases) =
+  def apply(unit: BaseUnit, options: RenderOptions, namespaceAliases: NamespaceAliases = Namespace.defaultAliases) =
     new FlattenedGraphEmitterContext(mutable.Map(), unit.id, options, namespaceAliases = namespaceAliases)
 }

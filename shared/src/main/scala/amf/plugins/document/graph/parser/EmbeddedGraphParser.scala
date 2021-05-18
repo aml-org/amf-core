@@ -112,8 +112,8 @@ class EmbeddedGraphParser()(implicit val ctx: GraphParserContext) extends GraphP
                 val modelFields = model match {
                   case shapeModel: ShapeModel =>
                     shapeModel.fields ++ Seq(
-                      ShapeModel.CustomShapePropertyDefinitions,
-                      ShapeModel.CustomShapeProperties
+                        ShapeModel.CustomShapePropertyDefinitions,
+                        ShapeModel.CustomShapeProperties
                     )
                   case _ => model.fields
                 }
@@ -222,7 +222,7 @@ class EmbeddedGraphParser()(implicit val ctx: GraphParserContext) extends GraphP
               val obj       = entry.value.as[YMap]
 
               parseScalarProperty(obj, DomainExtensionModel.Name)
-                .map(extension.set(DomainExtensionModel.Name,_))
+                .map(extension.set(DomainExtensionModel.Name, _))
               parseScalarProperty(obj, DomainExtensionModel.Element)
                 .map(extension.withElement)
 
@@ -369,8 +369,8 @@ object EmbeddedGraphParser {
         val keys                                  = Seq("encodes", "declares", "references").map(toDocumentNamespace)
         val types                                 = Seq("Document", "Fragment", "Module", "Unit").map(toDocumentNamespace)
 
-        val acceptedKeys  = keys ++ keys.map(Namespace.staticAliases.compact)
-        val acceptedTypes = types ++ types.map(Namespace.staticAliases.compact)
+        val acceptedKeys  = keys ++ keys.map(Namespace.defaultAliases.compact)
+        val acceptedTypes = types ++ types.map(Namespace.defaultAliases.compact)
         acceptedKeys.exists(m.key(_).isDefined) ||
         m.key(JsonLdKeywords.Type).exists { typesEntry =>
           val retrievedTypes = typesEntry.value.asOption[YSequence].map(stringNodesFrom)

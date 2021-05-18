@@ -72,7 +72,7 @@ object Namespace {
     val amlAnyNode: ValueType = Namespace.Meta + "anyNode"
   }
 
-  val staticAliases: NamespaceAliases = NamespaceAliases()
+  val defaultAliases: NamespaceAliases = NamespaceAliases()
 }
 
 case class NamespaceAliases private (ns: Map[Aliases.Alias, Namespace]) {

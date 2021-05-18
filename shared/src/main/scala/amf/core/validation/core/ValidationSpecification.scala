@@ -149,7 +149,7 @@ case class ValidationSpecification(name: String,
     if (name.startsWith("http://") || name.startsWith("https://") || name.startsWith("file:")) {
       name
     } else {
-      Namespace.staticAliases.expand(name).iri() match {
+      Namespace.defaultAliases.expand(name).iri() match {
         case s if s.startsWith("http://") || s.startsWith("https://") || s.startsWith("file:") => s
         case s                                                                                 => (Namespace.Data + s).iri()
       }
@@ -182,9 +182,9 @@ object ValidationSpecification {
 
 object ShaclSeverityUris {
 
-  private val SHACL_VIOLATION: String = Namespace.staticAliases.expand("sh:Violation").iri()
-  private val SHACL_WARNING: String = Namespace.staticAliases.expand("sh:Warning").iri()
-  private val SHACL_INFO: String = Namespace.staticAliases.expand("sh:Info").iri()
+  private val SHACL_VIOLATION: String = Namespace.defaultAliases.expand("sh:Violation").iri()
+  private val SHACL_WARNING: String = Namespace.defaultAliases.expand("sh:Warning").iri()
+  private val SHACL_INFO: String = Namespace.defaultAliases.expand("sh:Info").iri()
 
   private lazy val shaclSeverities = Map(
     VIOLATION -> SHACL_VIOLATION,

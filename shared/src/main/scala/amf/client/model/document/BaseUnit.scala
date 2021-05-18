@@ -63,10 +63,10 @@ trait BaseUnit extends AmfObjectWrapper with PlatformSecrets with RdfExportable 
   }
 
   def findById(id: String): ClientOption[DomainElement] =
-    _internal.findById(Namespace.staticAliases.uri(id).iri()).asClient
+    _internal.findById(Namespace.defaultAliases.uri(id).iri()).asClient
 
   def findByType(typeId: String): ClientList[DomainElement] =
-    _internal.findByType(Namespace.staticAliases.expand(typeId).iri()).asClient
+    _internal.findByType(Namespace.defaultAliases.expand(typeId).iri()).asClient
 
   def sourceVendor: ClientOption[Vendor] = _internal.sourceVendor.asClient
 
