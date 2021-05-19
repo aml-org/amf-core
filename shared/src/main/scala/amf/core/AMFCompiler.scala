@@ -202,10 +202,10 @@ class AMFCompiler(compilerContext: CompilerContext,
   }
 
   private def parseSyntaxForMediaType(content: Content, mime: String) = {
-    AMFPluginsRegistry
-      .syntaxPluginForMediaType(mime)
-      .flatMap(_.parse(mime, content.stream, compilerContext.parseConfiguration.parserContext, parsingOptions))
-      .map((mime, _))
+    // TODO ARM sort
+    compilerContext.parseConfiguration.sortedParseSyntax
+      .find(_.applies(content.stream))
+      .map(p => (mime, p.parse(content.stream, mime, compilerContext.parseConfiguration)))
   }
 
   def parseExternalFragment(content: Content)(implicit executionContext: ExecutionContext): Future[BaseUnit] = Future {
