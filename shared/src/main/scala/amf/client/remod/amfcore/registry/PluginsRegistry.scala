@@ -3,6 +3,12 @@ package amf.client.remod.amfcore.registry
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.plugins.namespace.NamespaceAliasesPlugin
 import amf.client.remod.amfcore.plugins.parse.{AMFParsePlugin, DomainParsingFallback, ExternalFragmentDomainFallback}
+import amf.client.remod.amfcore.plugins.parse.{
+  AMFParsePlugin,
+  AMFSyntaxPlugin,
+  DomainParsingFallback,
+  ExternalFragmentDomainFallback
+}
 import amf.client.remod.amfcore.plugins.render.AMFRenderPlugin
 import amf.client.remod.amfcore.plugins.validate.AMFValidatePlugin
 
@@ -17,6 +23,7 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
                                          validatePlugins: List[AMFValidatePlugin],
                                          renderPlugins: List[AMFRenderPlugin],
                                          namespacePlugins: List[NamespaceAliasesPlugin],
+                                         syntaxPlugin: List[AMFSyntaxPlugin],
                                          domainParsingFallback: DomainParsingFallback) {
 
   lazy val allPlugins: List[AMFPlugin[_]] = parsePlugins ++ validatePlugins ++ renderPlugins
@@ -31,6 +38,8 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
         copy(renderPlugins = renderPlugins :+ r)
       case r: NamespaceAliasesPlugin if !namespacePlugins.exists(_.id == r.id) =>
         copy(namespacePlugins = namespacePlugins :+ r)
+      case r: AMFSyntaxPlugin if !syntaxPlugin.exists(_.id == r.id) =>
+        copy(syntaxPlugin = syntaxPlugin :+ r)
       case _ => this
     }
   }

@@ -21,14 +21,14 @@ object SYamlSyntaxPlugin extends AMFSyntaxPlugin with PlatformSecrets {
   override def dependencies(): Seq[AMFPlugin] = Nil
 
   override def supportedMediaTypes(): Seq[String] = Seq(
-    "application/yaml",
-    "application/x-yaml",
-    "text/yaml",
-    "text/x-yaml",
-    "application/json",
-    "text/json",
-    "application/raml",
-    "text/vnd.yaml"
+      "application/yaml",
+      "application/x-yaml",
+      "text/yaml",
+      "text/x-yaml",
+      "application/json",
+      "text/json",
+      "application/raml",
+      "text/vnd.yaml"
   )
 
   override def parse(mediaType: String,
@@ -37,7 +37,7 @@ object SYamlSyntaxPlugin extends AMFSyntaxPlugin with PlatformSecrets {
                      options: ParsingOptions): Option[ParsedDocument] = {
     if (text.length() == 0) None
     else if ((mediaType == "application/ld+json" || mediaType == "application/json") && !options.isAmfJsonLdSerilization && platform.rdfFramework.isDefined) {
-      platform.rdfFramework.get.syntaxToRdfModel(mediaType, text)
+      Some(platform.rdfFramework.get.syntaxToRdfModel(mediaType, text))
     } else {
       val parser = getFormat(mediaType) match {
         case "json" => JsonParserFactory.fromCharsWithSource(text, ctx.rootContextDocument)(ctx.eh)
@@ -46,7 +46,9 @@ object SYamlSyntaxPlugin extends AMFSyntaxPlugin with PlatformSecrets {
       val document1 = parser.document()
       val (document, comment) = document1 match {
         case d if d.isNull =>
-          (YDocument(Array(YNode(YMap.empty)), ctx.rootContextDocument), d.children collectFirst { case c: YComment => c.metaText })
+          (YDocument(Array(YNode(YMap.empty)), ctx.rootContextDocument), d.children collectFirst {
+            case c: YComment => c.metaText
+          })
         case d =>
           (d, d.children collectFirst { case c: YComment => c.metaText })
       }

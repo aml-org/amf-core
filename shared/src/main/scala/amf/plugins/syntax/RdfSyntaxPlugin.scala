@@ -24,7 +24,7 @@ object RdfSyntaxPlugin extends AMFSyntaxPlugin with PlatformSecrets {
                      ctx: ParserContext,
                      options: ParsingOptions): Option[ParsedDocument] = {
     platform.rdfFramework match {
-      case Some(r) if !options.isAmfJsonLdSerilization => r.syntaxToRdfModel(mediaType, text)
+      case Some(r) if !options.isAmfJsonLdSerilization => Option(r.syntaxToRdfModel(mediaType, text))
       case _                                           => None
     }
   }
