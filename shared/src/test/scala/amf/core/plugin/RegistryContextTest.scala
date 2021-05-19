@@ -1,37 +1,46 @@
 package amf.core.plugin
 
 import amf.client.remod.amfcore.registry.AMFRegistry
+import amf.core.annotations.serializable.CoreSerializableAnnotations
+import amf.core.entities.CoreEntities
 import amf.core.metamodel.document.SourceMapModel
 import amf.core.parser.Annotations
 import amf.core.registries.AMFDomainRegistry.defaultIri
+import amf.plugins.document.graph.entities.AMFGraphEntities
 import org.scalatest.{FunSuite, Matchers}
 
 class RegistryContextTest extends FunSuite with Matchers {
 
   test("Test types without blacklist") {
-    val ctx = RegistryContext(AMFRegistry.empty)
+    val ctx = RegistryContext(
+        AMFRegistry.empty
+          .withEntities(CoreEntities.entities ++ AMFGraphEntities.entities)
+          .withAnnotations(CoreSerializableAnnotations.annotations))
 
-    CorePlugin.modelEntities.foreach { `type` =>
+    CoreEntities.entities.values.foreach { `type` =>
       val iri = defaultIri(`type`)
       shouldBeDefined(ctx.findType(iri))
     }
 
-    CorePlugin.modelEntities.filterNot(_ == SourceMapModel).foreach { `type` =>
+    CoreEntities.entities.values.filterNot(_ == SourceMapModel).foreach { `type` =>
       val builder  = ctx.buildType(`type`)
       val instance = builder(Annotations())
       instance.meta should be(`type`)
     }
   }
 
-  test("Test types with blacklist") {
-    val ctx = RegistryContext(AMFRegistry.empty)
+  test("Test types without Core") {
+    val ctx = RegistryContext(
+        AMFRegistry.empty
+          .withEntities(AMFGraphEntities.entities)
+          .withAnnotations(CoreSerializableAnnotations.annotations))
 
-    CorePlugin.modelEntities.foreach { `type` =>
+    CoreEntities.entities.values.foreach { `type` =>
       val iri = defaultIri(`type`)
       shouldBeEmpty(ctx.findType(iri))
     }
 
-    CorePlugin.modelEntities.foreach { `type` =>
+    CoreEntities.entities.values.foreach { `type` =>
       the[Exception] thrownBy {
         ctx.buildType(`type`)
       } should have message s"Cannot find builder for type ${`type`}"
