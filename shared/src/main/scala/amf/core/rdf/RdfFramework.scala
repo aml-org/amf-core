@@ -17,10 +17,10 @@ trait RdfFramework {
     model
   }
 
-  def syntaxToRdfModel(mediaType: String, text: CharSequence): Option[RdfModelDocument] = {
+  def syntaxToRdfModel(mediaType: String, text: CharSequence): RdfModelDocument = {
     val model = emptyRdfModel()
     model.load(mediaType, text.toString)
-    Some(RdfModelDocument(model))
+    RdfModelDocument(model)
   }
 
   def rdfModelToSyntax(mediaType: String, rdfModelDocument: RdfModelDocument): Option[String] = {

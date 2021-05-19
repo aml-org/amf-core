@@ -1,7 +1,7 @@
 package amf.client.remod
 
 import amf.client.remod.amfcore.config.{AMFEvent, ParsingOptions}
-import amf.client.remod.amfcore.plugins.parse.{AMFParsePlugin, DomainParsingFallback}
+import amf.client.remod.amfcore.plugins.parse.{AMFParsePlugin, AMFSyntaxPlugin, DomainParsingFallback}
 import amf.client.remote.Content
 import amf.core.Root
 import amf.core.model.document.BaseUnit
@@ -24,6 +24,7 @@ class ParseConfiguration(config: AMFGraphConfiguration, val url: String) {
   def resolveContent(url: String): Future[Content] = config.resolvers.resolveContent(url)
 
   val sortedParsePlugins: immutable.Seq[AMFParsePlugin] = config.registry.plugins.parsePlugins.sorted
+  val sortedParseSyntax: immutable.Seq[AMFSyntaxPlugin] = config.registry.plugins.syntaxPlugin.sorted
   val domainFallback: DomainParsingFallback             = config.registry.plugins.domainParsingFallback
   val parsingOptions: ParsingOptions                    = config.options.parsingOptions
   def notifyEvent(e: AMFEvent): Unit                    = config.listeners.foreach(_.notifyEvent(e))

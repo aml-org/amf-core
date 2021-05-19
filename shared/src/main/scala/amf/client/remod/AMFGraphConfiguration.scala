@@ -4,6 +4,7 @@ import amf.ProfileName
 import amf.client.exported.config.{AMFLogger, MutedLogger}
 import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.AMFPlugin
+import amf.client.remod.amfcore.plugins.parse.SyamlSyntaxParsePlugin
 import amf.client.remod.amfcore.registry.AMFRegistry
 import amf.core.annotations.serializable.CoreSerializableAnnotations
 import amf.core.entities.CoreEntities
@@ -51,7 +52,7 @@ object AMFGraphConfiguration {
         MutedLogger,
         Set.empty,
         AMFOptions.default()
-    ).withPlugins(List(AMFGraphParsePlugin, AMFGraphRenderPlugin))
+    ).withPlugins(List(AMFGraphParsePlugin, AMFGraphRenderPlugin, SyamlSyntaxParsePlugin))
       // we might need to register editing pipeline as well because of legacy behaviour.
       .withTransformationPipeline(BasicTransformationPipeline())
   }
