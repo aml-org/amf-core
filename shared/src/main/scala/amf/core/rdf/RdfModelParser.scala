@@ -10,7 +10,7 @@ import amf.plugins.features.validation.CoreValidations.UnableToParseRdfDocument
 
 object RdfModelParser {
   def apply(amfConfig: AMFGraphConfiguration): RdfModelParser =
-    new RdfModelParser(new ParseConfiguration(amfConfig, ""))
+    new RdfModelParser(ParseConfiguration(amfConfig, ""))
 }
 
 class RdfModelParser(parserConfig: ParseConfiguration) extends RdfParserCommon {

@@ -32,8 +32,11 @@ object AMFParser {
     * @param content: The unit as a string
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
-  def parseContent(content: String, env: AMFGraphConfiguration): Future[AMFResult] = ???
-//    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)), env)
+  def parseContent(content: String, env: AMFGraphConfiguration): Future[AMFResult] = {
+    val loader     = fromStream(content)
+    val withLoader = env.withResourceLoader(loader)
+    parseAsync(DEFAULT_DOCUMENT_URL, None, withLoader)
+  }
 
   /**
     * Asynchronously generate a BaseUnit from a given string.
@@ -46,7 +49,7 @@ object AMFParser {
   private[amf] def parseAsync(url: String,
                               mediaType: Option[String],
                               amfConfig: AMFGraphConfiguration): Future[AMFResult] = {
-    val parseConfig                                 = new ParseConfiguration(amfConfig, url)
+    val parseConfig                                 = ParseConfiguration(amfConfig, url)
     implicit val executionContext: ExecutionContext = parseConfig.executionContext
     RuntimeCompiler(
         mediaType,
