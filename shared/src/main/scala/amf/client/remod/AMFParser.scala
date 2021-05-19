@@ -37,8 +37,11 @@ object AMFParser {
     * @param configuration [[AMFGraphConfiguration]]
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parseContent(content: String, configuration: AMFGraphConfiguration): Future[AMFResult] = ???
-//    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)), env)
+  def parseContent(content: String, env: AMFGraphConfiguration): Future[AMFResult] = {
+    val loader     = fromStream(content)
+    val withLoader = env.withResourceLoader(loader)
+    parseAsync(DEFAULT_DOCUMENT_URL, None, withLoader)
+  }
 
   /**
     * Asynchronously generate a BaseUnit from a given string.
@@ -53,8 +56,8 @@ object AMFParser {
 
   private[amf] def parseAsync(url: String,
                               mediaType: Option[String],
-                              configuration: AMFGraphConfiguration): Future[AMFResult] = {
-    val parseConfig                                 = new ParseConfiguration(configuration, url)
+                              amfConfig: AMFGraphConfiguration): Future[AMFResult] = {
+    val parseConfig                                 = new ParseConfiguration(amfConfig, url)
     implicit val executionContext: ExecutionContext = parseConfig.executionContext
     RuntimeCompiler(
         mediaType,

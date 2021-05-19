@@ -4,6 +4,7 @@ import amf.client.remod.amfcore.config.{AMFEvent, ParsingOptions}
 import amf.client.remod.amfcore.plugins.parse.{AMFParsePlugin, AMFSyntaxPlugin, DomainParsingFallback}
 import amf.client.remote.Content
 import amf.core.Root
+import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.parser.ParserContext
 import amf.core.plugin.RegistryContext
@@ -17,8 +18,7 @@ import java.net.URISyntaxException
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
-class ParseConfiguration(config: AMFGraphConfiguration, val url: String) {
-  val eh = config.errorHandlerProvider.errorHandler()
+case class ParseConfiguration private (config: AMFGraphConfiguration, url: String, eh: AMFErrorHandler) {
 
   val executionContext: ExecutionContext           = config.resolvers.executionContext.executionContext
   def resolveContent(url: String): Future[Content] = config.resolvers.resolveContent(url)
@@ -52,5 +52,12 @@ class ParseConfiguration(config: AMFGraphConfiguration, val url: String) {
 
   lazy val entitiesFacade = new PluginEntitiesFacade(this)
 
-  def forUrl(url: String) = new ParseConfiguration(config, url)
+  def forUrl(url: String) = new ParseConfiguration(config, url, eh)
+}
+
+object ParseConfiguration {
+
+  /** use with caution, new error handler is created here */
+  def apply(config: AMFGraphConfiguration, url: String): ParseConfiguration =
+    ParseConfiguration(config, url, config.errorHandlerProvider.errorHandler())
 }
