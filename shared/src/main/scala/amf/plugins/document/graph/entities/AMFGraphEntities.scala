@@ -10,8 +10,6 @@ private[amf] object AMFGraphEntities extends Entities {
       ObjectNodeModel,
       ScalarNodeModel,
       ArrayNodeModel,
-      LinkNodeModel,
-      RecursiveShapeModel
+      LinkNodeModel
   )
-
 }
