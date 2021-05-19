@@ -12,16 +12,15 @@ import org.yaml.model._
 
 import scala.collection.mutable
 
-trait AMFErrorHandler extends IllegalTypeHandler with ParseErrorHandler{
-  protected val results :mutable.LinkedHashSet[AMFValidationResult] = mutable.LinkedHashSet()
+trait AMFErrorHandler extends IllegalTypeHandler with ParseErrorHandler {
+  protected val results: mutable.LinkedHashSet[AMFValidationResult] = mutable.LinkedHashSet()
 
   def getResults: List[AMFValidationResult] = results.toList
 
-  def report(result:AMFValidationResult):Unit = synchronized {
-    if (results.contains(result)) { // TODO ARM check this assertion
+  def report(result: AMFValidationResult): Unit = synchronized {
+    if (!results.contains(result)) { // TODO ARM check this assertion
       results += result
-      true
-    } else false
+    }
   }
 
   def guiKey(message: String, location: Option[String], lexical: Option[LexicalInformation]): String = {
@@ -34,7 +33,8 @@ trait AMFErrorHandler extends IllegalTypeHandler with ParseErrorHandler{
                        message: String,
                        lexical: Option[LexicalInformation],
                        level: String,
-                       location: Option[String]): Unit = report(AMFValidationResult(message, level, node, property, id, lexical, location, this))
+                       location: Option[String]): Unit =
+    report(AMFValidationResult(message, level, node, property, id, lexical, location, this))
 
   def reportConstraint(specification: ValidationSpecification,
                        node: String,
