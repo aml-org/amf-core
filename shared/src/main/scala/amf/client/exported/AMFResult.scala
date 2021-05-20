@@ -13,12 +13,14 @@ case class AMFResult(private[amf] val _internal: InternalAMFResult) {
   def conforms: Boolean = _internal.conforms
 
   /**
-    * @return The resultant [[amf.client.validate.AMFValidationReport]] of the BaseUnit
+    * @return The resultant [[AMFValidationReport]] of the BaseUnit
     */
   def validationResult: AMFValidationReport = _internal.result
 
   /**
-    * @return [[amf.client.model.document.BaseUnit]] returned from AMF parse or transform
+    * @return [[BaseUnit]] returned from AMF parse or transform. It can be:
+    *  - A [[BaseUnit]] when parsing/transformation is successful
+    *  - The most complete unit that could be built, and an [[AMFValidationReport]] report with errors/warnings found
     */
   def baseUnit: BaseUnit = _internal.bu
 }

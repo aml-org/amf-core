@@ -10,8 +10,8 @@ object AMFParser {
   /**
     * Asynchronously generate a BaseUnit from the unit located in the given url.
     * @param url Location of the api
-    * @param configuration [[amf.client.remod.AMFGraphConfiguration]]
-    * @return A client future that will have a BaseUnit or an error to handle the result of such invocation.
+    * @param configuration [[AMFGraphConfiguration]]
+    * @return A CompletableFuture of [[AMFResult]]
     */
   def parse(url: String, configuration: AMFGraphConfiguration): Future[AMFResult] =
     parseAsync(url, None, configuration)
@@ -19,8 +19,9 @@ object AMFParser {
   /**
     * Asynchronously generate a BaseUnit from the unit located in the given url.
     * @param url Location of the api
-    * @param mediaType The type of the file to parse
-    * @param configuration [[amf.client.remod.AMFGraphConfiguration]]
+    * @param mediaType The nature and format of the given content. Must be <code>"application/spec"</code> or <code>"application/spec+syntax"</code>.
+    *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
+    * @param configuration [[AMFGraphConfiguration]]
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
   // check Vendor , only param? ParseParams?
@@ -30,8 +31,8 @@ object AMFParser {
   /**
     * Asynchronously generate a BaseUnit from a given string.
     * @param content The unit to parse as a string
-    * @param configuration [[amf.client.remod.AMFGraphConfiguration]]
-    * @return A client future that will have a BaseUnit or an error to handle the result of such invocation.
+    * @param configuration [[AMFGraphConfiguration]]
+    * @return A CompletableFuture of [[AMFResult]]
     */
   def parseContent(content: String, configuration: AMFGraphConfiguration): Future[AMFResult] = ???
 //    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)), env)
@@ -39,8 +40,9 @@ object AMFParser {
   /**
     * Asynchronously generate a BaseUnit from a given string.
     * @param content The unit as a string
-    * @param mediaType The type of the file to parse
-    * @param configuration [[amf.client.remod.AMFGraphConfiguration]]
+    * @param mediaType The nature and format of the given content. Must be <code>"application/spec"</code> or <code>"application/spec+syntax"</code>.
+    *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
+    * @param configuration [[AMFGraphConfiguration]]
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
   def parseContent(content: String, mediaType: String, configuration: AMFGraphConfiguration): Future[AMFResult] = ???
