@@ -1,17 +1,18 @@
 package amf.client.exported
 
-import amf.client.remod.{AMFGraphConfiguration => InternalGraphConfiguration}
-import amf.client.resolve.ClientErrorHandlerConverter._
 import amf.client.convert.CoreClientConverters._
 import amf.client.convert.TransformationPipelineConverter._
 import amf.client.exported.config.{AMFEventListener, AMFLogger, ParsingOptions, RenderOptions}
 import amf.client.exported.transform.TransformationPipeline
 import amf.client.reference.UnitCache
+import amf.client.remod.{AMFGraphConfiguration => InternalGraphConfiguration}
+import amf.client.resolve.ClientErrorHandlerConverter._
 import amf.client.resource.ResourceLoader
 
 import scala.concurrent.ExecutionContext
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
+/** Base AMF configuration object */
 @JSExportAll
 class AMFGraphConfiguration private[amf] (private[amf] val _internal: InternalGraphConfiguration) {
   private implicit val ec: ExecutionContext = _internal.getExecutionContext
@@ -57,13 +58,11 @@ object AMFGraphConfiguration {
 
   /**
     * Predefined AMF core environment with:
-    * <ul>
-    *   <li>AMF Resolvers predefined `amf.client.remod.amfcore.config.AMFResolvers.predefined`</li>
-    *   <li>Default error handler provider that will create a {@link amf.client.parse.DefaultParserErrorHandler}</li>
-    *   <li>Empty `amf.client.remod.amfcore.registry.AMFRegistry`</li>
-    *   <li>MutedLogger: `amf.client.remod.amfcore.config.MutedLogger`</li>
-    *   <li>Without Any listener</li>
-    * </ul>
+    *   - AMF Resolvers [[amf.client.remod.amfcore.config.AMFResolvers.predefined predefined]]
+    *   - Default error handler provider that will create a [[amf.client.parse.DefaultParserErrorHandler]]
+    *   - Empty [[amf.client.remod.amfcore.registry.AMFRegistry]]
+    *   - MutedLogger: [[amf.client.exported.config.MutedLogger]]
+    *   - Without Any listener
     */
   def predefined(): AMFGraphConfiguration = InternalGraphConfiguration.predefined()
 }

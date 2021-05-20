@@ -12,7 +12,6 @@ import amf.internal.reference.UnitCache
 import amf.internal.resource.ResourceLoader
 import amf.plugins.document.graph.{AMFGraphParsePlugin, AMFGraphRenderPlugin}
 
-import java.rmi.registry.LocateRegistry.getRegistry
 import scala.concurrent.ExecutionContext
 // all constructors only visible from amf. Users should always use builders or defaults
 
@@ -31,13 +30,11 @@ object AMFGraphConfiguration {
 
   /**
     * Predefined AMF core environment with:
-    * <ul>
-    *   <li>AMF Resolvers predefined {@link amf.client.remod.amfcore.config.AMFResolvers.predefined}</li>
-    *   <li>Default error handler provider that will create a {@link amf.client.parse.DefaultParserErrorHandler}</li>
-    *   <li>Empty {@link amf.client.remod.amfcore.registry.AMFRegistry}</li>
-    *   <li>MutedLogger: {@link amf.client.remod.amfcore.config.MutedLogger}</li>
-    *   <li>Without Any listener</li>
-    * </ul>
+    *   - AMF Resolvers [[amf.client.remod.amfcore.config.AMFResolvers.predefined predefined]]
+    *   - Default error handler provider that will create a [[amf.client.parse.DefaultParserErrorHandler]]
+    *   - Empty [[amf.client.remod.amfcore.registry.AMFRegistry]]
+    *   - MutedLogger: [[amf.client.exported.config.MutedLogger]]
+    *   - Without Any listener
     */
   def predefined(): AMFGraphConfiguration = {
     new AMFGraphConfiguration(
@@ -63,12 +60,12 @@ object AMFGraphConfiguration {
 
 /**
   * Base AMF configuration object
-  * @param resolvers {@link amf.client.remod.amfcore.config.AMFResolvers}
-  * @param errorHandlerProvider {@link amf.client.remod.ErrorHandlerProvider}
-  * @param registry {@link amf.client.remod.amfcore.registry.AMFRegistry}
-  * @param logger {@link amf.client.remod.amfcore.config.AMFLogger}
-  * @param listeners a Set of {@link amf.client.remod.amfcore.config.AMFEventListener}
-  * @param options {@link amf.client.remod.amfcore.config.AMFOptions}
+  * @param resolvers [[amf.client.remod.amfcore.config.AMFResolvers]]
+  * @param errorHandlerProvider [[amf.client.remod.ErrorHandlerProvider]]
+  * @param registry [[amf.client.remod.amfcore.registry.AMFRegistry]]
+  * @param logger [[amf.client.exported.config.AMFLogger]]
+  * @param listeners a Set of [[amf.client.remod.amfcore.config.AMFEventListener]]
+  * @param options [[amf.client.remod.amfcore.config.AMFOptions]]
   */
 class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: AMFResolvers,
                                           override private[amf] val errorHandlerProvider: ErrorHandlerProvider,
@@ -115,7 +112,7 @@ class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: A
 
   /**
     * AMF internal method just to facilitate the construction
-    * @param pipelines a list of {@link amf.core.resolution.pipelines.TransformationPipeline}
+    * @param pipelines a list of [[amf.core.resolution.pipelines.TransformationPipeline]]
     * @return
     */
   private[amf] def withTransformationPipelines(pipelines: List[TransformationPipeline]): AMFGraphConfiguration =

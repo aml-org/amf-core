@@ -126,9 +126,9 @@ trait Platform extends FileMediaType {
   }
 
   /** Resolve remote url. */
-  def fetchContent(url: String, env: AMFGraphConfiguration)(
+  def fetchContent(url: String, configuration: AMFGraphConfiguration)(
       implicit executionContext: ExecutionContext): Future[Content] =
-    loaderConcat(url, env.getResourceLoaders.filter(_.accepts(url)))
+    loaderConcat(url, configuration.getResourceLoaders.filter(_.accepts(url)))
 
   /** Platform out of the box [ResourceLoader]s */
   def loaders(exec: BaseExecutionEnvironment = defaultExecutionEnvironment): Seq[ResourceLoader] = {

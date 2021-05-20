@@ -4,9 +4,9 @@ import amf.core.model.document.BaseUnit
 
 object AMFTransformer {
 
-  def transform(unit: BaseUnit, conf: AMFGraphConfiguration): AMFResult = ???
+  def transform(unit: BaseUnit, configuration: AMFGraphConfiguration): AMFResult = ???
 
-  def transform(unit: BaseUnit, pipelineName: String, conf: AMFGraphConfiguration): AMFResult = ???
+  def transform(unit: BaseUnit, pipelineName: String, configuration: AMFGraphConfiguration): AMFResult = ???
 //  {
 //    val pipelines = conf.registry.transformationPipelines
 //    val pipeline  = pipelines.get(pipelineName)

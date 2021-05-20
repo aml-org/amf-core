@@ -10,7 +10,7 @@ import amf.core.validation.core.ValidationProfile
 import scala.collection.mutable
 
 object AMFPluginsRegistry {
-  // all static registries will end up here, and with a mayor version release the AmfEnvironment will not be static
+  // all static registries will end up here, and with a mayor version release the AMFGraphConfiguration will not be static
   private[amf] var staticConfiguration: AMFGraphConfiguration = AMFGraphConfiguration.predefined()
 
   private val syntaxPluginIDRegistry: mutable.HashMap[String, AMFSyntaxPlugin]     = mutable.HashMap()

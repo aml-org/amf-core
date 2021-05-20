@@ -10,9 +10,10 @@ import amf.client.convert.CoreClientConverters._
 object AMFRenderer {
   // TODO: return AMFRenderResult?
 
-  def render(bu: BaseUnit, env: AMFGraphConfiguration): String = InternalAMFRenderer.render(bu, env)
+  def render(bu: BaseUnit, configuration: AMFGraphConfiguration): String =
+    InternalAMFRenderer.render(bu, configuration)
 
-  def render(bu: BaseUnit, mediaType: String, env: AMFGraphConfiguration): String =
-    InternalAMFRenderer.render(bu, mediaType, env)
+  def render(bu: BaseUnit, mediaType: String, configuration: AMFGraphConfiguration): String =
+    InternalAMFRenderer.render(bu, mediaType, configuration)
 
 }

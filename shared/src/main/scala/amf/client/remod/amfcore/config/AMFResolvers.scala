@@ -12,9 +12,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Configuration object for resolvers
-  * @param resourceLoaders a list of {@link amf.internal.resource.ResourceLoader} to use
-  * @param unitCache a {@link amf.internal.reference.UnitCache} that stores {@link amf.core.model.document.BaseUnit} resolved
-  * @param executionContext the {@link amf.client.execution.BaseExecutionEnvironment} to use
+  * @param resourceLoaders a list of [[amf.internal.resource.ResourceLoader]] to use
+  * @param unitCache a [[amf.internal.reference.UnitCache]] that stores [[amf.core.model.document.BaseUnit]] resolved
+  * @param executionContext the [[amf.client.execution.BaseExecutionEnvironment]] to use
   */
 private[amf] case class AMFResolvers(resourceLoaders: List[ResourceLoader],
                                      val unitCache: Option[UnitCache],

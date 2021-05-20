@@ -21,13 +21,13 @@ case class DefaultRenderConfiguration(renderPlugins: List[AMFRenderPlugin],
     extends RenderConfiguration
 
 object DefaultRenderConfiguration {
-  def apply(env: AMFGraphConfiguration): RenderConfiguration = {
+  def apply(configuration: AMFGraphConfiguration): RenderConfiguration = {
     DefaultRenderConfiguration(
-        env.registry.plugins.renderPlugins,
-        env.registry.plugins.namespacePlugins,
-        env.options.renderOptions,
-        env.errorHandlerProvider.errorHandler(),
-        env.listeners
+        configuration.registry.plugins.renderPlugins,
+        configuration.registry.plugins.namespacePlugins,
+        configuration.options.renderOptions,
+        configuration.errorHandlerProvider.errorHandler(),
+        configuration.listeners
     )
   }
 }
