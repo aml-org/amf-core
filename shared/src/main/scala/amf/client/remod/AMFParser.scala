@@ -45,13 +45,15 @@ object AMFParser {
     */
   def parseContent(content: String, mediaType: String, env: AMFGraphConfiguration): Future[AMFResult] = ???
 //    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)))
+  // TODO ARM COMPLETE THIS IMPLEMENTATION
 
   private[amf] def parseAsync(url: String,
                               mediaType: Option[String],
                               amfConfig: AMFGraphConfiguration): Future[AMFResult] = {
-    val parseConfig                                 = ParseConfiguration(amfConfig, url)
+    val parseConfig                                 = ParseConfiguration(amfConfig)
     implicit val executionContext: ExecutionContext = parseConfig.executionContext
     RuntimeCompiler(
+        url,
         mediaType,
         Context(platform),
         cache = Cache(),

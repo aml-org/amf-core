@@ -12,6 +12,10 @@ private[remod] case class EntitiesRegistry(domainEntities: Map[String, Obj],
     copy(serializableAnnotations = serializableAnnotations ++ annotations)
 
   private[amf] def findType(`type`: String): Option[Obj] = domainEntities.get(`type`)
+
+  private[amf] def findAnnotation(annotationID: String): Option[AnnotationGraphLoader] =
+    serializableAnnotations.get(annotationID)
+
 }
 
 private[remod] object EntitiesRegistry {

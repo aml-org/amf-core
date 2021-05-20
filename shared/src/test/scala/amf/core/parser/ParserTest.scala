@@ -1,5 +1,6 @@
 package amf.core.parser
 
+import amf.client.remod.ParseConfiguration
 import amf.core.client.ParsingOptions
 import amf.core.errorhandling.UnhandledErrorHandler
 import amf.core.model.document.BaseUnit
@@ -87,7 +88,7 @@ class ParserTest extends FunSuite {
   }
 
   test("Test empty YAML with comment") {
-    val context = ParserContext("", Seq.empty, eh = UnhandledErrorHandler)
+    val context = ParserContext("", Seq.empty, config = ParseConfiguration(UnhandledErrorHandler))
     val parsed  = SYamlSyntaxPlugin.parse("application/yaml", "#%Header", context, ParsingOptions())
     parsed.isDefined shouldBe true
     parsed.get match {

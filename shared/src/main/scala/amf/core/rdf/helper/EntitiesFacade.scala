@@ -5,15 +5,14 @@ import amf.core.metamodel.Obj
 import amf.core.metamodel.document.{BaseUnitModel, DocumentModel}
 import amf.core.model.document.{DeclaresModel, EncodesModel}
 import amf.core.model.domain.AmfObject
-import amf.core.parser.{Annotations, ParserContext}
+import amf.core.parser.Annotations
 import amf.core.rdf.Node
 import amf.plugins.features.validation.CoreValidations.UnableToParseNode
 import org.mulesoft.common.core.CachedFunction
 import org.mulesoft.common.functional.MonadInstances._
 
-import scala.collection.mutable
+class EntitiesFacade private[amf] (parserConfig: ParseConfiguration) {
 
-class PluginEntitiesFacade private[amf] (parserConfig: ParseConfiguration) {
   private val sorter = new DefaultNodeClassSorter()
 
   private def isUnitModel(typeModel: Obj): Boolean =
@@ -43,10 +42,7 @@ class PluginEntitiesFacade private[amf] (parserConfig: ParseConfiguration) {
     foundType match {
       case Some(t) => findType(t)
       case None =>
-        parserConfig.eh.violation(UnableToParseNode,
-                                  id,
-                                  s"Error parsing JSON-LD node, unknown @types $types",
-                                  parserConfig.parserContext.rootContextDocument)
+        parserConfig.eh.violation(UnableToParseNode, id, s"Error parsing JSON-LD node, unknown @types $types")
         None
     }
   }

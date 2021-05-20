@@ -1,29 +1,28 @@
 package amf.client.remod.amfcore.plugins.parse
 
-import amf.client.remod.ParseConfiguration
 import amf.client.remod.amfcore.plugins.{NormalPriority, PluginPriority}
-import amf.core.parser.{JsonParserFactory, ParsedDocument, SyamlParsedDocument}
+import amf.core.parser.{JsonParserFactory, ParsedDocument, ParserContext, SyamlParsedDocument}
 import amf.plugins.syntax.SYamlSyntaxPlugin.platform
 import org.yaml.model.{YComment, YDocument, YMap, YNode}
 import org.yaml.parser.YamlParser
 
 object SyamlSyntaxParsePlugin extends AMFSyntaxPlugin {
 
-  private def getFormat(mediaType: String) = if (mediaType.contains("json")) "json" else "yaml"
+  private def getFormat(mediaType: String): String = if (mediaType.contains("json")) "json" else "yaml"
 
-  override def parse(text: CharSequence, mediaType: String, config: ParseConfiguration): ParsedDocument = {
+  override def parse(text: CharSequence, mediaType: String, ctx: ParserContext): ParsedDocument = {
     if (text.length() == 0) SyamlParsedDocument(YDocument(YNode.Null))
-    else if ((mediaType == "application/ld+json" || mediaType == "application/json") && !config.parsingOptions.isAmfJsonLdSerialization && platform.rdfFramework.isDefined) {
+    else if ((mediaType == "application/ld+json" || mediaType == "application/json") && !ctx.parsingOptions.isAmfJsonLdSerialization && platform.rdfFramework.isDefined) {
       platform.rdfFramework.get.syntaxToRdfModel(mediaType, text)
     } else {
       val parser = getFormat(mediaType) match {
-        case "json" => JsonParserFactory.fromCharsWithSource(text, config.parserContext.rootContextDocument)(config.eh)
-        case _      => YamlParser(text, config.parserContext.rootContextDocument)(config.eh).withIncludeTag("!include")
+        case "json" => JsonParserFactory.fromCharsWithSource(text, ctx.rootContextDocument)(ctx.eh)
+        case _      => YamlParser(text, ctx.rootContextDocument)(ctx.eh).withIncludeTag("!include")
       }
       val document1 = parser.document()
       val (document, comment) = document1 match {
         case d if d.isNull =>
-          (YDocument(Array(YNode(YMap.empty)), config.parserContext.rootContextDocument), d.children collectFirst {
+          (YDocument(Array(YNode(YMap.empty)), ctx.rootContextDocument), d.children collectFirst {
             case c: YComment => c.metaText
           })
         case d =>

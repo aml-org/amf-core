@@ -1,5 +1,7 @@
 package amf.core.parser
 
+import amf.client.remod.ParseConfiguration
+import amf.client.remod.amfcore.config.ParsingOptions
 import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.validation.core.ValidationSpecification
@@ -7,14 +9,6 @@ import org.mulesoft.lexer.SourceLocation
 import org.yaml.model.{IllegalTypeHandler, ParseErrorHandler, SyamlException, YError}
 
 import scala.collection.mutable
-
-//abstract class DataNodeParserContext(eh: ParserErrorHandler) extends ErrorHandlingContext()(eh) {
-//
-//  def rootContextDocument: String
-//  def violation(violationId: ValidationSpecification, node: String, message: String): Unit =
-//    eh.violation(violationId, node, message, rootContextDocument)
-//
-//}
 
 abstract class ErrorHandlingContext(implicit val eh: AMFErrorHandler)
     extends ParseErrorHandler
@@ -38,8 +32,8 @@ object EmptyFutureDeclarations {
 case class ParserContext(rootContextDocument: String = "",
                          refs: Seq[ParsedReference] = Seq.empty,
                          futureDeclarations: FutureDeclarations = EmptyFutureDeclarations(),
-                         override val eh: AMFErrorHandler)
-    extends ErrorHandlingContext()(eh)
+                         config: ParseConfiguration)
+    extends ErrorHandlingContext()(config.eh)
     with UnresolvedComponents
     with IllegalTypeHandler {
 
@@ -77,5 +71,7 @@ case class ParserContext(rootContextDocument: String = "",
 
   def violation(violationId: ValidationSpecification, node: String, message: String): Unit =
     eh.violation(violationId, node, message, rootContextDocument)
+
+  def parsingOptions: ParsingOptions = config.parsingOptions
 
 }
