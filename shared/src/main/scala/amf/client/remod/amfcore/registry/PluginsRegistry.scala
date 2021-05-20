@@ -2,7 +2,6 @@ package amf.client.remod.amfcore.registry
 
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.plugins.namespace.NamespaceAliasesPlugin
-import amf.client.remod.amfcore.plugins.parse.{AMFParsePlugin, DomainParsingFallback, ExternalFragmentDomainFallback}
 import amf.client.remod.amfcore.plugins.parse.{
   AMFParsePlugin,
   AMFSyntaxPlugin,
@@ -61,5 +60,5 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
 object PluginsRegistry {
 
   /** Creates an empty PluginsRegistry */
-  val empty: PluginsRegistry = PluginsRegistry(Nil, Nil, Nil, Nil, ExternalFragmentDomainFallback)
+  val empty: PluginsRegistry = PluginsRegistry(Nil, Nil, Nil, Nil, Nil, ExternalFragmentDomainFallback)
 }
