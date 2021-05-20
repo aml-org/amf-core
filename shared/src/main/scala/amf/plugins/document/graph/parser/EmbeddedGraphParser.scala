@@ -1,7 +1,7 @@
 package amf.plugins.document.graph.parser
 
+import amf.client.remod.ParseConfiguration
 import amf.core.annotations.DomainExtensionAnnotation
-import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.Type.{Array, Bool, Iri, LiteralUri, RegExp, SortedArray, Str}
 import amf.core.metamodel._
 import amf.core.metamodel.document.BaseUnitModel.Location
@@ -29,7 +29,8 @@ import scala.collection.mutable.ListBuffer
 /**
   * AMF Graph parser
   */
-class EmbeddedGraphParser()(implicit val ctx: GraphParserContext) extends GraphParserHelpers with GraphParser {
+class EmbeddedGraphParser(config: ParseConfiguration)(implicit val ctx: GraphParserContext)
+    extends GraphParser(config) {
 
   override def canParse(document: SyamlParsedDocument): Boolean = EmbeddedGraphParser.canParse(document)
 
@@ -357,8 +358,9 @@ class EmbeddedGraphParser()(implicit val ctx: GraphParserContext) extends GraphP
 }
 
 object EmbeddedGraphParser {
-  def apply(errorHandler: AMFErrorHandler): EmbeddedGraphParser =
-    new EmbeddedGraphParser()(new GraphParserContext(eh = errorHandler))
+
+  def apply(config: ParseConfiguration): EmbeddedGraphParser =
+    new EmbeddedGraphParser(config)(new GraphParserContext(eh = config.eh))
 
   def canParse(document: SyamlParsedDocument): Boolean = {
     val maybeMaps = document.document.node.toOption[Seq[YMap]]
@@ -380,5 +382,6 @@ object EmbeddedGraphParser {
     }
   }
 
-  private def stringNodesFrom(seq: YSequence) = seq.nodes.flatMap(node => node.asOption[YScalar]).map(_.value)
+  private def stringNodesFrom(seq: YSequence): IndexedSeq[Any] =
+    seq.nodes.flatMap(node => node.asOption[YScalar]).map(_.value)
 }

@@ -2,7 +2,6 @@ package amf.client.plugins
 
 import amf.client.remod.amfcore.config.RenderOptions
 import amf.core.Root
-import amf.core.client.ParsingOptions
 import amf.core.errorhandling.{AMFErrorHandler, UnhandledErrorHandler}
 import amf.core.metamodel.Obj
 import amf.core.model.document.BaseUnit
@@ -54,7 +53,7 @@ abstract class AMFDocumentPlugin extends AMFPlugin {
   /**
     * Parses an accepted document returning an optional BaseUnit
     */
-  def parse(document: Root, ctx: ParserContext, options: ParsingOptions): BaseUnit
+  def parse(document: Root, ctx: ParserContext): BaseUnit
 
   /**
     * Emit an Output for a given base unit

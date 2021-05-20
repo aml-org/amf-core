@@ -1,4 +1,5 @@
 package amf.core.parser
+
 import amf.core.benchmark.ExecutionLog
 import amf.core.exception.CyclicReferenceException
 import amf.core.model.document.RecursiveUnit
@@ -21,7 +22,7 @@ case class Reference(url: String, refs: Seq[RefContainer]) extends PlatformSecre
       implicit executionContext: ExecutionContext): Future[ReferenceResolutionResult] = {
     // If there is any ReferenceResolver attached to the environment, then first try to get the cached reference if it exists. If not, load and parse as usual.
     try {
-      compilerContext.parseConfiguration.getUnitsCache match {
+      compilerContext.parserContext.config.getUnitsCache match {
         case Some(resolver) =>
           // cached references do not take into account allowedVendorsToReference defined in plugin
           resolver.fetch(compilerContext.resolvePath(url)) flatMap { cachedReference =>
@@ -63,7 +64,7 @@ case class Reference(url: String, refs: Seq[RefContainer]) extends PlatformSecre
   protected def resolveRecursiveUnit(fullUrl: String, compilerContext: CompilerContext)(
       implicit executionContext: ExecutionContext): Future[RecursiveUnit] = {
     ExecutionLog.log(s"AMFCompiler#parserReferences: Recursive reference $fullUrl")
-    compilerContext.parseConfiguration.resolveContent(fullUrl) map { content =>
+    compilerContext.parserContext.config.resolveContent(fullUrl) map { content =>
       val recUnit = RecursiveUnit().adopted(fullUrl).withLocation(fullUrl)
       recUnit.withRaw(content.stream.toString)
       recUnit

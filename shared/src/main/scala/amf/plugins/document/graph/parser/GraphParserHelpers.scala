@@ -12,8 +12,8 @@ import amf.core.metamodel.domain.{
 import amf.core.metamodel.{Field, Obj, Type}
 import amf.core.model.DataType
 import amf.core.model.document.SourceMap
-import amf.core.model.domain.{AmfElement, AmfScalar, Annotation}
-import amf.core.parser.{Annotations, _}
+import amf.core.model.domain.AmfScalar
+import amf.core.parser._
 import amf.core.vocabulary.Namespace.SourceMaps
 import amf.core.vocabulary._
 import amf.plugins.document.graph.JsonLdKeywords
@@ -23,7 +23,7 @@ import org.mulesoft.common.time.SimpleDateTime
 import org.yaml.convert.YRead.SeqNodeYRead
 import org.yaml.model._
 
-import scala.collection.{immutable, mutable}
+import scala.collection.immutable
 
 trait GraphParserHelpers extends GraphContextHelper {
   protected def double(node: YNode)(implicit errorHandler: IllegalTypeHandler): AmfScalar = {
@@ -287,22 +287,6 @@ trait GraphParserHelpers extends GraphContextHelper {
     }
   }
 
-  protected def annotations(nodes: Map[String, AmfElement], sources: SourceMap, key: String): Annotations = {
-    val result = Annotations()
-
-    if (sources.nonEmpty) {
-      sources.annotations.foreach {
-        case (annotation, values: mutable.Map[String, String]) =>
-          annotation match {
-            case Annotation(deserialize) if values.contains(key) =>
-              deserialize(values(key), nodes).foreach(result += _)
-            case _ =>
-          }
-      }
-    }
-
-    result
-  }
 }
 
 abstract class GraphContextHelper extends GraphContextOperations {

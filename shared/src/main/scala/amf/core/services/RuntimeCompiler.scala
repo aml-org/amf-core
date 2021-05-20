@@ -22,22 +22,23 @@ object RuntimeCompiler {
   }
 
   // interface used by amf-service
-  def apply(mediaType: Option[String],
+  def apply(url: String,
+            mediaType: Option[String],
             base: Context,
             cache: Cache,
             parserConfig: ParseConfiguration,
             referenceKind: ReferenceKind = UnspecifiedReference): Future[BaseUnit] = {
-    val context = new CompilerContextBuilder(base.platform, parserConfig)
+    val context = new CompilerContextBuilder(url, base.platform, parserConfig)
       .withCache(cache)
       .withFileContext(base)
       .build()
     compiler match {
       case Some(runtimeCompiler) =>
-        val startingParsingEvent = StartingParsingEvent(parserConfig.path, mediaType)
+        val startingParsingEvent = StartingParsingEvent(context.path, mediaType)
         parserConfig.notifyEvent(startingParsingEvent)
         implicit val executionContext: ExecutionContext = parserConfig.executionContext
         runtimeCompiler.build(context, mediaType, referenceKind) map { parsedUnit =>
-          val finishedParsingEvent = FinishedParsingEvent(parserConfig.path, parsedUnit)
+          val finishedParsingEvent = FinishedParsingEvent(context.path, parsedUnit)
           parserConfig.notifyEvent(finishedParsingEvent)
           parsedUnit
         }
