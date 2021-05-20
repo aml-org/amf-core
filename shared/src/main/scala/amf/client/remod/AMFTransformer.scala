@@ -1,33 +1,34 @@
 package amf.client.remod
 
 import amf.core.model.document.BaseUnit
+import amf.core.resolution.pipelines.TransformationPipelineRunner
+import amf.core.validation.AMFValidationReport
+import amf.plugins.features.validation.CoreValidations.ResolutionValidation
 
 object AMFTransformer {
 
   def transform(unit: BaseUnit, conf: AMFGraphConfiguration): AMFResult = ???
 
-  def transform(unit: BaseUnit, pipelineName: String, conf: AMFGraphConfiguration): AMFResult = ???
-//  {
-//    val pipelines = conf.registry.transformationPipelines
-//    val pipeline  = pipelines.get(pipelineName)
-//
-//    val handler = DefaultErrorHandler() // what about the error handler provider?
-//    pipeline match {
-//      case Some(pipeline) =>
-//        val runner = TransformationPipelineRunner(handler, conf.listeners.toList)
-//        val result = runner.run(unit, pipeline)
-//        AMFResult(result, handler.getErrors)
-//      case None =>
-//        handler.violation(
-//          ResolutionValidation,
-//          unit.id,
-//          None,
-//          s"Cannot find transformation pipeline with name $pipelineName",
-//          unit.position(),
-//          unit.location()
-//        )
-//        unit
-//    }
-//  }
+  def transform(unit: BaseUnit, pipelineName: String, conf: AMFGraphConfiguration): AMFResult = {
+    val pipelines = conf.registry.transformationPipelines
+    val pipeline  = pipelines.get(pipelineName)
+    val handler   = conf.errorHandlerProvider.errorHandler()
+    val resolved = pipeline match {
+      case Some(pipeline) =>
+        val runner = TransformationPipelineRunner(handler, conf.listeners.toList)
+        runner.run(unit, pipeline)
+      case None =>
+        handler.violation(
+            ResolutionValidation,
+            unit.id,
+            None,
+            s"Cannot find transformation pipeline with name $pipelineName",
+            unit.position(),
+            unit.location()
+        )
+        unit
+    }
+    AMFResult(resolved, AMFValidationReport.forModel(resolved, handler.getResults))
+  }
 
 }
