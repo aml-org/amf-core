@@ -1,13 +1,11 @@
 package amf.client.remod.amfcore.plugins.parse
 
-import amf.client.remod.ParseConfiguration
 import amf.client.remod.amfcore.plugins.AMFPlugin
-import amf.core.model.document.BaseUnit
-import amf.core.parser.ParsedDocument
+import amf.core.parser.{ParsedDocument, ParserContext}
 
 trait AMFSyntaxPlugin extends AMFPlugin[CharSequence] {
 
-  def parse(text: CharSequence, mediaType: String, config: ParseConfiguration): ParsedDocument
+  def parse(text: CharSequence, mediaType: String, ctx: ParserContext): ParsedDocument
 
   /**
     * media types which specifies vendors that are parsed by this plugin.

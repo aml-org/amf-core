@@ -1,12 +1,10 @@
 package amf.plugins.document.graph
 
 import amf.client.plugins.{AMFDocumentPlugin, AMFPlugin}
-import amf.client.remod.AMFGraphConfiguration
-import amf.client.remod.amfcore.config.RenderOptions
+import amf.client.remod.amfcore.config.{ParsingOptions, RenderOptions}
 import amf.client.remod.amfcore.plugins.parse.AMFParsePluginAdapter
 import amf.client.remod.amfcore.plugins.render.AMFRenderPluginAdapter
 import amf.core.Root
-import amf.core.client.ParsingOptions
 import amf.core.errorhandling.AMFErrorHandler
 import amf.core.exception.UnsupportedParsedDocumentException
 import amf.core.metamodel.Obj
@@ -63,17 +61,15 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
     }
   }
 
-  override def parse(root: Root, ctx: ParserContext, options: ParsingOptions): BaseUnit =
+  override def parse(root: Root, ctx: ParserContext): BaseUnit =
     root.parsed match {
       case parsed: SyamlParsedDocument if FlattenedGraphParser.canParse(parsed) =>
-        FlattenedGraphParser(ctx.eh).parse(parsed.document, effectiveUnitUrl(root.location, options))
+        FlattenedGraphParser(ctx.config).parse(parsed.document, effectiveUnitUrl(root.location, ctx.parsingOptions))
       case parsed: SyamlParsedDocument if EmbeddedGraphParser.canParse(parsed) =>
-        EmbeddedGraphParser(ctx.eh).parse(parsed.document, effectiveUnitUrl(root.location, options))
+        EmbeddedGraphParser(ctx.config).parse(parsed.document, effectiveUnitUrl(root.location, ctx.parsingOptions))
       case parsed: RdfModelDocument =>
-        RdfModelParser(AMFGraphConfiguration.fromParseCtx(ctx))
-          .parse(parsed.model, effectiveUnitUrl(root.location, options))
-      case _ =>
-        throw UnsupportedParsedDocumentException
+        RdfModelParser(ctx.config).parse(parsed.model, effectiveUnitUrl(root.location, ctx.parsingOptions))
+      case _ => throw UnsupportedParsedDocumentException
     }
 
   override def canUnparse(unit: BaseUnit) = true

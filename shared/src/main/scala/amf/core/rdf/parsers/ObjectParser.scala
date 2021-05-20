@@ -17,7 +17,7 @@ import amf.core.model.domain.{
 import amf.core.parser.Annotations
 import amf.core.rdf.converter.{AnyTypeConverter, ScalarTypeConverter, StringIriUriRegexParser}
 import amf.core.rdf.graph.NodeFinder
-import amf.core.rdf.helper.PluginEntitiesFacade
+import amf.core.rdf.helper.EntitiesFacade
 import amf.core.rdf.{Literal, Node, PropertyObject, RdfParserCommon, RdfParserContext, RecursionControl, Uri}
 import amf.core.vocabulary.Namespace
 import amf.plugins.features.validation.CoreValidations.UnableToParseRdfDocument
@@ -26,7 +26,7 @@ import scala.collection.mutable.ListBuffer
 
 class ObjectParser(val rootId: String,
                    val recursionControl: RecursionControl,
-                   val plugins: PluginEntitiesFacade,
+                   val plugins: EntitiesFacade,
                    val nodeFinder: NodeFinder,
                    val sourcesRetriever: SourcesRetriever)(implicit val ctx: RdfParserContext)
     extends RdfParserCommon {
@@ -82,8 +82,8 @@ class ObjectParser(val rootId: String,
     model match {
       case shapeModel: ShapeModel =>
         shapeModel.fields ++ Seq(
-          ShapeModel.CustomShapePropertyDefinitions,
-          ShapeModel.CustomShapeProperties
+            ShapeModel.CustomShapePropertyDefinitions,
+            ShapeModel.CustomShapeProperties
         )
       case _ => model.fields
     }
@@ -147,18 +147,18 @@ class ObjectParser(val rootId: String,
             }
           case _ =>
             ctx.eh.violation(
-              UnableToParseRdfDocument,
-              instance.id,
-              s"Error parsing RDF graph node, unknown linked node for property $key in node ${instance.id}")
+                UnableToParseRdfDocument,
+                instance.id,
+                s"Error parsing RDF graph node, unknown linked node for property $key in node ${instance.id}")
         }
 
       case array: SortedArray if properties.length == 1 =>
         parseList(instance, array, f, properties, annots(sources, key))
       case _: SortedArray =>
         ctx.eh.violation(
-          UnableToParseRdfDocument,
-          instance.id,
-          s"Error, more than one sorted array values found in node for property $key in node ${instance.id}")
+            UnableToParseRdfDocument,
+            instance.id,
+            s"Error, more than one sorted array values found in node for property $key in node ${instance.id}")
       case a: Array =>
         val items = properties
         val values: Seq[AmfElement] = a.element match {
@@ -188,7 +188,10 @@ class ObjectParser(val rootId: String,
                         annotations: Annotations): Unit =
     instance.setArray(field, parseList(l.element, findLink(properties.head)), annotations)
 
-  private def parseScalar(instance: AmfObject, field: Field, property: PropertyObject, annotations: Annotations): Unit =
+  private def parseScalar(instance: AmfObject,
+                          field: Field,
+                          property: PropertyObject,
+                          annotations: Annotations): Unit =
     ScalarTypeConverter.tryConvert(field.`type`, property)(ctx.eh).foreach(instance.set(field, _, annotations))
 
   private def parseAny(instance: AmfObject, field: Field, property: PropertyObject, annotations: Annotations): Unit =

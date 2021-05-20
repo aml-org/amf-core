@@ -1,7 +1,7 @@
 package amf.plugins.document.graph.parser
 import amf.client.parse.IgnoringErrorHandler
+import amf.client.remod.ParseConfiguration
 import amf.core.annotations.DomainExtensionAnnotation
-import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.Type.{Array, Bool, Iri, LiteralUri, RegExp, SortedArray, Str}
 import amf.core.metamodel.document.BaseUnitModel
 import amf.core.metamodel.domain.extensions.DomainExtensionModel
@@ -31,7 +31,8 @@ import org.yaml.model._
 import scala.collection.mutable
 import scala.language.implicitConversions
 
-class FlattenedGraphParser()(implicit val ctx: GraphParserContext) extends GraphParser {
+class FlattenedGraphParser(config: ParseConfiguration)(implicit val ctx: GraphParserContext)
+    extends GraphParser(config) {
 
   override def canParse(document: SyamlParsedDocument): Boolean = FlattenedGraphParser.canParse(document)
 
@@ -563,8 +564,9 @@ class FlattenedGraphParser()(implicit val ctx: GraphParserContext) extends Graph
 }
 
 object FlattenedGraphParser extends GraphContextHelper with GraphParserHelpers {
-  def apply(errorHandler: AMFErrorHandler): FlattenedGraphParser =
-    new FlattenedGraphParser()(new GraphParserContext(eh = errorHandler))
+
+  def apply(config: ParseConfiguration): FlattenedGraphParser =
+    new FlattenedGraphParser(config)(new GraphParserContext(eh = config.eh))
 
   /**
     * Returns true if `document` contains a @graph node which in turn must contain a Root node.
@@ -607,7 +609,7 @@ object FlattenedGraphParser extends GraphContextHelper with GraphParserHelpers {
     }
   }
 
-  private[amf] val findRootNode = CachedFunction.from(findRootNodeImpl)
+  private[amf] val findRootNode: CachedFunction[YMap, Option[YNode], Identity] = CachedFunction.from(findRootNodeImpl)
 
   private[amf] def findRootNodeImpl(m: YMap): Option[YNode] = {
     implicit val ctx: GraphParserContext = new GraphParserContext(

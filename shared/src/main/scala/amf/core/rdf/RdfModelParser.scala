@@ -9,13 +9,14 @@ import amf.core.rdf.parsers._
 import amf.plugins.features.validation.CoreValidations.UnableToParseRdfDocument
 
 object RdfModelParser {
-  def apply(amfConfig: AMFGraphConfiguration): RdfModelParser =
-    new RdfModelParser(ParseConfiguration(amfConfig, ""))
+  def apply(config: ParseConfiguration): RdfModelParser       = new RdfModelParser(config)
+  def apply(amfConfig: AMFGraphConfiguration): RdfModelParser = apply(ParseConfiguration(amfConfig))
 }
 
-class RdfModelParser(parserConfig: ParseConfiguration) extends RdfParserCommon {
+class RdfModelParser(config: ParseConfiguration) extends RdfParserCommon {
 
-  override implicit val ctx: RdfParserContext = new RdfParserContext(eh = parserConfig.eh)
+  override implicit val ctx: RdfParserContext = new RdfParserContext(config = config)
+
   def parse(model: RdfModel, location: String): BaseUnit = {
     val unit = model.findNode(location) match {
       case Some(rootNode) =>
@@ -23,7 +24,7 @@ class RdfModelParser(parserConfig: ParseConfiguration) extends RdfParserCommon {
         val nodeFinder = new NodeFinder(model)
         val parser = new ObjectParser(location,
                                       new RecursionControl(),
-                                      parserConfig.entitiesFacade,
+                                      config.entitiesFacade,
                                       nodeFinder,
                                       new SourcesRetriever(nodeFinder))
         parser.parse(rootNode, findBaseUnit = true) match {

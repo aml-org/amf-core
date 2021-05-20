@@ -1,4 +1,5 @@
 package amf.client.remod.amfcore.config
+
 import amf.core.client.{ParsingOptions => LegacyParsingOptions}
 
 /**

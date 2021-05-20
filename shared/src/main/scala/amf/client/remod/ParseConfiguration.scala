@@ -6,19 +6,14 @@ import amf.client.remote.Content
 import amf.core.Root
 import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit
-import amf.core.parser.ParserContext
 import amf.core.plugin.RegistryContext
-import amf.core.rdf.helper.PluginEntitiesFacade
-import amf.core.remote.PathResolutionError
-import amf.core.utils.AmfStrings
+import amf.core.rdf.helper.{EntitiesFacade, SerializableAnnotationsFacade}
 import amf.internal.reference.UnitCache
-import amf.plugins.features.validation.CoreValidations.UriSyntaxError
 
-import java.net.URISyntaxException
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
-case class ParseConfiguration private (config: AMFGraphConfiguration, url: String, eh: AMFErrorHandler) {
+case class ParseConfiguration private (config: AMFGraphConfiguration, eh: AMFErrorHandler) {
 
   val executionContext: ExecutionContext           = config.resolvers.executionContext.executionContext
   def resolveContent(url: String): Future[Content] = config.resolvers.resolveContent(url)
@@ -34,30 +29,18 @@ case class ParseConfiguration private (config: AMFGraphConfiguration, url: Strin
 
   def getUnitsCache: Option[UnitCache] = config.getUnitsCache
 
-  /**
-    * normalized url
-    * */
-  val path: String = {
-    try {
-      url.normalizePath
-    } catch {
-      case e: URISyntaxException =>
-        eh.violation(UriSyntaxError, url, e.getMessage)
-        url
-      case e: Exception => throw new PathResolutionError(e.getMessage)
-    }
-  }
-  val parserContext: ParserContext                       = ParserContext(path, eh = eh)
   private[amf] lazy val registryContext: RegistryContext = RegistryContext(config.getRegistry)
 
-  lazy val entitiesFacade = new PluginEntitiesFacade(this)
+  lazy val entitiesFacade                = new EntitiesFacade(this)
+  lazy val serializableAnnotationsFacade = new SerializableAnnotationsFacade(this)
 
-  def forUrl(url: String) = new ParseConfiguration(config, url, eh)
 }
 
 object ParseConfiguration {
 
   /** use with caution, new error handler is created here */
-  def apply(config: AMFGraphConfiguration, url: String): ParseConfiguration =
-    ParseConfiguration(config, url, config.errorHandlerProvider.errorHandler())
+  def apply(config: AMFGraphConfiguration): ParseConfiguration =
+    ParseConfiguration(config, config.errorHandlerProvider.errorHandler())
+  def apply(eh: AMFErrorHandler): ParseConfiguration =
+    ParseConfiguration(AMFGraphConfiguration.predefined(), eh)
 }
