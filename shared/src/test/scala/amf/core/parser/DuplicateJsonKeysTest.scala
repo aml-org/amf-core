@@ -22,7 +22,7 @@ trait DuplicateJsonKeysTest extends AsyncFunSuite with PlatformSecrets with Nati
       RuntimeCompiler(None,
                       base = Context(platform),
                       cache = Cache(),
-                      new ParseConfiguration(AMFGraphConfiguration.fromEH(errorHandler), url)).map { _ =>
+                      ParseConfiguration(AMFGraphConfiguration.fromEH(errorHandler), url, errorHandler)).map { _ =>
         val errors = errorHandler.getResults
         errors.size should be(4)
         val allAreDuplicateKeyWarnings =
