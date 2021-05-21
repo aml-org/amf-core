@@ -5,19 +5,12 @@ import org.yaml.model.YDocument
 
 object AMFRenderer {
 
-  def render(bu: BaseUnit, env: AMFGraphConfiguration): String = ???
+  def render(bu: BaseUnit, configuration: AMFGraphConfiguration): String = ???
 
-  def renderAST(bu: BaseUnit, env: AMFGraphConfiguration): YDocument = ???
+  def renderAST(bu: BaseUnit, configuration: AMFGraphConfiguration): YDocument = ???
 
-  /**
-    *
-    * @param bu
-    * @param target media type which specifies a vendor, and optionally a syntax.
-    * @param env
-    * @return
-    */
-  def render(bu: BaseUnit, mediaType: String, env: AMFGraphConfiguration): String = ???
+  def render(bu: BaseUnit, mediaType: String, configuration: AMFGraphConfiguration): String = ???
 
-  def renderAST(bu: BaseUnit, mediaType: String, env: AMFGraphConfiguration): YDocument = ???
+  def renderAST(bu: BaseUnit, mediaType: String, configuration: AMFGraphConfiguration): YDocument = ???
 
 }

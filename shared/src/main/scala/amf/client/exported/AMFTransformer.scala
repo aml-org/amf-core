@@ -9,9 +9,10 @@ import amf.client.convert.CoreClientConverters._
 @JSExportTopLevel("AMFTransformer")
 object AMFTransformer {
 
-  def transform(unit: BaseUnit, conf: AMFGraphConfiguration): AMFResult = InternalAMFTransformer.transform(unit, conf)
+  def transform(unit: BaseUnit, configuration: AMFGraphConfiguration): AMFResult =
+    InternalAMFTransformer.transform(unit, configuration)
 
-  def transform(unit: BaseUnit, pipelineName: String, conf: AMFGraphConfiguration): AMFResult =
-    InternalAMFTransformer.transform(unit, pipelineName, conf)
+  def transform(unit: BaseUnit, pipelineName: String, configuration: AMFGraphConfiguration): AMFResult =
+    InternalAMFTransformer.transform(unit, pipelineName, configuration)
 
 }

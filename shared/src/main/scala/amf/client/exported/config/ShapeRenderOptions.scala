@@ -15,6 +15,7 @@ case class ShapeRenderOptions(private[amf] val _internal: InternalShapeRenderOpt
   def isWithCompactedEmission: Boolean = _internal.isWithCompactedEmission
   def schemaVersion: JSONSchemaVersion = _internal.schemaVersion
 
+  /** Remove documentation info as examples, descriptions, display names, etc. */
   def withoutDocumentation: ShapeRenderOptions = _internal.withoutDocumentation
 
   /** Render shape extracting common types to definitions. */

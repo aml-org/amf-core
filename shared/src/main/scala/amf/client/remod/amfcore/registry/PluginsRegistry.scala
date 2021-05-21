@@ -1,19 +1,17 @@
 package amf.client.remod.amfcore.registry
 
-import amf.ProfileName
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.plugins.namespace.NamespaceAliasesPlugin
 import amf.client.remod.amfcore.plugins.parse.{AMFParsePlugin, DomainParsingFallback, ExternalFragmentDomainFallback}
 import amf.client.remod.amfcore.plugins.render.AMFRenderPlugin
 import amf.client.remod.amfcore.plugins.validate.AMFValidatePlugin
-import amf.core.model.document.BaseUnit
 
 /**
   * A registry of plugins
-  * @param parsePlugins a list of {@link amf.client.remod.amfcore.plugins.parse.AMFParsePlugin}
-  * @param validatePlugins a list of {@link amf.client.remod.amfcore.plugins.validate.AMFValidatePlugin}
-  * @param renderPlugins a list of {@link amf.client.remod.amfcore.plugins.render.AMFRenderPlugin}
-  * @param domainParsingFallback {@link amf.client.remod.amfcore.plugins.parse.DomainParsingFallback}
+  * @param parsePlugins a list of [[amf.client.remod.amfcore.plugins.parse.AMFParsePlugin]]
+  * @param validatePlugins a list of [[amf.client.remod.amfcore.plugins.validate.AMFValidatePlugin]]
+  * @param renderPlugins a list of [[amf.client.remod.amfcore.plugins.render.AMFRenderPlugin]]
+  * @param domainParsingFallback [[amf.client.remod.amfcore.plugins.parse.DomainParsingFallback]]
   */
 case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
                                          validatePlugins: List[AMFValidatePlugin],

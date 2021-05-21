@@ -2,13 +2,7 @@ package amf.core
 
 import amf.client.parse.DefaultParserErrorHandler
 import amf.client.remod.AMFGraphConfiguration
-import amf.client.remod.amfcore.config.{
-  AMFEvent,
-  ParsedModelEvent,
-  ParsedSyntaxEvent,
-  ParsingOptionsConverter,
-  StartingContentParsingEvent
-}
+import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.parse.{AMFParsePlugin, ParsingInfo}
 import amf.client.remote.Content
 import amf.core.TaggedReferences._
@@ -102,7 +96,7 @@ class CompilerContextBuilder(url: String,
   private var givenContent: Option[ParserContext]    = None
   private var cache                                  = Cache()
   private var normalizeUri: Boolean                  = true
-  private var env: AMFGraphConfiguration             = AMFPluginsRegistry.obtainStaticConfig()
+  private var configuration: AMFGraphConfiguration   = AMFPluginsRegistry.obtainStaticConfig()
   private var allowedMediaTypes: Option[Seq[String]] = None
 
   def withBaseParserContext(parserContext: ParserContext): this.type = {
@@ -121,13 +115,13 @@ class CompilerContextBuilder(url: String,
   }
 
   def withEnvironment(environment: Environment): CompilerContextBuilder = {
-    val newEnv = AMFGraphConfiguration.fromLegacy(this.env, environment)
-    this.env = newEnv
+    val newEnv = AMFGraphConfiguration.fromLegacy(this.configuration, environment)
+    this.configuration = newEnv
     this
   }
 
   def withBaseEnvironment(environment: AMFGraphConfiguration): CompilerContextBuilder = {
-    this.env = environment
+    this.configuration = environment
     this
   }
 
@@ -168,7 +162,7 @@ class CompilerContextBuilder(url: String,
 
   def build()(implicit executionContext: ExecutionContext): CompilerContext = {
     val fc = buildFileContext()
-    new CompilerContext(url, path, buildParserContext(fc), fc, cache, this.env, allowedMediaTypes)
+    new CompilerContext(url, path, buildParserContext(fc), fc, cache, this.configuration, allowedMediaTypes)
   }
 }
 

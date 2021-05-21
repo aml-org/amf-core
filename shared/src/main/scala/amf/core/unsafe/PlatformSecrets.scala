@@ -78,7 +78,7 @@ case class TrunkPlatform(content: String,
 
   override def tmpdir(): String = throw new Exception("Unsupported tmpdir operation")
 
-  override def fetchContent(url: String, env: AMFGraphConfiguration)(
+  override def fetchContent(url: String, configuration: AMFGraphConfiguration)(
       implicit executionContext: ExecutionContext): Future[Content] =
     Future.successful(new Content(content, url, forcedMediaType))
 

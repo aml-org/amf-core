@@ -26,7 +26,7 @@ import amf.client.remote.Content
 import amf.client.validate.AMFValidationReport
 
 /**
-  * Defines an event listener linked to a specific {@link AMFEvent}
+  * Defines an event listener linked to a specific [[AMFEvent]]
   */
 @JSExportAll
 trait AMFEventListener {
