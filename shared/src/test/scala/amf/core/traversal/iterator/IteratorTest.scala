@@ -12,17 +12,17 @@ trait IteratorTest extends FunSuite with Matchers {
 
   test("Complete iterator (simple document)") {
     val it = AmfElementStrategy.iterator(List(DataNodes.document), IdCollector())
-    it.size should be(19)
+    it.size should be(20)
   }
 
   test("Complete iterator (simple document) with instance collector") {
     val it = AmfElementStrategy.iterator(List(DataNodes.document), InstanceCollector())
-    it.size should be(19)
+    it.size should be(20)
   }
 
   test("Complete iterator (recursive fragment)") {
     val it = AmfElementStrategy.iterator(List(DataNodes.fragment), IdCollector())
-    it.size should be(14)
+    it.size should be(15)
   }
 
   test("Domain element iterator (recursive fragment) collect") {
@@ -34,28 +34,30 @@ trait IteratorTest extends FunSuite with Matchers {
 
   test("Amf element iterator (recursive fragment) collect first") {
     val location = AmfElementStrategy.iterator(List(DataNodes.fragment), IdCollector()).collectFirst {
-        case obj: AmfObject if obj.fields.?(FragmentModel.Location).isDefined =>
-          obj.fields.get(FragmentModel.Location).toString
-      }
+      case obj: AmfObject if obj.fields.?(FragmentModel.Location).isDefined =>
+        obj.fields.get(FragmentModel.Location).toString
+    }
 
     location shouldBe Some("http://fragment")
   }
 
   test("Domain element iterator (complex document) with local fields") {
     val complex: Document = DataNodes.complex
-    val ids = complex.iterator(strategy = DomainElementStrategy, fieldsFilter = Local).collect { case e: DomainElement => e.id }.toStream
+    val ids = complex
+      .iterator(strategy = DomainElementStrategy, fieldsFilter = Local)
+      .collect { case e: DomainElement => e.id }
+      .toStream
     ids should contain inOrderOnly ("amf://name", "amf://age", "amf://happy")
   }
 
   test("Amf element iterator with instance collector for iterating node with duplicate ids") {
     val it = AmfElementStrategy.iterator(List(DataNodes.duplicateIds), InstanceCollector())
-    it.size should be(8)
+    it.size should be(9)
   }
 
   test("Domain element iterator with instance collector for iterating node with duplicate ids") {
     val it = DomainElementStrategy.iterator(List(DataNodes.duplicateIds), InstanceCollector())
     it.size should be(2) // object node and scalar node
   }
-
 
 }

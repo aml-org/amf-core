@@ -3,10 +3,22 @@ package amf.core.plugin
 import amf.client.plugins.{AMFDomainPlugin, AMFPlugin}
 import amf.core.annotations._
 import amf.core.metamodel.Obj
-import amf.core.metamodel.document.{DocumentModel, ExternalFragmentModel, ModuleModel, SourceMapModel}
-import amf.core.metamodel.domain.extensions.{CustomDomainPropertyModel, DomainExtensionModel, PropertyShapeModel, ShapeExtensionModel}
+import amf.core.metamodel.document.{
+  AmfProcessingDataModel,
+  DocumentModel,
+  ExternalFragmentModel,
+  ModuleModel,
+  SourceMapModel
+}
+import amf.core.metamodel.domain.extensions.{
+  CustomDomainPropertyModel,
+  DomainExtensionModel,
+  PropertyShapeModel,
+  ShapeExtensionModel
+}
 import amf.core.metamodel.domain.templates.VariableValueModel
 import amf.core.metamodel.domain.{ExternalDomainElementModel, RecursiveShapeModel}
+import amf.core.model.document.AmfProcessingData
 import amf.core.model.domain.AnnotationGraphLoader
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -15,31 +27,32 @@ import scala.concurrent.{ExecutionContext, Future}
 object CorePlugin extends AMFDomainPlugin {
 
   override def modelEntities: Seq[Obj] = Seq(
-    DocumentModel,
-    ModuleModel,
-    VariableValueModel,
-    SourceMapModel,
-    RecursiveShapeModel,
-    PropertyShapeModel,
-    ShapeExtensionModel,
-    CustomDomainPropertyModel,
-    ExternalFragmentModel,
-    ExternalDomainElementModel,
-    DomainExtensionModel
+      DocumentModel,
+      AmfProcessingDataModel,
+      ModuleModel,
+      VariableValueModel,
+      SourceMapModel,
+      RecursiveShapeModel,
+      PropertyShapeModel,
+      ShapeExtensionModel,
+      CustomDomainPropertyModel,
+      ExternalFragmentModel,
+      ExternalDomainElementModel,
+      DomainExtensionModel
   )
 
-  override def serializableAnnotations(): Map[String, AnnotationGraphLoader] = Map (
-    "lexical"              -> LexicalInformation,
-    "host-lexical"         -> HostLexicalInformation,
-    "base-path-lexical"    -> BasePathLexicalInformation,
-    "source-vendor"        -> SourceVendor,
-    "single-value-array"   -> SingleValueArray,
-    "aliases-array"        -> Aliases,
-    "synthesized-field"    -> SynthesizedField,
-    "default-node"         -> DefaultNode,
-    "data-node-properties" -> DataNodePropertiesAnnotations,
-    "resolved-link"        -> ResolvedLinkAnnotation,
-    "null-security"        -> NullSecurity
+  override def serializableAnnotations(): Map[String, AnnotationGraphLoader] = Map(
+      "lexical"              -> LexicalInformation,
+      "host-lexical"         -> HostLexicalInformation,
+      "base-path-lexical"    -> BasePathLexicalInformation,
+      "source-vendor"        -> SourceVendor,
+      "single-value-array"   -> SingleValueArray,
+      "aliases-array"        -> Aliases,
+      "synthesized-field"    -> SynthesizedField,
+      "default-node"         -> DefaultNode,
+      "data-node-properties" -> DataNodePropertiesAnnotations,
+      "resolved-link"        -> ResolvedLinkAnnotation,
+      "null-security"        -> NullSecurity
   )
 
   override val ID: String = ""

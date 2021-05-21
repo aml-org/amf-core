@@ -1,12 +1,11 @@
 package amf.core.model.document
 
 import amf.client.parse.DefaultParserErrorHandler
-import amf.core.annotations.SourceVendor
 import amf.core.emitter.RenderOptions
 import amf.core.errorhandling.ErrorHandler
 import amf.core.metamodel.MetaModelTypeMapping
-import amf.core.metamodel.document.{BaseUnitModel, FragmentModel}
-import amf.core.metamodel.document.BaseUnitModel.{Location, ModelVersion, Root, Usage}
+import amf.core.metamodel.document.BaseUnitModel
+import amf.core.metamodel.document.BaseUnitModel.{Location, Root, Usage}
 import amf.core.metamodel.document.DocumentModel.References
 import amf.core.model.document.FieldsFilter.Local
 import amf.core.model.domain._
@@ -14,18 +13,12 @@ import amf.core.model.{BoolField, StrField}
 import amf.core.parser.ParserContext
 import amf.core.rdf.{RdfModel, RdfModelParser}
 import amf.core.remote.Vendor
+import amf.core.traversal.iterator._
 import amf.core.traversal.{
   DomainElementSelectorAdapter,
   DomainElementTransformationAdapter,
   TransformationData,
   TransformationTraversal
-}
-import amf.core.traversal.iterator.{
-  AmfIterator,
-  DomainElementStrategy,
-  IdCollector,
-  IteratorStrategy,
-  VisitedCollector
 }
 import amf.core.unsafe.PlatformSecrets
 
@@ -35,7 +28,7 @@ import scala.collection.mutable
 trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets {
 
   // Set the current model version
-  withModelVersion("3.1.0")
+  initProcessingData("3.1.0")
 
   // Set the default parsingRoot
   withRoot(false)
@@ -77,11 +70,23 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
   def root: BoolField = fields.field(Root)
 
   /** Returns the version. */
-  def modelVersion: StrField = fields.field(ModelVersion)
+  def modelVersion: StrField = amfProcessingData.modelVersion
+
+  protected[model] def amfProcessingData: AmfProcessingData = fields.field(BaseUnitModel.AmfProcessingData)
+
+  private def initProcessingData(modelVersion: String) =
+    set(BaseUnitModel.AmfProcessingData, AmfProcessingData().withModelVersion(modelVersion))
 
   /** Set the raw value for the base unit */
   def withRaw(raw: String): BaseUnit = {
     this.raw = Some(raw)
+    this
+  }
+
+  /** Set element unique identifier. */
+  override def withId(value: String): BaseUnit.this.type = {
+    super.withId(value)
+    amfProcessingData.simpleAdoption(id)
     this
   }
 
@@ -90,8 +95,6 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
   def withLocation(location: String): this.type = set(Location, location)
 
   def withUsage(usage: String): this.type = set(Usage, usage)
-
-  private def withModelVersion(version: String): this.type = set(ModelVersion, version)
 
   def withRoot(value: Boolean): this.type = set(Root, value)
 
@@ -137,12 +140,22 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
     }
   }
 
-  def sourceVendor: Option[Vendor] = this match {
-    case e: EncodesModel if Option(e.encodes).isDefined =>
-      e.encodes.annotations.find(classOf[SourceVendor]).map(a => a.vendor)
-    case d: DeclaresModel => d.annotations.find(classOf[SourceVendor]).map(a => a.vendor)
-    case _                => None
+  def withSourceVendor(mediatype: String): this.type = {
+    amfProcessingData.withSourceVendor(mediatype)
+    this
   }
+
+  def withGraphDependencies(deps: Seq[String]): this.type = {
+    amfProcessingData.withGraphDependencies(deps)
+    this
+  }
+
+  def transformedBy(transformationId: String): this.type = {
+    amfProcessingData.transformedBy(transformationId)
+    this
+  }
+
+  def sourceVendor: Option[Vendor] = amfProcessingData.sourceVendor.option().flatMap(value => Vendor.unapply(value))
 
   def cloneUnit(): BaseUnit = cloneElement(mutable.Map.empty).asInstanceOf[BaseUnit]
 
