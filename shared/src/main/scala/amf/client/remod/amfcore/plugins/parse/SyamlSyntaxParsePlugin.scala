@@ -6,7 +6,7 @@ import amf.plugins.syntax.SYamlSyntaxPlugin.platform
 import org.yaml.model.{YComment, YDocument, YMap, YNode}
 import org.yaml.parser.YamlParser
 
-object SyamlSyntaxParsePlugin extends AMFSyntaxPlugin {
+object SyamlSyntaxParsePlugin extends AMFSyntaxParsePlugin {
 
   private def getFormat(mediaType: String): String = if (mediaType.contains("json")) "json" else "yaml"
 
@@ -44,7 +44,7 @@ object SyamlSyntaxParsePlugin extends AMFSyntaxPlugin {
         "text/json",
         "text/vnd.yaml")
 
-  override val id: String = "syaml"
+  override val id: String = "syaml-parse"
 
   override def applies(element: CharSequence): Boolean = element.length() > 0
 

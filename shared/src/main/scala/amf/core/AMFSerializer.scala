@@ -18,12 +18,11 @@ import amf.core.model.document.{BaseUnit, ExternalFragment}
 import amf.core.parser.SyamlParsedDocument
 import amf.core.rdf.RdfModelDocument
 import amf.core.registries.AMFPluginsRegistry
-import amf.core.remote.{Platform, Vendor}
-import amf.core.services.RuntimeSerializer
+import amf.core.remote.{MediaTypeParser, Platform, Vendor}
 import amf.core.vocabulary.{Namespace, NamespaceAliases}
 import amf.plugins.document.graph.AMFGraphPlugin.platform
-import amf.plugins.document.graph.emitter.{EmbeddedJsonLdEmitter, FlattenedJsonLdEmitter}
 import amf.plugins.document.graph._
+import amf.plugins.document.graph.emitter.{EmbeddedJsonLdEmitter, FlattenedJsonLdEmitter}
 import amf.plugins.syntax.RdfSyntaxPlugin
 import org.mulesoft.common.io.Output
 import org.mulesoft.common.io.Output._
@@ -33,32 +32,15 @@ import org.yaml.model.YDocument
 import java.io.StringWriter
 import scala.concurrent.{ExecutionContext, Future}
 
-class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, config: RenderConfiguration) {
+class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfiguration) {
 
-  private def this(unit: BaseUnit,
-                   mediaType: String,
-                   vendor: String,
-                   options: Option[RenderOptions],
-                   shapeOptions: ShapeRenderOptions) =
-    this(unit, mediaType, vendor, AMFSerializer.generateRenderEnv(options, shapeOptions))
+  private val mediaTypeExp = new MediaTypeParser(mediaType)
 
-  private def this(unit: BaseUnit, mediaType: String, vendor: String, shapeOptions: ShapeRenderOptions) =
-    this(unit, mediaType, vendor, None, shapeOptions)
+  private val options = config.renderOptions
 
-  // maintained for compatibility reasons
-  def this(unit: BaseUnit,
-           mediaType: String,
-           vendor: String,
-           options: RenderOptions,
-           shapeOptions: ShapeRenderOptions = ShapeRenderOptions()) =
-    this(unit, mediaType, vendor, Some(options), shapeOptions)
+  def renderAsYDocument(renderPlugin: AMFRenderPlugin): SyamlParsedDocument = {
 
-  private val options       = config.renderOptions
-  private val legacyOptions = RenderOptions.fromImmutable(options, config.errorHandler)
-
-  def renderAsYDocument(): SyamlParsedDocument = {
-    val renderPlugin = getRenderPlugin
-    val builder      = new YDocumentBuilder
+    val builder = new YDocumentBuilder
     notifyEvent(StartingRenderingEvent(unit, renderPlugin, mediaType))
     if (renderPlugin.emit(unit, builder, options, config.errorHandler)) {
       val result = SyamlParsedDocument(builder.result.asInstanceOf[YDocument])
@@ -71,10 +53,10 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, config: R
 
   /** Render to doc builder. */
   def renderToBuilder[T](builder: DocBuilder[T])(implicit executor: ExecutionContext): Future[Unit] = Future {
-    vendor match {
-      case Vendor.AMF.name =>
+    mediaTypeExp.getPureVendorExp match {
+      case Vendor.AMF.mediaType =>
         val namespaceAliases = generateNamespaceAliasesFromPlugins
-        legacyOptions.toGraphSerialization match {
+        config.renderOptions.toGraphSerialization match {
           case JsonLdSerialization(FlattenedForm) =>
             FlattenedJsonLdEmitter.emit(unit, builder, options, namespaceAliases)
           case JsonLdSerialization(EmbeddedForm) =>
@@ -100,24 +82,31 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, config: R
     renderToString.map(remote.write(path, _))
 
   private def render[W: Output](writer: W): Unit = {
-    ExecutionLog.log(s"AMFSerializer#render: Rendering to $mediaType ($vendor file) ${unit.location()}")
-    vendor match {
+    ExecutionLog.log(s"AMFSerializer#render: Rendering to $mediaType ($mediaType file) ${unit.location()}")
+    mediaTypeExp.getPureVendorExp match {
       case Vendor.AMF.name =>
-        legacyOptions.toGraphSerialization match {
+        config.renderOptions.toGraphSerialization match {
           case RdfSerialization()                => emitRdf(writer)
           case JsonLdSerialization(documentForm) => emitJsonLd(writer, documentForm)
         }
       case _ =>
-        val ast = renderAsYDocument()
-        AMFPluginsRegistry.syntaxPluginForMediaType(mediaType) match {
+        val renderPlugin = getRenderPlugin
+        val ast          = renderAsYDocument(renderPlugin)
+        val mT           = mediaTypeExp.getSyntaxExp.getOrElse(renderPlugin.defaultSyntax())
+        getSyntaxPlugin(ast, mT) match {
           case Some(syntaxPlugin) =>
-            syntaxPlugin.unparse(mediaType, ast, writer)
+            syntaxPlugin.emit(mT, ast, writer)
             notifyEvent(FinishedRenderingSyntaxEvent(unit))
           case None if unit.isInstanceOf[ExternalFragment] =>
             writer.append(unit.asInstanceOf[ExternalFragment].encodes.raw.value())
-          case _ => throw new Exception(s"Unsupported media type $mediaType and vendor $vendor")
+          case _ => throw new Exception(s"Unsupported media type $mediaType")
         }
     }
+  }
+
+  private def getSyntaxPlugin(ast: SyamlParsedDocument, mediaType: String) = {
+    val candidates = config.syntaxPlugin.filter(_.mediaTypes.contains(mediaType))
+    candidates.find(_.applies(ast))
   }
 
   private def emitJsonLd[W: Output](writer: W, form: JsonLdDocumentForm): Unit = {
@@ -133,7 +122,7 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, config: R
   private def emitRdf[W: Output](writer: W): Unit =
     platform.rdfFramework match {
       case Some(r) =>
-        val d = RdfModelDocument(r.unitToRdfModel(unit, legacyOptions))
+        val d = RdfModelDocument(r.unitToRdfModel(unit, config.renderOptions))
         RdfSyntaxPlugin.unparse(mediaType, d, writer)
       case _ => None
     }
@@ -145,10 +134,10 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, vendor: String, config: R
   }
 
   private def getRenderPlugin: AMFRenderPlugin = {
-    val renderPlugin = config.renderPlugins.sorted.find(_.applies(RenderInfo(unit, vendor, mediaType)))
+    val renderPlugin =
+      config.renderPlugins.filter(_.mediaTypes.contains(mediaType)).sorted.find(_.applies(RenderInfo(unit, mediaType)))
     renderPlugin.getOrElse {
-      throw new Exception(
-          s"Cannot serialize domain model '${unit.location()}' for detected media type $mediaType and vendor $vendor")
+      throw new Exception(s"Cannot serialize domain model '${unit.location()}' for media type $mediaType")
     }
   }
 }
@@ -164,34 +153,5 @@ object AMFSerializer {
       .obtainStaticConfig()
       .withRenderOptions(immutableOptions)
     DefaultRenderConfiguration(env)
-  }
-
-  def init()(implicit executionContext: ExecutionContext): Unit = {
-    RuntimeSerializer.register(
-        new RuntimeSerializer {
-          override def dump(unit: BaseUnit,
-                            mediaType: String,
-                            vendor: String,
-                            options: RenderOptions,
-                            shapeOptions: ShapeRenderOptions): String =
-            new AMFSerializer(unit, mediaType, vendor, options, shapeOptions).render()
-
-          override def dump(unit: BaseUnit,
-                            mediaType: String,
-                            vendor: String,
-                            shapeOptions: ShapeRenderOptions): String = {
-            new AMFSerializer(unit, mediaType, vendor, shapeOptions).render()
-          }
-
-          override def dumpToFile(platform: Platform,
-                                  file: String,
-                                  unit: BaseUnit,
-                                  mediaType: String,
-                                  vendor: String,
-                                  options: RenderOptions,
-                                  shapeOptions: ShapeRenderOptions): Future[Unit] = {
-            new AMFSerializer(unit, mediaType, vendor, options, shapeOptions).renderToFile(platform, file)
-          }
-        })
   }
 }

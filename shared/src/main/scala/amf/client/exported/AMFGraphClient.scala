@@ -29,8 +29,8 @@ class AMFGraphClient private[amf] (private val _internal: InternalAMFGraphClient
   def transform(bu: BaseUnit): AMFResult                       = _internal.transform(bu)
   def transform(bu: BaseUnit, pipelineName: String): AMFResult = _internal.transform(bu, pipelineName)
 
-  def render(bu: BaseUnit): String                    = _internal.render(bu)
-  def render(bu: BaseUnit, mediaType: String): String = _internal.render(bu, mediaType)
+  def render(bu: BaseUnit): ClientFuture[String]                    = _internal.render(bu).asClient
+  def render(bu: BaseUnit, mediaType: String): ClientFuture[String] = _internal.render(bu, mediaType).asClient
 
   def validate(bu: BaseUnit): AMFValidationReport                           = _internal.validate(bu)
   def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport = _internal.validate(bu, profileName)

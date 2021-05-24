@@ -2,8 +2,8 @@ package amf.core.services
 
 import amf.client.execution.BaseExecutionEnvironment
 import amf.client.remod.AMFGraphConfiguration
+import amf.client.remod.amfcore.config.RenderOptions
 import amf.client.remod.amfcore.plugins.validate.ValidationConfiguration
-import amf.core.emitter.RenderOptions
 import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.Field
 import amf.core.model.document.BaseUnit

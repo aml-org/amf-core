@@ -65,7 +65,7 @@ object ExternalModelVocabularies {
   *
   * Base class for any element describing a domain model. Domain Elements are encoded into fragments
   */
-trait DomainElementModel extends Obj with ModelDefaultBuilder {
+trait DomainElementModel extends ModelDefaultBuilder {
 
   /**
     * Entity that is going to be extended overlaying or adding additional information

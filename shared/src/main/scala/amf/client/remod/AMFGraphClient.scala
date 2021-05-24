@@ -23,10 +23,10 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
   def transform(bu: BaseUnit, pipelineName: String): AMFResult =
     AMFTransformer.transform(bu, pipelineName, configuration) // clone? BaseUnit.resolved
 
-  def render(bu: BaseUnit): String                          = AMFRenderer.render(bu, configuration)
-  def renderAST(bu: BaseUnit): YDocument                    = AMFRenderer.renderAST(bu, configuration)
-  def render(bu: BaseUnit, mediaType: String): String       = AMFRenderer.render(bu, mediaType, configuration)
-  def renderAST(bu: BaseUnit, mediaType: String): YDocument = AMFRenderer.renderAST(bu, mediaType, configuration)
+  def render(bu: BaseUnit): Future[String]                    = AMFRenderer.render(bu, configuration)
+  def renderAST(bu: BaseUnit): YDocument                      = AMFRenderer.renderAST(bu, configuration)
+  def render(bu: BaseUnit, mediaType: String): Future[String] = AMFRenderer.render(bu, mediaType, configuration)
+  def renderAST(bu: BaseUnit, mediaType: String): YDocument   = AMFRenderer.renderAST(bu, mediaType, configuration)
 
   def validate(bu: BaseUnit): AMFValidationReport = AMFValidator.validate(bu, configuration)
   def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport =

@@ -96,15 +96,13 @@ class FlattenedGraphParser(config: ParseConfiguration)(implicit val ctx: GraphPa
       }
     }
 
-    private def parseRootNodeWithModel(rootNode: YMap, model: Obj) = {
+    private def parseRootNodeWithModel(rootNode: YMap, model: ModelDefaultBuilder) = {
       for {
         id      <- retrieveId(rootNode, ctx)
         sources <- Option(retrieveSources(rootNode))
         finalId <- Option(transformIdFromContext(id))
-        instance <- {
-          buildType(finalId, rootNode, model)(annotations(nodes, sources, finalId))
-        }
         parsed <- {
+          val instance = buildType(model, annotations(nodes, sources, finalId))
           parseNodeFields(rootNode, fieldsFrom(model), sources, finalId, instance)
         }
       } yield {
@@ -163,14 +161,14 @@ class FlattenedGraphParser(config: ParseConfiguration)(implicit val ctx: GraphPa
       }
     }
 
-    private def retrieveType(id: String, map: YMap): Option[Obj] = retrieveTypeIgnoring(id, map, Nil)
+    private def retrieveType(id: String, map: YMap): Option[ModelDefaultBuilder] = retrieveTypeIgnoring(id, map, Nil)
 
-    private def retrieveTypeFrom(id: String, map: YMap, from: Seq[ValueType]): Option[Obj] = {
+    private def retrieveTypeFrom(id: String, map: YMap, from: Seq[ValueType]): Option[ModelDefaultBuilder] = {
       val expectedIris = from.map(_.iri())
       this.retrieveTypeCondition(id, map, t => expectedIris.exists(iri => equal(t, iri)(ctx.graphContext)))
     }
 
-    private def retrieveTypeIgnoring(id: String, map: YMap, ignored: Seq[ValueType]): Option[Obj] = {
+    private def retrieveTypeIgnoring(id: String, map: YMap, ignored: Seq[ValueType]): Option[ModelDefaultBuilder] = {
       val ignoredIris = ignored.map(_.iri())
       this.retrieveTypeCondition(id, map, t => !ignoredIris.exists(iri => equal(t, iri)(ctx.graphContext)))
     }
@@ -182,7 +180,7 @@ class FlattenedGraphParser(config: ParseConfiguration)(implicit val ctx: GraphPa
       * @param pred predicate
       * @return Option for the first matching type as an Obj
       */
-    private def retrieveTypeCondition(id: String, map: YMap, pred: String => Boolean): Option[Obj] = {
+    private def retrieveTypeCondition(id: String, map: YMap, pred: String => Boolean): Option[ModelDefaultBuilder] = {
       // this returns a certain order, we will return the first one that matches, but many could match
       // first non-documents (including AML documents, dialect instances, dialects, vocabs, etc) are returned
       // then the base document models are returned in sorted order: Document, Fragment, Module
@@ -237,16 +235,14 @@ class FlattenedGraphParser(config: ParseConfiguration)(implicit val ctx: GraphPa
       }
     }
 
-    private def parseNode(map: YMap, id: String, model: Obj): Option[AmfObject] = {
+    private def parseNode(map: YMap, id: String, model: ModelDefaultBuilder): Option[AmfObject] = {
       val sources               = retrieveSources(map)
       val transformedId: String = transformIdFromContext(id)
-      buildType(transformedId, map, model)(annotations(nodes, sources, transformedId)) match {
-        case Some(builder) =>
-          cache(id) = builder
-          val fields = fieldsFrom(model)
-          parseNodeFields(map, fields, sources, transformedId, builder)
-        case _ => None
-      }
+
+      val builder = buildType(model, annotations(nodes, sources, transformedId))
+      cache(id) = builder
+      val fields = fieldsFrom(model)
+      parseNodeFields(map, fields, sources, transformedId, builder)
     }
 
     private def parseNodeFields(node: YMap,
@@ -537,28 +533,13 @@ class FlattenedGraphParser(config: ParseConfiguration)(implicit val ctx: GraphPa
 
     private val types: Map[String, Obj] = Map.empty ++ AMFDomainRegistry.metadataRegistry
 
-    private def findType(typeString: String): Option[Obj] = {
-      types.get(expandUriFromContext(typeString)).orElse(AMFDomainRegistry.findType(typeString))
-    }
+    private def findType(typeString: String): Option[ModelDefaultBuilder] =
+      config.registryContext.findType(typeString)
 
-    private def buildType(id: String, map: YMap, modelType: Obj): Annotations => Option[AmfObject] = {
-      AMFDomainRegistry.metadataRegistry.get(modelType.`type`.head.iri()) match {
-        case Some(modelType: ModelDefaultBuilder) =>
-          (annotations: Annotations) =>
-            val instance = modelType.modelInstance
-            instance.annotations ++= annotations
-            Some(instance)
-        case _ =>
-          AMFDomainRegistry.buildType(modelType) match {
-            case Some(builder) =>
-              (a: Annotations) =>
-                Some(builder(a))
-            case _ =>
-              ctx.eh.violation(NodeNotFound, id, s"Cannot find builder for node type $modelType", map)
-              (_: Annotations) =>
-                None
-          }
-      }
+    private def buildType(modelType: ModelDefaultBuilder, ann: Annotations): AmfObject = {
+      val instance = modelType.modelInstance
+      instance.annotations ++= ann
+      instance
     }
   }
 }

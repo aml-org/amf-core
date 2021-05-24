@@ -1,11 +1,10 @@
 package amf.client.model.document
 
 import amf.client.convert.CoreClientConverters._
-import amf.client.model.{AmfObjectWrapper, StrField}
+import amf.client.exported.config.RenderOptions
 import amf.client.model.domain.DomainElement
-import amf.client.render.RenderOptions
+import amf.client.model.{AmfObjectWrapper, StrField}
 import amf.core.annotations.AliasDeclaration
-import amf.core.annotations.Aliases.{FullUrl, RelativeUrl}
 import amf.core.model.document.{BaseUnit => InternalBaseUnit}
 import amf.core.rdf.RdfModel
 import amf.core.remote.Vendor
@@ -81,7 +80,7 @@ trait BaseUnit extends AmfObjectWrapper with PlatformSecrets with RdfExportable 
 // Trait to avoid having to export one by one each element of the BaseUnit except for this method. @author: Tom
 protected[document] trait RdfExportable { unit: BaseUnit =>
   def toNativeRdfModel(renderOptions: RenderOptions = new RenderOptions()): RdfModel = {
-    val coreOptions = amf.core.emitter.RenderOptions(renderOptions)
+    val coreOptions = renderOptions
     _internal.toNativeRdfModel(coreOptions)
   }
 }

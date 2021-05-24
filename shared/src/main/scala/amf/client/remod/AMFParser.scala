@@ -50,7 +50,7 @@ object AMFParser {
   private[amf] def parseAsync(url: String,
                               mediaType: Option[String],
                               amfConfig: AMFGraphConfiguration): Future[AMFResult] = {
-    val parseConfig                                 = ParseConfiguration(amfConfig)
+    val parseConfig                                 = amfConfig.parseConfiguration
     implicit val executionContext: ExecutionContext = parseConfig.executionContext
     RuntimeCompiler(
         url,

@@ -95,7 +95,7 @@ class ModelCloneTest extends FunSuite with ElementsFixture with Matchers {
 
   test("Test clone with elements that have same hash code") {
     case class SomeType(fields: Fields, annotations: Annotations) extends DomainElement {
-      override def meta: Obj = new Obj with ModelDefaultBuilder {
+      override def meta: Obj = new ModelDefaultBuilder {
         override def fields: List[Field]      = Nil
         override val `type`: List[ValueType]  = Nil
         override def modelInstance: AmfObject = SomeType(Fields(), Annotations())
