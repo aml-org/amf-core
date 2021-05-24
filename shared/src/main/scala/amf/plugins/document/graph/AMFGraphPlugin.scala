@@ -28,7 +28,7 @@ import org.yaml.model.YDocument
 import scala.concurrent.{ExecutionContext, Future}
 
 object AMFGraphParsePlugin  extends AMFParsePluginAdapter(AMFGraphPlugin)
-object AMFGraphRenderPlugin extends AMFRenderPluginAdapter(AMFGraphPlugin)
+object AMFGraphRenderPlugin extends AMFRenderPluginAdapter(AMFGraphPlugin, "application/json")
 
 object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
 
@@ -48,7 +48,9 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
   override def documentSyntaxes: Seq[String] = Seq(
       "application/ld+json",
       "application/json",
-      "application/amf+json"
+      "application/amf+json",
+      "application/amf+json",
+      "application/graph"
   )
 
   override def canParse(root: Root): Boolean = {

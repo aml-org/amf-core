@@ -14,7 +14,7 @@ object AMFParser {
     * Asynchronously generate a BaseUnit from the unit located in the given url.
     * @param url Location of the api
     * @param configuration [[AMFGraphConfiguration]]
-    * @return A CompletableFuture of [[AMFResult]]
+    * @return A Future of [[AMFResult]]
     */
   def parse(url: String, configuration: AMFGraphConfiguration): Future[AMFResult] =
     parseAsync(url, None, configuration)
@@ -35,7 +35,7 @@ object AMFParser {
     * Asynchronously generate a BaseUnit from a given string.
     * @param content The unit to parse as a string
     * @param configuration [[AMFGraphConfiguration]]
-    * @return A CompletableFuture of [[AMFResult]]
+    * @return A Future of [[AMFResult]]
     */
   def parseContent(content: String, env: AMFGraphConfiguration): Future[AMFResult] = {
     val loader     = fromStream(content)
@@ -58,7 +58,7 @@ object AMFParser {
   private[amf] def parseAsync(url: String,
                               mediaType: Option[String],
                               amfConfig: AMFGraphConfiguration): Future[AMFResult] = {
-    val parseConfig                                 = new ParseConfiguration(amfConfig, url)
+    val parseConfig                                 = amfConfig.parseConfiguration
     implicit val executionContext: ExecutionContext = parseConfig.executionContext
     RuntimeCompiler(
         url,

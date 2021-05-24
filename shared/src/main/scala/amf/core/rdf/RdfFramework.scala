@@ -1,6 +1,6 @@
 package amf.core.rdf
 
-import amf.core.emitter.RenderOptions
+import amf.client.remod.amfcore.config.RenderOptions
 import amf.core.model.document.BaseUnit
 import amf.core.parser.ParsedDocument
 import org.mulesoft.common.io.Output

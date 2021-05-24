@@ -12,5 +12,4 @@ object AMFRenderer {
   def render(bu: BaseUnit, mediaType: String, configuration: AMFGraphConfiguration): String = ???
 
   def renderAST(bu: BaseUnit, mediaType: String, configuration: AMFGraphConfiguration): YDocument = ???
-
 }

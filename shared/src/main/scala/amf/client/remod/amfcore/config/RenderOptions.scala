@@ -1,6 +1,13 @@
 package amf.client.remod.amfcore.config
 
 import amf.core.metamodel.Field
+import amf.plugins.document.graph.{
+  EmbeddedForm,
+  FlattenedForm,
+  GraphSerialization,
+  JsonLdSerialization,
+  RdfSerialization
+}
 
 /**
   * Immutable implementation of render options
@@ -90,4 +97,17 @@ case class RenderOptions private[amf] (
   def renderField(field: Field): Boolean = !filterFields(field)
   def isPrettyPrint: Boolean             = prettyPrint
   def isEmitNodeIds: Boolean             = emitNodeIds
+
+  // TODO: remove when embeddedform is deleted
+  private[amf] def toGraphSerialization: GraphSerialization = {
+    if (isAmfJsonLdSerialization) {
+      if (isFlattenedJsonLd) {
+        JsonLdSerialization(FlattenedForm)
+      } else {
+        JsonLdSerialization(EmbeddedForm)
+      }
+    } else {
+      RdfSerialization()
+    }
+  }
 }

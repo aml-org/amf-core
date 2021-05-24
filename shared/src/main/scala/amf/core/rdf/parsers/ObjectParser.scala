@@ -40,8 +40,8 @@ class ObjectParser(val rootId: String,
       val id = node.subject
       plugins.retrieveType(id, node, findBaseUnit, visitedSelfEncoded) map { model =>
         val sources  = retrieveSources(node)
-        val instance = plugins.buildType(model)(annots(sources, id))
-        instance.withId(id)
+        val instance = model.modelInstance.withId(id)
+        instance.annotations ++= annots(sources, id)
 
         ctx.nodes = ctx.nodes + (id -> instance)
 

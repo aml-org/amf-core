@@ -76,18 +76,18 @@ class AMFGraphClient private[amf] (private val _internal: InternalAMFGraphClient
   /**
     * Render a [[BaseUnit]] to its default type
     * @param bu [[BaseUnit]] to be rendered
-    * @return The content rendered
+    * @return A CompletableFuture with rendered content
     */
-  def render(bu: BaseUnit): String = _internal.render(bu)
+  def render(bu: BaseUnit): ClientFuture[String] = _internal.render(bu)
 
   /**
     * Render a [[BaseUnit]] to a certain mediaType
     * @param bu [[BaseUnit]] to be rendered
     * @param mediaType The nature and format of the given content. Must be <code>"application/spec"</code> or <code>"application/spec+syntax"</code>.
     *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
-    * @return The content rendered
+    * @return A CompletableFuture with rendered content
     */
-  def render(bu: BaseUnit, mediaType: String): String = _internal.render(bu, mediaType)
+  def render(bu: BaseUnit, mediaType: String): ClientFuture[String] = _internal.render(bu, mediaType)
 
   /**
     * Validate a [[BaseUnit]] with its default validation profile name

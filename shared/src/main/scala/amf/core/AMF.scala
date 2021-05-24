@@ -19,9 +19,8 @@ object AMF {
     */
   def init()(implicit executionContext: ExecutionContext): Future[Unit] = {
     AMFCompiler.init()
-    AMFSerializer.init()
-    val registeredSYamlPlugin                = SYamlSyntaxPlugin.init()
-    val registeredAMFGraphPlugin             = AMFGraphPlugin.init()
+    val registeredSYamlPlugin    = SYamlSyntaxPlugin.init()
+    val registeredAMFGraphPlugin = AMFGraphPlugin.init()
     Future
       .sequence(Seq(registeredSYamlPlugin, registeredAMFGraphPlugin))
       .flatMap { _ =>
@@ -43,7 +42,8 @@ object AMF {
     case feature: AMFPayloadValidationPlugin => AMFPluginsRegistry.registerPayloadValidationPlugin(feature)
   }
 
-  protected def processInitializations(plugins: Seq[AMFPlugin])(implicit executionContext: ExecutionContext): Future[Unit] = {
+  protected def processInitializations(plugins: Seq[AMFPlugin])(
+      implicit executionContext: ExecutionContext): Future[Unit] = {
     if (plugins.isEmpty) {
       Future.successful(Unit)
     } else {

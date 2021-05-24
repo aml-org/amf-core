@@ -6,7 +6,6 @@ import amf.client.environment.{DefaultEnvironment, Environment}
 import amf.client.execution.BaseExecutionEnvironment
 import amf.client.model.document._
 import amf.client.plugins.AMFPlugin
-import amf.client.render.Renderer
 import amf.client.resolve.Resolver
 import amf.client.validate.{AMFValidationReport, Validator}
 import amf.core.AMF
@@ -26,22 +25,17 @@ object Core extends PlatformSecrets {
     AMF.init().asClient
   }
 
-  def generator(vendor: String, mediaType: String): Renderer = new Renderer(vendor, mediaType, None)
-
-  def generator(vendor: String, mediaType: String, env: Environment): Renderer =
-    new Renderer(vendor, mediaType, Some(env))
-
   def resolver(vendor: String): Resolver = new Resolver(vendor)
 
-  def validate(model: BaseUnit,
-               profileName: ProfileName,
-               env: Environment): ClientFuture[AMFValidationReport] =
+  def validate(model: BaseUnit, profileName: ProfileName, env: Environment): ClientFuture[AMFValidationReport] =
     Validator.validate(model, profileName, AMFPluginsRegistry.obtainStaticConfig(), resolved = false)
 
   def validate(model: BaseUnit, profileName: ProfileName): ClientFuture[AMFValidationReport] =
     validate(model, profileName, DefaultEnvironment())
 
-  def validateResolved(model: BaseUnit, profileName: ProfileName, env: Environment): ClientFuture[AMFValidationReport] = {
+  def validateResolved(model: BaseUnit,
+                       profileName: ProfileName,
+                       env: Environment): ClientFuture[AMFValidationReport] = {
     Validator.validate(model, profileName, AMFPluginsRegistry.obtainStaticConfig(), resolved = true)
   }
 

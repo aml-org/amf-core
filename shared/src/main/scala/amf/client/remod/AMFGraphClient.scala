@@ -20,7 +20,7 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
   /**
     * Asynchronously generate a BaseUnit from the content located in the given url.
     * @param url Location of the file to parse
-    * @return A CompletableFuture of [[AMFResult]]
+    * @return A Future of [[AMFResult]]
     */
   def parse(url: String): Future[AMFResult] = AMFParser.parse(url, configuration)
 
@@ -29,14 +29,14 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
     * @param url Location of the file to parse
     * @param mediaType The nature and format of the given content. Must be <code>"application/spec"</code> or <code>"application/spec+syntax"</code>.
     *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
-    * @return A CompletableFuture of [[AMFResult]]
+    * @return A Future of [[AMFResult]]
     */
   def parse(url: String, mediaType: String): Future[AMFResult] = AMFParser.parse(url, mediaType, configuration)
 
   /**
     * Asynchronously generate a BaseUnit from a given string.
     * @param content The content as a string
-    * @return A CompletableFuture of [[AMFResult]]
+    * @return A Future of [[AMFResult]]
     */
   def parseContent(content: String): Future[AMFResult] = AMFParser.parseContent(content, configuration)
 
@@ -45,7 +45,7 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
     * @param content The content as a string
     * @param mediaType The nature and format of the given content. Must be <code>"application/spec"</code> or <code>"application/spec+syntax"</code>.
     *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
-    * @return A CompletableFuture of [[AMFResult]]
+    * @return A Future of [[AMFResult]]
     */
   def parseContent(content: String, mediaType: String): Future[AMFResult] =
     AMFParser.parseContent(content, mediaType, configuration)
@@ -69,9 +69,9 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
   /**
     * Render a [[BaseUnit]] to its default type
     * @param bu [[BaseUnit]] to be rendered
-    * @return The content rendered
+    * @return A Future with the rendered content
     */
-  def render(bu: BaseUnit): String = AMFRenderer.render(bu, configuration)
+  def render(bu: BaseUnit): Future[String] = AMFRenderer.render(bu, configuration)
 
   /**
     * Render a [[BaseUnit]] and return the AST
@@ -85,9 +85,9 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
     * @param bu [[BaseUnit]] to be rendered
     * @param mediaType The nature and format of the given content. Must be <code>"application/spec"</code> or <code>"application/spec+syntax"</code>.
     *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
-    * @return The content rendered
+    * @return A Future with the rendered content
     */
-  def render(bu: BaseUnit, mediaType: String): String = AMFRenderer.render(bu, mediaType, configuration)
+  def render(bu: BaseUnit, mediaType: String): Future[String] = AMFRenderer.render(bu, mediaType, configuration)
 
   /**
     * Render a [[BaseUnit]] to a certain mediaType and return the AST
