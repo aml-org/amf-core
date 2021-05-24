@@ -1,8 +1,8 @@
 package amf.core.model.document
 
 import amf.client.remod.AMFGraphConfiguration
+import amf.client.remod.amfcore.config.RenderOptions
 import amf.core.annotations.SourceVendor
-import amf.core.emitter.RenderOptions
 import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.MetaModelTypeMapping
 import amf.core.metamodel.document.BaseUnitModel
@@ -121,7 +121,7 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
 
   def findInReferences(id: String): Option[BaseUnit] = references.find(_.id == id)
 
-  def toNativeRdfModel(renderOptions: RenderOptions = new RenderOptions()): RdfModel = {
+  def toNativeRdfModel(renderOptions: RenderOptions = RenderOptions()): RdfModel = {
     platform.rdfFramework match {
       case Some(rdf) => rdf.unitToRdfModel(this, renderOptions)
       case None      => throw new Exception("RDF Framework not registered cannot export to native RDF model")

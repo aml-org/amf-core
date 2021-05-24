@@ -11,15 +11,9 @@ import amf.core.model.document._
 import amf.core.model.domain._
 import amf.core.model.domain.extensions.{CustomDomainProperty, DomainExtension}
 import amf.core.parser.{Annotations, _}
-import amf.core.registries.AMFDomainRegistry
 import amf.core.vocabulary.Namespace
 import amf.plugins.document.graph.JsonLdKeywords
-import amf.plugins.features.validation.CoreValidations.{
-  NodeNotFound,
-  NotLinkable,
-  UnableToParseDocument,
-  UnableToParseNode
-}
+import amf.plugins.features.validation.CoreValidations.{NotLinkable, UnableToParseDocument, UnableToParseNode}
 import org.yaml.convert.YRead.SeqNodeYRead
 import org.yaml.model._
 
@@ -66,7 +60,7 @@ class EmbeddedGraphParser(config: ParseConfiguration)(implicit val ctx: GraphPar
       }
     }
 
-    private def retrieveType(id: String, map: YMap): Option[Obj] = {
+    private def retrieveType(id: String, map: YMap): Option[ModelDefaultBuilder] = {
       val stringTypes = ts(map, id)
       stringTypes.find(findType(_).isDefined) match {
         case Some(t) => findType(t)
@@ -102,57 +96,53 @@ class EmbeddedGraphParser(config: ParseConfiguration)(implicit val ctx: GraphPar
             val sources               = retrieveSources(map)
             val transformedId: String = transformIdFromContext(id)
 
-            buildType(transformedId, map, model)(annotations(nodes, sources, transformedId)) match {
-              case Some(builder) =>
-                val instance: AmfObject = builder
-                instance.withId(transformedId)
+            val instance: AmfObject = buildType(model, annotations(nodes, sources, transformedId))
+            instance.withId(transformedId)
 
-                checkLinkables(instance)
+            checkLinkables(instance)
 
-                // workaround for lazy values in shape
-                val modelFields = model match {
-                  case shapeModel: ShapeModel =>
-                    shapeModel.fields ++ Seq(
-                        ShapeModel.CustomShapePropertyDefinitions,
-                        ShapeModel.CustomShapeProperties
-                    )
-                  case _ => model.fields
-                }
-
-                modelFields.foreach(f => {
-                  val k = compactUriFromContext(f.value.iri())
-                  map.key(k) match {
-                    case Some(entry) =>
-                      traverse(instance, f, value(f.`type`, entry.value), sources, k)
-                    case _ =>
-                  }
-                })
-
-                // parsing custom extensions
-                instance match {
-                  case l: DomainElement with Linkable =>
-                    parseLinkableProperties(map, l)
-                  case ex: ExternalDomainElement if unresolvedExtReferencesMap.contains(ex.id) =>
-                    unresolvedExtReferencesMap.get(ex.id).foreach { element =>
-                      ex.raw
-                        .option()
-                        .foreach(element.set(ExternalSourceElementModel.Raw, _))
-                    }
-                  case obj: ObjectNode =>
-                    parseObjectNodeProperties(obj, map, modelFields)
-
-                  case _ => // ignore
-                }
-                instance match {
-                  case elm: DomainElement => parseCustomProperties(map, elm)
-                  case _                  => // ignore
-                }
-
-                nodes = nodes + (transformedId -> instance)
-                Some(instance)
-              case _ => None
+            // workaround for lazy values in shape
+            val modelFields = model match {
+              case shapeModel: ShapeModel =>
+                shapeModel.fields ++ Seq(
+                    ShapeModel.CustomShapePropertyDefinitions,
+                    ShapeModel.CustomShapeProperties
+                )
+              case _ => model.fields
             }
 
+            modelFields.foreach(f => {
+              val k = compactUriFromContext(f.value.iri())
+              map.key(k) match {
+                case Some(entry) =>
+                  traverse(instance, f, value(f.`type`, entry.value), sources, k)
+                case _ =>
+              }
+            })
+
+            // parsing custom extensions
+            instance match {
+              case l: DomainElement with Linkable =>
+                parseLinkableProperties(map, l)
+              case ex: ExternalDomainElement if unresolvedExtReferencesMap.contains(ex.id) =>
+                unresolvedExtReferencesMap.get(ex.id).foreach { element =>
+                  ex.raw
+                    .option()
+                    .foreach(element.set(ExternalSourceElementModel.Raw, _))
+                }
+              case obj: ObjectNode =>
+                parseObjectNodeProperties(obj, map, modelFields)
+
+              case _ => // ignore
+            }
+            instance match {
+              case elm: DomainElement => parseCustomProperties(map, elm)
+              case _                  => // ignore
+            }
+
+            nodes = nodes + (transformedId -> instance)
+            Some(instance)
+          case _ => None
         }
     }
 
@@ -329,30 +319,14 @@ class EmbeddedGraphParser(config: ParseConfiguration)(implicit val ctx: GraphPar
       .key(compactUriFromContext(field.value.iri()))
       .map(entry => value(field.`type`, entry.value).as[YScalar].text)
 
-  private val types: Map[String, Obj] = Map.empty ++ AMFDomainRegistry.metadataRegistry
-
-  private def findType(typeString: String): Option[Obj] = {
-    types.get(expandUriFromContext(typeString)).orElse(AMFDomainRegistry.findType(typeString))
+  private def findType(typeString: String): Option[ModelDefaultBuilder] = {
+    config.registryContext.findType(typeString)
   }
 
-  private def buildType(id: String, map: YMap, modelType: Obj): Annotations => Option[AmfObject] = {
-    AMFDomainRegistry.metadataRegistry.get(modelType.`type`.head.iri()) match {
-      case Some(modelType: ModelDefaultBuilder) =>
-        (annotations: Annotations) =>
-          val instance = modelType.modelInstance
-          instance.annotations ++= annotations
-          Some(instance)
-      case _ =>
-        AMFDomainRegistry.buildType(modelType) match {
-          case Some(builder) =>
-            (a: Annotations) =>
-              Some(builder(a))
-          case _ =>
-            ctx.eh.violation(NodeNotFound, id, s"Cannot find builder for node type $modelType", map)
-            (_: Annotations) =>
-              None
-        }
-    }
+  private def buildType(modelType: ModelDefaultBuilder, ann: Annotations): AmfObject = {
+    val instance = modelType.modelInstance
+    instance.annotations ++= ann
+    instance
   }
 
 }

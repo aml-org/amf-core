@@ -12,7 +12,7 @@ import amf.core.vocabulary.{Namespace, ValueType}
   * Base class for every single document model unit. After parsing a document the parser generate parsing Base Units.
   * Base Units encode the domain elements and can reference other units to re-use descriptions.
   */
-trait BaseUnitModel extends Obj with ModelDefaultBuilder {
+trait BaseUnitModel extends ModelDefaultBuilder {
 
   val Root: Field = Field(
       Bool,
@@ -22,10 +22,11 @@ trait BaseUnitModel extends Obj with ModelDefaultBuilder {
                "Indicates if the base unit represents the root of the document model obtained from parsing")
   )
 
-  val Location: Field = Field(
-      Str,
-      Document + "location",
-      ModelDoc(ModelVocabularies.AmlDoc, "location", "Location of the metadata document that generated this base unit"))
+  val Location: Field = Field(Str,
+                              Document + "location",
+                              ModelDoc(ModelVocabularies.AmlDoc,
+                                       "location",
+                                       "Location of the metadata document that generated this base unit"))
 
   val References: Field = Field(Array(BaseUnitModel),
                                 Document + "references",

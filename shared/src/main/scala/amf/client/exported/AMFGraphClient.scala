@@ -3,9 +3,8 @@ package amf.client.exported
 import amf.ProfileName
 import amf.client.convert.CoreClientConverters._
 import amf.client.model.document.BaseUnit
-import amf.client.remod.{AMFGraphClient => InternalAMFGraphClient}
 import amf.client.validate.AMFValidationReport
-
+import amf.client.remod.{AMFGraphClient => InternalAMFGraphClient}
 import scala.concurrent.ExecutionContext
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
@@ -78,8 +77,7 @@ class AMFGraphClient private[amf] (private val _internal: InternalAMFGraphClient
     * @param bu [[BaseUnit]] to be rendered
     * @return The content rendered
     */
-  def render(bu: BaseUnit): String = _internal.render(bu)
-
+  def render(bu: BaseUnit): ClientFuture[String]                    = _internal.render(bu).asClient
   /**
     * Render a [[BaseUnit]] to a certain mediaType
     * @param bu [[BaseUnit]] to be rendered
@@ -87,7 +85,7 @@ class AMFGraphClient private[amf] (private val _internal: InternalAMFGraphClient
     *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
     * @return The content rendered
     */
-  def render(bu: BaseUnit, mediaType: String): String = _internal.render(bu, mediaType)
+  def render(bu: BaseUnit, mediaType: String): ClientFuture[String] = _internal.render(bu, mediaType).asClient
 
   /**
     * Validate a [[BaseUnit]] with its default validation profile name

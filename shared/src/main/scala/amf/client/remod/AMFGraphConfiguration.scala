@@ -5,10 +5,12 @@ import amf.client.exported.config.{AMFLogger, MutedLogger}
 import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.plugins.parse.SyamlSyntaxParsePlugin
+import amf.client.remod.amfcore.plugins.render.{DefaultRenderConfiguration, SyamlSyntaxRenderPlugin}
 import amf.client.remod.amfcore.registry.AMFRegistry
 import amf.core.annotations.serializable.CoreSerializableAnnotations
 import amf.core.entities.CoreEntities
 import amf.core.errorhandling.AMFErrorHandler
+import amf.core.metamodel.{ModelDefaultBuilder, Obj}
 import amf.core.parser.ParserContext
 import amf.core.resolution.pipelines.{BasicTransformationPipeline, TransformationPipeline}
 import amf.core.validation.core.ValidationProfile
@@ -52,7 +54,7 @@ object AMFGraphConfiguration {
         MutedLogger,
         Set.empty,
         AMFOptions.default()
-    ).withPlugins(List(AMFGraphParsePlugin, AMFGraphRenderPlugin, SyamlSyntaxParsePlugin))
+    ).withPlugins(List(AMFGraphParsePlugin, AMFGraphRenderPlugin, SyamlSyntaxParsePlugin, SyamlSyntaxRenderPlugin))
       // we might need to register editing pipeline as well because of legacy behaviour.
       .withTransformationPipeline(BasicTransformationPipeline())
   }
@@ -112,6 +114,7 @@ class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: A
 
   def withPlugins(plugins: List[AMFPlugin[_]]): AMFGraphConfiguration = super._withPlugins(plugins)
 
+  def withEntities(entities: Map[String, ModelDefaultBuilder]): AMFGraphConfiguration = super._withEntities(entities)
   // //TODO: ARM - delete
   def removePlugin(id: String): AMFGraphConfiguration = super._removePlugin(id)
 
@@ -157,6 +160,10 @@ class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: A
   private[amf] def getResourceLoaders: List[ResourceLoader] = resolvers.resourceLoaders
   private[amf] def getUnitsCache: Option[UnitCache]         = resolvers.unitCache
   private[amf] def getExecutionContext: ExecutionContext    = resolvers.executionContext.executionContext
+
+  private[amf] lazy val parseConfiguration  = ParseConfiguration(this)
+  private[amf] lazy val renderConfiguration = DefaultRenderConfiguration(this)
+
 }
 
 sealed abstract class BaseAMFConfigurationSetter(private[amf] val resolvers: AMFResolvers,
@@ -187,6 +194,9 @@ sealed abstract class BaseAMFConfigurationSetter(private[amf] val resolvers: AMF
 
   protected def _withPlugins[T](plugins: List[AMFPlugin[_]]): T =
     copy(registry = registry.withPlugins(plugins)).asInstanceOf[T]
+
+  protected def _withEntities[T](entities: Map[String, ModelDefaultBuilder]): T =
+    copy(registry = registry.withEntities(entities)).asInstanceOf[T]
 
   // //TODO: ARM - delete
   protected def _removePlugin[T](id: String): T = copy(registry = registry.removePlugin(id)).asInstanceOf[T]

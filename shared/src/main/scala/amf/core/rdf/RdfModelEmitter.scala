@@ -1,7 +1,7 @@
 package amf.core.rdf
 
+import amf.client.remod.amfcore.config.RenderOptions
 import amf.core.annotations.{DomainExtensionAnnotation, ScalarType}
-import amf.core.emitter.RenderOptions
 import amf.core.metamodel.Type.{Array, Bool, EncodedIri, Iri, LiteralUri, SortedArray, Str}
 import amf.core.metamodel._
 import amf.core.metamodel.document.SourceMapModel
@@ -23,21 +23,22 @@ import scala.collection.mutable.ListBuffer
 /**
   * AMF RDF Model emitter
   */
-class RdfModelEmitter(rdfmodel: RdfModel) extends MetaModelTypeMapping with CommonEmitter{
+class RdfModelEmitter(rdfmodel: RdfModel) extends MetaModelTypeMapping with CommonEmitter {
 
   def emit(unit: BaseUnit, options: RenderOptions): Unit = Emitter(options).root(unit)
 
   case class Emitter(options: RenderOptions) {
 
-    private val traversal = ModelTraversalRegistry()
-    var rootId: Option[String]     = None
+    private val traversal      = ModelTraversalRegistry()
+    var rootId: Option[String] = None
 
     def root(unit: BaseUnit): Unit = {
       rootId = Some(unit.id)
       traverse(unit)
     }
 
-    protected def selfEncoded(element: AmfObject): Boolean = element.id == rootId.getOrElse("") && !element.isInstanceOf[BaseUnit]
+    protected def selfEncoded(element: AmfObject): Boolean =
+      element.id == rootId.getOrElse("") && !element.isInstanceOf[BaseUnit]
 
     def traverse(element: AmfObject): Unit = {
       if (!traversal.isInCurrentPath(element.id) || selfEncoded(element)) {
@@ -54,8 +55,8 @@ class RdfModelEmitter(rdfmodel: RdfModel) extends MetaModelTypeMapping with Comm
         val modelFields = obj.fields ++ (obj match {
           case _: ShapeModel =>
             Seq(
-              ShapeModel.CustomShapePropertyDefinitions,
-              ShapeModel.CustomShapeProperties
+                ShapeModel.CustomShapePropertyDefinitions,
+                ShapeModel.CustomShapeProperties
             )
           case _ => Nil
         }).filter(options.renderField)
@@ -157,7 +158,12 @@ class RdfModelEmitter(rdfmodel: RdfModel) extends MetaModelTypeMapping with Comm
     private def objectValue(subject: String, property: String, t: Type, v: Value): Unit = {
       t match {
         // if this is an external link, emit jus the URI without the dialect class so the validation is not triggered
-        case e: DomainElementModel if v.value.isInstanceOf[DomainElement] && v.value.asInstanceOf[DomainElement].isExternalLink.option().getOrElse(false) =>
+        case e: DomainElementModel
+            if v.value.isInstanceOf[DomainElement] && v.value
+              .asInstanceOf[DomainElement]
+              .isExternalLink
+              .option()
+              .getOrElse(false) =>
           rdfmodel.addTriple(subject, property, v.value.asInstanceOf[DomainElement].id)
         case t: DomainElement with Linkable if t.isLink =>
           link(subject, property, t)
@@ -177,19 +183,13 @@ class RdfModelEmitter(rdfmodel: RdfModel) extends MetaModelTypeMapping with Comm
               rdfmodel.addTriple(subject, property, v.value.asInstanceOf[AmfScalar].toString, None)
           }
         case Bool =>
-          rdfmodel.addTriple(subject,
-            property,
-            v.value.asInstanceOf[AmfScalar].toString,
-            Some(DataType.Boolean))
+          rdfmodel.addTriple(subject, property, v.value.asInstanceOf[AmfScalar].toString, Some(DataType.Boolean))
         case Type.Int =>
           emitIntLiteral(subject, property, v.value.asInstanceOf[AmfScalar].toString)
         case Type.Double =>
           // this will transform the value to double and will not emit @type TODO: ADD YType.Double
           // @TODO: see also in the Type.Any emitter
-          rdfmodel.addTriple(subject,
-            property,
-            v.value.asInstanceOf[AmfScalar].toString,
-            Some(DataType.Double))
+          rdfmodel.addTriple(subject, property, v.value.asInstanceOf[AmfScalar].toString, Some(DataType.Double))
         case Type.Float =>
           emitFloatLiteral(subject, property, v.value.asInstanceOf[AmfScalar].toString)
         case Type.DateTime =>
@@ -212,19 +212,13 @@ class RdfModelEmitter(rdfmodel: RdfModel) extends MetaModelTypeMapping with Comm
         case Type.Any =>
           v.value.asInstanceOf[AmfScalar].value match {
             case bool: Boolean =>
-              rdfmodel.addTriple(subject,
-                property,
-                v.value.asInstanceOf[AmfScalar].toString,
-                Some(DataType.Boolean))
+              rdfmodel.addTriple(subject, property, v.value.asInstanceOf[AmfScalar].toString, Some(DataType.Boolean))
             case i: Int =>
               emitIntLiteral(subject, property, v.value.asInstanceOf[AmfScalar].toString)
             case f: Float =>
               emitFloatLiteral(subject, property, v.value.asInstanceOf[AmfScalar].toString)
             case d: Double =>
-              rdfmodel.addTriple(subject,
-                property,
-                v.value.asInstanceOf[AmfScalar].toString,
-                Some(DataType.Double))
+              rdfmodel.addTriple(subject, property, v.value.asInstanceOf[AmfScalar].toString, Some(DataType.Double))
             case _ =>
               v.annotations.find(classOf[ScalarType]) match {
                 case Some(annotation) =>

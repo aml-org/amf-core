@@ -1,7 +1,7 @@
 package amf.core.rdf.helper
 
 import amf.client.remod.ParseConfiguration
-import amf.core.metamodel.Obj
+import amf.core.metamodel.{ModelDefaultBuilder, Obj}
 import amf.core.metamodel.document.{BaseUnitModel, DocumentModel}
 import amf.core.model.document.{DeclaresModel, EncodesModel}
 import amf.core.model.domain.AmfObject
@@ -22,7 +22,7 @@ class EntitiesFacade private[amf] (parserConfig: ParseConfiguration) {
   def retrieveType(id: String,
                    node: Node,
                    findBaseUnit: Boolean = false,
-                   visitedSelfEncoded: Boolean = false): Option[Obj] = {
+                   visitedSelfEncoded: Boolean = false): Option[ModelDefaultBuilder] = {
     val types = sorter.sortedClassesOf(node)
 
     val foundType = types.find { t =>
@@ -49,9 +49,6 @@ class EntitiesFacade private[amf] (parserConfig: ParseConfiguration) {
 
   private val findType = CachedFunction.fromMonadic(parserConfig.registryContext.findType)
 
-  private val buildType = CachedFunction.from(parserConfig.registryContext.buildType)
+  private def findType(`type`: String): Option[ModelDefaultBuilder] = findType.runCached(`type`)
 
-  private def findType(`type`: String): Option[Obj] = findType.runCached(`type`)
-
-  def buildType(`type`: Obj): Annotations => AmfObject = buildType.runCached(`type`)
 }

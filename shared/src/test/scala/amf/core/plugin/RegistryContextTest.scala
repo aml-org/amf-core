@@ -23,8 +23,7 @@ class RegistryContextTest extends FunSuite with Matchers {
     }
 
     CoreEntities.entities.values.filterNot(_ == SourceMapModel).foreach { `type` =>
-      val builder  = ctx.buildType(`type`)
-      val instance = builder(Annotations())
+      val instance = `type`.modelInstance
       instance.meta should be(`type`)
     }
   }
@@ -40,11 +39,11 @@ class RegistryContextTest extends FunSuite with Matchers {
       shouldBeEmpty(ctx.findType(iri))
     }
 
-    CoreEntities.entities.values.foreach { `type` =>
-      the[Exception] thrownBy {
-        ctx.buildType(`type`)
-      } should have message s"Cannot find builder for type ${`type`}"
-    }
+//    CoreEntities.entities.values.foreach { `type` =>
+//      the[Exception] thrownBy {
+//        `type`.
+//      } should have message s"Cannot find builder for type ${`type`}"
+//    }
   }
 
   private def shouldBeDefined[T](opt: Option[T]): Unit = {

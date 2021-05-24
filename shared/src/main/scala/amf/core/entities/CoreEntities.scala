@@ -1,6 +1,6 @@
 package amf.core.entities
 
-import amf.core.metamodel.Obj
+import amf.core.metamodel.{ModelDefaultBuilder, Obj}
 import amf.core.metamodel.document.{DocumentModel, ExternalFragmentModel, ModuleModel, SourceMapModel}
 import amf.core.metamodel.domain.{ExternalDomainElementModel, RecursiveShapeModel}
 import amf.core.metamodel.domain.extensions.{
@@ -13,11 +13,10 @@ import amf.core.metamodel.domain.templates.VariableValueModel
 
 private[amf] object CoreEntities extends Entities {
 
-  override protected val innerEntities: Seq[Obj] = Seq(
+  override protected val innerEntities: Seq[ModelDefaultBuilder] = Seq(
       DocumentModel,
       ModuleModel,
       VariableValueModel,
-      SourceMapModel,
       RecursiveShapeModel,
       PropertyShapeModel,
       ShapeExtensionModel,

@@ -3,7 +3,7 @@ package amf.client.remod.amfcore.plugins.parse
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.core.parser.{ParsedDocument, ParserContext}
 
-trait AMFSyntaxPlugin extends AMFPlugin[CharSequence] {
+trait AMFSyntaxParsePlugin extends AMFPlugin[CharSequence] {
 
   def parse(text: CharSequence, mediaType: String, ctx: ParserContext): ParsedDocument
 

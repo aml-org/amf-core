@@ -31,8 +31,8 @@ object AMFPluginsRegistry {
   def obtainStaticConfig(): AMFGraphConfiguration = staticConfiguration
 
   private def registerPluginInEnv(plugin: AMFDocumentPlugin): Unit = {
-    staticConfiguration =
-      staticConfiguration.withPlugins(List(AMFParsePluginAdapter(plugin), AMFRenderPluginAdapter(plugin)))
+//    staticConfiguration =
+//      staticConfiguration.withPlugins(List(AMFParsePluginAdapter(plugin), AMFRenderPluginAdapter(plugin)))
     staticConfiguration = staticConfiguration.withTransformationPipelines(plugin.pipelines.values.toList)
     plugin match {
       case validationPlugin: AMFValidationPlugin =>
