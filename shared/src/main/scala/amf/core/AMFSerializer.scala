@@ -84,7 +84,7 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfigurati
   private def render[W: Output](writer: W): Unit = {
     ExecutionLog.log(s"AMFSerializer#render: Rendering to $mediaType ($mediaType file) ${unit.location()}")
     mediaTypeExp.getPureVendorExp match {
-      case Vendor.AMF.name =>
+      case Vendor.AMF.mediaType =>
         config.renderOptions.toGraphSerialization match {
           case RdfSerialization()                => emitRdf(writer)
           case JsonLdSerialization(documentForm) => emitJsonLd(writer, documentForm)
