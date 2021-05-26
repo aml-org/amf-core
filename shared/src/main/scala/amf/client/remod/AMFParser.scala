@@ -37,11 +37,8 @@ object AMFParser {
     * @param configuration [[AMFGraphConfiguration]]
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parseContent(content: String, env: AMFGraphConfiguration): Future[AMFResult] = {
-    val loader     = fromStream(content)
-    val withLoader = env.withResourceLoader(loader)
-    parseAsync(DEFAULT_DOCUMENT_URL, None, withLoader)
-  }
+  def parseContent(content: String, env: AMFGraphConfiguration): Future[AMFResult] =
+    parseContent(content, DEFAULT_DOCUMENT_URL, None, env)
 
   /**
     * Asynchronously generate a BaseUnit from a given string.
@@ -51,9 +48,17 @@ object AMFParser {
     * @param configuration [[AMFGraphConfiguration]]
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
-  def parseContent(content: String, mediaType: String, configuration: AMFGraphConfiguration): Future[AMFResult] = ???
-//    parseAsync(DEFAULT_DOCUMENT_URL, Some(fromStream(stream)))
-  // TODO ARM COMPLETE THIS IMPLEMENTATION
+  def parseContent(content: String, mediaType: String, configuration: AMFGraphConfiguration): Future[AMFResult] =
+    parseContent(content, DEFAULT_DOCUMENT_URL, Some(mediaType), configuration)
+
+  private[amf] def parseContent(content: String,
+                                url: String,
+                                mediaType: Option[String],
+                                env: AMFGraphConfiguration): Future[AMFResult] = {
+    val loader     = fromStream(url, content)
+    val withLoader = env.withResourceLoader(loader)
+    parseAsync(url, mediaType, withLoader)
+  }
 
   private[amf] def parseAsync(url: String,
                               mediaType: Option[String],
@@ -74,8 +79,6 @@ object AMFParser {
 
   private def fromStream(url: String, stream: String): ResourceLoader =
     StringResourceLoader(platform.resolvePath(url), stream)
-
-  private def fromStream(stream: String): ResourceLoader = fromStream(DEFAULT_DOCUMENT_URL, stream)
 
   private val DEFAULT_DOCUMENT_URL = "http://a.ml/amf/default_document"
 }
