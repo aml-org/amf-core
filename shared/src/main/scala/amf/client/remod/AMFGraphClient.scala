@@ -103,7 +103,7 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
     * @param bu [[BaseUnit]] to validate
     * @return an [[AMFValidationReport]]
     */
-  def validate(bu: BaseUnit): AMFValidationReport = AMFValidator.validate(bu, configuration)
+  def validate(bu: BaseUnit): Future[AMFValidationReport] = AMFValidator.validate(bu, configuration)
 
   /**
     * Validate a [[BaseUnit]] with a specific validation profile name
@@ -111,6 +111,6 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
     * @param profileName the [[amf.ProfileName]] of the desired validation profile
     * @return an [[AMFValidationReport]]
     */
-  def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport =
+  def validate(bu: BaseUnit, profileName: ProfileName): Future[AMFValidationReport] =
     AMFValidator.validate(bu, profileName, configuration)
 }

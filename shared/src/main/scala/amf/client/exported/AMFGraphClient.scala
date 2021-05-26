@@ -78,7 +78,7 @@ class AMFGraphClient private[amf] (private val _internal: InternalAMFGraphClient
     * @param bu [[BaseUnit]] to be rendered
     * @return A CompletableFuture with rendered content
     */
-  def render(bu: BaseUnit): ClientFuture[String] = _internal.render(bu)
+  def render(bu: BaseUnit): ClientFuture[String] = _internal.render(bu).asClient
 
   /**
     * Render a [[BaseUnit]] to a certain mediaType
@@ -87,14 +87,14 @@ class AMFGraphClient private[amf] (private val _internal: InternalAMFGraphClient
     *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
     * @return A CompletableFuture with rendered content
     */
-  def render(bu: BaseUnit, mediaType: String): ClientFuture[String] = _internal.render(bu, mediaType)
+  def render(bu: BaseUnit, mediaType: String): ClientFuture[String] = _internal.render(bu, mediaType).asClient
 
   /**
     * Validate a [[BaseUnit]] with its default validation profile name
     * @param bu [[BaseUnit]] to validate
     * @return an [[AMFValidationReport]]
     */
-  def validate(bu: BaseUnit): AMFValidationReport = _internal.validate(bu)
+  def validate(bu: BaseUnit): ClientFuture[AMFValidationReport] = _internal.validate(bu).asClient
 
   /**
     * Validate a [[BaseUnit]] with a specific validation profile name
@@ -102,5 +102,5 @@ class AMFGraphClient private[amf] (private val _internal: InternalAMFGraphClient
     * @param profileName the [[amf.ProfileName]] of the desired validation profile
     * @return an [[AMFValidationReport]]
     */
-  def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport = _internal.validate(bu, profileName)
+  def validate(bu: BaseUnit, profileName: ProfileName): ClientFuture[AMFValidationReport] = _internal.validate(bu, profileName).asClient
 }

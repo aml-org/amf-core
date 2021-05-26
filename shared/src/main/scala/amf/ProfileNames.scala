@@ -32,8 +32,9 @@ case class ProfileName(private[amf] val p: String, private val m: MessageStyle =
   def isRaml(): Boolean          = false
 }
 
-object AmfProfile extends ProfileName(Amf.name)
-object AmlProfile extends ProfileName(Aml.name)
+object AmfProfile     extends ProfileName(Amf.name)
+object AmlProfile     extends ProfileName(Aml.name)
+object UnknownProfile extends ProfileName("")
 
 object Oas20Profile extends ProfileName(Oas20.name, OASStyle) {
   override def isOas(): Boolean = true
