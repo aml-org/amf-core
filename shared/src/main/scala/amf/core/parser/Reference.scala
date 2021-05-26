@@ -3,9 +3,8 @@ package amf.core.parser
 import amf.core.benchmark.ExecutionLog
 import amf.core.exception.CyclicReferenceException
 import amf.core.model.document.RecursiveUnit
-import amf.core.services.RuntimeCompiler
 import amf.core.unsafe.PlatformSecrets
-import amf.core.{CompilerContext, parser}
+import amf.core.{AMFCompiler, CompilerContext, parser}
 import org.yaml.model.YNode
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,7 +44,7 @@ case class Reference(url: String, refs: Seq[RefContainer]) extends PlatformSecre
     val kind  = if (kinds.size > 1) UnspecifiedReference else kinds.head
     try {
       val context = compilerContext.forReference(url, allowedMediaTypes = Some(allowedMediaTypes))
-      val res: Future[Future[ReferenceResolutionResult]] = RuntimeCompiler.forContext(context, None, kind) map {
+      val res: Future[Future[ReferenceResolutionResult]] = AMFCompiler.forContext(context, None, kind).build() map {
         eventualUnit =>
           Future(parser.ReferenceResolutionResult(None, Some(eventualUnit)))
       } recover {

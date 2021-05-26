@@ -5,6 +5,7 @@ import amf.core.remote.Syntax.{Json, Syntax, Yaml}
 
 case class Hint(vendor: Vendor, syntax: Syntax, kind: ReferenceKind = UnspecifiedReference) {
   def +(k: ReferenceKind): Hint = copy(kind = k)
+
 }
 
 object Raml10YamlHint extends Hint(Raml10, Yaml)
@@ -23,9 +24,9 @@ object Oas30YamlHint extends Hint(Oas30, Yaml)
 
 object Oas30JsonHint extends Hint(Oas30, Json)
 
-object AsyncYamlHint extends Hint(AsyncApi, Yaml)
+object Async20YamlHint extends Hint(AsyncApi20, Yaml)
 
-object AsyncJsonHint extends Hint(AsyncApi, Json)
+object Async20JsonHint extends Hint(AsyncApi20, Json)
 
 object AmfJsonHint extends Hint(Amf, Json)
 

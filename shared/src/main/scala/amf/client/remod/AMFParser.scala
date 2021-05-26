@@ -1,9 +1,8 @@
 package amf.client.remod
 
-import amf.{AmfProfile, ProfileName, UnknownProfile}
 import amf.client.convert.CoreClientConverters.platform
+import amf.core.AMFCompiler
 import amf.core.remote.{Cache, Context}
-import amf.core.services.RuntimeCompiler
 import amf.core.validation.AMFValidationReport
 import amf.internal.resource.{ResourceLoader, StringResourceLoader}
 
@@ -66,16 +65,12 @@ object AMFParser {
                               amfConfig: AMFGraphConfiguration): Future[AMFResult] = {
     val parseConfig                                 = amfConfig.parseConfiguration
     implicit val executionContext: ExecutionContext = parseConfig.executionContext
-    RuntimeCompiler(
-        url,
-        mediaType,
-        Context(platform),
-        cache = Cache(),
-        parseConfig
-    ) map { model =>
-      val results = parseConfig.eh.getResults
-      AMFResult(model, AMFValidationReport.forModel(model, results))
-    }
+    AMFCompiler(url, mediaType, Context(platform), Cache(), parseConfig)
+      .build()
+      .map { model =>
+        val results = parseConfig.eh.getResults
+        AMFResult(model, AMFValidationReport.forModel(model, results))
+      }
   }
 
   private def fromStream(url: String, stream: String): ResourceLoader =

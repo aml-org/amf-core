@@ -29,7 +29,7 @@ private[amf] case class AMFRenderPluginAdapter(plugin: AMFDocumentPlugin, overri
 
   override val id: String = plugin.ID
 
-  override val mediaTypes: Seq[String] = plugin.documentSyntaxes
+  override val mediaTypes: Seq[String] = plugin.vendors
 
   override def applies(renderingInfo: RenderInfo): Boolean = {
     plugin.canUnparse(renderingInfo.unit)

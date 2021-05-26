@@ -1,6 +1,6 @@
 package amf.core.remote
 
-import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 @JSExportTopLevel("core.Vendor")
 object Vendor {
@@ -99,13 +99,13 @@ object Oas30 extends Oas {
 
 object Raml08 extends Raml {
   override def version: String   = "0.8"
-  override val mediaType: String = "application/raml08+yaml"
+  override val mediaType: String = "application/raml08"
 }
 
 object Raml10 extends Raml {
   override def version: String = "1.0"
 
-  override val mediaType: String = "application/raml10+yaml"
+  override val mediaType: String = "application/raml10"
 }
 
 object AsyncApi extends Async {
