@@ -1,5 +1,6 @@
 package amf.core.model.document
 
+import amf.ProfileName
 import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.config.RenderOptions
 import amf.core.annotations.SourceVendor
@@ -134,6 +135,8 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
     case d: DeclaresModel => d.annotations.find(classOf[SourceVendor]).map(a => a.vendor)
     case _                => None
   }
+
+  protected[amf] def profileName: Option[ProfileName] = sourceVendor.map(v => ProfileName.apply(v.name))
 
   def sourceMediaType: String = sourceVendor.map(_.mediaType).getOrElse(Amf.mediaType)
 

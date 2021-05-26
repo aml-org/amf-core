@@ -1,5 +1,6 @@
 package amf.client.remod
 
+import amf.{AmfProfile, ProfileName, UnknownProfile}
 import amf.client.convert.CoreClientConverters.platform
 import amf.core.remote.{Cache, Context}
 import amf.core.services.RuntimeCompiler

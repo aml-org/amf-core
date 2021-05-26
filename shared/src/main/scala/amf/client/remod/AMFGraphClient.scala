@@ -28,7 +28,7 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
   def render(bu: BaseUnit, mediaType: String): Future[String] = AMFRenderer.render(bu, mediaType, configuration)
   def renderAST(bu: BaseUnit, mediaType: String): YDocument   = AMFRenderer.renderAST(bu, mediaType, configuration)
 
-  def validate(bu: BaseUnit): AMFValidationReport = AMFValidator.validate(bu, configuration)
-  def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport =
+  def validate(bu: BaseUnit): Future[AMFValidationReport] = AMFValidator.validate(bu, configuration)
+  def validate(bu: BaseUnit, profileName: ProfileName): Future[AMFValidationReport] =
     AMFValidator.validate(bu, profileName, configuration)
 }

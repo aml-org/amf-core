@@ -15,7 +15,7 @@ case class AMFResult(private[amf] val _internal: InternalAMFResult) {
   /**
     * @return result the resultant {@link amf.client.validate.AMFValidationReport} of the BaseUnit
     */
-  def validationResult: AMFValidationReport = _internal.result
+  def validationResult: AMFValidationReport = _internal.report
 
   /**
     * @return baseUnit {@link amf.client.model.document.BaseUnit} returned from AMF parse or transform
