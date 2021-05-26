@@ -18,7 +18,6 @@ object AMF {
     * Initializes AMF and all the registered plugins
     */
   def init()(implicit executionContext: ExecutionContext): Future[Unit] = {
-    AMFCompiler.init()
     val registeredSYamlPlugin    = SYamlSyntaxPlugin.init()
     val registeredAMFGraphPlugin = AMFGraphPlugin.init()
     Future

@@ -8,6 +8,9 @@ import amf.core.remote.Platform
 /** Shared Core registrations. */
 object CoreRegister {
 
+  // TODO ARM remove when APIMF-3000 is done
+  def register(): Unit = register(platform)
+
   def register(platform: Platform): Unit = {
     platform.registerWrapper(amf.core.metamodel.document.ModuleModel) {
       case m: amf.core.model.document.Module => Module(m)

@@ -1,11 +1,13 @@
 package amf.client.remod
 
 import amf.ProfileName
+import amf.client.convert.CoreRegister
 import amf.client.exported.config.{AMFLogger, MutedLogger}
 import amf.client.remod.amfcore.config._
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.plugins.parse.SyamlSyntaxParsePlugin
 import amf.client.remod.amfcore.plugins.render.{DefaultRenderConfiguration, SyamlSyntaxRenderPlugin}
+import amf.client.remod.amfcore.plugins.validate.ValidationConfiguration
 import amf.client.remod.amfcore.registry.AMFRegistry
 import amf.core.annotations.serializable.CoreSerializableAnnotations
 import amf.core.entities.CoreEntities
@@ -45,6 +47,7 @@ object AMFGraphConfiguration {
     *   - Without Any listener
     */
   def predefined(): AMFGraphConfiguration = {
+    CoreRegister.register() // TODO ARM remove when APIMF-3000 is done
     new AMFGraphConfiguration(
         AMFResolvers.predefined(),
         DefaultErrorHandlerProvider,
@@ -161,8 +164,9 @@ class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: A
   private[amf] def getUnitsCache: Option[UnitCache]         = resolvers.unitCache
   private[amf] def getExecutionContext: ExecutionContext    = resolvers.executionContext.executionContext
 
-  private[amf] lazy val parseConfiguration  = ParseConfiguration(this)
-  private[amf] lazy val renderConfiguration = DefaultRenderConfiguration(this)
+  private[amf] lazy val parseConfiguration      = ParseConfiguration(this)
+  private[amf] lazy val renderConfiguration     = DefaultRenderConfiguration(this)
+  private[amf] lazy val validationConfiguration = new ValidationConfiguration(this)
 
 }
 
