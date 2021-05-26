@@ -46,6 +46,7 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
   override def serializableAnnotations(): Map[String, AnnotationGraphLoader] = Map.empty
 
   override def documentSyntaxes: Seq[String] = Seq(
+      Amf.mediaType,
       "application/ld+json",
       "application/json",
       "application/amf+json",

@@ -345,7 +345,7 @@ class AMFCompiler(compilerContext: CompilerContext,
 object AMFCompiler {
   def init()(implicit executionContext: ExecutionContext) {
     // We register ourselves as the Runtime compiler
-    RuntimeCompiler.register(new AMFCompilerAdapter())
+//    RuntimeCompiler.register(new AMFCompilerAdapter())
   }
 }
 
