@@ -50,7 +50,7 @@ import amf.client.remote.Content
 import amf.client.resolve.{ClientErrorHandler, ClientErrorHandlerConverter}
 import amf.client.resource.{ResourceLoader => ClientResourceLoader}
 import amf.client.validate.{
-  AMFValidationReport => ClientValidatorReport,
+  AMFValidationReport => ClientValidationReport,
   PayloadValidator => ClientInternalPayloadValidator,
   ValidationCandidate => ClientValidationCandidate,
   ValidationResult => ClientValidationResult,
@@ -456,10 +456,10 @@ trait VariableValueConverter {
 }
 
 trait ValidationConverter {
-  implicit object ValidationReportMatcher extends BidirectionalMatcher[AMFValidationReport, ClientValidatorReport] {
-    override def asClient(from: AMFValidationReport): ClientValidatorReport = new ClientValidatorReport(from)
+  implicit object ValidationReportMatcher extends BidirectionalMatcher[AMFValidationReport, ClientValidationReport] {
+    override def asClient(from: AMFValidationReport): ClientValidationReport = new ClientValidationReport(from)
 
-    override def asInternal(from: ClientValidatorReport): AMFValidationReport = from._internal
+    override def asInternal(from: ClientValidationReport): AMFValidationReport = from._internal
   }
 
   implicit object ValidationResultMatcher extends BidirectionalMatcher[AMFValidationResult, ClientValidationResult] {

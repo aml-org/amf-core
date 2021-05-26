@@ -6,6 +6,7 @@ import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.unsafe.PlatformSecrets
+import amf.core.validation.core.ValidationProfile
 import amf.core.validation.{AMFValidationReport, EffectiveValidations}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,21 +15,22 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * TODO: environment is only there for the AMFPayloadValidationPlugin -> canValidate(Shape, Environment). The Environment is never used (checked XML also).
   */
-class ValidationConfiguration(amfConfig: AMFGraphConfiguration) {
+case class ValidationConfiguration(amfConfig: AMFGraphConfiguration) {
 
-  val eh: AMFErrorHandler                = amfConfig.errorHandlerProvider.errorHandler()
-  val executionContext: ExecutionContext = amfConfig.getExecutionContext
-  val maxYamlReferences: Option[Long]    = amfConfig.options.parsingOptions.maxYamlReferences
-
+  val eh: AMFErrorHandler                              = amfConfig.errorHandlerProvider.errorHandler()
+  val executionContext: ExecutionContext               = amfConfig.getExecutionContext
+  val maxYamlReferences: Option[Long]                  = amfConfig.options.parsingOptions.maxYamlReferences
+  val constraints: Map[ProfileName, ValidationProfile] = amfConfig.registry.constraintsRules
 }
 
 object ValidationConfiguration {
   def predefined(): ValidationConfiguration = new ValidationConfiguration(AMFGraphConfiguration.predefined())
 }
 
-class ValidationOptions(var profileName: ProfileName,
-                        var validations: EffectiveValidations,
-                        val config: ValidationConfiguration)
+case class ValidationOptions(profile: ProfileName,
+                             effectiveValidations: EffectiveValidations,
+                             config: ValidationConfiguration)
+class ValidationInfo(val baseUnit: BaseUnit, val profile: ProfileName)
 
 // TODO: this class shouldn't exist, used to propagate the resolved model
 case class ValidationResult(unit: BaseUnit, report: AMFValidationReport)

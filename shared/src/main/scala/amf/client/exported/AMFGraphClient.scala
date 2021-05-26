@@ -92,7 +92,7 @@ class AMFGraphClient private[amf] (private val _internal: InternalAMFGraphClient
     * @param bu [[BaseUnit]] to validate
     * @return an [[AMFValidationReport]]
     */
-  def validate(bu: BaseUnit): AMFValidationReport = _internal.validate(bu)
+  def validate(bu: BaseUnit): ClientFuture[AMFValidationReport] = _internal.validate(bu).asClient
 
   /**
     * Validate a [[BaseUnit]] with a specific validation profile name
@@ -100,5 +100,6 @@ class AMFGraphClient private[amf] (private val _internal: InternalAMFGraphClient
     * @param profileName the [[amf.ProfileName]] of the desired validation profile
     * @return an [[AMFValidationReport]]
     */
-  def validate(bu: BaseUnit, profileName: ProfileName): AMFValidationReport = _internal.validate(bu, profileName)
+  def validate(bu: BaseUnit, profileName: ProfileName): ClientFuture[AMFValidationReport] =
+    _internal.validate(bu, profileName).asClient
 }

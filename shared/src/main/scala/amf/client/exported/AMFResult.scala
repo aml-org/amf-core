@@ -15,7 +15,7 @@ case class AMFResult(private[amf] val _internal: InternalAMFResult) {
   /**
     * @return The resultant [[AMFValidationReport]] of the BaseUnit
     */
-  def validationResult: AMFValidationReport = _internal.result
+  def validationResult: AMFValidationReport = _internal.report
 
   /**
     * @return [[BaseUnit]] returned from AMF parse or transform. It can be:
