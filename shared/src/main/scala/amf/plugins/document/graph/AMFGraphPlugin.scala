@@ -39,7 +39,12 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
 
   override val validVendorsToReference: Seq[String] = Nil
 
-  val vendors: Seq[String] = Seq(Amf.name)
+  val vendors: Seq[String] = Seq("application/graph",
+                                 "application/graph+json",
+                                 "application/graph+jsonld",
+                                 "application/amf",
+                                 "application/amf+json",
+                                 "application/amf+jsonld")
 
   override def modelEntities: Seq[Obj] = AMFGraphEntities.entities.values.toSeq
 
