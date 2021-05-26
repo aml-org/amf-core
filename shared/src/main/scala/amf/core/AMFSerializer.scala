@@ -127,13 +127,13 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfigurati
       case _ => None
     }
 
-  private def render(): String = {
+  private[amf] def render(): String = {
     val w = new StringWriter
     render(w)
     w.toString
   }
 
-  private def getRenderPlugin: AMFRenderPlugin = {
+  private[amf] def getRenderPlugin: AMFRenderPlugin = {
     val renderPlugin =
       config.renderPlugins.filter(_.mediaTypes.contains(mediaType)).sorted.find(_.applies(RenderInfo(unit, mediaType)))
     renderPlugin.getOrElse {
