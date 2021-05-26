@@ -1,11 +1,7 @@
 package amf.core.parser
 
-import amf.Core
 import amf.client.convert.NativeOps
-import amf.client.parse.DefaultErrorHandler
-import amf.client.remod.ParseConfiguration
-import amf.core.remote.{Cache, Context}
-import amf.core.services.RuntimeCompiler
+import amf.client.remod.AMFGraphConfiguration
 import amf.core.unsafe.PlatformSecrets
 import org.scalatest.{AsyncFunSuite, Matchers}
 
@@ -16,17 +12,15 @@ trait DuplicateJsonKeysTest extends AsyncFunSuite with PlatformSecrets with Nati
   override implicit def executionContext: ExecutionContext = ExecutionContext.Implicits.global
 
   test("Parsed JSON with duplicate keys has several warnings") {
-    Core.init().asFuture.flatMap { _ =>
-      val errorHandler = DefaultErrorHandler()
-      val url          = "file://shared/src/test/resources/parser/duplicate-key.json"
-      RuntimeCompiler(url, None, base = Context(platform), cache = Cache(), ParseConfiguration(errorHandler)).map {
-        _ =>
-          val errors = errorHandler.getResults
-          errors.size should be(4)
-          val allAreDuplicateKeyWarnings =
-            errors.forall(r => r.completeMessage.contains("Duplicate key") && r.severityLevel.contains("Warning"))
-          allAreDuplicateKeyWarnings shouldBe true
-      }
+
+    val config = AMFGraphConfiguration.predefined()
+    val url    = "file://shared/src/test/resources/parser/duplicate-key.json"
+    config.createClient().parse(url).map { r =>
+      val errors = r.report.results
+      errors.size should be(4)
+      val allAreDuplicateKeyWarnings =
+        errors.forall(r => r.completeMessage.contains("Duplicate key") && r.severityLevel.contains("Warning"))
+      allAreDuplicateKeyWarnings shouldBe true
     }
   }
 }

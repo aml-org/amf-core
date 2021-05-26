@@ -594,7 +594,7 @@ object FlattenedGraphParser extends GraphContextHelper with GraphParserHelpers {
 
   private[amf] def findRootNodeImpl(m: YMap): Option[YNode] = {
     implicit val ctx: GraphParserContext = new GraphParserContext(
-        eh = IgnoringErrorHandler()
+        eh = IgnoringErrorHandler
     )
     m.key(JsonLdKeywords.Context).foreach(entry => JsonLdGraphContextParser(entry.value, ctx.graphContext).parse())
     m.key(JsonLdKeywords.Graph).flatMap { graphEntry =>

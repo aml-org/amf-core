@@ -5,7 +5,7 @@ import amf.core.validation.core.ValidationSpecification
 import org.mulesoft.lexer.SourceLocation
 import org.yaml.model.{SyamlException, YError}
 
-case class IgnoringErrorHandler() extends AMFErrorHandler {
+object IgnoringErrorHandler extends AMFErrorHandler {
   override def handle[T](error: YError, defaultValue: T): T = defaultValue
   override def warning(id: ValidationSpecification,
                        node: String,

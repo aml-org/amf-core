@@ -320,7 +320,7 @@ class EmbeddedGraphParser(config: ParseConfiguration)(implicit val ctx: GraphPar
       .map(entry => value(field.`type`, entry.value).as[YScalar].text)
 
   private def findType(typeString: String): Option[ModelDefaultBuilder] = {
-    config.registryContext.findType(typeString)
+    config.registryContext.findType(expandUriFromContext(typeString))
   }
 
   private def buildType(modelType: ModelDefaultBuilder, ann: Annotations): AmfObject = {

@@ -18,7 +18,6 @@ import amf.core.parser.{
   UnspecifiedReference
 }
 import amf.core.remote._
-import amf.core.services.RuntimeCompiler
 import amf.core.utils.AmfStrings
 import amf.core.validation.core.ValidationSpecification
 import amf.plugins.features.validation.CoreValidations._
@@ -153,11 +152,13 @@ class AMFCompiler(compilerContext: CompilerContext,
   }
 
   private def compile()(implicit executionContext: ExecutionContext): Future[BaseUnit] = {
+    compilerContext.parserContext.config.notifyEvent(StartingParsingEvent(compilerContext.path, mediaType))
     for {
       content <- fetchContent()
       ast     <- Future.successful(parseSyntax(content))
       parsed  <- parseDomain(ast)
     } yield {
+      compilerContext.parserContext.config.notifyEvent(FinishedParsingEvent(compilerContext.path, parsed))
       parsed
     }
   }
@@ -277,18 +278,16 @@ class AMFCompiler(compilerContext: CompilerContext,
 
   private[amf] def getDomainPluginFor(document: Root): Option[AMFParsePlugin] = {
     val allowed = filterByAllowed(compilerContext.parserContext.config.sortedParsePlugins,
-                                  compilerContext.allowedMediaTypes.map(s => s ++ mediaType))
+                                  compilerContext.allowedMediaTypes.getOrElse(Nil) ++ mediaType)
     allowed.find(_.applies(document))
   }
 
   /**
     * filters plugins that are allowed given the current compiler context.
     */
-  private def filterByAllowed(plugins: Seq[AMFParsePlugin], allowed: Option[Seq[String]]): Seq[AMFParsePlugin] =
-    allowed match {
-      case Some(allowedList) => plugins.filter(_.mediaTypes.exists(allowedList.contains(_)))
-      case None              => plugins
-    }
+  private def filterByAllowed(plugins: Seq[AMFParsePlugin], allowed: Seq[String]): Seq[AMFParsePlugin] =
+    if (allowed.nonEmpty) plugins.filter(_.mediaTypes.exists(allowed.contains(_)))
+    else plugins
 
   private[amf] def parseReferences(root: Root, domainPlugin: AMFParsePlugin)(
       implicit executionContext: ExecutionContext): Future[Root] = {
@@ -343,33 +342,25 @@ class AMFCompiler(compilerContext: CompilerContext,
 }
 
 object AMFCompiler {
-  def init()(implicit executionContext: ExecutionContext) {
-    // We register ourselves as the Runtime compiler
-//    RuntimeCompiler.register(new AMFCompilerAdapter())
+
+  // interface used by amf-service
+  def apply(url: String,
+            mediaType: Option[String],
+            base: Context,
+            cache: Cache,
+            parserConfig: ParseConfiguration,
+            referenceKind: ReferenceKind = UnspecifiedReference): AMFCompiler = {
+    val context = new CompilerContextBuilder(url, base.platform, parserConfig)
+      .withCache(cache)
+      .withFileContext(base)
+      .build()
+    forContext(context, mediaType, referenceKind)
   }
-}
 
-class AMFCompilerAdapter(implicit executionContext: ExecutionContext) extends RuntimeCompiler {
-  override def build(compilerContext: CompilerContext,
-                     mediaType: Option[String],
-                     referenceKind: ReferenceKind): Future[BaseUnit] = {
-    new AMFCompiler(compilerContext, mediaType, referenceKind).build()
+  // could not add new environment in this method as it forces breaking changes in ReferenceHandler
+  def forContext(compilerContext: CompilerContext,
+                 mediaType: Option[String],
+                 referenceKind: ReferenceKind = UnspecifiedReference): AMFCompiler = {
+    new AMFCompiler(compilerContext, mediaType, referenceKind)
   }
-}
-
-case class Root(parsed: ParsedDocument,
-                location: String,
-                mediatype: String,
-                references: Seq[ParsedReference],
-                referenceKind: ReferenceKind,
-                raw: String) {}
-
-object Root {
-  def apply(parsed: ParsedDocument,
-            location: String,
-            mediatype: String,
-            references: Seq[ParsedReference],
-            referenceKind: ReferenceKind,
-            raw: String): Root =
-    new Root(parsed, location.normalizeUrl, mediatype, references, referenceKind, raw)
 }
