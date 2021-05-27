@@ -1,8 +1,7 @@
 package amf.core.emitter
 
-import amf.core.annotations.SourceVendor
-import amf.core.parser.Annotations
-import amf.core.remote.{Amf, Async, Oas, Raml, Vendor}
+import amf.core.model.document.BaseUnit
+import amf.core.remote._
 
 /**
   * Created by pedro.colunga on 8/22/17.
@@ -23,19 +22,19 @@ object SpecOrdering {
     override def compare(x: Emitter, y: Emitter): Int = x.position().compareTo(y.position())
   }
 
-  def ordering(target: Vendor, annotations: Annotations): SpecOrdering = {
-    annotations.find(classOf[SourceVendor]) match {
-      case Some(SourceVendor(source)) if source == Amf || equivalent(source, target) => Lexical
-      case _                                                                         => Default
+  def ordering(target: Vendor, unit: BaseUnit): SpecOrdering = {
+    unit.sourceVendor match {
+      case Some(source: Vendor) if source == Amf || equivalent(source, target) => Lexical
+      case _                                                                   => Default
     }
   }
 
   private def equivalent(left: Vendor, right: Vendor) = {
     left match {
-      case _: Oas  => right.isInstanceOf[Oas]
-      case _: Raml => right.isInstanceOf[Raml]
+      case _: Oas   => right.isInstanceOf[Oas]
+      case _: Raml  => right.isInstanceOf[Raml]
       case _: Async => right.isInstanceOf[Async]
-      case _       => false
+      case _        => false
     }
   }
 }

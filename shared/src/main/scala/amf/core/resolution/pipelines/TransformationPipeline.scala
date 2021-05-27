@@ -29,9 +29,10 @@ private[amf] case class TransformationPipelineRunner(errorHandler: ErrorHandler,
     var m     = model
     val steps = pipeline.steps
     steps.zipWithIndex foreach {
-      case (s, index) =>
-        m = step(m, s, errorHandler)
-        notifyEvent(FinishedTransformationStepEvent(s, index))
+      case (transformStep, index) =>
+        m = step(m, transformStep, errorHandler)
+        m.transformedBy(transformStep.id)
+        notifyEvent(FinishedTransformationStepEvent(transformStep, index))
     }
     // TODO: should be unit metadata
     m.resolved = true

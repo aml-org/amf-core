@@ -22,10 +22,11 @@ trait BaseUnitModel extends Obj with ModelDefaultBuilder {
                "Indicates if the base unit represents the root of the document model obtained from parsing")
   )
 
-  val Location: Field = Field(
-      Str,
-      Document + "location",
-      ModelDoc(ModelVocabularies.AmlDoc, "location", "Location of the metadata document that generated this base unit"))
+  val Location: Field = Field(Str,
+                              Document + "location",
+                              ModelDoc(ModelVocabularies.AmlDoc,
+                                       "location",
+                                       "Location of the metadata document that generated this base unit"))
 
   val References: Field = Field(Array(BaseUnitModel),
                                 Document + "references",
@@ -49,17 +50,18 @@ trait BaseUnitModel extends Obj with ModelDefaultBuilder {
                "Link to the AML dialect describing a particular subgraph of information")
   )
 
-  // TODO: This is specific to web api, we should remove this from here
-  val ModelVersion: Field =
-    Field(Str, Document + "version", ModelDoc(ModelVocabularies.AmlDoc, "version", "Version of the current model"))
-
+  val AmfProcessingData: Field = Field(
+      AmfProcessingDataModel,
+      ValueType(Namespace.Meta, "unitActions"),
+      ModelDoc(ModelVocabularies.AmlDoc, "unitActions", "Describes processing information about the Unit")
+  )
 }
 
 object BaseUnitModel extends BaseUnitModel {
 
   override val `type`: List[ValueType] = List(Document + "Unit")
 
-  override val fields: List[Field] = List(ModelVersion, References, Usage, DescribedBy, Root)
+  override val fields: List[Field] = List(References, Usage, DescribedBy, Root, AmfProcessingData)
 
   override def modelInstance = throw new Exception("BaseUnit is an abstract class")
 
