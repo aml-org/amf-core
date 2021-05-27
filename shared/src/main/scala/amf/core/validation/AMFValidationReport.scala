@@ -1,6 +1,6 @@
 package amf.core.validation
 
-import amf.{AmfProfile, ProfileName}
+import amf.{AmfProfile, ProfileName, UnknownProfile}
 import amf.core.model.document.BaseUnit
 
 case class AMFValidationReport(conforms: Boolean,
@@ -51,10 +51,11 @@ object AMFValidationReport {
   def empty(model: String, profileName: ProfileName): AMFValidationReport = apply(model, profileName, Seq())
 
   def forModel(model: BaseUnit, results: List[AMFValidationResult]): AMFValidationReport = {
+    val profileName = model.profileName.getOrElse(UnknownProfile)
     new AMFValidationReport(
         !results.exists(r => r.severityLevel == SeverityLevels.VIOLATION),
         model.location().getOrElse(model.id),
-        model.sourceVendor.map(v => ProfileName.apply(v.name)).getOrElse(AmfProfile),
+        profileName,
         results
     )
   }
