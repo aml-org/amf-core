@@ -3,8 +3,8 @@ package amf.client.remod.amfcore.registry
 import amf.core.metamodel.{ModelDefaultBuilder, Obj}
 import amf.core.model.domain.AnnotationGraphLoader
 
-private[remod] case class EntitiesRegistry(domainEntities: Map[String, ModelDefaultBuilder],
-                                           serializableAnnotations: Map[String, AnnotationGraphLoader]) {
+private[amf] case class EntitiesRegistry(domainEntities: Map[String, ModelDefaultBuilder],
+                                         serializableAnnotations: Map[String, AnnotationGraphLoader]) {
 
   def withEntities(entities: Map[String, ModelDefaultBuilder]): EntitiesRegistry =
     copy(domainEntities = domainEntities ++ entities)
@@ -19,6 +19,6 @@ private[remod] case class EntitiesRegistry(domainEntities: Map[String, ModelDefa
 
 }
 
-private[remod] object EntitiesRegistry {
+private[amf] object EntitiesRegistry {
   val empty: EntitiesRegistry = EntitiesRegistry(Map.empty, Map.empty)
 }
