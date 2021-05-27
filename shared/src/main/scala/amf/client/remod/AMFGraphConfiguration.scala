@@ -220,11 +220,16 @@ sealed abstract class BaseAMFConfigurationSetter(private[amf] val resolvers: AMF
   protected def _withTransformationPipelines[T](pipelines: List[TransformationPipeline]): T =
     copy(registry = registry.withTransformationPipelines(pipelines)).asInstanceOf[T]
 
+  protected def _withContraintsRules[T](rules: Map[ProfileName, ValidationProfile]): T =
+    copy(registry = registry.withConstraintsRules(rules)).asInstanceOf[T]
+
   protected def _merge[T <: BaseAMFConfigurationSetter](other: T): T = {
     this
       ._withPlugins(other.registry.getAllPlugins())
       .asInstanceOf[T]
       ._withTransformationPipelines(other.registry.transformationPipelines.values.toList)
+      .asInstanceOf[T]
+      ._withContraintsRules(other.registry.constraintsRules)
       .asInstanceOf[T]
   }
 
