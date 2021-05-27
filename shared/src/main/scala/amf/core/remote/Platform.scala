@@ -63,20 +63,12 @@ trait Platform extends FileMediaType {
   val wrappersRegistry: mutable.HashMap[String, (AmfObject) => AmfObjectWrapper]             = mutable.HashMap.empty
   val wrappersRegistryFn: mutable.HashMap[(Obj) => Boolean, (AmfObject) => AmfObjectWrapper] = mutable.HashMap.empty
 
-  val validations: mutable.Set[ValidationSpecification]                     = mutable.Set.empty
-  val securityLevelOverrides: mutable.Map[String, Map[ProfileName, String]] = mutable.Map.empty
-
   def registerWrapper(model: Obj)(builder: (AmfObject) => AmfObjectWrapper): Option[AmfObject => AmfObjectWrapper] =
     wrappersRegistry.put(model.`type`.head.iri(), builder)
 
   def registerWrapperPredicate(p: (Obj) => Boolean)(
       builder: (AmfObject) => AmfObjectWrapper): Option[AmfObject => AmfObjectWrapper] =
     wrappersRegistryFn.put(p, builder)
-
-  def registerValidations(v: Seq[ValidationSpecification], l: Map[String, Map[ProfileName, String]]): Unit = {
-    validations ++= v
-    securityLevelOverrides ++= l
-  }
 
   def wrap[T <: AmfObjectWrapper](entity: AmfObject): T = entity match {
     case e: DomainElement =>

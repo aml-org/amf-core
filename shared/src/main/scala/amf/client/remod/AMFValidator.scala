@@ -44,7 +44,9 @@ object AMFValidator {
 
   private def findProfileHierarchy(profileName: ProfileName, constraints: Map[ProfileName, ValidationProfile], seen: Set[ProfileName] = Set.empty): Seq[ValidationProfile] = {
     if (seen.contains(profileName)) return Seq.empty
-    constraints.get(profileName)
+    constraints.map {
+      case (key, value) => key.p -> value
+    }.get(profileName.p)
       .map { profile =>
         profile.baseProfile
           .map(base => findProfileHierarchy(base, constraints, seen + profile.name))
