@@ -38,6 +38,9 @@ private[amf] case class AMFRegistry(plugins: PluginsRegistry,
   def withTransformationPipelines(pipelines: List[TransformationPipeline]): AMFRegistry =
     copy(transformationPipelines = transformationPipelines ++ pipelines.map(p => p.name -> p))
 
+  def withConstraintsRules(rules: Map[ProfileName, ValidationProfile]): AMFRegistry =
+    copy(constraintsRules = constraintsRules ++ rules)
+
   def withEntities(entities: Map[String, ModelDefaultBuilder]): AMFRegistry =
     copy(entitiesRegistry = entitiesRegistry.withEntities(entities))
 
