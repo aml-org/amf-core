@@ -68,7 +68,7 @@ import amf.core.resolution.stages.TransformationStep
 import amf.core.unsafe.PlatformSecrets
 import amf.core.validation._
 import amf.internal.reference.{CachedReference, UnitCache, UnitCacheAdapter}
-import amf.internal.resource.{ResourceLoader, ResourceLoaderAdapter}
+import amf.internal.resource.{ClientResourceLoaderAdapter, InternalResourceLoaderAdapter, ResourceLoader}
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
@@ -526,11 +526,12 @@ trait ResourceLoaderConverter {
 
   implicit object ResourceLoaderMatcher extends BidirectionalMatcherWithEC[ResourceLoader, ClientResourceLoader] {
     override def asInternal(from: ClientResourceLoader)(implicit executionContext: ExecutionContext): ResourceLoader =
-      ResourceLoaderAdapter(from)
+      InternalResourceLoaderAdapter(from)
 
     override def asClient(from: ResourceLoader)(implicit executionContext: ExecutionContext): ClientResourceLoader =
       from match {
-        case ResourceLoaderAdapter(adaptee) => adaptee
+        case InternalResourceLoaderAdapter(adaptee) => adaptee
+        case _                                      => ClientResourceLoaderAdapter(from)
       }
   }
 
