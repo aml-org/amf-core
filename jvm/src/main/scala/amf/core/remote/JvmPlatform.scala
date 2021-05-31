@@ -4,7 +4,7 @@ import java.net.URI
 import amf.client.execution.{BaseExecutionEnvironment, DefaultExecutionEnvironment, ExecutionEnvironment}
 import amf.client.resource.{FileResourceLoader, HttpResourceLoader}
 import amf.core.unsafe.PlatformBuilder
-import amf.internal.resource.{ResourceLoader, ResourceLoaderAdapter}
+import amf.internal.resource.{ResourceLoader, InternalResourceLoaderAdapter}
 import org.mulesoft.common.io.{FileSystem, Fs}
 
 import scala.concurrent.ExecutionContext
@@ -18,7 +18,6 @@ class JvmPlatform extends Platform {
 
   override val defaultExecutionEnvironment: ExecutionEnvironment = DefaultExecutionEnvironment()
 
-
   /** Platform out of the box [ResourceLoader]s */
   override def loaders(exec: BaseExecutionEnvironment = defaultExecutionEnvironment): Seq[ResourceLoader] = {
     implicit val executionContext: ExecutionContext = exec.executionContext
@@ -28,8 +27,8 @@ class JvmPlatform extends Platform {
   /** Platform out of the box [ResourceLoader]s */
   override def loaders()(implicit executionContext: ExecutionContext): Seq[ResourceLoader] = {
     Seq(
-      ResourceLoaderAdapter(FileResourceLoader(executionContext)),
-      ResourceLoaderAdapter(HttpResourceLoader(executionContext))
+        InternalResourceLoaderAdapter(FileResourceLoader(executionContext)),
+        InternalResourceLoaderAdapter(HttpResourceLoader(executionContext))
     )
   }
 

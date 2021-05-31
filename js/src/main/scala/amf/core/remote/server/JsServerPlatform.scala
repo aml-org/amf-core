@@ -1,7 +1,7 @@
 package amf.core.remote.server
 
 import amf.client.execution.{BaseExecutionEnvironment, DefaultExecutionEnvironment, ExecutionEnvironment}
-import amf.internal.resource.{ResourceLoader, ResourceLoaderAdapter}
+import amf.internal.resource.{ResourceLoader, InternalResourceLoaderAdapter}
 import amf.core.remote.File.FILE_PROTOCOL
 import amf.core.remote._
 import amf.core.remote.server.JsServerPlatform.OS
@@ -30,9 +30,9 @@ class JsServerPlatform extends JsPlatform {
   }
 
   override def loaders()(implicit executionContext: ExecutionContext): Seq[ResourceLoader] = Seq(
-      ResourceLoaderAdapter(JsServerFileResourceLoader()),
-      ResourceLoaderAdapter(JsServerHttpResourceLoader())
-    )
+      InternalResourceLoaderAdapter(JsServerFileResourceLoader()),
+      InternalResourceLoaderAdapter(JsServerHttpResourceLoader())
+  )
 
   /** Return temporary directory. */
   override def tmpdir(): String = OS.tmpdir() + "/"
