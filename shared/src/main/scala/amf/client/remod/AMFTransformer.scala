@@ -28,7 +28,7 @@ object AMFTransformer {
         )
         unit
     }
-    AMFResult(resolved, AMFValidationReport.forModel(resolved, handler.getResults))
+    AMFResult(resolved, handler.getResults)
   }
 
 }

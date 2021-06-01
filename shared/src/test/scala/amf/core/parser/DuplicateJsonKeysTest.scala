@@ -16,7 +16,7 @@ trait DuplicateJsonKeysTest extends AsyncFunSuite with PlatformSecrets with Nati
     val config = AMFGraphConfiguration.predefined()
     val url    = "file://shared/src/test/resources/parser/duplicate-key.json"
     config.createClient().parse(url).map { r =>
-      val errors = r.report.results
+      val errors = r.results
       errors.size should be(4)
       val allAreDuplicateKeyWarnings =
         errors.forall(r => r.completeMessage.contains("Duplicate key") && r.severityLevel.contains("Warning"))

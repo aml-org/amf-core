@@ -61,7 +61,7 @@ object AMFParser {
       .build()
       .map { model =>
         val results = parseConfig.eh.getResults
-        AMFResult(model, AMFValidationReport.forModel(model, results))
+        AMFResult(model, results)
       }
   }
 

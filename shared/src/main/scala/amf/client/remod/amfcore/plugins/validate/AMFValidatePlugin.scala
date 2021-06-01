@@ -7,7 +7,7 @@ import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit
 import amf.core.unsafe.PlatformSecrets
 import amf.core.validation.core.ValidationProfile
-import amf.core.validation.{AMFValidationReport, EffectiveValidations}
+import amf.core.validation.{AMFValidationReport, AMFValidationResult, EffectiveValidations}
 
 import scala.concurrent.{ExecutionContext, Future}
 
