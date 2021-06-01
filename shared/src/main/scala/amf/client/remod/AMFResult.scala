@@ -1,19 +1,17 @@
 package amf.client.remod
 
 import amf.core.model.document.{BaseUnit, Document}
-import amf.core.validation.{AMFValidationReport, AMFValidationResult}
+import amf.core.validation.{AMFValidationReport, AMFValidationResult, ReportConformance, SeverityLevels}
 
 import scala.concurrent.Future
 
 /**
   *
-  * @param bu {@link amf.core.model.document.BaseUnit} returned from AMF parse or transform
-  * @param report the resultant {@link amf.core.validation.AMFValidationReport} of the BaseUnit
   * @param bu [[BaseUnit]] returned from AMF parse or transform. It can be:
   *  - A [[BaseUnit]] when parsing/transformation is successful
-  *  - The most complete unit that could be built, and an [[AMFValidationReport]] report with errors/warnings found
-  * @param result the resultant [[AMFValidationReport]] of the BaseUnit
+  *  - The most complete unit that could be built, and a list of [[AMFValidationResult]] with errors/warnings found
+  * @param results list of [[AMFValidationResult]] obtained from AMF parse or transform
   */
-case class AMFResult(bu: BaseUnit, report: AMFValidationReport) {
-  def conforms: Boolean = report.conforms
+case class AMFResult(bu: BaseUnit, results: Seq[AMFValidationResult]) extends ReportConformance {
+  lazy val conforms: Boolean = resultsConform(results)
 }
