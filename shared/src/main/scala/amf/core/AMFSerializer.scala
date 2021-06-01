@@ -42,7 +42,7 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfigurati
 
     val builder = new YDocumentBuilder
     notifyEvent(StartingRenderingEvent(unit, renderPlugin, mediaType))
-    if (renderPlugin.emit(unit, builder, config)) {
+    if (renderPlugin.emit(unit, builder, options, config.errorHandler)) {
       val result = SyamlParsedDocument(builder.result.asInstanceOf[YDocument])
       notifyEvent(FinishedRenderingASTEvent(unit, result))
       result

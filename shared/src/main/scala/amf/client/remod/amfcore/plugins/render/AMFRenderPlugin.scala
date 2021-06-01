@@ -1,7 +1,6 @@
 package amf.client.remod.amfcore.plugins.render
 
 import amf.client.plugins.AMFDocumentPlugin
-import amf.client.remod.{AMFGraphConfiguration, ParseConfiguration}
 import amf.client.remod.amfcore.config.RenderOptions
 import amf.client.remod.amfcore.plugins.{AMFPlugin, PluginPriority}
 import amf.core.errorhandling.AMFErrorHandler
@@ -11,7 +10,10 @@ import org.yaml.builder.DocBuilder
 trait AMFRenderPlugin extends AMFPlugin[RenderInfo] {
   def defaultSyntax(): String
 
-  def emit[T](unit: BaseUnit, builder: DocBuilder[T], renderConfiguration: RenderConfiguration): Boolean
+  def emit[T](unit: BaseUnit,
+              builder: DocBuilder[T],
+              renderOptions: RenderOptions,
+              errorHandler: AMFErrorHandler): Boolean
 
   def mediaTypes: Seq[String]
 }
@@ -19,8 +21,11 @@ trait AMFRenderPlugin extends AMFPlugin[RenderInfo] {
 private[amf] case class AMFRenderPluginAdapter(plugin: AMFDocumentPlugin, override val defaultSyntax: String)
     extends AMFRenderPlugin {
 
-  override def emit[T](unit: BaseUnit, builder: DocBuilder[T], renderConfiguration: RenderConfiguration): Boolean =
-    plugin.emit(unit, builder, renderConfiguration.renderOptions, renderConfiguration.errorHandler)
+  override def emit[T](unit: BaseUnit,
+                       builder: DocBuilder[T],
+                       renderOptions: RenderOptions,
+                       errorHandler: AMFErrorHandler): Boolean =
+    plugin.emit(unit, builder, renderOptions, errorHandler)
 
   override val id: String = plugin.ID
 
