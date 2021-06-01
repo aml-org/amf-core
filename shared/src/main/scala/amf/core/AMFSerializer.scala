@@ -52,7 +52,7 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfigurati
   private def notifyEvent(e: AMFEvent): Unit = config.listeners.foreach(_.notifyEvent(e))
 
   /** Render to doc builder. */
-  def renderToBuilder[T](builder: DocBuilder[T])(implicit executor: ExecutionContext): Future[Unit] = Future {
+  def renderToBuilder[T](builder: DocBuilder[T])(implicit executor: ExecutionContext): Unit =
     mediaTypeExp.getPureVendorExp match {
       case Vendor.AMF.mediaType =>
         val namespaceAliases = generateNamespaceAliasesFromPlugins
@@ -63,7 +63,6 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfigurati
             EmbeddedJsonLdEmitter.emit(unit, builder, options, namespaceAliases)
         }
     }
-  }
 
   private def generateNamespaceAliasesFromPlugins: NamespaceAliases =
     config.namespacePlugins.sorted
@@ -72,14 +71,14 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfigurati
       .getOrElse(Namespace.defaultAliases)
 
   /** Print ast to writer. */
-  def renderToWriter[W: Output](writer: W)(implicit executor: ExecutionContext): Future[Unit] = Future(render(writer))
+  def renderToWriter[W: Output](writer: W)(implicit executor: ExecutionContext): Unit = render(writer)
 
   /** Print ast to string. */
-  def renderToString(implicit executor: ExecutionContext): Future[String] = Future(render())
+  def renderToString: String = render()
 
   /** Print ast to file. */
   def renderToFile(remote: Platform, path: String)(implicit executor: ExecutionContext): Future[Unit] =
-    renderToString.map(remote.write(path, _))
+    remote.write(path, renderToString)
 
   private def render[W: Output](writer: W): Unit = {
     ExecutionLog.log(s"AMFSerializer#render: Rendering to $mediaType ($mediaType file) ${unit.location()}")

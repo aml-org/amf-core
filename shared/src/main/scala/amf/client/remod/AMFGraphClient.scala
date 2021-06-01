@@ -71,14 +71,14 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
     * @param bu [[BaseUnit]] to be rendered
     * @return The content rendered
     */
-  def render(bu: BaseUnit): Future[String]                    = AMFRenderer.render(bu, configuration)
+  def render(bu: BaseUnit): String = AMFRenderer.render(bu, configuration)
 
   /**
     * Render a [[BaseUnit]] and return the AST
     * @param bu [[BaseUnit]] to be rendered
     * @return the AST as a [[YDocument]]
     */
-  def renderAST(bu: BaseUnit): YDocument                      = AMFRenderer.renderAST(bu, configuration)
+  def renderAST(bu: BaseUnit): YDocument = AMFRenderer.renderAST(bu, configuration)
 
   /**
     * Render a [[BaseUnit]] to a certain mediaType
@@ -87,7 +87,7 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
     *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
     * @return The content rendered
     */
-  def render(bu: BaseUnit, mediaType: String): Future[String] = AMFRenderer.render(bu, mediaType, configuration)
+  def render(bu: BaseUnit, mediaType: String): String = AMFRenderer.render(bu, mediaType, configuration)
 
   /**
     * Render a [[BaseUnit]] to a certain mediaType and return the AST
@@ -96,7 +96,7 @@ class AMFGraphClient(protected val configuration: AMFGraphConfiguration) {
     *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
     * @return the AST as a [[YDocument]]
     */
-  def renderAST(bu: BaseUnit, mediaType: String): YDocument   = AMFRenderer.renderAST(bu, mediaType, configuration)
+  def renderAST(bu: BaseUnit, mediaType: String): YDocument = AMFRenderer.renderAST(bu, mediaType, configuration)
 
   /**
     * Validate a [[BaseUnit]] with its default validation profile name

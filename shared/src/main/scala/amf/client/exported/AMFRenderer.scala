@@ -11,16 +11,15 @@ import scala.concurrent.ExecutionContext
 @JSExportAll
 @JSExportTopLevel("AMFRenderer")
 object AMFRenderer {
-  // TODO: return AMFRenderResult?
 
-  def render(bu: BaseUnit, env: AMFGraphConfiguration): ClientFuture[String] = {
+  def render(bu: BaseUnit, env: AMFGraphConfiguration): String = {
     implicit val executionContext: ExecutionContext = env.getExecutionContext
-    InternalAMFRenderer.render(bu, env).asClient
+    InternalAMFRenderer.render(bu, env)
   }
 
-  def render(bu: BaseUnit, mediaType: String, env: AMFGraphConfiguration): ClientFuture[String] = {
+  def render(bu: BaseUnit, mediaType: String, env: AMFGraphConfiguration): String = {
     implicit val executionContext: ExecutionContext = env.getExecutionContext
-    InternalAMFRenderer.render(bu, mediaType, env).asClient
+    InternalAMFRenderer.render(bu, mediaType, env)
   }
 
 }

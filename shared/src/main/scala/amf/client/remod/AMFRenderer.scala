@@ -9,7 +9,7 @@ import scala.concurrent.Future
 
 object AMFRenderer {
 
-  def render(bu: BaseUnit, configuration: AMFGraphConfiguration): Future[String] = render(bu, AMF.mediaType, configuration)
+  def render(bu: BaseUnit, configuration: AMFGraphConfiguration): String = render(bu, AMF.mediaType, configuration)
 
   def renderAST(bu: BaseUnit, configuration: AMFGraphConfiguration): YDocument = ???
 
@@ -20,8 +20,8 @@ object AMFRenderer {
     * @param env
     * @return
     */
-  def render(bu: BaseUnit, mediaType: String, configuration: AMFGraphConfiguration): Future[String] =
-    new AMFSerializer(bu, mediaType, configuration.renderConfiguration).renderToString(configuration.getExecutionContext)
+  def render(bu: BaseUnit, mediaType: String, configuration: AMFGraphConfiguration): String =
+    new AMFSerializer(bu, mediaType, configuration.renderConfiguration).renderToString
 
   def renderAST(bu: BaseUnit, mediaType: String, configuration: AMFGraphConfiguration): YDocument = ???
 

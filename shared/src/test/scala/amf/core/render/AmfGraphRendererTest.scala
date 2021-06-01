@@ -12,7 +12,7 @@ import amf.core.remote.Vendor.AMF
 import amf.core.vocabulary.Namespace
 import org.scalatest.AsyncFunSuite
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 trait AmfGraphRendererTest
     extends AsyncFunSuite
@@ -27,13 +27,12 @@ trait AmfGraphRendererTest
     val golden = "shared/src/test/resources/parser/simple-document.jsonld"
 
     for {
-      _ <- Core.init().asFuture // TODO ARM: when wrapper stop being registered, remove this
-      rendered <- AMFGraphConfiguration
-        .predefined()
-        .withRenderOptions(new RenderOptions().withPrettyPrint)
-        .createClient()
-        .render(BaseUnitMatcher.asClient(document), AMF.mediaType)
-        .asFuture
+      rendered <- Future.successful(
+          AMFGraphConfiguration
+            .predefined()
+            .withRenderOptions(new RenderOptions().withPrettyPrint)
+            .createClient()
+            .render(BaseUnitMatcher.asClient(document), AMF.mediaType))
       file   <- writeTemporaryFile(golden)(rendered)
       result <- assertDifferences(file, golden)
     } yield result
