@@ -1,7 +1,7 @@
 package amf.core.remote.browser
 
 import amf.client.execution.BaseExecutionEnvironment
-import amf.internal.resource.{ResourceLoader, ResourceLoaderAdapter}
+import amf.internal.resource.{ResourceLoader, InternalResourceLoaderAdapter}
 import amf.core.remote._
 import org.mulesoft.common.io.FileSystem
 
@@ -24,8 +24,7 @@ class JsBrowserPlatform extends JsPlatform {
 
   /** Platform out of the box [ResourceLoader]s */
   override def loaders()(implicit executionContext: ExecutionContext): Seq[ResourceLoader] =
-    Seq(ResourceLoaderAdapter(JsBrowserHttpResourceLoader()))
-
+    Seq(InternalResourceLoaderAdapter(JsBrowserHttpResourceLoader()))
 
   /** Return temporary directory. */
   override def tmpdir(): String = {
