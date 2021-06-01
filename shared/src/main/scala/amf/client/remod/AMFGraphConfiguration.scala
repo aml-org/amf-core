@@ -8,6 +8,7 @@ import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.plugins.parse.SyamlSyntaxParsePlugin
 import amf.client.remod.amfcore.plugins.render.{DefaultRenderConfiguration, SyamlSyntaxRenderPlugin}
 import amf.client.remod.amfcore.plugins.validate.ValidationConfiguration
+import amf.client.remod.amfcore.plugins.validate.ValidationConfiguration
 import amf.client.remod.amfcore.registry.AMFRegistry
 import amf.core.annotations.serializable.CoreSerializableAnnotations
 import amf.core.entities.CoreEntities
@@ -226,7 +227,7 @@ sealed abstract class BaseAMFConfigurationSetter(private[amf] val resolvers: AMF
   protected def _withTransformationPipelines[T](pipelines: List[TransformationPipeline]): T =
     copy(registry = registry.withTransformationPipelines(pipelines)).asInstanceOf[T]
 
-  protected def _withContraintsRules[T](rules: Map[ProfileName, ValidationProfile]): T =
+  protected def _withConstraintsRules[T](rules: Map[ProfileName, ValidationProfile]): T =
     copy(registry = registry.withConstraintsRules(rules)).asInstanceOf[T]
 
   protected def _merge[T <: BaseAMFConfigurationSetter](other: T): T = {
@@ -235,7 +236,7 @@ sealed abstract class BaseAMFConfigurationSetter(private[amf] val resolvers: AMF
       .asInstanceOf[T]
       ._withTransformationPipelines(other.registry.transformationPipelines.values.toList)
       .asInstanceOf[T]
-      ._withContraintsRules(other.registry.constraintsRules)
+      ._withConstraintsRules(other.registry.constraintsRules)
       .asInstanceOf[T]
   }
 
