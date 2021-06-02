@@ -28,8 +28,7 @@ object GraphDependenciesReferenceHandler extends ReferenceHandler {
   }
 
   private def collectFromFlattened(document: YDocument)(implicit errorHandler: IllegalTypeHandler) = {
-    val m        = document.as[YMap]
-    val rootNode = FlattenedGraphParser.findRootNode.runCached(m)
+    val rootNode = FlattenedUnitGraphParser.findRootNode.runCached(document)
     rootNode match {
       case Some(rootNode) if rootNode.tagType == YType.Map =>
         collectGraphDependenciesFrom(rootNode.as[YMap])

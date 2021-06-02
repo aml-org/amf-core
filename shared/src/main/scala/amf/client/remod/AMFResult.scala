@@ -1,6 +1,8 @@
 package amf.client.remod
 
 import amf.core.model.document.{BaseUnit, Document}
+import amf.core.model.domain.AmfObject
+import amf.core.validation.{AMFValidationReport, AMFValidationResult}
 import amf.core.validation.{AMFValidationReport, AMFValidationResult, ReportConformance, SeverityLevels}
 
 import scala.concurrent.Future
@@ -12,4 +14,6 @@ import scala.concurrent.Future
   *  - The most complete unit that could be built, and a list of [[AMFValidationResult]] with errors/warnings found
   * @param results list of [[AMFValidationResult]] obtained from AMF parse or transform
   */
-case class AMFResult(bu: BaseUnit, results: Seq[AMFValidationResult]) extends ReportConformance(results)
+case class AMFResult(bu: BaseUnit, results: Seq[AMFValidationResult]) extends AMFObjectResult(bu,results)
+
+class AMFObjectResult(val element: AmfObject, results: Seq[AMFValidationResult]) extends ReportConformance(results)

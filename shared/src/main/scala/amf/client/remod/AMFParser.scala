@@ -1,9 +1,9 @@
 package amf.client.remod
 
 import amf.client.convert.CoreClientConverters.platform
-import amf.core.AMFCompiler
 import amf.core.remote.{Cache, Context}
 import amf.core.validation.AMFValidationReport
+import amf.core.{AMFCompiler, AMFGraphPartialCompiler, AmfObjectUnitContainer, CompilerContextBuilder}
 import amf.internal.resource.{ResourceLoader, StringResourceLoader}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -51,6 +51,24 @@ object AMFParser {
   def parseContent(content: String, mediaType: String, configuration: AMFGraphConfiguration): Future[AMFResult] =
     parseContent(content, DEFAULT_DOCUMENT_URL, Some(mediaType), configuration)
 
+  def parseStartingPoint(graphUrl: String,
+                         startingPoint: String,
+                         env: AMFGraphConfiguration): Future[AMFObjectResult] = {
+    val configuration                               = env.parseConfiguration
+    implicit val executionContext: ExecutionContext = configuration.executionContext
+    val context = new CompilerContextBuilder(graphUrl, platform, configuration)
+      .withCache(Cache())
+      .withFileContext(Context(platform))
+      .build()
+    val compiler = new AMFGraphPartialCompiler(context, startingPoint)
+    build(compiler, configuration).map { r =>
+      r.bu match {
+        case container: AmfObjectUnitContainer => new AMFObjectResult(container.result, r.report)
+        case _                                 => throw new UnsupportedOperationException("Unexpected result unit type for partial parsing")
+      }
+    }
+  }
+
   private[amf] def parseContent(content: String,
                                 url: String,
                                 mediaType: Option[String],
@@ -65,7 +83,11 @@ object AMFParser {
                               amfConfig: AMFGraphConfiguration): Future[AMFResult] = {
     val parseConfig                                 = amfConfig.parseConfiguration
     implicit val executionContext: ExecutionContext = parseConfig.executionContext
-    AMFCompiler(url, mediaType, Context(platform), Cache(), parseConfig)
+    build(AMFCompiler(url, mediaType, Context(platform), Cache(), parseConfig), parseConfig)
+  }
+
+  private def build(compiler: AMFCompiler, parserConfig: ParseConfiguration)(implicit context: ExecutionContext) = {
+    compiler
       .build()
       .map { model =>
         val results = parseConfig.eh.getResults

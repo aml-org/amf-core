@@ -97,6 +97,16 @@ object CoreValidations extends Validations {
       "Unable to parse document"
   )
 
+  val InvalidRootStructure = validation(
+      "invalid-root-structure",
+      "Unable to parse map at given structure"
+  )
+
+  val UnableToParseDomainElement = validation(
+      "parse-domain-element-fail",
+      "Parsed element for @id is not a domain element"
+  )
+
   val MissingIdInNode = validation(
       "missing-id-in-node",
       "Missing @id in json-ld node"

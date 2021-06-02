@@ -14,6 +14,7 @@ import amf.core.annotations.serializable.CoreSerializableAnnotations
 import amf.core.entities.CoreEntities
 import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.{ModelDefaultBuilder, Obj}
+import amf.core.model.domain.AnnotationGraphLoader
 import amf.core.parser.ParserContext
 import amf.core.resolution.pipelines.{BasicTransformationPipeline, TransformationPipeline}
 import amf.core.validation.core.ValidationProfile
@@ -119,6 +120,10 @@ class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: A
   def withPlugins(plugins: List[AMFPlugin[_]]): AMFGraphConfiguration = super._withPlugins(plugins)
 
   def withEntities(entities: Map[String, ModelDefaultBuilder]): AMFGraphConfiguration = super._withEntities(entities)
+
+  def withAnnotations(annotations: Map[String, AnnotationGraphLoader]): AMFGraphConfiguration =
+    super._withAnnotations(annotations)
+
   // //TODO: ARM - delete
   def removePlugin(id: String): AMFGraphConfiguration = super._removePlugin(id)
 
@@ -202,6 +207,9 @@ sealed abstract class BaseAMFConfigurationSetter(private[amf] val resolvers: AMF
 
   protected def _withEntities[T](entities: Map[String, ModelDefaultBuilder]): T =
     copy(registry = registry.withEntities(entities)).asInstanceOf[T]
+
+  protected def _withAnnotations[T](ann: Map[String, AnnotationGraphLoader]): T =
+    copy(registry = registry.withAnnotations(ann)).asInstanceOf[T]
 
   // //TODO: ARM - delete
   protected def _removePlugin[T](id: String): T = copy(registry = registry.removePlugin(id)).asInstanceOf[T]

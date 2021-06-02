@@ -5,9 +5,11 @@ import amf.plugins.document.graph.JsonLdKeywords
 import amf.plugins.document.graph.context.GraphContext
 import org.yaml.model._
 
-case class JsonLdGraphContextParser(node: YNode, context: GraphContext = GraphContext()) {
+case class JsonLdGraphContextParser(node: YNode, parserContext: GraphParserContext) {
+  val context: GraphContext                     = parserContext.graphContext
+  implicit val errorHandler: IllegalTypeHandler = parserContext
 
-  def parse()(implicit errorHandler: IllegalTypeHandler): GraphContext = {
+  def parse(): GraphContext = {
     node.tagType match {
       case YType.Map => parseMap(node.value.asInstanceOf[YMap])
       case YType.Str => parseRemoteContext()
@@ -32,8 +34,7 @@ case class JsonLdGraphContextParser(node: YNode, context: GraphContext = GraphCo
     context
   }
 
-  private def parseExpandedTermEntry(entry: YMapEntry, term: String)(
-      implicit errorHandler: IllegalTypeHandler): Unit = {
+  private def parseExpandedTermEntry(entry: YMapEntry, term: String)(implicit errorHandler: IllegalTypeHandler): Unit = {
     val termMap = entry.value.value.asInstanceOf[YMap]
 
     val id     = termMap.key(JsonLdKeywords.Id).map(_.value.as[String])

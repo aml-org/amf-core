@@ -158,15 +158,18 @@ trait GraphParserHelpers extends GraphContextHelper {
 
   protected def nodeIsOfType(node: YNode, obj: Obj)(implicit ctx: GraphParserContext): Boolean = {
     node.value match {
-      case map: YMap =>
-        map.key(JsonLdKeywords.Type).exists { entry =>
-          val types = entry.value.as[YSequence].nodes.flatMap(_.asScalar)
-          types.exists(`type` => {
-            val typeIri = expandUriFromContext(`type`.text)
-            obj.`type`.map(_.iri()).contains(typeIri)
-          })
-        }
-      case _ => false
+      case map: YMap => nodeIsOfType(map, obj)
+      case _         => false
+    }
+  }
+
+  protected def nodeIsOfType(map: YMap, obj: Obj)(implicit ctx: GraphParserContext): Boolean = {
+    map.key(JsonLdKeywords.Type).exists { entry =>
+      val types = entry.value.as[YSequence].nodes.flatMap(_.asScalar)
+      types.exists(`type` => {
+        val typeIri = expandUriFromContext(`type`.text)
+        obj.`type`.map(_.iri()).contains(typeIri)
+      })
     }
   }
 
@@ -306,12 +309,23 @@ abstract class GraphContextHelper extends GraphContextOperations {
     }
   }
 
-  private def resolveWithBase(id: String, ctx: GraphParserContext): String = {
-    val prefixOption = ctx.graphContext.base.map { base =>
+  protected def adaptUriToContext(iri: String)(implicit ctx: GraphParserContext): String = {
+    IriClassification.classify(iri) match {
+      case AbsoluteIri => iri.stripPrefix(getPrefixOption(iri, ctx).getOrElse(""))
+      case RelativeIri => iri
+    }
+  }
+
+  private def getPrefixOption(id: String, ctx: GraphParserContext): Option[String] = {
+    ctx.graphContext.base.map { base =>
       if (id.startsWith("./")) base.parent.iri + "/"
       else base.iri
     }
-    val prefix = prefixOption.getOrElse("")
+  }
+
+  private def resolveWithBase(id: String, ctx: GraphParserContext): String = {
+    val prefixOption = getPrefixOption(id, ctx)
+    val prefix       = prefixOption.getOrElse("")
     s"$prefix$id"
   }
 }

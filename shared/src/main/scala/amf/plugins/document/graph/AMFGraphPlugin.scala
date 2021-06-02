@@ -21,7 +21,12 @@ import amf.core.resolution.pipelines.{
 import amf.core.unsafe.PlatformSecrets
 import amf.plugins.document.graph.emitter.EmbeddedJsonLdEmitter
 import amf.plugins.document.graph.entities.AMFGraphEntities
-import amf.plugins.document.graph.parser.{EmbeddedGraphParser, FlattenedGraphParser, GraphDependenciesReferenceHandler}
+import amf.plugins.document.graph.parser.{
+  EmbeddedGraphParser,
+  FlattenedGraphParser,
+  FlattenedUnitGraphParser,
+  GraphDependenciesReferenceHandler
+}
 import org.yaml.builder.DocBuilder
 import org.yaml.model.YDocument
 
@@ -62,17 +67,17 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
   override def canParse(root: Root): Boolean = {
     root.parsed match {
       case parsed: SyamlParsedDocument =>
-        FlattenedGraphParser.canParse(parsed) || EmbeddedGraphParser.canParse(parsed)
+        FlattenedUnitGraphParser.canParse(parsed) || EmbeddedGraphParser.canParse(parsed)
       case _: RdfModelDocument => true
-
-      case _ => false
+      case _                   => false
     }
   }
 
   override def parse(root: Root, ctx: ParserContext): BaseUnit =
     root.parsed match {
-      case parsed: SyamlParsedDocument if FlattenedGraphParser.canParse(parsed) =>
-        FlattenedGraphParser(ctx.config).parse(parsed.document, effectiveUnitUrl(root.location, ctx.parsingOptions))
+      case parsed: SyamlParsedDocument if FlattenedUnitGraphParser.canParse(parsed) =>
+        FlattenedUnitGraphParser(ctx.config)
+          .parse(parsed.document, effectiveUnitUrl(root.location, ctx.parsingOptions))
       case parsed: SyamlParsedDocument if EmbeddedGraphParser.canParse(parsed) =>
         EmbeddedGraphParser(ctx.config).parse(parsed.document, effectiveUnitUrl(root.location, ctx.parsingOptions))
       case parsed: RdfModelDocument =>

@@ -45,7 +45,7 @@ class EmbeddedGraphParser(config: ParseConfiguration)(implicit val ctx: GraphPar
         seq  <- document.node.toOption[Seq[YMap]]
         head <- seq.headOption
         parsed <- {
-          head.key(JsonLdKeywords.Context, e => JsonLdGraphContextParser(e.value, ctx.graphContext).parse())
+          head.key(JsonLdKeywords.Context, e => JsonLdGraphContextParser(e.value, ctx).parse())
           parse(head)
         }
       } yield {
