@@ -12,6 +12,4 @@ import scala.concurrent.Future
   *  - The most complete unit that could be built, and a list of [[AMFValidationResult]] with errors/warnings found
   * @param results list of [[AMFValidationResult]] obtained from AMF parse or transform
   */
-case class AMFResult(bu: BaseUnit, results: Seq[AMFValidationResult]) extends ReportConformance {
-  lazy val conforms: Boolean = resultsConform(results)
-}
+case class AMFResult(bu: BaseUnit, results: Seq[AMFValidationResult]) extends ReportConformance(results)

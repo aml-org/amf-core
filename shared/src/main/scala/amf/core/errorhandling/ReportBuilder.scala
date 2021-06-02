@@ -6,7 +6,6 @@ import amf.core.validation._
 class AmfReportBuilder(model: BaseUnit, profileName: ProfileName) {
   def buildReport(results: Seq[AMFValidationResult]): AMFValidationReport = {
     AMFValidationReport(
-        conforms = !results.exists(_.severityLevel == SeverityLevels.VIOLATION),
         model = model.id,
         profile = profileName,
         results = results
