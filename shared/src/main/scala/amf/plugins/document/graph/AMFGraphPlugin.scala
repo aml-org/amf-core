@@ -2,7 +2,6 @@ package amf.plugins.document.graph
 
 import amf.client.plugins.{AMFDocumentPlugin, AMFPlugin}
 import amf.client.remod.amfcore.config.RenderOptions
-import amf.client.remod.amfcore.plugins.render.AMFRenderPluginAdapter
 import amf.core.Root
 import amf.core.errorhandling.AMFErrorHandler
 import amf.core.metamodel.Obj
@@ -23,8 +22,6 @@ import org.yaml.builder.DocBuilder
 import org.yaml.model.YDocument
 
 import scala.concurrent.{ExecutionContext, Future}
-
-object AMFGraphRenderPlugin extends AMFRenderPluginAdapter(AMFGraphPlugin, "application/json")
 
 object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
 

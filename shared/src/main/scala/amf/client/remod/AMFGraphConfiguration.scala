@@ -8,12 +8,11 @@ import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.plugins.parse.SyamlSyntaxParsePlugin
 import amf.client.remod.amfcore.plugins.render.{DefaultRenderConfiguration, SyamlSyntaxRenderPlugin}
 import amf.client.remod.amfcore.plugins.validate.ValidationConfiguration
-import amf.client.remod.amfcore.plugins.validate.ValidationConfiguration
 import amf.client.remod.amfcore.registry.AMFRegistry
 import amf.core.annotations.serializable.CoreSerializableAnnotations
 import amf.core.entities.CoreEntities
 import amf.core.errorhandling.AMFErrorHandler
-import amf.core.metamodel.{ModelDefaultBuilder, Obj}
+import amf.core.metamodel.ModelDefaultBuilder
 import amf.core.model.domain.AnnotationGraphLoader
 import amf.core.parser.ParserContext
 import amf.core.resolution.pipelines.{BasicTransformationPipeline, TransformationPipeline}
@@ -22,8 +21,8 @@ import amf.internal.environment.Environment
 import amf.internal.reference.UnitCache
 import amf.internal.resource.ResourceLoader
 import amf.plugins.document.graph.entities.AMFGraphEntities
-import amf.plugins.document.graph.AMFGraphRenderPlugin
 import amf.plugins.parse.AMFGraphParsePlugin
+import amf.plugins.render.AMFGraphRenderPlugin
 
 import scala.concurrent.ExecutionContext
 // all constructors only visible from amf. Users should always use builders or defaults
