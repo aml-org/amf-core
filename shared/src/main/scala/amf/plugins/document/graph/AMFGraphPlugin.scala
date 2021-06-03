@@ -1,17 +1,14 @@
 package amf.plugins.document.graph
 
 import amf.client.plugins.{AMFDocumentPlugin, AMFPlugin}
-import amf.client.remod.amfcore.config.{ParsingOptions, RenderOptions}
-import amf.client.remod.amfcore.plugins.parse.AMFParsePluginAdapter
+import amf.client.remod.amfcore.config.RenderOptions
 import amf.client.remod.amfcore.plugins.render.AMFRenderPluginAdapter
 import amf.core.Root
 import amf.core.errorhandling.AMFErrorHandler
-import amf.core.exception.UnsupportedParsedDocumentException
 import amf.core.metamodel.Obj
 import amf.core.model.document.BaseUnit
 import amf.core.model.domain.AnnotationGraphLoader
 import amf.core.parser._
-import amf.core.rdf.{RdfModelDocument, RdfModelParser}
 import amf.core.remote.Amf
 import amf.core.resolution.pipelines.{
   BasicEditingTransformationPipeline,
@@ -21,18 +18,12 @@ import amf.core.resolution.pipelines.{
 import amf.core.unsafe.PlatformSecrets
 import amf.plugins.document.graph.emitter.EmbeddedJsonLdEmitter
 import amf.plugins.document.graph.entities.AMFGraphEntities
-import amf.plugins.document.graph.parser.{
-  EmbeddedGraphParser,
-  FlattenedGraphParser,
-  FlattenedUnitGraphParser,
-  GraphDependenciesReferenceHandler
-}
+import amf.plugins.parse.AMFGraphParsePlugin
 import org.yaml.builder.DocBuilder
 import org.yaml.model.YDocument
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object AMFGraphParsePlugin  extends AMFParsePluginAdapter(AMFGraphPlugin)
 object AMFGraphRenderPlugin extends AMFRenderPluginAdapter(AMFGraphPlugin, "application/json")
 
 object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
@@ -44,12 +35,7 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
 
   override val validVendorsToReference: Seq[String] = Nil
 
-  val vendors: Seq[String] = Seq("application/graph",
-                                 "application/graph+json",
-                                 "application/graph+jsonld",
-                                 "application/amf",
-                                 "application/amf+json",
-                                 "application/amf+jsonld")
+  val vendors: Seq[String] = AMFGraphParsePlugin.mediaTypes
 
   override def modelEntities: Seq[Obj] = AMFGraphEntities.entities.values.toSeq
 
@@ -64,26 +50,9 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
       "application/graph"
   )
 
-  override def canParse(root: Root): Boolean = {
-    root.parsed match {
-      case parsed: SyamlParsedDocument =>
-        FlattenedUnitGraphParser.canParse(parsed) || EmbeddedGraphParser.canParse(parsed)
-      case _: RdfModelDocument => true
-      case _                   => false
-    }
-  }
+  override def canParse(root: Root): Boolean = AMFGraphParsePlugin.applies(root)
 
-  override def parse(root: Root, ctx: ParserContext): BaseUnit =
-    root.parsed match {
-      case parsed: SyamlParsedDocument if FlattenedUnitGraphParser.canParse(parsed) =>
-        FlattenedUnitGraphParser(ctx.config)
-          .parse(parsed.document, effectiveUnitUrl(root.location, ctx.parsingOptions))
-      case parsed: SyamlParsedDocument if EmbeddedGraphParser.canParse(parsed) =>
-        EmbeddedGraphParser(ctx.config).parse(parsed.document, effectiveUnitUrl(root.location, ctx.parsingOptions))
-      case parsed: RdfModelDocument =>
-        RdfModelParser(ctx.config).parse(parsed.model, effectiveUnitUrl(root.location, ctx.parsingOptions))
-      case _ => throw UnsupportedParsedDocumentException
-    }
+  override def parse(root: Root, ctx: ParserContext): BaseUnit = AMFGraphParsePlugin.parse(root, ctx)
 
   override def canUnparse(unit: BaseUnit) = true
 
@@ -98,7 +67,7 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
                                             errorHandler: AMFErrorHandler): Option[YDocument] =
     throw new IllegalStateException("Unreachable")
 
-  override def referenceHandler(eh: AMFErrorHandler): ReferenceHandler = GraphDependenciesReferenceHandler
+  override def referenceHandler(eh: AMFErrorHandler): ReferenceHandler = AMFGraphParsePlugin.referenceHandler(eh)
 
   override val pipelines: Map[String, TransformationPipeline] = Map(
       BasicTransformationPipeline.name        -> BasicTransformationPipeline(),
@@ -108,13 +77,5 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
   /**
     * Does references in this type of documents be recursive?
     */
-  override val allowRecursiveReferences: Boolean = true
-
-  protected def effectiveUnitUrl(location: String, options: ParsingOptions): String = {
-    options.definedBaseUrl match {
-      case Some(url) => url
-      case None      => location
-    }
-  }
-
+  override val allowRecursiveReferences: Boolean = AMFGraphParsePlugin.allowRecursiveReferences
 }

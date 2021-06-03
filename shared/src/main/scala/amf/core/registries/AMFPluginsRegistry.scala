@@ -2,8 +2,6 @@ package amf.core.registries
 
 import amf.client.plugins._
 import amf.client.remod.AMFGraphConfiguration
-import amf.client.remod.amfcore.plugins.parse.AMFParsePluginAdapter
-import amf.client.remod.amfcore.plugins.render.AMFRenderPluginAdapter
 import amf.core.validation.AMFPayloadValidationPlugin
 import amf.core.validation.core.ValidationProfile
 

@@ -22,7 +22,8 @@ import amf.internal.environment.Environment
 import amf.internal.reference.UnitCache
 import amf.internal.resource.ResourceLoader
 import amf.plugins.document.graph.entities.AMFGraphEntities
-import amf.plugins.document.graph.{AMFGraphParsePlugin, AMFGraphRenderPlugin}
+import amf.plugins.document.graph.AMFGraphRenderPlugin
+import amf.plugins.parse.AMFGraphParsePlugin
 
 import scala.concurrent.ExecutionContext
 // all constructors only visible from amf. Users should always use builders or defaults
