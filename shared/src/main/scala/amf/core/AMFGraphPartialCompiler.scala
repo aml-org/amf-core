@@ -23,31 +23,32 @@ class AMFGraphPartialCompiler(compilerContext: CompilerContext, startingPoint: S
 
   implicit val executionContext = compilerContext.parserContext.config.executionContext
 
-  private val parsePlugin = new AMFParsePlugin {
+  private case class PartialGraphParsePlugin() extends AMFParsePlugin {
+
+    private case class EmptyDomainElement() extends DomainElement {
+      override def meta: Obj = DomainElementModel
+
+      /** Set of fields composing object. */
+      override val fields: Fields = Fields()
+
+      /** Value , path + field value that is used to compose the id when the object its adopted */
+      override def componentId: String = "error"
+
+      /** Set of annotations for element. */
+      override val annotations: Annotations = Annotations()
+      withId("amf://error-domain-element")
+    }
+
     override def parse(document: Root, ctx: ParserContext): BaseUnit = {
       document.parsed match {
         case s: SyamlParsedDocument =>
-          val maybeObject =
-            new FlattenedGraphParser(ctx.config, startingPoint)(new GraphParserContext(eh = ctx.config.eh))
-              .parse(s.document)
-          val obj = maybeObject match {
+          val parsed = new FlattenedGraphParser(ctx.config, startingPoint)(new GraphParserContext(eh = ctx.config.eh))
+            .parse(s.document) match {
             case Some(obj) => obj
-            case _ =>
-              new DomainElement {
-                override def meta: Obj = DomainElementModel
-
-                /** Set of fields composing object. */
-                override val fields: Fields = Fields()
-
-                /** Value , path + field value that is used to compose the id when the object its adopted */
-                override def componentId: String = "error"
-
-                /** Set of annotations for element. */
-                override val annotations: Annotations = Annotations()
-                withId("amf://error-domain-element")
-              }
+            case _         => EmptyDomainElement()
           }
-          AmfObjectUnitContainer(obj)
+
+          AmfObjectUnitContainer(parsed)
 
         case _ => throw UnsupportedParsedDocumentException
       }
@@ -72,7 +73,9 @@ class AMFGraphPartialCompiler(compilerContext: CompilerContext, startingPoint: S
     override def applies(element: Root): Boolean = true
 
     override def priority: PluginPriority = HighPriority
+
   }
+  private val parsePlugin = PartialGraphParsePlugin()
 
   override def getDomainPluginFor(document: Root): Option[AMFParsePlugin] = {
     document.parsed match {
