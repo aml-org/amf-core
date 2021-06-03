@@ -19,8 +19,8 @@ import amf.core.parser.SyamlParsedDocument
 import amf.core.rdf.RdfModelDocument
 import amf.core.registries.AMFPluginsRegistry
 import amf.core.remote.{MediaTypeParser, Platform, Vendor}
+import amf.core.unsafe.PlatformSecrets
 import amf.core.vocabulary.{Namespace, NamespaceAliases}
-import amf.plugins.document.graph.AMFGraphPlugin.platform
 import amf.plugins.document.graph._
 import amf.plugins.document.graph.emitter.{EmbeddedJsonLdEmitter, FlattenedJsonLdEmitter}
 import amf.plugins.syntax.RdfSyntaxPlugin
@@ -32,7 +32,7 @@ import org.yaml.model.YDocument
 import java.io.StringWriter
 import scala.concurrent.{ExecutionContext, Future}
 
-class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfiguration) {
+class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfiguration) extends PlatformSecrets {
 
   private val mediaTypeExp = new MediaTypeParser(mediaType)
 

@@ -12,7 +12,7 @@ import amf.core.parser.Annotations
 import amf.core.rdf.RdfModel
 import amf.core.services.RuntimeValidator.CustomShaclFunctions
 import amf.core.unsafe.PlatformSecrets
-import amf.core.validation.core.{ValidationReport, ValidationSpecification}
+import amf.core.validation.core.{ValidationProfile, ValidationReport, ValidationSpecification}
 import amf.core.validation.{AMFValidationReport, AMFValidationResult, EffectiveValidations}
 import amf.internal.environment.Environment
 import amf.{AMFStyle, MessageStyle, ProfileName}
@@ -58,7 +58,7 @@ trait RuntimeValidator extends PlatformSecrets {
     *
     * @return JSON-LD graph
     */
-  def emitShapesGraph(profileName: ProfileName): String
+  def emitShapesGraph(profileName: ProfileName, constraints: Map[String, ValidationProfile]): String
 
   /**
     * Returns a native RDF model with the SHACL shapes graph
@@ -108,8 +108,8 @@ object RuntimeValidator {
   type CustomShaclFunction  = (AmfObject, Option[PropertyInfo] => Unit) => Unit
   type CustomShaclFunctions = Map[String, CustomShaclFunction]
 
-  def emitShapesGraph(profileName: ProfileName): String =
-    validator.emitShapesGraph(profileName)
+  def emitShapesGraph(profileName: ProfileName, constraints: Map[String, ValidationProfile]): String =
+    validator.emitShapesGraph(profileName, constraints: Map[String, ValidationProfile])
 
   def shaclModel(validations: Seq[ValidationSpecification],
                  validationFunctionUrl: String,

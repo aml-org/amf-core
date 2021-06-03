@@ -39,5 +39,5 @@ object Validator {
 
   @JSExport
   def emitShapesGraph(profileName: ProfileName): String =
-    RuntimeValidator.emitShapesGraph(profileName)
+    RuntimeValidator.emitShapesGraph(profileName, Map.empty)
 }
