@@ -4,7 +4,7 @@ import amf.ProfileName
 import amf.client.remod.amfcore.plugins.AMFPlugin
 import amf.client.remod.amfcore.plugins.parse.{AMFParsePlugin, DomainParsingFallback}
 import amf.core.metamodel.{ModelDefaultBuilder, Obj}
-import amf.core.model.domain.{AnnotationGraphLoader, DomainElement}
+import amf.core.model.domain.AnnotationGraphLoader
 import amf.core.resolution.pipelines.TransformationPipeline
 import amf.core.validation.core.ValidationProfile
 
@@ -46,9 +46,6 @@ private[amf] case class AMFRegistry(plugins: PluginsRegistry,
 
   def withAnnotations(annotations: Map[String, AnnotationGraphLoader]): AMFRegistry =
     copy(entitiesRegistry = entitiesRegistry.withAnnotations(annotations))
-
-  def withExtensions(extensions: Seq[DomainElement]): AMFRegistry =
-    copy(entitiesRegistry = entitiesRegistry.withExtensions(extensions))
 
   private[amf] def getAllPlugins(): List[AMFPlugin[_]] = plugins.allPlugins
 

@@ -1,20 +1,16 @@
 package amf.client.remod.amfcore.registry
 
 import amf.core.metamodel.{ModelDefaultBuilder, Obj}
-import amf.core.model.domain.{AnnotationGraphLoader, DomainElement}
+import amf.core.model.domain.AnnotationGraphLoader
 
 private[amf] case class EntitiesRegistry(domainEntities: Map[String, ModelDefaultBuilder],
-                                         serializableAnnotations: Map[String, AnnotationGraphLoader],
-                                         extensions: Seq[DomainElement]) {
+                                         serializableAnnotations: Map[String, AnnotationGraphLoader]) {
 
   def withEntities(entities: Map[String, ModelDefaultBuilder]): EntitiesRegistry =
     copy(domainEntities = domainEntities ++ entities)
 
   def withAnnotations(annotations: Map[String, AnnotationGraphLoader]): EntitiesRegistry =
     copy(serializableAnnotations = serializableAnnotations ++ annotations)
-
-  def withExtensions(extensions: Seq[DomainElement]): EntitiesRegistry =
-    copy(extensions = this.extensions ++ extensions)
 
   private[amf] def findType(`type`: String): Option[ModelDefaultBuilder] = domainEntities.get(`type`)
 
@@ -24,5 +20,5 @@ private[amf] case class EntitiesRegistry(domainEntities: Map[String, ModelDefaul
 }
 
 private[amf] object EntitiesRegistry {
-  val empty: EntitiesRegistry = EntitiesRegistry(Map.empty, Map.empty, Seq.empty)
+  val empty: EntitiesRegistry = EntitiesRegistry(Map.empty, Map.empty)
 }
