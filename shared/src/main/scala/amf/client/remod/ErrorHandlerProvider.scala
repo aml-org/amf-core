@@ -1,6 +1,6 @@
 package amf.client.remod
 
-import amf.client.parse.DefaultErrorHandler
+import amf.client.errorhandling.DefaultErrorHandler
 import amf.core.errorhandling.AMFErrorHandler
 
 trait ErrorHandlerProvider {

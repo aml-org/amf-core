@@ -1,6 +1,6 @@
 package amf.core.services
 
-import amf.client.parse.DefaultErrorHandler
+import amf.client.errorhandling.DefaultErrorHandler
 import amf.client.remod.amfcore.resolution.PipelineName
 import amf.core.errorhandling.AMFErrorHandler
 import amf.core.model.document.BaseUnit

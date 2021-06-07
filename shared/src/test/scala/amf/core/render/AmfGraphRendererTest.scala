@@ -1,6 +1,5 @@
 package amf.core.render
 
-import amf.Core
 import amf.client.convert.{BaseUnitConverter, NativeOps}
 import amf.client.exported.AMFGraphConfiguration
 import amf.client.exported.config.RenderOptions

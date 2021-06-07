@@ -1,6 +1,6 @@
 package amf.core.resolution
 
-import amf.client.parse.DefaultErrorHandler
+import amf.client.errorhandling.DefaultErrorHandler
 import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.resolution.{PipelineName, TransformationPipelineBuilder}
 import amf.core.errorhandling.{AMFErrorHandler, UnhandledErrorHandler}

@@ -1,8 +1,8 @@
 package amf.core.utils
 
-import amf.Core.platform
+import amf.core.unsafe.PlatformSecrets
 
-object UriUtils {
+object UriUtils extends PlatformSecrets {
 
   def resolveRelativeTo(current: String, rawUrl: String): String = {
     val base = rawUrl match {
@@ -14,13 +14,15 @@ object UriUtils {
   }
 
   def resolve(base: Option[String], url: String): String = {
-    val result = base.map { baseUri =>
-      if (url.startsWith("#")) baseUri + url
-      else {
-        val baseDir = stripFileName(baseUri)
-        safeConcat(baseDir, url)
+    val result = base
+      .map { baseUri =>
+        if (url.startsWith("#")) baseUri + url
+        else {
+          val baseDir = stripFileName(baseUri)
+          safeConcat(baseDir, url)
+        }
       }
-    }.getOrElse(url)
+      .getOrElse(url)
     platform.resolvePath(result)
   }
 
@@ -36,12 +38,12 @@ object UriUtils {
   private[utils] def stripFileName(url: String, so: String): String = {
     val withoutFrag = if (url.contains("#")) url.split("#").head else url
 
-    val containsBackSlash = withoutFrag.contains('\\') && so == "win"
+    val containsBackSlash    = withoutFrag.contains('\\') && so == "win"
     val containsForwardSlash = withoutFrag.contains('/')
     if (!containsBackSlash && !containsForwardSlash) {
       return ""
     }
-    val sep = if (containsBackSlash) '\\' else '/'
+    val sep                   = if (containsBackSlash) '\\' else '/'
     val lastPieceHasExtension = withoutFrag.split(sep).last.contains('.')
     if (lastPieceHasExtension) {
       withoutFrag.substring(0, withoutFrag.lastIndexOf(sep) + 1)

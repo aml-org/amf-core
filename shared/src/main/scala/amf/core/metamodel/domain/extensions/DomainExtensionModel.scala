@@ -1,6 +1,5 @@
 package amf.core.metamodel.domain.extensions
 
-import amf.Core
 import amf.core.metamodel.Field
 import amf.core.metamodel.Type.Str
 import amf.core.metamodel.domain.templates.KeyField

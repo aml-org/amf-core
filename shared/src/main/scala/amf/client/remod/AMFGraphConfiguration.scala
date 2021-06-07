@@ -43,7 +43,7 @@ object AMFGraphConfiguration {
   /**
     * Predefined AMF core environment with:
     *   - AMF Resolvers [[amf.client.remod.amfcore.config.AMFResolvers.predefined predefined]]
-    *   - Default error handler provider that will create a [[amf.client.parse.DefaultErrorHandler]]
+    *   - Default error handler provider that will create a [[amf.client.errorhandling.DefaultErrorHandler]]
     *   - Empty [[amf.client.remod.amfcore.registry.AMFRegistry]]
     *   - MutedLogger: [[amf.client.exported.config.MutedLogger]]
     *   - Without Any listener

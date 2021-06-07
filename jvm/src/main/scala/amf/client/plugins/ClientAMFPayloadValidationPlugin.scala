@@ -1,9 +1,10 @@
 package amf.client.plugins
 
 import amf.client.convert.CoreClientConverters._
-import amf.client.environment.Environment
+import amf.client.exported.AMFGraphConfiguration
 import amf.client.model.document.PayloadFragment
 import amf.client.model.domain.Shape
+import amf.client.remod.amfcore.plugins.validate.ValidationConfiguration
 import amf.client.validate.AMFValidationReport
 
 import scala.concurrent.ExecutionContext
@@ -14,10 +15,10 @@ trait ClientAMFPayloadValidationPlugin extends ClientAMFPlugin {
 
   val payloadMediaType: ClientList[String]
 
-  def canValidate(shape: Shape, env: Environment): Boolean
+  def canValidate(shape: Shape, config: ValidationConfiguration): Boolean
 
   def validator(s: Shape,
-                env: Environment,
+                config: ValidationConfiguration,
                 validationMode: ValidationMode = StrictValidationMode): ClientPayloadValidator
 }
 
@@ -26,7 +27,7 @@ trait ClientPayloadValidator {
   val shape: Shape
   val defaultSeverity: String
   val validationMode: ValidationMode
-  val env: Environment
+  val config: ValidationConfiguration
 
   def validate(payload: String, mediaType: String)(
       implicit executionContext: ExecutionContext): ClientFuture[AMFValidationReport]

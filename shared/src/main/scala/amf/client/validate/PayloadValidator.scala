@@ -1,6 +1,5 @@
 package amf.client.validate
 
-import amf.Core.platform
 import amf.client.convert.CoreClientConverters._
 import amf.client.execution.BaseExecutionEnvironment
 import amf.client.model.document.PayloadFragment
