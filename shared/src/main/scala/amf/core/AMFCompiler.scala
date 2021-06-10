@@ -252,9 +252,10 @@ class AMFCompiler(compilerContext: CompilerContext,
   }
 
   private def parseSyntaxForMediaType(content: Content, mime: String) = {
+    val withContentUrl = compilerContext.parserContext.forLocation(content.url)
     AMFPluginsRegistry
       .syntaxPluginForMediaType(mime)
-      .flatMap(_.parse(mime, content.stream, compilerContext.parserContext, parsingOptions))
+      .flatMap(_.parse(mime, content.stream, withContentUrl, parsingOptions))
       .map((mime, _))
   }
 
