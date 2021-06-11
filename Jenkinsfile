@@ -31,7 +31,7 @@ pipeline {
     }
     stage('Publish') {
       when {
-        branch 'master'
+        branch 'publish-APIMF-3125'
       }
       steps {
         wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
