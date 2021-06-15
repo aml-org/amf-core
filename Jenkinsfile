@@ -34,6 +34,7 @@ pipeline {
         anyOf {
           branch 'master'
           branch 'remod-breaking'
+	  branch 'remod-breaking-package-refactor'
         }
       }
       steps {
