@@ -15,7 +15,7 @@ import scala.scalajs.js.annotation.JSExportAll
 
 /** Any parsable unit, backed by a source URI. */
 @JSExportAll
-trait BaseUnit extends AmfObjectWrapper with PlatformSecrets with RdfExportable {
+trait BaseUnit extends AmfObjectWrapper with PlatformSecrets {
 
   override private[amf] val _internal: InternalBaseUnit
 
@@ -74,13 +74,5 @@ trait BaseUnit extends AmfObjectWrapper with PlatformSecrets with RdfExportable 
   def withReferenceAlias(alias: String, fullUrl: String, relativeUrl: String): BaseUnit = {
     AliasDeclaration(_internal, alias, fullUrl, relativeUrl)
     this
-  }
-}
-
-// Trait to avoid having to export one by one each element of the BaseUnit except for this method. @author: Tom
-protected[document] trait RdfExportable { unit: BaseUnit =>
-  def toNativeRdfModel(renderOptions: RenderOptions = new RenderOptions()): RdfModel = {
-    val coreOptions = renderOptions
-    _internal.toNativeRdfModel(coreOptions)
   }
 }

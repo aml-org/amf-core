@@ -1,8 +1,6 @@
 package amf.core.client.scala.model.document
 
 import amf.core.client.scala.errorhandling.AMFErrorHandler
-import amf.core.client.scala.{AMFGraphConfiguration, config}
-import amf.core.client.scala.config.RenderOptions
 import amf.core.internal.annotations.SourceVendor
 import amf.core.internal.metamodel.MetaModelTypeMapping
 import amf.core.internal.metamodel.document.BaseUnitModel
@@ -122,13 +120,6 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
   }
 
   def findInReferences(id: String): Option[BaseUnit] = references.find(_.id == id)
-
-  def toNativeRdfModel(renderOptions: RenderOptions = config.RenderOptions()): RdfModel = {
-    platform.rdfFramework match {
-      case Some(rdf) => rdf.unitToRdfModel(this, renderOptions)
-      case None      => throw new Exception("RDF Framework not registered cannot export to native RDF model")
-    }
-  }
 
   private[amf] def sourceVendor: Option[Vendor] = this match {
     case e: EncodesModel if Option(e.encodes).isDefined =>
