@@ -15,7 +15,7 @@ class CompilerRootUrlTest extends AsyncFunSuite with PlatformSecrets with Matche
   override implicit def executionContext: ExecutionContext = ExecutionContext.Implicits.global
 
   class CustomContentUrlResourceLoader(customUrl: String) extends ResourceLoader {
-    override def fetch(resource: String): Future[Content] = Future.successful(
+    override def fetch(resource: String)(implicit ec: ExecutionContext): Future[Content] = Future.successful(
         new Content("""
           |{
           |   "a": 5

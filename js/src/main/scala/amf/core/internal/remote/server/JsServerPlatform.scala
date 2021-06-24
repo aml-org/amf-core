@@ -25,12 +25,7 @@ class JsServerPlatform extends JsPlatform {
   }
 
   /** Platform out of the box [ResourceLoader]s */
-  override def loaders(exec: BaseExecutionEnvironment = defaultExecutionEnvironment): Seq[ResourceLoader] = {
-    implicit val executionContext: ExecutionContext = exec.executionContext
-    loaders()
-  }
-
-  override def loaders()(implicit executionContext: ExecutionContext): Seq[ResourceLoader] = Seq(
+  override def loaders(): Seq[ResourceLoader] = Seq(
       InternalResourceLoaderAdapter(JsServerFileResourceLoader()),
       InternalResourceLoaderAdapter(JsServerHttpResourceLoader())
   )

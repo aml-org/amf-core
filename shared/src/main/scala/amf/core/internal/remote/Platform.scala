@@ -122,7 +122,7 @@ trait Platform extends FileMediaType {
   }
 
   /** Platform out of the box [ResourceLoader]s */
-  def loaders()(implicit executionContext: ExecutionContext): Seq[ResourceLoader]
+  def loaders(): Seq[ResourceLoader]
 
   def ensureFileAuthority(str: String): String =
     if (str.startsWith("file:")) {

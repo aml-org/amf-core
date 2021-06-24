@@ -87,13 +87,7 @@ case class TrunkPlatform(content: String,
     Future.successful(new Content(content, url, forcedMediaType))
 
   /** Platform out of the box [ResourceLoader]s */
-  override def loaders(exec: BaseExecutionEnvironment = defaultExecutionEnvironment): Seq[ResourceLoader] = {
-    implicit val executionContext: ExecutionContext = exec.executionContext
-    loaders()
-  }
-
-  /** Platform out of the box [ResourceLoader]s */
-  override def loaders()(implicit executionContext: ExecutionContext): Seq[ResourceLoader] =
+  override def loaders(): Seq[ResourceLoader] =
     wrappedPlatform.map(_.loaders()).getOrElse(Seq())
 
   override def findCharInCharSequence(s: CharSequence)(p: Char => Boolean): Option[Char] =

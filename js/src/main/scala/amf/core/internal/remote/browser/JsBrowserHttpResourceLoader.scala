@@ -6,7 +6,7 @@ import amf.core.internal.remote.{NetworkError, UnexpectedStatusCode}
 import org.scalajs.dom.ext.Ajax
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
@@ -15,7 +15,7 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 @JSExportAll
 case class JsBrowserHttpResourceLoader() extends BaseHttpResourceLoader {
 
-  override def fetch(resource: String): js.Promise[Content] = {
+  override def fetch(resource: String, ec: ExecutionContext): js.Promise[Content] = {
     Ajax
       .get(resource)
       .flatMap(xhr =>

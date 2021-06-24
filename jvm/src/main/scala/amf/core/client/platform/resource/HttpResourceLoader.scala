@@ -11,14 +11,9 @@ import amf.core.internal.remote.{JvmPlatform, NetworkError, SocketTimeout, Unexp
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class HttpResourceLoader(executionContext: ExecutionContext) extends BaseHttpResourceLoader {
+case class HttpResourceLoader() extends BaseHttpResourceLoader {
 
-  implicit val exec: ExecutionContext = executionContext
-
-  def this() = this(JvmPlatform.instance().defaultExecutionEnvironment.executionContext)
-  def this(executionEnvironment: BaseExecutionEnvironment) = this(executionEnvironment.executionContext)
-
-  override def fetch(resource: String): CompletableFuture[Content] = {
+  override def fetch(resource: String, ec: ExecutionContext): CompletableFuture[Content] = {
     val u          = new java.net.URL(resource)
     val connection = u.openConnection.asInstanceOf[HttpURLConnection]
     connection.setRequestMethod("GET")
@@ -38,7 +33,7 @@ case class HttpResourceLoader(executionContext: ExecutionContext) extends BaseHt
         case ex: Exception             => throw NetworkError(ex)
         case e: SocketTimeoutException => throw SocketTimeout(e)
       }
-    }.asJava
+    }(ec).asJava
   }
 
   private def createContent(connection: HttpURLConnection, url: String): Content = {

@@ -18,13 +18,7 @@ class JsBrowserPlatform extends JsPlatform {
   override val fs: FileSystem = UnsupportedFileSystem
 
   /** Platform out of the box [ResourceLoader]s */
-  override def loaders(exec: BaseExecutionEnvironment = defaultExecutionEnvironment): Seq[ResourceLoader] = {
-    implicit val executionContext: ExecutionContext = exec.executionContext
-    loaders()
-  }
-
-  /** Platform out of the box [ResourceLoader]s */
-  override def loaders()(implicit executionContext: ExecutionContext): Seq[ResourceLoader] =
+  override def loaders(): Seq[ResourceLoader] =
     Seq(InternalResourceLoaderAdapter(JsBrowserHttpResourceLoader()))
 
   /** Return temporary directory. */

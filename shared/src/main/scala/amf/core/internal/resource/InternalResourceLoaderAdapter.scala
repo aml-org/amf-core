@@ -8,20 +8,20 @@ import amf.core.internal.convert.CoreClientConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
 /** Adapts a client ResourceLoader to an internal one. */
-case class InternalResourceLoaderAdapter(private[amf] val adaptee: ClientResourceLoader)(
-    implicit executionContext: ExecutionContext)
-    extends ResourceLoader {
+case class InternalResourceLoaderAdapter(private[amf] val adaptee: ClientResourceLoader) extends ResourceLoader {
 
-  override def fetch(resource: String): Future[Content] = adaptee.fetch(resource).asInternal
+  override def fetch(resource: String)(implicit ec: ExecutionContext): Future[Content] =
+    adaptee.fetch(resource, ec).asInternal
 
   override def accepts(resource: String): Boolean = adaptee.accepts(resource)
 }
 
-case class ClientResourceLoaderAdapter(private[amf] val adaptee: ResourceLoader)(
-    implicit executionContext: ExecutionContext)
-    extends ClientResourceLoader {
+case class ClientResourceLoaderAdapter(private[amf] val adaptee: ResourceLoader) extends ClientResourceLoader {
 
-  override def fetch(resource: String): ClientFuture[Content] = adaptee.fetch(resource).asClient
+  override def fetch(resource: String, ec: ExecutionContext): ClientFuture[Content] = {
+    implicit val implicitEc: ExecutionContext = ec
+    adaptee.fetch(resource).asClient
+  }
 
   override def accepts(resource: String): Boolean = adaptee.accepts(resource)
 }

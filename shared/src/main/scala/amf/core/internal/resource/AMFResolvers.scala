@@ -3,6 +3,7 @@ package amf.core.internal.resource
 import amf.core.client.platform.execution.BaseExecutionEnvironment
 import amf.core.client.common.remote.Content
 import amf.core.client.scala.config.UnitCache
+import amf.core.client.scala.execution.ExecutionEnvironment
 import amf.core.client.scala.resource.ResourceLoader
 import amf.core.internal.remote.UnsupportedUrlScheme
 import amf.core.internal.unsafe.PlatformSecrets
@@ -17,8 +18,8 @@ import scala.concurrent.{ExecutionContext, Future}
   * @param executionContext the [[amf.core.client.platform.execution.BaseExecutionEnvironment]] to use
   */
 private[amf] case class AMFResolvers(resourceLoaders: List[ResourceLoader],
-                                     val unitCache: Option[UnitCache],
-                                     val executionContext: BaseExecutionEnvironment) {
+                                     unitCache: Option[UnitCache],
+                                     executionEnv: ExecutionEnvironment) {
 
   /**
     *
@@ -47,6 +48,8 @@ private[amf] case class AMFResolvers(resourceLoaders: List[ResourceLoader],
     copy(unitCache = Some(cache))
   }
 
+  def withExecutionEnvironment(ee: ExecutionEnvironment): AMFResolvers = copy(executionEnv = ee)
+
   /**
     *
     * @param url
@@ -54,7 +57,7 @@ private[amf] case class AMFResolvers(resourceLoaders: List[ResourceLoader],
     * @return
     */
   def resolveContent(url: String): Future[Content] = {
-    loaderConcat(url, resourceLoaders.filter(_.accepts(url)))(executionContext.executionContext)
+    loaderConcat(url, resourceLoaders.filter(_.accepts(url)))(executionEnv.context)
   }
 
   private def loaderConcat(url: String, loaders: Seq[ResourceLoader])(
@@ -78,9 +81,6 @@ object AMFResolvers extends PlatformSecrets {
     * @return
     */
   def predefined() = {
-    // TODO: user execution environment?
-    AMFResolvers(platform.loaders()((platform.defaultExecutionEnvironment).executionContext).toList,
-                 None,
-                 (platform.defaultExecutionEnvironment))
+    AMFResolvers(platform.loaders().toList, None, (platform.defaultExecutionEnvironment._internal))
   }
 }

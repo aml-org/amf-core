@@ -9,6 +9,7 @@ import amf.core.internal.entities.CoreEntities
 import amf.core.internal.metamodel.ModelDefaultBuilder
 import amf.core.client.scala.model.domain.AnnotationGraphLoader
 import amf.core.client.common.validation.ProfileName
+import amf.core.client.scala.execution.ExecutionEnvironment
 import amf.core.client.scala.transform.pipelines.{BasicTransformationPipeline, TransformationPipeline}
 import amf.core.client.scala.parse.document.ParserContext
 import amf.core.client.scala.resource.ResourceLoader
@@ -146,6 +147,9 @@ class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: A
 
   def withLogger(logger: AMFLogger): AMFGraphConfiguration = super._withLogger(logger)
 
+  def withExecutionEnvironment(executionEnv: ExecutionEnvironment): AMFGraphConfiguration =
+    super._withExecutionEnvironment(executionEnv)
+
   /**
     * Merges two environments taking into account specific attributes that can be merged.
     * This is currently limited to: registry plugins, registry transformation pipelines.
@@ -166,7 +170,7 @@ class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: A
   private[amf] def getRegistry: AMFRegistry                 = registry
   private[amf] def getResourceLoaders: List[ResourceLoader] = resolvers.resourceLoaders
   private[amf] def getUnitsCache: Option[UnitCache]         = resolvers.unitCache
-  private[amf] def getExecutionContext: ExecutionContext    = resolvers.executionContext.executionContext
+  private[amf] def getExecutionContext: ExecutionContext    = resolvers.executionEnv.context
 
   private[amf] lazy val parseConfiguration      = ParseConfiguration(this)
   private[amf] lazy val renderConfiguration     = DefaultRenderConfiguration(this)
@@ -233,6 +237,9 @@ sealed abstract class BaseAMFConfigurationSetter(private[amf] val resolvers: AMF
 
   protected def _withConstraintsRules[T](rules: Map[ProfileName, ValidationProfile]): T =
     copy(registry = registry.withConstraintsRules(rules)).asInstanceOf[T]
+
+  protected def _withExecutionEnvironment[T](executionEnv: ExecutionEnvironment): T =
+    copy(resolvers = resolvers.withExecutionEnvironment(executionEnv)).asInstanceOf[T]
 
   protected def _merge[T <: BaseAMFConfigurationSetter](other: T): T = {
     this

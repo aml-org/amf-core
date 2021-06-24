@@ -10,9 +10,10 @@ import scala.scalajs.js.annotation.JSExportAll
 
 @JSExportAll
 trait BaseFileResourceLoader extends ResourceLoader {
-  override def fetch(resource: String): ClientFuture[Content] = fetchFile(resource.stripPrefix(FILE_PROTOCOL))
+  override def fetch(resource: String, ec: ExecutionContext): ClientFuture[Content] =
+    fetchFile(resource.stripPrefix(FILE_PROTOCOL), ec)
 
-  def fetchFile(resource: String): ClientFuture[Content]
+  def fetchFile(resource: String, ec: ExecutionContext): ClientFuture[Content]
 
   override def accepts(resource: String): Boolean = resource match {
     case File(_) => true

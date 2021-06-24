@@ -13,14 +13,9 @@ import amf.core.internal.utils.AmfStrings
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class FileResourceLoader(executionContext: ExecutionContext) extends BaseFileResourceLoader {
+case class FileResourceLoader() extends BaseFileResourceLoader {
 
-  implicit val exec: ExecutionContext = executionContext
-
-  def this() = this(JvmPlatform.instance().defaultExecutionEnvironment.executionContext)
-  def this(executionEnvironment: BaseExecutionEnvironment) = this(executionEnvironment.executionContext)
-
-  def fetchFile(resource: String): CompletableFuture[Content] = {
+  def fetchFile(resource: String, ec: ExecutionContext): CompletableFuture[Content] = {
     Future {
       try {
         Content(new FileStream(resource),
@@ -38,7 +33,7 @@ case class FileResourceLoader(executionContext: ExecutionContext) extends BaseFi
             case e: FileNotFoundException => throw FileNotFound(e)
           }
       }
-    }.asJava
+    }(ec).asJava
   }
 
   def ensureFileAuthority(str: String): String = if (str.startsWith("file:")) str else s"file://$str"

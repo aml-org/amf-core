@@ -1,7 +1,6 @@
 package amf.core.internal.remote.server
 
 import java.io.IOException
-
 import amf.core.client.common.remote.Content
 import amf.core.client.platform.resource.BaseFileResourceLoader
 import amf.core.client.scala.lexer.CharSequenceStream
@@ -15,10 +14,12 @@ import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 import amf.core.internal.utils.AmfStrings
 
+import scala.concurrent.ExecutionContext
+
 @JSExportTopLevel("JsServerFileResourceLoader")
 @JSExportAll
 case class JsServerFileResourceLoader() extends BaseFileResourceLoader {
-  override def fetchFile(resource: String): js.Promise[Content] =
+  override def fetchFile(resource: String, ec: ExecutionContext): js.Promise[Content] =
     Fs.asyncFile(resource)
       .read()
       .map(
