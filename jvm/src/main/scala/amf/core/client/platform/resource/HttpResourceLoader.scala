@@ -2,21 +2,25 @@ package amf.core.client.platform.resource
 
 import java.net.{HttpURLConnection, SocketTimeoutException}
 import java.util.concurrent.CompletableFuture
-
 import amf.core.client.platform.execution.BaseExecutionEnvironment
 import amf.core.client.common.remote.Content
 import amf.core.client.scala.lexer.CharArraySequence
 import amf.core.internal.remote.FutureConverter._
 import amf.core.internal.remote.{JvmPlatform, NetworkError, SocketTimeout, UnexpectedStatusCode}
+import amf.core.internal.resource.LoaderWithExecutionContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class HttpResourceLoader(executionContext: ExecutionContext) extends BaseHttpResourceLoader {
+case class HttpResourceLoader(executionContext: ExecutionContext)
+    extends BaseHttpResourceLoader
+    with LoaderWithExecutionContext {
 
   implicit val exec: ExecutionContext = executionContext
 
   def this() = this(JvmPlatform.instance().defaultExecutionEnvironment.executionContext)
   def this(executionEnvironment: BaseExecutionEnvironment) = this(executionEnvironment.executionContext)
+
+  override def withNewContext(newEc: ExecutionContext): ResourceLoader = HttpResourceLoader(newEc)
 
   override def fetch(resource: String): CompletableFuture[Content] = {
     val u          = new java.net.URL(resource)

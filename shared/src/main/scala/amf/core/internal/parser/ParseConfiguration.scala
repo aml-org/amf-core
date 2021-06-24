@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class ParseConfiguration private (config: AMFGraphConfiguration, eh: AMFErrorHandler) {
 
-  val executionContext: ExecutionContext           = config.resolvers.executionContext.executionContext
+  val executionContext: ExecutionContext           = config.resolvers.executionEnv.context
   def resolveContent(url: String): Future[Content] = config.resolvers.resolveContent(url)
 
   val sortedParsePlugins: immutable.Seq[AMFParsePlugin]      = config.registry.plugins.parsePlugins.sorted

@@ -2,6 +2,7 @@ package amf.core.client.platform
 
 import amf.core.client.platform.config.{AMFEventListener, AMFLogger, ParsingOptions, RenderOptions}
 import amf.core.client.platform.errorhandling.ErrorHandlerProvider
+import amf.core.client.platform.execution.BaseExecutionEnvironment
 import amf.core.client.platform.reference.UnitCache
 import amf.core.client.platform.resource.ResourceLoader
 import amf.core.client.platform.transform.TransformationPipeline
@@ -49,6 +50,9 @@ class AMFGraphConfiguration private[amf] (private[amf] val _internal: InternalGr
   def withEventListener(listener: AMFEventListener): AMFGraphConfiguration = _internal.withEventListener(listener)
 
   def withLogger(logger: AMFLogger): AMFGraphConfiguration = _internal.withLogger(logger)
+
+  def withExecutionEnvironment(executionEnv: BaseExecutionEnvironment): AMFGraphConfiguration =
+    _internal.withExecutionEnvironment(executionEnv._internal)
 
   /**
     * Merges two environments taking into account specific attributes that can be merged.
