@@ -14,8 +14,7 @@ import amf.core.internal.convert.TransformationPipelineConverter._
 import scala.concurrent.ExecutionContext
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 import amf.core.client.scala.{AMFGraphConfiguration => InternalGraphConfiguration}
-import amf.core.internal.registries.AMFRegistry
-import amf.core.internal.resource.AMFResolvers
+import amf.core.internal.convert.CoreClientConverters
 
 /** Base AMF configuration object */
 @JSExportAll
@@ -24,7 +23,8 @@ class AMFGraphConfiguration private[amf] (private[amf] val _internal: InternalGr
 
   def createClient(): AMFGraphClient = new AMFGraphClient(this)
 
-  def payloadValidatorFactory(): ShapePayloadValidatorFactory = _internal.payloadValidatorFactory()
+  def payloadValidatorFactory(): ShapePayloadValidatorFactory =
+    ShapePayloadValidatorFactoryMatcher.asClient(_internal.payloadValidatorFactory())
 
   def withParsingOptions(parsingOptions: ParsingOptions): AMFGraphConfiguration =
     _internal.withParsingOptions(parsingOptions)

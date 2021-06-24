@@ -116,12 +116,6 @@ trait Platform extends FileMediaType {
     loaderConcat(url, configuration.getResourceLoaders.filter(_.accepts(url)))
 
   /** Platform out of the box [ResourceLoader]s */
-  def loaders(exec: BaseExecutionEnvironment = defaultExecutionEnvironment): Seq[ResourceLoader] = {
-    implicit val executionContext: ExecutionContext = exec.executionContext
-    loaders()
-  }
-
-  /** Platform out of the box [ResourceLoader]s */
   def loaders()(implicit executionContext: ExecutionContext): Seq[ResourceLoader]
 
   def ensureFileAuthority(str: String): String =

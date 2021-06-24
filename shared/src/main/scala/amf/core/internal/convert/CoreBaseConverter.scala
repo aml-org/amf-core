@@ -600,11 +600,13 @@ trait ValidationShapeSetConverter {
 trait PayloadValidatorConverter {
 
   implicit object PayloadValidatorMatcher
-      extends BidirectionalMatcher[AMFShapePayloadValidator, ClientAMFShapePayloadValidator] {
-    override def asClient(from: AMFShapePayloadValidator): ClientAMFShapePayloadValidator =
-      new ClientAMFShapePayloadValidator(from)
+      extends BidirectionalMatcherWithEC[AMFShapePayloadValidator, ClientAMFShapePayloadValidator] {
+    override def asClient(from: AMFShapePayloadValidator)(
+        implicit executionContext: ExecutionContext): ClientAMFShapePayloadValidator =
+      new ClientAMFShapePayloadValidator(from, executionContext)
 
-    override def asInternal(from: ClientAMFShapePayloadValidator): AMFShapePayloadValidator = from._internal
+    override def asInternal(from: ClientAMFShapePayloadValidator)(
+        implicit executionContext: ExecutionContext): AMFShapePayloadValidator = from._internal
   }
 }
 
@@ -703,8 +705,9 @@ trait ValidationProfileConverter {
 
 trait ShapePayloadValidatorFactoryConverter extends PayloadValidatorConverter {
   implicit object ShapePayloadValidatorFactoryMatcher
-      extends InternalClientMatcher[ShapePayloadValidatorFactory, ClientShapePayloadValidatorFactory] {
-    override def asClient(from: ShapePayloadValidatorFactory): ClientShapePayloadValidatorFactory = {
+      extends InternalClientMatcherWithEC[ShapePayloadValidatorFactory, ClientShapePayloadValidatorFactory] {
+    override def asClient(from: ShapePayloadValidatorFactory)(
+        implicit executionContext: ExecutionContext): ClientShapePayloadValidatorFactory = {
       new ClientShapePayloadValidatorFactory {
         override def createFor(shape: ClientShape,
                                mediaType: String,

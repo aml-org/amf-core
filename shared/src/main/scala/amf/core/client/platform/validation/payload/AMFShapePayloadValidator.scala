@@ -1,6 +1,5 @@
 package amf.core.client.platform.validation.payload
 
-import amf.core.client.platform.execution.BaseExecutionEnvironment
 import amf.core.client.platform.model.document.PayloadFragment
 import amf.core.client.platform.validation.AMFValidationReport
 import amf.core.client.scala.validation.payload.{AMFShapePayloadValidator => InternalPayloadValidator}
@@ -10,10 +9,7 @@ import scala.scalajs.js.annotation.JSExportAll
 
 @JSExportAll
 class AMFShapePayloadValidator private[amf] (private[amf] val _internal: InternalPayloadValidator,
-                                             private val exec: BaseExecutionEnvironment =
-                                               platform.defaultExecutionEnvironment) {
-
-  private implicit val executionContext: ExecutionContext = exec.executionContext
+                                             private implicit val ec: ExecutionContext) {
 
   def validate(payload: String): ClientFuture[AMFValidationReport] = _internal.validate(payload).asClient
   def validate(payloadFragment: PayloadFragment): ClientFuture[AMFValidationReport] =

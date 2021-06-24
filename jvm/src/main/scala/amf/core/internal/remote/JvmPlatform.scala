@@ -19,12 +19,6 @@ class JvmPlatform extends Platform {
   override val defaultExecutionEnvironment: ExecutionEnvironment = DefaultExecutionEnvironment()
 
   /** Platform out of the box [ResourceLoader]s */
-  override def loaders(exec: BaseExecutionEnvironment = defaultExecutionEnvironment): Seq[ResourceLoader] = {
-    implicit val executionContext: ExecutionContext = exec.executionContext
-    loaders()
-  }
-
-  /** Platform out of the box [ResourceLoader]s */
   override def loaders()(implicit executionContext: ExecutionContext): Seq[ResourceLoader] = {
     Seq(
         InternalResourceLoaderAdapter(FileResourceLoader(executionContext)),
