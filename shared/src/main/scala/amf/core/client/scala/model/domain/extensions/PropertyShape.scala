@@ -16,11 +16,14 @@ import amf.core.internal.parser.domain.{Annotations, Fields}
   */
 case class PropertyShape(fields: Fields, annotations: Annotations) extends Shape {
 
-  def path: StrField        = fields.field(Path)
-  def range: Shape          = fields.field(Range)
-  def minCount: IntField    = fields.field(MinCount)
-  def maxCount: IntField    = fields.field(MaxCount)
-  def patternName: StrField = fields.field(PatternName)
+  def path: StrField               = fields.field(Path)
+  def range: Shape                 = fields.field(Range)
+  def minCount: IntField           = fields.field(MinCount)
+  def maxCount: IntField           = fields.field(MaxCount)
+  def patternName: StrField        = fields.field(PatternName)
+  def serializationOrder: IntField = fields.field(SerializationOrder)
+
+  def withSerializationOrder(order: Int): this.type = set(SerializationOrder, order)
 
   def withPath(path: String): this.type  = set(Path, path)
   def withRange(range: Shape): this.type = set(Range, range)

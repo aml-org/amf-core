@@ -1,12 +1,14 @@
 package amf.core.internal.remote
 
 import amf.core.client.scala.parse.document.{ReferenceKind, UnspecifiedReference}
-import amf.core.internal.remote.Syntax.{Json, JsonLd, Syntax, Yaml}
+import amf.core.internal.remote.Syntax.{Json, Protobuf, Syntax, Yaml}
 
 case class Hint(spec: Spec, syntax: Syntax, kind: ReferenceKind = UnspecifiedReference) {
   def +(k: ReferenceKind): Hint = copy(kind = k)
 
 }
+
+object GrpcProtoHint extends Hint(Proto3, Protobuf)
 
 object Raml10YamlHint extends Hint(Raml10, Yaml)
 

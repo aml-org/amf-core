@@ -16,6 +16,11 @@ object Syntax {
     override val extension: String = "yaml"
     override val mediaType: String = `application/yaml`
   }
+
+  case object Protobuf extends Syntax {
+    override val extension: String = "proto"
+  }
+
   case object Json extends Syntax {
     override val extension: String = "json"
     override val mediaType: String = `application/json`
@@ -42,10 +47,14 @@ object Syntax {
   private val jsonMimes = Set(`application/json`,
                               `application/ld+json`)
 
+  val proto3Mimes  = Set(`APPLICATION/GRPC`, `APPLICATION/GRPC+PROTO`, `APPLICATION/X-PROTOBUF`,
+    `APPLICATION/PROTOBUF`, `APPLICATION/PROTOBUF_`, `APPLICATION/VND_GOOGLE`)
+
   /** Attempt to resolve [[Syntax]] from [[Mimes]]. */
   def unapply(mime: Option[String]): Option[Syntax] = mime match {
     case Some(m) if yamlMimes.contains(m) => Some(Yaml)
     case Some(m) if jsonMimes.contains(m) => Some(Json)
-    case _                                => None
+    case Some(m) if proto3Mimes.contains(m) => Some(Protobuf)
+    case _ => None
   }
 }

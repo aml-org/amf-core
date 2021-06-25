@@ -2,17 +2,30 @@ package amf.core.client.scala.parse.document
 
 import amf.core.client.common.position.Range
 import amf.core.client.scala.model.document._
-import amf.core.internal.utils.AmfStrings
 import amf.core.internal.remote.File.FILE_PROTOCOL
 import amf.core.internal.remote.HttpParts.{HTTPS_PROTOCOL, HTTP_PROTOCOL}
+import amf.core.internal.utils.AmfStrings
+import org.mulesoft.antlrast.ast.ASTElement
 import org.yaml.model.YNode.MutRef
 import org.yaml.model.{YNode, YScalar}
 
 case class ReferenceResolutionResult(exception: Option[Throwable], unit: Option[BaseUnit])
 
-case class RefContainer(linkType: ReferenceKind, node: YNode, uriFragment: Option[String]){
+trait RefContainer {
+  val linkType: ReferenceKind
+  val uriFragment: Option[String]
+  def reduceToLocation(): Range
+}
 
-  def reduceToLocation(): Range = {
+case class AntlrRefContainer(override val linkType: ReferenceKind, node: ASTElement, override val uriFragment: Option[String]) extends RefContainer {
+  override def reduceToLocation(): Range = {
+    Range((node.start.line, node.start.column),(node.end.line, node.end.column))
+  }
+}
+
+case class SYamlRefContainer(override val linkType: ReferenceKind, node: YNode, override val uriFragment: Option[String]) extends RefContainer {
+
+  override def reduceToLocation(): Range = {
     node.asOption[YScalar] match {
       case Some(s)  =>
         reduceStringLength(s, uriFragment.map(l => l.length + 1).getOrElse(0), if(s.mark.plain) 0  else 1)
@@ -46,6 +59,14 @@ case class CompilerReferenceCollector() {
   private val collector = DefaultReferenceCollector[Reference]()
 
   def +=(key: String, kind: ReferenceKind, node: YNode): Unit = {
+    val (url, fragment) = ReferenceFragmentPartition(key)
+    collector.get(url) match {
+      case Some(reference: Reference) => collector += (url, reference + (kind, node, fragment))
+      case None                       => collector += (url, Reference(url, kind, node, fragment))
+    }
+  }
+
+  def +=(key: String, kind: ReferenceKind, node: ASTElement): Unit = {
     val (url, fragment) = ReferenceFragmentPartition(key)
     collector.get(url) match {
       case Some(reference: Reference) => collector += (url, reference + (kind, node, fragment))

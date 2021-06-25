@@ -17,6 +17,7 @@ import amf.core.internal.remote._
 import amf.core.internal.utils.AmfStrings
 import amf.core.internal.validation.CoreValidations._
 import amf.core.internal.validation.core.ValidationSpecification
+import org.mulesoft.antlrast.ast.ASTElement
 import org.yaml.model.YPart
 
 import java.net.URISyntaxException
@@ -169,11 +170,22 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
           case ReferenceResolutionResult(Some(e), _) =>
             e match {
               case e: CyclicReferenceException if !domainPlugin.allowRecursiveReferences =>
-                compilerContext.violation(CycleReferenceError, link.url, e.getMessage, link.refs.head.node)
+                link.refs.head match {
+                  case SYamlRefContainer(_, node, _) =>
+                    compilerContext.violation(CycleReferenceError, link.url, e.getMessage, node)
+                  case AntlrRefContainer(_, node, _) =>
+                    compilerContext.violation(CycleReferenceError, link.url, e.getMessage, node)
+                }
+
                 Future(None)
               case _ =>
                 if (!link.isInferred) {
-                  nodes.foreach(compilerContext.violation(UnresolvedReference, link.url, e.getMessage, _))
+                  link.refs.foreach {
+                    case SYamlRefContainer(_, node, _) =>
+                      compilerContext.violation(UnresolvedReference, link.url, e.getMessage, node)
+                    case AntlrRefContainer(_, node, _) =>
+                      compilerContext.violation(UnresolvedReference, link.url, e.getMessage, node)
+                  }
                 }
                 Future(None)
             }

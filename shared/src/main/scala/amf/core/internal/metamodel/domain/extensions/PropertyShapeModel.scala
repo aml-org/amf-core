@@ -20,6 +20,9 @@ object PropertyShapeModel extends ShapeModel {
   val Range =
     Field(ShapeModel, Shapes + "range", ModelDoc(ModelVocabularies.Shapes, "range", "Range property constraint"))
 
+  val SerializationOrder =
+    Field(Int, Shapes + "serializationOrder", ModelDoc(ModelVocabularies.Shapes, "serializationOrder", "position in the set of properties for a shape used to serialize this property on the wire"))
+
   val MinCount = Field(Int,
                        Shacl + "minCount",
                        ModelDoc(ExternalModelVocabularies.Shacl, "minCount", "Minimum count property constraint"))
@@ -35,7 +38,7 @@ object PropertyShapeModel extends ShapeModel {
   override val `type`: List[ValueType] = List(Shacl + "PropertyShape") ++ ShapeModel.`type`
 
   override def fields: List[Field] =
-    List(Path, Range, MinCount, MaxCount, PatternName) ++ ShapeModel.fields ++ DomainElementModel.fields
+    List(Path, Range, MinCount, MaxCount, PatternName, SerializationOrder) ++ ShapeModel.fields ++ DomainElementModel.fields
 
   override def modelInstance = PropertyShape()
 

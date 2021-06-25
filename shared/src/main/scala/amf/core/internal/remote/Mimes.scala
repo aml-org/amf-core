@@ -19,4 +19,10 @@ object Mimes {
   val `application/x-turtle`        = "application/x-turtle"
   val `text/turtle`                 = "text/turtle"
   val `text/plain`                  = "text/plain"
+  val `APPLICATION/GRPC`: String          = "application/grpc"
+  val `APPLICATION/GRPC+PROTO`: String    = "application/grpc+proto"
+  val `APPLICATION/X-PROTOBUF`: String    = "application/x-protobuf"
+  val `APPLICATION/PROTOBUF`: String      = "application/protobuf"
+  val `APPLICATION/PROTOBUF_`: String     = "application/protobuf; proto=org.some.Message"
+  val `APPLICATION/VND_GOOGLE`: String    = "application/vnd.google.protobuf"
 }

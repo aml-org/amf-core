@@ -102,7 +102,13 @@ trait ShapeModel extends DomainElementModel with LinkableElementModel with KeyFi
       Shapes + "deprecated",
       ModelDoc(ModelVocabularies.Shapes, "deprecated", "Deprecated annotation for a property constraint"))
 
+  val SerializationSchema = Field(
+    ShapeModel,
+    Shapes + "serializationSchema",
+    ModelDoc(ModelVocabularies.Shapes, "serializationSchema", "Serialization schema for a shape"))
+
   override val key: Field = Name
+
 
   // RAML user-defined facets: definitions and values
   lazy val CustomShapePropertyDefinitions = Field(
@@ -140,6 +146,7 @@ object ShapeModel extends ShapeModel {
                                                                          Else,
                                                                          ReadOnly,
                                                                          WriteOnly,
+                                                                         SerializationSchema,
                                                                          Deprecated)
 
   override val `type`: List[ValueType] = List(Shacl + "Shape", Shapes + "Shape") ++ DomainElementModel.`type`
