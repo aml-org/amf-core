@@ -1,6 +1,7 @@
 package amf.core.internal.resource
 
 import amf.core.client.common.remote.Content
+import amf.core.client.platform.resource.LoaderWithExecutionContext
 import amf.core.client.scala.config.UnitCache
 import amf.core.client.scala.execution.ExecutionEnvironment
 import amf.core.client.scala.resource.ResourceLoader
@@ -48,14 +49,14 @@ private[amf] case class AMFResolvers(resourceLoaders: List[ResourceLoader],
   }
 
   def withExecutionEnvironment(ee: ExecutionEnvironment): AMFResolvers = {
-    val newLoaders = adaptDefaultLoadersToNewContext(ee)
+    val newLoaders = adaptLoadersToNewContext(ee)
     copy(executionEnv = ee, resourceLoaders = newLoaders)
   }
 
-  private def adaptDefaultLoadersToNewContext(ee: ExecutionEnvironment): List[ResourceLoader] = {
+  private def adaptLoadersToNewContext(ee: ExecutionEnvironment): List[ResourceLoader] = {
     resourceLoaders.map {
       case InternalResourceLoaderAdapter(a: LoaderWithExecutionContext) =>
-        val adjustedLoader = a.withNewContext(ee.context)
+        val adjustedLoader = a.withExecutionContext(ee.context)
         InternalResourceLoaderAdapter(adjustedLoader)(ee.context)
       case other => other
     }

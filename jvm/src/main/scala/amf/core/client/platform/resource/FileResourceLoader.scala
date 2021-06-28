@@ -8,7 +8,6 @@ import amf.core.client.scala.lexer.FileStream
 import amf.core.internal.remote.FileMediaType._
 import amf.core.internal.remote.FutureConverter._
 import amf.core.internal.remote.{FileNotFound, JvmPlatform}
-import amf.core.internal.resource.LoaderWithExecutionContext
 import amf.core.internal.utils.AmfStrings
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,7 +21,7 @@ case class FileResourceLoader(executionContext: ExecutionContext)
   def this() = this(JvmPlatform.instance().defaultExecutionEnvironment.executionContext)
   def this(executionEnvironment: BaseExecutionEnvironment) = this(executionEnvironment.executionContext)
 
-  override def withNewContext(newEc: ExecutionContext): ResourceLoader = FileResourceLoader(newEc)
+  override def withExecutionContext(newEc: ExecutionContext): ResourceLoader = FileResourceLoader(newEc)
 
   def fetchFile(resource: String): CompletableFuture[Content] = {
     Future {
