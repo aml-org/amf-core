@@ -1,22 +1,15 @@
-package amf.core.resource
+package amf.core.resource.platform
 
 import amf.core.client.platform.AMFGraphConfiguration
 import amf.core.client.platform.execution.ExecutionEnvironment
-import amf.core.client.platform.resource.{
-  FileResourceLoader,
-  HttpResourceLoader,
-  LoaderWithExecutionContext,
-  ResourceLoader
-}
+import amf.core.client.platform.resource.{FileResourceLoader, HttpResourceLoader, ResourceLoader}
 import amf.core.client.scala.resource.{ResourceLoader => InternalResourceLoader}
-import org.scalatest.{FunSuite, Matchers}
 import amf.core.internal.convert.CoreClientConverters._
-import org.scalatest.Matchers.{be, _}
+import org.scalatest.{FunSuite, Matchers}
 
 import java.util.concurrent.Executors
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent
 import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ResourceLoaderExecutionContextTest extends FunSuite with Matchers {
 

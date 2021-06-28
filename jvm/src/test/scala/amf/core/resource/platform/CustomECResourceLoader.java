@@ -1,4 +1,4 @@
-package amf.core.resource;
+package amf.core.resource.platform;
 
 import amf.core.client.common.remote.Content;
 import amf.core.client.platform.resource.LoaderWithExecutionContext;

@@ -1,10 +1,10 @@
 package amf.core.internal.resource
 
 import amf.core.client.common.remote.Content
-import amf.core.client.platform.resource.LoaderWithExecutionContext
+import amf.core.client.platform.resource.{LoaderWithExecutionContext => PlatformLoaderWithExecutionContext}
 import amf.core.client.scala.config.UnitCache
 import amf.core.client.scala.execution.ExecutionEnvironment
-import amf.core.client.scala.resource.ResourceLoader
+import amf.core.client.scala.resource.{LoaderWithExecutionContext, ResourceLoader}
 import amf.core.internal.remote.UnsupportedUrlScheme
 import amf.core.internal.unsafe.PlatformSecrets
 
@@ -55,10 +55,11 @@ private[amf] case class AMFResolvers(resourceLoaders: List[ResourceLoader],
 
   private def adaptLoadersToNewContext(ee: ExecutionEnvironment): List[ResourceLoader] = {
     resourceLoaders.map {
-      case InternalResourceLoaderAdapter(a: LoaderWithExecutionContext) =>
+      case InternalResourceLoaderAdapter(a: PlatformLoaderWithExecutionContext) =>
         val adjustedLoader = a.withExecutionContext(ee.context)
         InternalResourceLoaderAdapter(adjustedLoader)(ee.context)
-      case other => other
+      case a: LoaderWithExecutionContext => a.withExecutionContext(ee.context)
+      case other                         => other
     }
   }
 
