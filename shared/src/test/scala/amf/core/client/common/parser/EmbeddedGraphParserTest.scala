@@ -26,7 +26,7 @@ trait EmbeddedGraphParserTest
   test("Test parse simple document") {
     val golden = "shared/src/test/resources/parser/simple-document.expanded.jsonld"
     // TODO ARM update for new interfaces
-    val client               = AMFGraphConfiguration.predefined().createClient()
+    val client               = AMFGraphConfiguration.predefined().documentClient()
     val f: Future[AMFResult] = client.parse("file://" + golden).asFuture
 
     f.map { r =>

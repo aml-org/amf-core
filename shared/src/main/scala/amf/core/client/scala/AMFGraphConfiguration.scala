@@ -92,7 +92,7 @@ class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: A
                                           override private[amf] val options: AMFOptions)
     extends BaseAMFConfigurationSetter(resolvers, errorHandlerProvider, registry, logger, listeners, options) { // break platform into more specific classes?
 
-  def createClient(): AMFGraphClient = new AMFGraphClient(this)
+  def documentClient(): AMFGraphDocumentClient = new AMFGraphDocumentClient(this)
 
   def payloadValidatorFactory(): ShapePayloadValidatorFactory = DefaultShapePayloadValidatorFactory(this)
 
