@@ -25,7 +25,7 @@ trait BasicResolutionTest
     val domainProperty = CustomDomainProperty().withName("myProperty").withId("amf://id6")
     document.withEncodes(domainProperty.link("myLink"))
     document.encodes.asInstanceOf[CustomDomainProperty].linkTarget.isEmpty shouldBe false
-    val result = AMFGraphConfiguration.predefined().documentClient().transform(BaseUnitMatcher.asClient(document))
+    val result = AMFGraphConfiguration.predefined().baseUnitClient().transform(BaseUnitMatcher.asClient(document))
     result.baseUnit
       .asInstanceOf[Document]
       .encodes

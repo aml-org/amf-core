@@ -23,7 +23,7 @@ trait FlattenedGraphParserTest
   test("Test parse simple document") {
     val golden = "shared/src/test/resources/parser/simple-document.flattened.jsonld"
     /// TODO ARM use new client interfaces
-    val client               = AMFGraphConfiguration.predefined().documentClient()
+    val client               = AMFGraphConfiguration.predefined().baseUnitClient()
     val f: Future[AMFResult] = client.parse("file://" + golden).asFuture
 
     f.map { r =>

@@ -21,7 +21,7 @@ import amf.core.internal.convert.CoreClientConverters
 class AMFGraphConfiguration private[amf] (private[amf] val _internal: InternalGraphConfiguration) {
   private implicit val ec: ExecutionContext = _internal.getExecutionContext
 
-  def documentClient(): AMFGraphDocumentClient = new AMFGraphDocumentClient(this)
+  def baseUnitClient(): AMFGraphBaseUnitClient = new AMFGraphBaseUnitClient(this)
 
   def payloadValidatorFactory(): ShapePayloadValidatorFactory =
     ShapePayloadValidatorFactoryMatcher.asClient(_internal.payloadValidatorFactory())
