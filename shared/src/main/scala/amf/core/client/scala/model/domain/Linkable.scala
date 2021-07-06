@@ -13,12 +13,12 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
   def linkTarget: Option[DomainElement]    = Option(fields(LinkableElementModel.Target))
   var linkAnnotations: Option[Annotations] = None
   def supportsRecursion: BoolField         = fields.field(LinkableElementModel.SupportsRecursion)
-  def effectiveLinkTarget(links: Seq[String] = Seq()): DomainElement =
+  def effectiveLinkTarget(links: Set[Linkable] = Set()): DomainElement =
     linkTarget
       .map {
         case linkable: Linkable if linkTarget.isDefined =>
-          if (links.contains(linkable.id)) linkable.linkTarget.get
-          else linkable.effectiveLinkTarget(linkable.id +: links)
+          if (links.contains(linkable)) linkable.linkTarget.get
+          else linkable.effectiveLinkTarget(links + linkable)
         case other => other
       }
       .getOrElse(this)
