@@ -37,7 +37,10 @@ class BaseUnitFieldAdoptionOrdering(unit: BaseUnit) extends FieldAdoptionOrderin
   fieldsOrdered.add(DocumentModel.References)
   fieldsOrdered.add(DocumentModel.Declares)
   fieldsOrdered.add(DocumentModel.Encodes)
+  init()
 }
 
 // The fields are in a random order
-class GenericFieldAdoptionOrdering(any: AmfObject) extends FieldAdoptionOrdering(any)
+class GenericFieldAdoptionOrdering(any: AmfObject) extends FieldAdoptionOrdering(any) {
+  init()
+}

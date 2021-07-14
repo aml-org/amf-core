@@ -16,7 +16,7 @@ class IdAdopter(root: AmfElement, rootId: String) {
     root match {
       case obj: AmfObject =>
         val fieldOrdering = getFieldOrdering(obj)
-        obj.withId(rootId)
+        obj.id = rootId
         visited += obj.id
         while (fieldOrdering.hasPendingFields) adoptInner(fieldOrdering.nextField(), rootId)
       case _ => // Nothing to do
@@ -32,9 +32,9 @@ class IdAdopter(root: AmfElement, rootId: String) {
       case obj: AmfObject =>
         if (notVisited(obj)) {
           val fieldOrdering = getFieldOrdering(obj)
-          obj.withId(id)
+          obj.id = id
           visited += obj.id
-          while (fieldOrdering.hasPendingFields) adoptInner(fieldOrdering.nextField(), rootId)
+          while (fieldOrdering.hasPendingFields) adoptInner(fieldOrdering.nextField(), id)
         }
       case array: AmfArray =>
         array.values.zipWithIndex.foreach {
@@ -59,7 +59,7 @@ class IdAdopter(root: AmfElement, rootId: String) {
   private def makeId(parent: String, element: String): String = parent + "/" + element
 
   private def getFieldOrdering(obj: AmfObject) = obj match {
-    case b: BaseUnit => new BaseUnitFieldAdoptionOrdering(b).init()
+    case b: BaseUnit => new BaseUnitFieldAdoptionOrdering(b)
     case other       => new GenericFieldAdoptionOrdering(other)
   }
 
