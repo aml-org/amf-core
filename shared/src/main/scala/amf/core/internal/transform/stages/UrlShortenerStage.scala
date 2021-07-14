@@ -16,7 +16,7 @@ class UrlShortenerStage() extends TransformationStep {
   override def transform(model: BaseUnit, errorHandler: AMFErrorHandler): BaseUnit = {
     val ids: Set[String] = Set(model.id) ++ obtainNestedReferenceIds(model)
     shorten(model, ids)
-    model.withId(base)
+    model.setId(base)
   }
 
   private def obtainNestedReferenceIds[T <: BaseUnit](model: T): Seq[String] = {
@@ -29,11 +29,11 @@ class UrlShortenerStage() extends TransformationStep {
       case o: AmfObject =>
         val shorthenId = shortener.shorten(o.id)
         if (!shorthenId.equals(o.id)) {
-          o.withId(shortener.shorten(o.id))
+          o.setId(shortener.shorten(o.id))
           o.fields.fields().foreach {
             case FieldEntry(f, value: Value) if f == LinkableElementModel.Target =>
               value.value match {
-                case o: AmfObject => o.withId(shortener.shorten(o.id))
+                case o: AmfObject => o.setId(shortener.shorten(o.id))
                 case _            => // ignore
               }
             case FieldEntry(f, value: Value) if f.`type` == Iri =>

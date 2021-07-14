@@ -3,13 +3,7 @@ package amf.core.client.scala.parse
 import amf.core.client.scala.resource.ResourceLoader
 import amf.core.client.scala.{AMFGraphConfiguration, AMFObjectResult, AMFParseResult, AMFResult}
 import amf.core.internal.convert.CoreClientConverters.platform
-import amf.core.internal.parser.{
-  AMFCompiler,
-  AMFGraphPartialCompiler,
-  AmfObjectUnitContainer,
-  CompilerConfiguration,
-  CompilerContextBuilder
-}
+import amf.core.internal.parser.{AMFCompiler, AMFGraphPartialCompiler, AmfObjectUnitContainer, CompilerConfiguration, CompilerContextBuilder}
 import amf.core.internal.remote.{Cache, Context}
 import amf.core.internal.resource.StringResourceLoader
 
@@ -86,6 +80,7 @@ object AMFParser {
       .build()
       .map { model =>
         val results = compilerConfig.eh.getResults
+        new IdAdopter(model, model.location().getOrElse(DEFAULT_DOCUMENT_URL)).adopt()
         new AMFParseResult(model, results)
       }
   }

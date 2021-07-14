@@ -3,6 +3,7 @@ package amf.core.client.scala.model.document
 import amf.core.internal.metamodel.document.DocumentModel._
 import amf.core.internal.metamodel.document.{DocumentModel, ExtensionLikeModel}
 import amf.core.client.scala.model.domain.DomainElement
+import amf.core.internal.adoption.DefinableUriFields
 import amf.core.internal.parser.domain.Fields
 import amf.core.internal.parser.domain.{Annotations, Fields}
 
@@ -32,9 +33,18 @@ object Document {
 }
 
 abstract class ExtensionLike[T <: DomainElement](override val fields: Fields, override val annotations: Annotations)
-    extends Document(fields, annotations) {
+    extends Document(fields, annotations)
+    with DefinableUriFields {
   override def encodes: T = super.encodes.asInstanceOf[T]
   def extend: String      = fields(ExtensionLikeModel.Extends)
 
-  def withExtend(extend: BaseUnit): this.type = set(ExtensionLikeModel.Extends, extend)
+  private var extendedInstance: Option[BaseUnit] = None
+
+  override def defineUriFields(): Unit = {
+    extendedInstance.map(_.id).map(withExtend)
+  }
+
+  private[amf] def withExtend(b: BaseUnit): Unit = extendedInstance = Some(b)
+
+  def withExtend(extend: String): this.type = set(ExtensionLikeModel.Extends, extend)
 }

@@ -1,6 +1,11 @@
 package amf.core.internal.transform.stages.helpers
 
-import amf.core.internal.annotations.{DeclaredElement, ResolvedInheritance, ResolvedLinkAnnotation, ResolvedLinkTargetAnnotation}
+import amf.core.internal.annotations.{
+  DeclaredElement,
+  ResolvedInheritance,
+  ResolvedLinkAnnotation,
+  ResolvedLinkTargetAnnotation
+}
 import amf.core.client.scala.model.domain.{DomainElement, LinkNode}
 
 object LinkNodeResolver {
@@ -13,7 +18,7 @@ object LinkNodeResolver {
       case _ =>
         l.link.option().flatMap(f => modelResolver.flatMap(mr => mr.findFragment(f))) match {
           case Some(elem) =>
-            val resolved = new ResolvedLinkNode(l, elem).withId(l.id)
+            val resolved = new ResolvedLinkNode(l, elem).setId(l.id)
             if (keepEditingInfo) {
               resolved.annotations += ResolvedLinkAnnotation(l.id)
               l.linkedDomainElement.map { element =>
@@ -24,7 +29,7 @@ object LinkNodeResolver {
             if (elem.annotations.contains(classOf[DeclaredElement])) resolved.annotations += DeclaredElement()
             Some(resolved)
           case None if l.linkedDomainElement.isDefined =>
-            val resolved = new ResolvedLinkNode(l, l.linkedDomainElement.get).withId(l.id)
+            val resolved = new ResolvedLinkNode(l, l.linkedDomainElement.get).setId(l.id)
             if (keepEditingInfo) {
               resolved.annotations += ResolvedLinkAnnotation(l.id)
               l.linkedDomainElement.map { element =>
