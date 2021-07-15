@@ -4,7 +4,11 @@ import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.internal.metamodel.document.DocumentModel
 import amf.core.client.scala.model.document.{BaseUnit, Document}
 import amf.core.client.scala.model.domain._
-import amf.core.client.scala.transform.stages.elements.resolution.{ElementResolutionStage, ElementStageTransformer, ReferenceResolution}
+import amf.core.client.scala.transform.stages.elements.resolution.{
+  ElementResolutionStage,
+  ElementStageTransformer,
+  ReferenceResolution
+}
 import amf.core.client.scala.transform.stages.helpers.ModelReferenceResolver
 import amf.core.client.scala.transform.stages.selectors.{LinkNodeSelector, LinkSelector}
 
@@ -17,7 +21,7 @@ class ReferenceResolutionStage(keepEditingInfo: Boolean) extends TransformationS
 
   // TODO should be in an Adapter specific for ExtendsResolution
   def resolveDomainElement[T <: DomainElement](element: T, errorHandler: AMFErrorHandler): T = {
-    val doc = Document().withId("http://resolutionstage.com/test#")
+    val doc = Document().setId("http://resolutionstage.com/test#")
     if (element.id != null) {
       doc.fields.setWithoutId(DocumentModel.Encodes, element)
     } else {
@@ -30,7 +34,7 @@ class ReferenceResolutionStage(keepEditingInfo: Boolean) extends TransformationS
   // TODO should be in an Adapter specific for ExtendsResolution
   def resolveDomainElementSet[T <: DomainElement](elements: Seq[T],
                                                   errorHandler: AMFErrorHandler): Seq[DomainElement] = {
-    val doc = Document().withId("http://resolutionstage.com/test#")
+    val doc = Document().setId("http://resolutionstage.com/test#")
 
     doc.withDeclares(elements)
     transform(doc, errorHandler)

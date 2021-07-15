@@ -65,7 +65,7 @@ object RecursiveShape {
 
   def apply(l: Linkable): RecursiveShape =
     apply(Fields(), l.annotations)
-      .adopted(l.id)
+      .setId(l.id + "/recursive")
       .withSupportsRecursion(l.supportsRecursion.value())
       .withFixPoint(l.id)
       .withFixpointTarget(l.effectiveLinkTarget().asInstanceOf[Shape])
@@ -73,7 +73,7 @@ object RecursiveShape {
   def apply(shape: Shape): RecursiveShape =
     apply(Fields(), shape.annotations)
       .withName(shape.name.option().getOrElse("default-recursion"))
-      .adopted(shape.id)
+      .setId(shape.id + "/recursive")
       .withSupportsRecursion(shape.supportsRecursion.value())
       .withFixPoint(shape.id)
       .withFixpointTarget(shape)

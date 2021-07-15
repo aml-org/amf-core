@@ -19,6 +19,11 @@ trait AmfObject extends AmfElement {
   /** Return element unique identifier. */
   var id: String = _
 
+  def setId(value: String): this.type = {
+    id = value
+    this
+  }
+
   /** Set element unique identifier. */
   def withId(value: String): this.type = {
 //    def replaceSlashes(value: String) = if (value.contains("//")) value.replace("//", "/") else value

@@ -5,22 +5,23 @@ import amf.core.client.scala.model.domain.{AmfArray, AmfElement, AmfObject, Name
 import amf.core.internal.metamodel.Field
 import amf.core.internal.metamodel.domain.LinkableElementModel
 import amf.core.internal.parser.domain.FieldEntry
-
+import org.mulesoft.common.collections.FilterType
 import scala.collection.mutable
 
 class IdAdopter(root: AmfElement, rootId: String) {
 
-  val visited: mutable.Set[String] = mutable.Set.empty
+  val visited: mutable.Map[String, AmfObject] = mutable.Map.empty
 
   def adopt(): Unit = {
     root match {
       case obj: AmfObject =>
         val fieldOrdering = getFieldOrdering(obj)
         obj.id = rootId
-        visited += obj.id
+        visited += obj.id -> obj
         while (fieldOrdering.hasPendingFields) adoptInner(fieldOrdering.nextField(), rootId)
       case _ => // Nothing to do
     }
+    visited.values.filterType[DefinableUriFields].foreach(_.defineUriFields())
   }
 
   private def adoptInner(field: FieldEntry, parentId: String): Unit =
@@ -33,7 +34,7 @@ class IdAdopter(root: AmfElement, rootId: String) {
         if (notVisited(obj)) {
           val fieldOrdering = getFieldOrdering(obj)
           obj.id = id
-          visited += obj.id
+          visited += obj.id -> obj
           while (fieldOrdering.hasPendingFields) adoptInner(fieldOrdering.nextField(), id)
         }
       case array: AmfArray =>
@@ -61,6 +62,11 @@ class IdAdopter(root: AmfElement, rootId: String) {
   private def getFieldOrdering(obj: AmfObject) = obj match {
     case b: BaseUnit => new BaseUnitFieldAdoptionOrdering(b)
     case other       => new GenericFieldAdoptionOrdering(other)
+  }
+
+  private def defineUriFields(obj: AmfObject): Unit = obj match {
+    case o: DefinableUriFields => o.defineUriFields()
+    case _                     =>
   }
 
   // List of fields to avoid link adoption

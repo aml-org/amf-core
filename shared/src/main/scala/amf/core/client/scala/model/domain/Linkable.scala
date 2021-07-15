@@ -4,6 +4,7 @@ import amf.core.internal.annotations.Inferred
 import amf.core.internal.metamodel.domain.LinkableElementModel
 import amf.core.client.scala.model.{BoolField, StrField}
 import amf.core.client.scala.parse.document.UnresolvedComponents
+import amf.core.internal.adoption.DefinableUriFields
 import amf.core.internal.parser.domain.DeclarationPromise
 import amf.core.internal.parser.domain.{Annotations, DeclarationPromise, Fields, FutureDeclarations}
 import amf.core.internal.utils._
@@ -13,7 +14,7 @@ import amf.core.internal.utils.IdCounter
 import org.yaml.model.YPart
 import amf.core.internal.parser.domain.{ScalarNode => ScalarNodeObj}
 
-trait Linkable extends AmfObject { this: DomainElement with Linkable =>
+trait Linkable extends AmfObject with DefinableUriFields { this: DomainElement with Linkable =>
 
   def linkTarget: Option[DomainElement]    = Option(fields(LinkableElementModel.Target))
   var linkAnnotations: Option[Annotations] = None
@@ -36,6 +37,12 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
   def withLinkTarget(target: DomainElement): this.type = {
     fields.setWithoutId(LinkableElementModel.Target, target, Annotations.synthesized())
     set(LinkableElementModel.TargetId, AmfScalar(target.id), Annotations.synthesized())
+  }
+
+  override def defineUriFields(): Unit = {
+    linkTarget
+      .map(_.id)
+      .foreach(targetId => set(LinkableElementModel.TargetId, AmfScalar(targetId), Annotations.synthesized()))
   }
 
   def withLinkLabel(label: String, annotations: Annotations = Annotations()): this.type =
