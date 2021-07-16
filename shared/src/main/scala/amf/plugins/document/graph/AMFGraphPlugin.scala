@@ -21,6 +21,7 @@ import amf.plugins.document.graph.parser.{EmbeddedGraphParser, FlattenedGraphPar
 import org.yaml.builder.DocBuilder
 import org.yaml.model.YDocument
 import amf.core.exception.UnsupportedParsedDocumentException
+import amf.core.validation.core.ValidationSpecification
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -111,4 +112,5 @@ object AMFGraphPlugin extends AMFDocumentPlugin with PlatformSecrets {
     }
   }
 
+  override def vendorExtensionsValidations(): Seq[ValidationSpecification] = Nil
 }

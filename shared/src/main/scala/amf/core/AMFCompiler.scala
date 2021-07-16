@@ -1,5 +1,6 @@
 package amf.core
 
+import java.net.URISyntaxException
 import amf.client.parse.DefaultParserErrorHandler
 import amf.client.remod.AMFGraphConfiguration
 import amf.client.remod.amfcore.config.ParsingOptionsConverter
@@ -8,8 +9,9 @@ import amf.client.remote.Content
 import amf.core.TaggedReferences._
 import amf.core.benchmark.ExecutionLog
 import amf.core.exception.{CyclicReferenceException, UnsupportedMediaTypeException}
+import amf.core.metamodel.{Field, Obj}
 import amf.core.model.document.{BaseUnit, ExternalFragment}
-import amf.core.model.domain.ExternalDomainElement
+import amf.core.model.domain.{DomainElement, ExternalDomainElement}
 import amf.core.parser.errorhandler.ParserErrorHandler
 import amf.core.parser.{
   ParsedDocument,
@@ -26,7 +28,7 @@ import amf.core.utils.AmfStrings
 import amf.core.validation.core.ValidationSpecification
 import amf.internal.environment.Environment
 import amf.plugins.features.validation.CoreValidations._
-import org.yaml.model.YPart
+import org.yaml.model.{YMapEntry, YPart}
 
 import java.net.URISyntaxException
 import scala.concurrent.Future.failed
@@ -414,4 +416,23 @@ object Root {
             referenceKind: ReferenceKind,
             raw: String): Root =
     new Root(parsed, location.normalizeUrl, mediatype, references, referenceKind, raw)
+}
+
+object VendorExtensionCompiler {
+  def parseVendorExtension(name: String, entry: YMapEntry, parent: DomainElement, context: ParserContext): Boolean = {
+    AMFPluginsRegistry.documentPlugins.find(_.canParseVendorExtension(name)) match {
+      case Some(plugin) =>
+        plugin.parserVendorExtension(name, entry, parent, context)
+        true
+      case _ => false
+    }
+  }
+
+  def vendorExtensionFieldsFor(obj: Obj): Seq[Field] = {
+    obj.`type`.map(_.iri()).flatMap { className =>
+      AMFPluginsRegistry.documentPlugins.flatMap { plugin =>
+        plugin.vendorExtensionFieldsForClass(className)
+      }
+    }
+  }
 }

@@ -3,17 +3,19 @@ package amf.client.plugins
 import amf.client.remod.amfcore.config.RenderOptions
 import amf.core.{CompilerContext, Root}
 import amf.core.client.ParsingOptions
+import amf.core.emitter.EntryEmitter
 import amf.core.errorhandling.{ErrorHandler, UnhandledErrorHandler}
-import amf.core.metamodel.Obj
+import amf.core.metamodel.{Field, Obj}
 import amf.core.model.document.BaseUnit
-import amf.core.model.domain.AnnotationGraphLoader
+import amf.core.model.domain.{AnnotationGraphLoader, DomainElement}
 import amf.core.parser.{ParserContext, RefContainer, ReferenceHandler, ReferenceKind}
 import amf.core.registries.AMFDomainEntityResolver
 import amf.core.remote.{Platform, Vendor}
 import amf.core.resolution.pipelines.ResolutionPipeline
+import amf.core.validation.core.ValidationSpecification
 import amf.core.vocabulary.{Namespace, NamespaceAliases}
 import org.yaml.builder.{DocBuilder, YDocumentBuilder}
-import org.yaml.model.{YDocument, YNode}
+import org.yaml.model.{YDocument, YMapEntry, YNode}
 
 object AMFDocumentPluginSettings {
   object PluginPriorities {
@@ -110,4 +112,17 @@ abstract class AMFDocumentPlugin extends AMFPlugin {
   def generateNamespaceAliases(unit: BaseUnit): NamespaceAliases = Namespace.staticAliases
 
   def referenceHandler(eh: ErrorHandler): ReferenceHandler
+
+  // Vendor Extensions
+
+  def canParseVendorExtension(name: String): Boolean = false
+  def parserVendorExtension(extensionKey: String,
+                            entry: YMapEntry,
+                            parent: DomainElement,
+                            context: ParserContext): Unit          = None
+  def vendorExtensionFieldsForClass(className: String): Seq[Field] = Nil
+  def canEmitExtension(field: Field): Boolean                      = false
+  def emitVendorExtensions(element: DomainElement, field: Field, keyDecorator: String => String): Seq[EntryEmitter] =
+    Nil
+  def vendorExtensionsValidations(): Seq[ValidationSpecification] = Nil
 }

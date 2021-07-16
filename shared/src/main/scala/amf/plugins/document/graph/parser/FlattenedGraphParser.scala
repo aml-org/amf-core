@@ -241,7 +241,20 @@ class FlattenedGraphParser()(implicit val ctx: GraphParserContext) extends Graph
         case Some(builder) =>
           cache(id) = builder
           val fields = fieldsFrom(model)
-          parseNodeFields(map, fields, sources, transformedId, builder)
+          parseNodeFields(map, fields, sources, transformedId, builder) match {
+            case Some(parsed) =>
+              val extendedFields = extendedFieldsFrom(model)
+              if (extendedFields.nonEmpty) {
+                val collector = ObjectNode()
+                traverseFields(map, extendedFields, collector, sources)
+                collector.fields.fields().foreach { f =>
+                  parsed.extendedFields.setWithoutId(f.field, f.value.value, f.value.annotations)
+                }
+              }
+              Some(parsed)
+            case _ => None
+          }
+
         case _ => None
       }
     }

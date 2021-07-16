@@ -1,4 +1,5 @@
 package amf.plugins.document.graph
+import amf.core.VendorExtensionCompiler
 import amf.core.metamodel.domain.ShapeModel
 import amf.core.metamodel.{Field, Obj}
 
@@ -7,8 +8,10 @@ object MetaModelHelper {
     // workaround for lazy values in shape
     val lazyShapeFields = obj match {
       case _: ShapeModel => Seq(ShapeModel.CustomShapePropertyDefinitions, ShapeModel.CustomShapeProperties)
-      case _             => Nil
+      case _ => Nil
     }
     obj.fields ++ lazyShapeFields
   }
+
+  def extendedFieldsFrom(obj: Obj): Seq[Field] = VendorExtensionCompiler.vendorExtensionFieldsFor(obj)
 }

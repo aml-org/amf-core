@@ -3,6 +3,7 @@ package amf.core.model.domain
 import amf.core.metamodel.domain.DomainElementModel._
 import amf.core.model.BoolField
 import amf.core.model.domain.extensions.DomainExtension
+import amf.core.parser.Fields
 
 /**
   * Internal model for any domain element

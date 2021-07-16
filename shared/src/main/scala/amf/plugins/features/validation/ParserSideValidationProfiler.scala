@@ -1,8 +1,9 @@
 package amf.plugins.features.validation
 
-import amf.ProfileName
+import amf.core.registries.AMFPluginsRegistry
+import amf.{AmlProfile, ProfileName}
 import amf.core.validation._
-import amf.core.validation.core.{SeverityMapping, ValidationProfile}
+import amf.core.validation.core.{SeverityMapping, ValidationProfile, ValidationSpecification}
 
 import scala.collection.mutable
 

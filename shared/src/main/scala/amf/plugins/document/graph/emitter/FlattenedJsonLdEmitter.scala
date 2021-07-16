@@ -12,7 +12,7 @@ import amf.core.model.document.{BaseUnit, EncodesModel, SourceMap}
 import amf.core.model.domain.DataNodeOps.adoptTree
 import amf.core.model.domain._
 import amf.core.model.domain.extensions.DomainExtension
-import amf.core.parser.{Annotations, FieldEntry, Value}
+import amf.core.parser.{Annotations, FieldEntry, Fields, Value}
 import amf.core.vocabulary.{Namespace, NamespaceAliases, ValueType}
 import amf.plugins.document.graph.JsonLdKeywords
 import amf.plugins.document.graph.emitter.flattened.utils.{Emission, EmissionQueue, Metadata}
@@ -26,8 +26,12 @@ import scala.language.implicitConversions
 
 object FlattenedJsonLdEmitter {
 
-  def emit[T](unit: BaseUnit, builder: DocBuilder[T], renderOptions: RenderOptions = RenderOptions(), namespaceAliases: NamespaceAliases = Namespace.staticAliases): Boolean = {
-    implicit val ctx: GraphEmitterContext = FlattenedGraphEmitterContext(unit, renderOptions, namespaceAliases = namespaceAliases)
+  def emit[T](unit: BaseUnit,
+              builder: DocBuilder[T],
+              renderOptions: RenderOptions = RenderOptions(),
+              namespaceAliases: NamespaceAliases = Namespace.staticAliases): Boolean = {
+    implicit val ctx: GraphEmitterContext =
+      FlattenedGraphEmitterContext(unit, renderOptions, namespaceAliases = namespaceAliases)
     new FlattenedJsonLdEmitter[T](builder, renderOptions).root(unit)
     true
   }
@@ -45,72 +49,72 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
     builder.obj { ob =>
       // Initialize root object
       ob.entry(
-        JsonLdKeywords.Graph,
-        _.list { rootBuilder =>
-          root = rootBuilder
+          JsonLdKeywords.Graph,
+          _.list { rootBuilder =>
+            root = rootBuilder
 
-          /**
-            * First queue non declaration elements. We do this because these elements can generate new declarations that we
-            * need to know before emitting the Base Unit.
-            */
-          val declarationsEntry: Option[FieldEntry] = unit.fields.entry(ModuleModel.Declares)
-          val referencesEntry: Option[FieldEntry]   = unit.fields.entry(ModuleModel.References)
+            /**
+              * First queue non declaration elements. We do this because these elements can generate new declarations that we
+              * need to know before emitting the Base Unit.
+              */
+            val declarationsEntry: Option[FieldEntry] = unit.fields.entry(ModuleModel.Declares)
+            val referencesEntry: Option[FieldEntry]   = unit.fields.entry(ModuleModel.References)
 
-          extractDeclarationsAndReferencesToContext(declarationsEntry, referencesEntry, unit.annotations)
+            extractDeclarationsAndReferencesToContext(declarationsEntry, referencesEntry, unit.annotations)
 
-          unit.fields.removeField(ModuleModel.Declares)
-          unit.fields.removeField(ModuleModel.References)
+            unit.fields.removeField(ModuleModel.Declares)
+            unit.fields.removeField(ModuleModel.References)
 
-          unit match {
-            case u: EncodesModel if isSelfEncoded(u) =>
-              /**
-                * If it self encoded we do not queue the encodes node because it will be emitted in the same node as
-                * the base unit
-                */
-              queueObjectFieldValues(u, (f, _) => f != FragmentModel.Encodes)
-              queueObjectFieldValues(u.encodes) // Still need to queue encodes elements
-            case _ =>
-              queueObjectFieldValues(unit)
+            unit match {
+              case u: EncodesModel if isSelfEncoded(u) =>
+                /**
+                  * If it self encoded we do not queue the encodes node because it will be emitted in the same node as
+                  * the base unit
+                  */
+                queueObjectFieldValues(u, (f, _) => f != FragmentModel.Encodes)
+                queueObjectFieldValues(u.encodes) // Still need to queue encodes elements
+              case _ =>
+                queueObjectFieldValues(unit)
+            }
+
+            while (pending.hasPendingEmissions) {
+              val emission = pending.nextEmission()
+              emission.fn(root)
+            }
+
+            /**
+              * Emit Base Unit. This will emit declarations also. We don't render the already rendered elements because
+              * the queue avoids duplicate ids
+              */
+            if (isSelfEncoded(unit)) {
+              emitSelfEncodedBaseUnitNode(unit)
+            } else {
+              emitBaseUnitNode(unit)
+            }
+
+            // Check added declarations
+            while (pending.hasPendingEmissions) {
+              val emission = pending.nextEmission()
+              ctx.emittingDeclarations = emission.isDeclaration
+              ctx.emittingReferences = emission.isReference
+              emission.fn(root)
+            }
+
+            // Now process external links, not declared as part of the unit
+            while (pending.hasPendingExternalEmissions) {
+              val emission = pending.nextExternalEmission()
+              ctx.emittingDeclarations = emission.isDeclaration
+              ctx.emittingReferences = emission.isReference
+              emission.fn(root)
+            }
+            // new regular nodes might have been generated, annotations for example
+            while (pending.hasPendingEmissions) {
+              val emission = pending.nextEmission()
+              ctx.emittingDeclarations = emission.isDeclaration
+              ctx.emittingReferences = emission.isReference
+              emission.fn(root)
+            }
           }
-
-          while (pending.hasPendingEmissions) {
-            val emission = pending.nextEmission()
-            emission.fn(root)
-          }
-
-          /**
-            * Emit Base Unit. This will emit declarations also. We don't render the already rendered elements because
-            * the queue avoids duplicate ids
-            */
-          if (isSelfEncoded(unit)) {
-            emitSelfEncodedBaseUnitNode(unit)
-          } else {
-            emitBaseUnitNode(unit)
-          }
-
-          // Check added declarations
-          while (pending.hasPendingEmissions) {
-            val emission = pending.nextEmission()
-            ctx.emittingDeclarations = emission.isDeclaration
-            ctx.emittingReferences = emission.isReference
-            emission.fn(root)
-          }
-
-          // Now process external links, not declared as part of the unit
-          while (pending.hasPendingExternalEmissions) {
-            val emission = pending.nextExternalEmission()
-            ctx.emittingDeclarations = emission.isDeclaration
-            ctx.emittingReferences = emission.isReference
-            emission.fn(root)
-          }
-          // new regular nodes might have been generated, annotations for example
-          while (pending.hasPendingEmissions) {
-            val emission = pending.nextEmission()
-            ctx.emittingDeclarations = emission.isDeclaration
-            ctx.emittingReferences = emission.isReference
-            emission.fn(root)
-          }
-        }
       )
       ctx.emitContext(ob)
     }
@@ -130,8 +134,8 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
       val url = ctx.emitIri(f.value.iri())
       ctx.emittingDeclarations(true)
       b.entry(
-        url,
-        value(f.`type`, v, id, sources.property(url), _)
+          url,
+          value(f.`type`, v, id, sources.property(url), _)
       )
     }
     ctx.emittingDeclarations(false)
@@ -144,8 +148,8 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
       val url = ctx.emitIri(f.value.iri())
       ctx.emittingReferences(true)
       b.entry(
-        url,
-        value(f.`type`, v, id, sources.property(url), _)
+          url,
+          value(f.`type`, v, id, sources.property(url), _)
       )
     }
     ctx.emittingReferences(false)
@@ -189,10 +193,10 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
           val sources = SourceMap(id, unit)
 
           // Emit both unit and unit.encodes fields to the same node
-          emitFields(id, u.encodes, sources, b, getMetaModelFields(u.encodes, encodedObj))
+          emitFields(id, u.encodes, sources, b, getMetaModelFields(u.encodes, encodedObj), u.encodes.fields)
 
           pending.skip(id) // Skip emitting encodes node (since it is the same as this node)
-          emitFields(id, u, sources, b, getMetaModelFields(u, unitObj))
+          emitFields(id, u, sources, b, getMetaModelFields(u, unitObj), u.fields)
 
           createCustomExtensions(u, b)
 
@@ -264,13 +268,15 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
       case e: ObjectNode if options.isValidation =>
         val url = Namespace.AmfValidation.base + "/properties"
         b.entry(
-          url,
-          value(Type.Int, Value(AmfScalar(e.propertyFields().size), Annotations()), id, _ => {}, _)
+            url,
+            value(Type.Int, Value(AmfScalar(e.propertyFields().size), Annotations()), id, _ => {}, _)
         )
       case _ => // Nothing to do
     }
 
-    emitFields(id, element, sources, b, modelFields)
+    emitFields(id, element, sources, b, modelFields, element.fields)
+
+    emitFields(id, element, sources, b, getExtendedFields(element), element.extendedFields)
 
   }
 
@@ -278,19 +284,25 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
                          element: AmfObject,
                          sources: SourceMap,
                          b: Entry[T],
-                         modelFields: Seq[Field]): Unit = {
+                         modelFields: Seq[Field],
+                         fields: Fields): Unit = {
     modelFields.foreach { f =>
-      emitStaticField(f, element, id, sources, b)
+      emitStaticField(fields, f, element, id, sources, b)
     }
   }
 
-  private def emitStaticField(field: Field, element: AmfObject, id: String, sources: SourceMap, b: Entry[T]): Unit = {
-    element.fields.entryJsonld(field) match {
+  private def emitStaticField(fields: Fields,
+                              field: Field,
+                              element: AmfObject,
+                              id: String,
+                              sources: SourceMap,
+                              b: Entry[T]): Unit = {
+    fields.entryJsonld(field) match {
       case Some(FieldEntry(f, v)) =>
         val url = ctx.emitIri(f.value.iri())
         b.entry(
-          url,
-          value(f.`type`, v, id, sources.property(url), _)
+            url,
+            value(f.`type`, v, id, sources.property(url), _)
         )
       case None => // Missing field
     }
@@ -335,10 +347,10 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
 
     if (customProperties.nonEmpty)
       b.entry(
-        ctx.emitIri(DomainElementModel.CustomDomainProperties.value.iri()),
-        _.list { b =>
-          customProperties.foreach(iri(b, _, inArray = true))
-        }
+          ctx.emitIri(DomainElementModel.CustomDomainProperties.value.iri()),
+          _.list { b =>
+            customProperties.foreach(iri(b, _, inArray = true))
+          }
       )
   }
 
@@ -347,29 +359,29 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
                                     extension: DomainExtension,
                                     field: Option[Field] = None): Unit = {
     b.entry(
-      uri,
-      _.obj { b =>
-        createIdNode(b, extension.extension.id)
-        val e = new Emission((part: Part[T]) => {
-          part.obj { rb =>
-            rb.entry(
-              ctx.emitIri(DomainExtensionModel.Name.value.iri()),
-              emitScalar(_, extension.name.value())
-            )
-            field.foreach(
-              f =>
-                rb.entry(
-                  ctx.emitIri(DomainExtensionModel.Element.value.iri()),
-                  emitScalar(_, f.value.iri())
-              ))
-            emitObject(extension.extension, rb)
-          }
-        }) with Metadata
-        e.id = Some(extension.extension.id)
-        e.isDeclaration = ctx.emittingDeclarations
-        e.isReference = ctx.emittingReferences
-        pending.tryEnqueue(e)
-      }
+        uri,
+        _.obj { b =>
+          createIdNode(b, extension.extension.id)
+          val e = new Emission((part: Part[T]) => {
+            part.obj { rb =>
+              rb.entry(
+                  ctx.emitIri(DomainExtensionModel.Name.value.iri()),
+                  emitScalar(_, extension.name.value())
+              )
+              field.foreach(
+                  f =>
+                    rb.entry(
+                        ctx.emitIri(DomainExtensionModel.Element.value.iri()),
+                        emitScalar(_, f.value.iri())
+                  ))
+              emitObject(extension.extension, rb)
+            }
+          }) with Metadata
+          e.id = Some(extension.extension.id)
+          e.isDeclaration = ctx.emittingDeclarations
+          e.isReference = ctx.emittingReferences
+          pending.tryEnqueue(e)
+        }
     )
   }
 
@@ -385,42 +397,42 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
             seq.zipWithIndex.foreach {
               case (e, i) =>
                 rb.entry(
-                  ctx.emitIri((Namespace.Rdfs + s"_${i + 1}").iri()), {
-                    b =>
-                      element match {
-                        case _: Obj =>
-                          e match {
-                            case elementInArray: DomainElement with Linkable if elementInArray.isLink =>
-                              link(b, elementInArray, inArray = true)
-                            case elementInArray: AmfObject =>
-                              obj(b, elementInArray)
-                          }
-                        case Str =>
-                          scalar(b, e, SType.Str)
+                    ctx.emitIri((Namespace.Rdfs + s"_${i + 1}").iri()), {
+                      b =>
+                        element match {
+                          case _: Obj =>
+                            e match {
+                              case elementInArray: DomainElement with Linkable if elementInArray.isLink =>
+                                link(b, elementInArray, inArray = true)
+                              case elementInArray: AmfObject =>
+                                obj(b, elementInArray)
+                            }
+                          case Str =>
+                            scalar(b, e, SType.Str)
 
-                        case EncodedIri =>
-                          iri(b, e.asInstanceOf[AmfScalar].toString, inArray = true)
+                          case EncodedIri =>
+                            iri(b, e.asInstanceOf[AmfScalar].toString, inArray = true)
 
-                        case Iri =>
-                          iri(b, e.asInstanceOf[AmfScalar].toString, inArray = true)
+                          case Iri =>
+                            iri(b, e.asInstanceOf[AmfScalar].toString, inArray = true)
 
-                        case Any =>
-                          val scalarElement = e.asInstanceOf[AmfScalar]
-                          scalarElement.value match {
-                            case bool: Boolean =>
-                              typedScalar(b, bool.toString, DataType.Boolean, inArray = true)
-                            case str: String =>
-                              typedScalar(b, str, DataType.String, inArray = true)
-                            case i: Int =>
-                              typedScalar(b, i.toString, DataType.Integer, inArray = true)
-                            case f: Float =>
-                              typedScalar(b, f.toString, DataType.Float, inArray = true)
-                            case d: Double =>
-                              typedScalar(b, d.toString, DataType.Double, inArray = true)
-                            case other => scalar(b, other.toString)
-                          }
-                      }
-                  }
+                          case Any =>
+                            val scalarElement = e.asInstanceOf[AmfScalar]
+                            scalarElement.value match {
+                              case bool: Boolean =>
+                                typedScalar(b, bool.toString, DataType.Boolean, inArray = true)
+                              case str: String =>
+                                typedScalar(b, str, DataType.String, inArray = true)
+                              case i: Int =>
+                                typedScalar(b, i.toString, DataType.Integer, inArray = true)
+                              case f: Float =>
+                                typedScalar(b, f.toString, DataType.Float, inArray = true)
+                              case d: Double =>
+                                typedScalar(b, d.toString, DataType.Double, inArray = true)
+                              case other => scalar(b, other.toString)
+                            }
+                        }
+                    }
                 )
             }
         }
@@ -651,40 +663,40 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
   }
 
   private def createIdNode(b: Entry[T], id: String): Unit = b.entry(
-    JsonLdKeywords.Id,
-    raw(_, ctx.emitId(id))
+      JsonLdKeywords.Id,
+      raw(_, ctx.emitId(id))
   )
 
   private def createSourcesNode(id: String, sources: SourceMap, b: Entry[T]): Unit = {
     if (options.isWithSourceMaps && sources.nonEmpty) {
       if (options.isWithRawSourceMaps) {
         b.entry(
-          "smaps",
-          _.obj { b =>
-            createAnnotationNodes(id, b, sources.annotations)
-            createAnnotationNodes(id, b, sources.eternals)
-          }
+            "smaps",
+            _.obj { b =>
+              createAnnotationNodes(id, b, sources.annotations)
+              createAnnotationNodes(id, b, sources.eternals)
+            }
         )
       } else {
         b.entry(
-          ctx.emitIri(DomainElementModel.Sources.value.iri()),
-          _.list {
-            _.obj { b =>
-              createIdNode(b, id)
-              val e = new Emission((part: Part[T]) => {
-                part.obj { rb =>
-                  createIdNode(rb, id)
-                  createTypeNode(rb, SourceMapModel)
-                  createAnnotationNodes(id, rb, sources.annotations)
-                  createAnnotationNodes(id, rb, sources.eternals)
-                }
-              }) with Metadata
-              e.id = Some(id)
-              e.isDeclaration = ctx.emittingDeclarations
-              e.isReference = ctx.emittingReferences
-              pending.tryEnqueue(e)
+            ctx.emitIri(DomainElementModel.Sources.value.iri()),
+            _.list {
+              _.obj { b =>
+                createIdNode(b, id)
+                val e = new Emission((part: Part[T]) => {
+                  part.obj { rb =>
+                    createIdNode(rb, id)
+                    createTypeNode(rb, SourceMapModel)
+                    createAnnotationNodes(id, rb, sources.annotations)
+                    createAnnotationNodes(id, rb, sources.eternals)
+                  }
+                }) with Metadata
+                e.id = Some(id)
+                e.isDeclaration = ctx.emittingDeclarations
+                e.isReference = ctx.emittingReferences
+                pending.tryEnqueue(e)
+              }
             }
-          }
         )
       }
     } else {
@@ -699,31 +711,31 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
     if (sources.eternals.nonEmpty)
       if (options.isWithRawSourceMaps) {
         b.entry(
-          "smaps",
-          _.obj { b =>
-            createAnnotationNodes(id, b, sources.eternals)
-          }
+            "smaps",
+            _.obj { b =>
+              createAnnotationNodes(id, b, sources.eternals)
+            }
         )
       } else {
         b.entry(
-          ctx.emitIri(DomainElementModel.Sources.value.iri()),
-          _.list {
-            _.obj { b =>
-              createIdNode(b, id)
-              val e = new Emission((part: Part[T]) => {
-                part.obj { rb =>
-                  createIdNode(rb, id)
-                  createTypeNode(rb, SourceMapModel)
-                  createAnnotationNodes(id, rb, sources.eternals)
-                }
-              }) with Metadata
+            ctx.emitIri(DomainElementModel.Sources.value.iri()),
+            _.list {
+              _.obj { b =>
+                createIdNode(b, id)
+                val e = new Emission((part: Part[T]) => {
+                  part.obj { rb =>
+                    createIdNode(rb, id)
+                    createTypeNode(rb, SourceMapModel)
+                    createAnnotationNodes(id, rb, sources.eternals)
+                  }
+                }) with Metadata
 
-              e.id = Some(id)
-              e.isDeclaration = ctx.emittingDeclarations
-              e.isReference = ctx.emittingReferences
-              pending.tryEnqueue(e)
+                e.id = Some(id)
+                e.isDeclaration = ctx.emittingDeclarations
+                e.isReference = ctx.emittingReferences
+                pending.tryEnqueue(e)
+              }
             }
-          }
         )
       }
   }
@@ -735,25 +747,25 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
       case (a, values) =>
         if (ctx.options.isWithRawSourceMaps) {
           b.entry(
-            a,
-            _.obj { o =>
-              values.foreach {
-                case (iri, v) =>
-                  o.entry(
-                    ctx.emitId(ctx.emitIri(iri)),
-                    raw(_, v)
-                  )
+              a,
+              _.obj { o =>
+                values.foreach {
+                  case (iri, v) =>
+                    o.entry(
+                        ctx.emitId(ctx.emitIri(iri)),
+                        raw(_, v)
+                    )
+                }
               }
-            }
           )
         } else {
           b.entry(
-            ctx.emitIri(ValueType(Namespace.SourceMaps, a).iri()),
-            _.list(b =>
-              values.zipWithIndex.foreach {
-                case (tuple, index) =>
-                  createAnnotationValueNode(s"$id/$a/element_$index", b, tuple)
-            })
+              ctx.emitIri(ValueType(Namespace.SourceMaps, a).iri()),
+              _.list(b =>
+                values.zipWithIndex.foreach {
+                  case (tuple, index) =>
+                    createAnnotationValueNode(s"$id/$a/element_$index", b, tuple)
+              })
           )
         }
     })

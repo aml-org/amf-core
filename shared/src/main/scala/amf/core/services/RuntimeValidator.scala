@@ -10,7 +10,7 @@ import amf.core.parser.Annotations
 import amf.core.rdf.RdfModel
 import amf.core.services.RuntimeValidator.CustomShaclFunctions
 import amf.core.unsafe.PlatformSecrets
-import amf.core.validation.core.{ValidationReport, ValidationSpecification}
+import amf.core.validation.core.{ValidationProfile, ValidationReport, ValidationSpecification}
 import amf.core.validation.{AMFValidationReport, AMFValidationResult, EffectiveValidations}
 import amf.internal.environment.Environment
 import amf.internal.resource.{ResourceLoader, StringResourceLoader}
@@ -106,6 +106,7 @@ trait RuntimeValidator extends PlatformSecrets {
                resolved: Boolean,
                exec: BaseExecutionEnvironment = platform.defaultExecutionEnvironment): Future[AMFValidationReport]
 
+  def loadValidationProfileInstance(profile: ValidationProfile): ProfileName
 }
 
 object RuntimeValidator {
@@ -117,7 +118,9 @@ object RuntimeValidator {
 
   private def validator: RuntimeValidator = {
     validatorOption match {
-      case Some(runtimeValidator) => runtimeValidator
+      case Some(runtimeValidator) => {
+        runtimeValidator
+      }
       case None                   => throw new Exception("No registered runtime validator")
     }
   }
@@ -153,8 +156,9 @@ object RuntimeValidator {
       model: BaseUnit,
       validations: EffectiveValidations,
       customFunctions: CustomShaclFunctions = Map(), // used for customShaclValidator
-      options: ValidationOptions)(implicit executionContext: ExecutionContext): Future[ValidationReport] =
+      options: ValidationOptions)(implicit executionContext: ExecutionContext): Future[ValidationReport] = {
     validator.shaclValidation(model, validations, customFunctions, options)
+  }
 
   def emitShapesGraph(profileName: ProfileName): String =
     validator.emitShapesGraph(profileName)

@@ -45,6 +45,9 @@ trait CommonEmitter {
     }
   }
 
+  def getExtendedFields(element: AmfObject): Seq[Field] = element.extendedFields.fields().map(_.field).toSeq
+
+
   def getTypesAsIris(obj: Obj): List[String] = obj.`type`.map(_.iri())
 
   def createTypeNode[T](b: Entry[T], types: List[String])(implicit ctx: GraphEmitterContext): Unit = {

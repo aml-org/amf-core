@@ -15,6 +15,14 @@ trait AmfObject extends AmfElement {
   /** Set of fields composing object. */
   val fields: Fields
 
+  /** Fields extended not from main meta-model */
+  var extendedFields: Fields = Fields()
+  def extensions: Fields = extendedFields
+  def withExtensions(extendedFields: Fields): this.type = {
+    this.extendedFields = extendedFields
+    this
+  }
+
   /** Return element unique identifier. */
   var id: String = _
 

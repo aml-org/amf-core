@@ -43,4 +43,5 @@ trait DomainElement extends AmfObjectWrapper with PlatformSecrets with Customiza
   }
 
   def graph(): Graph = _internal.graph
+
 }

@@ -70,6 +70,15 @@ class RdfModelEmitter(rdfmodel: RdfModel) extends MetaModelTypeMapping with Comm
         modelFields.foreach { f =>
           emitStaticField(f, id, element, obj, sources)
         }
+
+        element.extendedFields.foreach {
+          case (f,v) =>
+            val url = f.value.iri()
+            sources.property(url)(v)
+            objectValue(id, url, f.`type`, v)
+          case _ => // ignore
+        }
+
         createCustomExtensions(element)
 
         val sourceMapId = sourceMapIdFor(id)
@@ -86,6 +95,7 @@ class RdfModelEmitter(rdfmodel: RdfModel) extends MetaModelTypeMapping with Comm
           objectValue(id, url, f.`type`, v)
         case None => // Missing field
       }
+
     }
 
     private def createCustomExtensions(element: AmfObject): Unit = {
