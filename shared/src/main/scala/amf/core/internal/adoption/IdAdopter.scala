@@ -77,7 +77,7 @@ class IdAdopter(root: AmfElement, rootId: String) {
 
   // List of fields to avoid link adoption
   private val blockedFields = Seq(
-      LinkableElementModel.Target
+//      LinkableElementModel.Target -> there where links that where only referenced from a single target
   )
 
   private def isAllowedField(field: Field) = !blockedFields.contains(field)
