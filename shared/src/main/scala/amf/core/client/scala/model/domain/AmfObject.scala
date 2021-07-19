@@ -25,6 +25,7 @@ trait AmfObject extends AmfElement {
   }
 
   /** Set element unique identifier. */
+  // TODO remove all usages, setId will be used instead.
   def withId(value: String): this.type = {
 //    def replaceSlashes(value: String) = if (value.contains("//")) value.replace("//", "/") else value
 //    val idx                           = value.indexOf("://")
@@ -42,11 +43,17 @@ trait AmfObject extends AmfElement {
   def componentId: String
 
   /** Call after object has been adopted by specified parent. */
+  // TODO remove all usages, adoptWithParentId will be used instead.
   final def simpleAdoption(parent: String): this.type = {
     withId(parent + componentId)
   }
 
+  def adoptWithParentId(parent: String): this.type = {
+    setId(parent + componentId)
+  }
+
   /** Call after object has been adopted by specified parent. */
+  // TODO remove all usages, adoptWithParentId will be used instead.
   def adopted(parent: String, cycle: Seq[String] = Seq()): this.type = simpleAdoption(parent)
 
   /** Set scalar value. */
