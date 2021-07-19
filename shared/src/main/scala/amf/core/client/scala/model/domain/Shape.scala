@@ -75,7 +75,7 @@ abstract class Shape extends DomainElement with Linkable with NamedDomainElement
       } else {
         base
       }
-    } filter (_.id != id)
+    } filter (_ != this)
   }
 
   type FacetsMap = Map[String, PropertyShape]
