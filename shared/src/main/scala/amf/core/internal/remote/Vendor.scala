@@ -15,6 +15,7 @@ object Vendor {
       case Payload.name    => Some(Payload)
       case Aml.name        => Some(Aml)
       case JsonSchema.name => Some(JsonSchema)
+      case JsonSchemaDialect.name => Some(JsonSchemaDialect)
       case _               => None
     }
   }
@@ -34,6 +35,7 @@ object Vendor {
   @JSExport val PAYLOAD: Vendor    = Payload
   @JSExport val AML: Vendor        = Aml
   @JSExport val JSONSCHEMA: Vendor = JsonSchema
+  @JSExport val JSONSCHEMADIALECT: Vendor = JsonSchemaDialect
 }
 
 @JSExportAll
@@ -137,6 +139,14 @@ case object JsonSchema extends Vendor {
   override val name: String = "JSON Schema"
 
   override val mediaType: String = "application/schema+json"
+
+  override def toString: String = name.trim
+}
+
+object JsonSchemaDialect extends Vendor {
+  override val name: String = "JSON Schema Dialect"
+
+  override val mediaType: String = "application/semantics+schema+json"
 
   override def toString: String = name.trim
 }
