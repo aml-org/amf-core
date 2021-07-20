@@ -66,14 +66,11 @@ class AMFGraphBaseUnitClient private[amf] (protected val configuration: AMFGraph
   /**
     * Transforms a [[BaseUnit]] with a specific pipeline
     * @param baseUnit [[BaseUnit]] to transform
-    * @param pipelineName name of any custom or [[AMFGraphConfiguration.predefined predefined]] pipeline
+    * @param pipeline name of any custom or [[AMFGraphConfiguration.predefined predefined]] pipeline
     * @return An [[AMFResult]] with the transformed BaseUnit and it's report
     */
-  def transform(baseUnit: BaseUnit, pipelineName: String): AMFResult =
-    AMFTransformer.transform(baseUnit, pipelineName, configuration) // clone? BaseUnit.resolved
-
-  def transformWithPipelineId(baseUnit: BaseUnit, pipelineId: String): AMFResult =
-    AMFTransformer.transform(baseUnit, PipelineName.from(baseUnit.sourceMediaType, pipelineId), configuration)
+  def transform(baseUnit: BaseUnit, pipeline: String): AMFResult =
+    AMFTransformer.transform(baseUnit, pipeline, configuration) // clone? BaseUnit.resolved
 
   /**
     * Render a [[BaseUnit]] to its default type
