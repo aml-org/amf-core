@@ -1,10 +1,11 @@
 package amf.core.client.scala.model.document
 
+import amf.core.client.common.validation.ProfileName
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.internal.annotations.SourceSpec
 import amf.core.internal.metamodel.MetaModelTypeMapping
 import amf.core.internal.metamodel.document.BaseUnitModel
-import amf.core.internal.metamodel.document.BaseUnitModel.{Location, ModelVersion, Root, Usage}
+import amf.core.internal.metamodel.document.BaseUnitModel.{Location, ModelVersion, Root, Usage, Package}
 import amf.core.internal.metamodel.document.DocumentModel.References
 import amf.core.client.scala.model.document.FieldsFilter.Local
 import amf.core.client.scala.model.domain._
@@ -42,6 +43,8 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
   /** Returns the list document URIs referenced from the document that has been parsed to generate this model */
   def references: Seq[BaseUnit]
 
+  def pkg: StrField = fields.field(Package)
+
   /** Returns the file location for the document that has been parsed to generate this model */
   override def location(): Option[String] = {
     val fieldValue: StrField = fields.field(Location)
@@ -74,6 +77,9 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
   def withRoot(value: Boolean): this.type = set(Root, value)
 
   def addReference(newRef: BaseUnit): Unit = synchronized(withReferences(references :+ newRef))
+
+  def withPkg(pkg: String): this.type = set(Package, pkg)
+  def withPkg(pkg: String, annotations: Annotations): this.type = set(Package, pkg, annotations)
 
   /** Returns Unit iterator for specified strategy and scope. */
   def iterator(strategy: IteratorStrategy = DomainElementStrategy,

@@ -1,7 +1,7 @@
 package amf.core.client.platform.model.domain
 
+import amf.core.client.platform.model.{StrField, IntField}
 import amf.core.internal.convert.CoreClientConverters._
-import amf.core.client.platform.model.StrField
 import amf.core.client.scala.model.domain.extensions.{CustomDomainProperty => InternalCustomDomainProperty}
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
@@ -23,6 +23,12 @@ case class CustomDomainProperty(private[amf] val _internal: InternalCustomDomain
   def domain: ClientList[StrField] = _internal.domain.asClient
 
   def schema: Shape = _internal.schema
+  def serializationOrder: IntField = _internal.serializationOrder
+
+  def withSerializationOrder(order: Int): this.type = {
+    _internal.withSerializationOrder(order)
+    this
+  }
 
   def withName(name: String): this.type = {
     _internal.withName(name)

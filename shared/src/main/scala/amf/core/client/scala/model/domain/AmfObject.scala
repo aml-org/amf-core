@@ -1,7 +1,6 @@
 package amf.core.client.scala.model.domain
 
 import amf.core.internal.metamodel.{Field, ModelDefaultBuilder, Obj}
-import amf.core.internal.parser.domain.Fields
 import amf.core.internal.parser.domain.{Annotations, Fields}
 
 import scala.collection.mutable

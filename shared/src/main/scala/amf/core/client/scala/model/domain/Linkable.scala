@@ -6,6 +6,7 @@ import amf.core.internal.metamodel.domain.LinkableElementModel
 import amf.core.internal.parser.domain.{Annotations, DeclarationPromise, Fields, ScalarNode => ScalarNodeObj}
 import amf.core.internal.utils.IdCounter
 import amf.core.internal.validation.CoreValidations.{UnresolvedReference, UnresolvedReferenceWarning}
+import org.mulesoft.antlrast.ast.ASTElement
 import org.yaml.model.YPart
 
 trait Linkable extends AmfObject { this: DomainElement with Linkable =>
@@ -98,7 +99,7 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
   private[amf] var refAliases                                        = Seq[String]()
   private var unresolvedSeverity: String           = "error"
   private var refAst: Option[YPart]                = None
-  private var var astPos: Option[org.mulesoft.lexer.SourceLocation] = None
+  private var astPos: Option[org.mulesoft.lexer.SourceLocation] = None
   private var refCtx: Option[UnresolvedComponents] = None
 
   private[amf] def unresolved(refName: String, refAst: YPart, unresolvedSeverity: String = "error")(

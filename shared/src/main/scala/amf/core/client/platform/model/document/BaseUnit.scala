@@ -23,6 +23,8 @@ trait BaseUnit extends AmfObjectWrapper with PlatformSecrets {
   /** Returns the list document URIs referenced from the document that has been parsed to generate this model */
   def references(): ClientList[BaseUnit] = _internal.references.asClient
 
+  def pkg(): StrField = _internal.pkg
+
   /** Raw text  used to generated this unit */
   def raw: ClientOption[String] = _internal.raw.asClient
 
@@ -37,6 +39,11 @@ trait BaseUnit extends AmfObjectWrapper with PlatformSecrets {
 
   def withReferences(references: ClientList[BaseUnit]): this.type = {
     _internal.withReferences(references.asInternal)
+    this
+  }
+
+  def withPkg(pkg: String): this.type = {
+    _internal.withPkg(pkg)
     this
   }
 

@@ -24,10 +24,24 @@ class SourceCodeBlock(val indentation: Integer, val lines: mutable.Buffer[(Strin
     b
   }
 
+  def sortedBuilderWithDelimiter(delimiter: String): StringBuilder = {
+    val b = new StringBuilder()
+    lines.sortBy(_._2).map(_._1).zipWithIndex.foreach { case (l, idx) =>
+      if (idx < lines.length-1) {
+        b.append(s"$l$delimiter")
+      } else {
+        b.append(l)
+      }
+    }
+    b
+  }
+
+  private def countOccurrences(src: String, tgt: String): Int = src.sliding(tgt.length).count(window => window == tgt)
+
   def builder: StringBuilder = {
     val b = new StringBuilder()
     lines.foreach { case (l,_) =>
-      b.append(s"${l}\n")
+      b.append(s"$l\n")
     }
     b
   }
@@ -62,6 +76,22 @@ object StringDocBuilder {
 
 class StringDocBuilder(document: SourceCodeBlock = SourceCodeBlock()) {
 
+  def inilined(f: StringDocBuilder => Unit): String = {
+    val cb = new SourceCodeBlock(0)
+    val b = new StringDocBuilder(cb)
+    f(b)
+    cb.builder.toString().replaceAll("\n", "")
+  }
+
+  def listWithDelimiter(delimiter: String)(f: StringDocBuilder => Unit) = {
+    val sb = new SourceCodeBlock(document.indentation)
+    val sortedDocBuilder = new StringDocBuilder(sb)
+    f(sortedDocBuilder)
+    val s = sb.sortedBuilderWithDelimiter(delimiter).toString()
+    val pos = sb.minPos
+    merge (s, pos)
+    this
+  }
   def list(f: StringDocBuilder => Unit): StringDocBuilder = {
     val sb = new SourceCodeBlock(document.indentation)
     val sortedDocBuilder = new StringDocBuilder(sb)

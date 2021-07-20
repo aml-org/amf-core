@@ -1,13 +1,13 @@
 package amf.core.internal.metamodel.domain.extensions
 
-import amf.core.internal.metamodel.Field
-import amf.core.internal.metamodel.Type.{Array, Iri, Str}
-import amf.core.internal.metamodel.domain.common.{DescriptionField, DisplayNameField}
-import amf.core.internal.metamodel.domain.templates.KeyField
-import amf.core.internal.metamodel.domain._
 import amf.core.client.scala.model.domain.extensions.CustomDomainProperty
 import amf.core.client.scala.vocabulary.Namespace._
 import amf.core.client.scala.vocabulary.ValueType
+import amf.core.internal.metamodel.Field
+import amf.core.internal.metamodel.Type.{Array, Iri, Str, Int}
+import amf.core.internal.metamodel.domain._
+import amf.core.internal.metamodel.domain.common.{DescriptionField, DisplayNameField}
+import amf.core.internal.metamodel.domain.templates.KeyField
 
 /**
   * Custom Domain Property
@@ -47,8 +47,11 @@ object CustomDomainPropertyModel extends DomainElementModel with KeyField with D
   val Schema =
     Field(ShapeModel, Shapes + "schema", ModelDoc(ModelVocabularies.Shapes, "schema", "Schema for an entity"))
 
+  val SerializationOrder =
+    Field(Int, Shapes + "serializationOrder", ModelDoc(ModelVocabularies.Shapes, "serializationOrder", "position in the set of properties for a shape used to serialize this property on the wire"))
+
   override val fields: List[Field] =
-    List(Domain, Schema, Name) ++ LinkableElementModel.fields ++ DomainElementModel.fields
+    List(Domain, Schema, Name, SerializationOrder) ++ LinkableElementModel.fields ++ DomainElementModel.fields
 
   override val `type`: List[ValueType] = Document + "DomainProperty" :: Rdf + "Property" :: DomainElementModel.`type`
 
