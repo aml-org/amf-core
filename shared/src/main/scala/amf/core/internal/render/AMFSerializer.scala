@@ -27,8 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfiguration) extends PlatformSecrets {
 
   private val mediaTypeExp = new MediaTypeParser(mediaType)
-
-  private val options = config.renderOptions
+  private val options      = config.renderOptions
 
   def renderAsYDocument(renderPlugin: AMFRenderPlugin): SyamlParsedDocument = {
 
@@ -55,33 +54,25 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfigurati
 
   private def render[W: Output](writer: W): Unit = {
     notifyEvent(StartingRenderToWriterEvent(unit, mediaType))
-    mediaTypeExp.getPureVendorExp match {
-      case Vendor.AMF.mediaType =>
-        config.renderOptions.toGraphSerialization match {
-          case RdfSerialization()     => emitRdf(writer)
-          case JsonLdSerialization(_) => emitJsonldToWriter(writer)
-        }
-      case _ =>
-        val renderPlugin = getRenderPlugin
-        val ast          = renderAsYDocument(renderPlugin)
-        val mT           = mediaTypeExp.getSyntaxExp.getOrElse(renderPlugin.defaultSyntax())
-        getSyntaxPlugin(ast, mT) match {
-          case Some(syntaxPlugin) =>
-            syntaxPlugin.emit(mT, ast, writer)
-            notifyEvent(FinishedRenderingSyntaxEvent(unit))
-          case None if unit.isInstanceOf[ExternalFragment] =>
-            writer.append(unit.asInstanceOf[ExternalFragment].encodes.raw.value())
-          case _ => throw new Exception(s"Unsupported media type $mediaType")
-        }
+    if (mediaType == Vendor.AMF.mediaType) emitJsonldToWriter(writer)
+    else {
+      val renderPlugin = getRenderPlugin
+      val ast          = renderAsYDocument(renderPlugin)
+      getSyntaxPlugin(ast, mediaType)
+        .orElse(mediaTypeExp.getSyntaxExp.flatMap(syntax => getSyntaxPlugin(ast, syntax)))
+        .orElse(getSyntaxPlugin(ast, renderPlugin.defaultSyntax())) match {
+        case Some(syntaxPlugin) =>
+          syntaxPlugin.emit(mediaType, ast, writer)
+          notifyEvent(FinishedRenderingSyntaxEvent(unit))
+        case None if unit.isInstanceOf[ExternalFragment] =>
+          writer.append(unit.asInstanceOf[ExternalFragment].encodes.raw.value())
+        case _ => throw new Exception(s"Unsupported media type $mediaType")
+      }
     }
   }
 
   def renderAST: ParsedDocument = {
-    mediaTypeExp.getPureVendorExp match {
-      case Vendor.AMF.mediaType if config.renderOptions.toGraphSerialization.isInstanceOf[RdfSerialization] =>
-        toRdfModelDoc.getOrElse(SyamlParsedDocument(YDocument(YNode.Empty)))
-      case _ => renderYDocumentWithPlugins
-    }
+    renderYDocumentWithPlugins
   }
 
   private[amf] def renderYDocumentWithPlugins: SyamlParsedDocument = {

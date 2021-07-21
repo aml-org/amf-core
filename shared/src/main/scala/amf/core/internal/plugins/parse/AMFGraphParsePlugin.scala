@@ -42,7 +42,7 @@ object AMFGraphParsePlugin extends AMFParsePlugin {
 
   override def mediaTypes: Seq[String] = Seq(
       "application/graph",
-      "application/graph+json",
+      "application/ld+json",
       "application/graph+jsonld",
       "application/amf",
       "application/amf+json",

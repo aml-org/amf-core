@@ -1,7 +1,7 @@
 package amf.core.internal.remote
 
 import amf.core.client.scala.parse.document.{ReferenceKind, UnspecifiedReference}
-import amf.core.internal.remote.Syntax.{Json, Syntax, Yaml}
+import amf.core.internal.remote.Syntax.{Json, JsonLd, Syntax, Yaml}
 
 case class Hint(vendor: Vendor, syntax: Syntax, kind: ReferenceKind = UnspecifiedReference) {
   def +(k: ReferenceKind): Hint = copy(kind = k)
@@ -28,7 +28,7 @@ object Async20YamlHint extends Hint(AsyncApi20, Yaml)
 
 object Async20JsonHint extends Hint(AsyncApi20, Json)
 
-object AmfJsonHint extends Hint(Amf, Json)
+object AmfJsonHint extends Hint(Amf, JsonLd)
 
 object PayloadJsonHint extends Hint(Payload, Json)
 
