@@ -23,7 +23,7 @@ class IdAdopter(root: AmfElement, rootId: String) {
         while (fieldOrdering.hasPendingFields) adoptInner(fieldOrdering.nextField(), rootId)
       case _ => // Nothing to do
     }
-    visited.values.filterType[DefinableUriFields].foreach(_.defineUriFields())
+    visited.values.filterType[AdoptionDependantCalls].foreach(_.run())
   }
 
   private def adoptInner(field: FieldEntry, parentId: String): Unit =
@@ -68,11 +68,6 @@ class IdAdopter(root: AmfElement, rootId: String) {
   private def getFieldOrdering(obj: AmfObject) = obj match {
     case b: BaseUnit => new BaseUnitFieldAdoptionOrdering(b)
     case other       => new GenericFieldAdoptionOrdering(other)
-  }
-
-  private def defineUriFields(obj: AmfObject): Unit = obj match {
-    case o: DefinableUriFields => o.defineUriFields()
-    case _                     =>
   }
 
   // List of fields to avoid link adoption

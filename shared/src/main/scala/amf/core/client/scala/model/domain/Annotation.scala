@@ -10,7 +10,7 @@ trait SerializableAnnotation extends Annotation {
   val name: String
 
   /** Value as string. */
-  val value: String
+  def value: String
 }
 
 trait ResolvableAnnotation extends Annotation {
@@ -24,7 +24,7 @@ trait AnnotationGraphLoader {
 }
 
 trait UriAnnotation {
-  val uris: Seq[String]
+  def uris: Seq[String]
   def shorten(fn: String => String): Annotation
 }
 

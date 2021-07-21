@@ -3,8 +3,9 @@ package amf.core.client.scala.model.domain
 import amf.core.internal.metamodel.Field
 import amf.core.internal.metamodel.domain.ExternalSourceElementModel._
 import amf.core.client.scala.model.StrField
+import amf.core.internal.adoption.AdoptionDependantCalls
 
-trait ExternalSourceElement extends DomainElement {
+trait ExternalSourceElement extends DomainElement with AdoptionDependantCalls {
 
   def raw: StrField         = fields.field(Raw)         //we should set this while parsing
   def referenceId: StrField = fields.field(ReferenceId) /// only for graph parser logic

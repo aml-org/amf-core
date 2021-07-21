@@ -5,11 +5,11 @@ import amf.core.client.scala.parse.document.UnresolvedComponents
 import amf.core.internal.metamodel.domain.LinkableElementModel
 import amf.core.internal.parser.domain.{Annotations, DeclarationPromise, Fields, ScalarNode => ScalarNodeObj}
 import amf.core.internal.utils.IdCounter
-import amf.core.internal.adoption.DefinableUriFields
+import amf.core.internal.adoption.AdoptionDependantCalls
 import amf.core.internal.validation.CoreValidations.{UnresolvedReference, UnresolvedReferenceWarning}
 import org.mulesoft.lexer.SourceLocation
 
-trait Linkable extends AmfObject with DefinableUriFields { this: DomainElement with Linkable =>
+trait Linkable extends AmfObject with AdoptionDependantCalls { this: DomainElement with Linkable =>
 
   def linkTarget: Option[DomainElement]    = Option(fields(LinkableElementModel.Target))
   var linkAnnotations: Option[Annotations] = None
@@ -34,7 +34,7 @@ trait Linkable extends AmfObject with DefinableUriFields { this: DomainElement w
     set(LinkableElementModel.TargetId, AmfScalar(target.id), Annotations.synthesized())
   }
 
-  override def defineUriFields(): Unit = {
+  callAfterAdoption { () =>
     linkTarget
       .map(_.id)
       .foreach(targetId => set(LinkableElementModel.TargetId, AmfScalar(targetId), Annotations.synthesized()))
@@ -57,7 +57,7 @@ trait Linkable extends AmfObject with DefinableUriFields { this: DomainElement w
     val copied = linkCopy()
     val hash   = buildLinkHash(Option(label.value).map(_.toString).getOrElse(""), annotations) // todo: label.value is sometimes null!
     copied
-      .withId(s"${copied.id}/link-$hash")
+      .setId(s"${copied.id}/link-$hash")
       .withLinkTarget(this)
       .set(LinkableElementModel.Label, label, fieldAnn)
       .add(annotations)

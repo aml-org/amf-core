@@ -49,7 +49,7 @@ class RecursiveShape(override val fields: Fields, override val annotations: Anno
   override def copyElement(): this.type = this
 
   override def copyShape(): this.type = {
-    val copy = super.copyShape().withId(id)
+    val copy = super.copyShape().setId(id)
     fixpointTarget.foreach(copy.withFixpointTarget)
     copy
   }
