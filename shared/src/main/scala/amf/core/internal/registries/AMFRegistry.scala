@@ -3,6 +3,7 @@ package amf.core.internal.registries
 import amf.core.client.scala.model.domain.{AnnotationGraphLoader, DomainElement}
 import amf.core.client.scala.parse.AMFParsePlugin
 import amf.core.client.common.validation.ProfileName
+import amf.core.client.scala.render.AMFElementRenderPlugin
 import amf.core.client.scala.transform.TransformationPipeline
 import amf.core.internal.metamodel.ModelDefaultBuilder
 import amf.core.internal.validation.core.ValidationProfile
@@ -55,7 +56,8 @@ private[amf] case class AMFRegistry(plugins: PluginsRegistry,
 
   private[amf] def getAllPlugins(): List[AMFPlugin[_]] = plugins.allPlugins
 
-  private[amf] lazy val sortedParsePlugins: List[AMFParsePlugin] = plugins.parsePlugins.sorted
+  private[amf] lazy val sortedParsePlugins: List[AMFParsePlugin]                 = plugins.parsePlugins.sorted
+  private[amf] lazy val sortedElementRenderPlugins: List[AMFElementRenderPlugin] = plugins.elementRenderPlugins.sorted
 
   private[amf] def getParsingFallback(): DomainParsingFallback = plugins.domainParsingFallback
 }

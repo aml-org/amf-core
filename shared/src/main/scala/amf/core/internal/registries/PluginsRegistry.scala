@@ -1,7 +1,7 @@
 package amf.core.internal.registries
 
 import amf.core.client.scala.parse.{AMFParsePlugin, AMFSyntaxParsePlugin}
-import amf.core.client.scala.render.AMFSyntaxRenderPlugin
+import amf.core.client.scala.render.{AMFElementRenderPlugin, AMFSyntaxRenderPlugin}
 import amf.core.client.scala.validation.payload.AMFShapePayloadValidationPlugin
 import amf.core.internal.plugins.AMFPlugin
 import amf.core.internal.plugins.namespace.NamespaceAliasesPlugin
@@ -24,9 +24,11 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
                                          namespacePlugins: List[NamespaceAliasesPlugin],
                                          syntaxParsePlugins: List[AMFSyntaxParsePlugin],
                                          syntaxRenderPlugins: List[AMFSyntaxRenderPlugin],
+                                         elementRenderPlugins: List[AMFElementRenderPlugin],
                                          domainParsingFallback: DomainParsingFallback) {
 
-  lazy val allPlugins: List[AMFPlugin[_]] = parsePlugins ++ validatePlugins ++ renderPlugins
+  lazy val allPlugins: List[AMFPlugin[_]] = parsePlugins ++ validatePlugins ++ renderPlugins ++ payloadPlugins ++
+    namespacePlugins ++ syntaxParsePlugins ++ syntaxRenderPlugins ++ elementRenderPlugins
 
   def withPlugin(plugin: AMFPlugin[_]): PluginsRegistry = {
     plugin match {
@@ -44,6 +46,8 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
         copy(syntaxRenderPlugins = syntaxRenderPlugins :+ r)
       case r: AMFShapePayloadValidationPlugin if !payloadPlugins.exists(_.id == r.id) =>
         copy(payloadPlugins = payloadPlugins :+ r)
+      case r: AMFElementRenderPlugin if !elementRenderPlugins.exists(_.id == r.id) =>
+        copy(elementRenderPlugins = elementRenderPlugins :+ r)
       case _ => this
     }
   }
@@ -65,5 +69,5 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
 object PluginsRegistry {
 
   /** Creates an empty PluginsRegistry */
-  val empty: PluginsRegistry = PluginsRegistry(Nil, Nil, Nil, Nil, Nil, Nil, Nil, ExternalFragmentDomainFallback)
+  val empty: PluginsRegistry = PluginsRegistry(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, ExternalFragmentDomainFallback)
 }
