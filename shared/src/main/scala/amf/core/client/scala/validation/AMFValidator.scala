@@ -28,11 +28,9 @@ object VendorToProfile {
 }
 
 object AMFValidator {
+
   def validate(baseUnit: BaseUnit, conf: AMFGraphConfiguration): Future[AMFValidationReport] = {
-    val guessedVendor = baseUnit.sourceVendor.map(v => VendorToProfile.mapOrDefault(v)).getOrElse(AmfProfile)
-    validate(baseUnit, guessedVendor, conf)
-  }
-  def validate(baseUnit: BaseUnit, profileName: ProfileName, conf: AMFGraphConfiguration): Future[AMFValidationReport] = {
+    val profileName = baseUnit.sourceVendor.map(VendorToProfile.mapOrDefault).getOrElse(AmfProfile)
     val plugins = conf.registry.plugins.validatePlugins.filter(_.applies(ValidationInfo(baseUnit, profileName)))
     val constraints = computeApplicableConstraints(profileName, conf.registry.constraintsRules)
     val options = ValidationOptions(profileName, constraints, ValidationConfiguration(conf))

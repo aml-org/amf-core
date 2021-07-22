@@ -15,11 +15,4 @@ object AMFValidator {
     implicit val contextForImplicitConversion: ExecutionContext = conf.getExecutionContext
     InternalAMFValidator.validate(baseUnit, conf).asClient
   }
-
-  def validate(baseUnit: BaseUnit,
-               profileName: ProfileName,
-               conf: AMFGraphConfiguration): ClientFuture[AMFValidationReport] = {
-    implicit val contextForImplicitConversion: ExecutionContext = conf.getExecutionContext
-    InternalAMFValidator.validate(baseUnit, profileName, conf).asClient
-  }
 }
