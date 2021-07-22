@@ -10,7 +10,7 @@ import org.yaml.builder.DocBuilder
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportAll
-@JSExportTopLevel("AMFRenderer")
+@JSExportTopLevel("AMFElementRenderer")
 object AMFElementRenderer {
 
   def renderToBuilder[T](element: DomainElement, builder: DocBuilder[T], config: AMFGraphConfiguration): Unit = {

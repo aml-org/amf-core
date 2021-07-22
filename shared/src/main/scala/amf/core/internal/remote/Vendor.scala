@@ -87,18 +87,18 @@ case object Aml extends Vendor {
 case object Oas20 extends Oas {
   override def version: String = "2.0"
 
-  override val mediaType: String = "application/json"
+  override val mediaType: String = "application/oas20"
 }
 
 case object Oas30 extends Oas {
   override def version: String = "3.0"
 
-  override val mediaType: String = "application/json"
+  override val mediaType: String = "application/openapi30"
 }
 
 case object Raml08 extends Raml {
   override def version: String   = "0.8"
-  override val mediaType: String = "application/yaml"
+  override val mediaType: String = "application/raml08"
 }
 
 case object Raml10 extends Raml {
@@ -110,13 +110,13 @@ case object Raml10 extends Raml {
 case object AsyncApi extends Async {
   override def version: String = ""
 
-  override val mediaType: String = "application/yaml"
+  override val mediaType: String = "application/asyncapi"
 }
 
 case object AsyncApi20 extends Async {
   override def version: String = "2.0"
 
-  override val mediaType: String = "application/yaml"
+  override val mediaType: String = "application/asyncapi20"
 
 }
 
@@ -136,7 +136,7 @@ case object Payload extends Vendor {
 case object JsonSchema extends Vendor {
   override val name: String = "JSON Schema"
 
-  override val mediaType: String = "application/json"
+  override val mediaType: String = "application/schema+json"
 
   override def toString: String = name.trim
 }
