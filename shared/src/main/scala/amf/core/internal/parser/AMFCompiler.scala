@@ -260,8 +260,12 @@ class AMFCompiler(compilerContext: CompilerContext,
   }
 
   private[amf] def getDomainPluginFor(document: Root): Option[AMFParsePlugin] = {
-    val allowed = filterByAllowed(compilerContext.compilerConfig.sortedParsePlugins,
-                                  compilerContext.allowedMediaTypes.getOrElse(Nil) ++ mediaType)
+    val allowed =
+      if (isRoot) compilerContext.compilerConfig.sortedParsePlugins
+      else {
+        filterByAllowed(compilerContext.compilerConfig.sortedParsePlugins,
+                        compilerContext.allowedMediaTypes.getOrElse(Nil) ++ mediaType)
+      }
     allowed.find(_.applies(document))
   }
 
