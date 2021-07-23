@@ -18,22 +18,16 @@ trait AmfObject extends AmfElement {
   /** Return element unique identifier. */
   var id: String = _
 
-  def setId(value: String): this.type = {
-    id = value
-    this
-  }
-
   /** Set element unique identifier. */
-  // TODO remove all usages, setId will be used instead.
   def withId(value: String): this.type = {
-//    def replaceSlashes(value: String) = if (value.contains("//")) value.replace("//", "/") else value
-//    val idx                           = value.indexOf("://")
-//    id =
-//      if (idx == -1) replaceSlashes(value)
-//      else {
-//        val n = idx + 3
-//        value.substring(0, n) + replaceSlashes(value.substring(n))
-//      }
+    def replaceSlashes(value: String) = if (value.contains("//")) value.replace("//", "/") else value
+    val idx                           = value.indexOf("://")
+    id =
+      if (idx == -1) replaceSlashes(value)
+      else {
+        val n = idx + 3
+        value.substring(0, n) + replaceSlashes(value.substring(n))
+      }
 
     this
   }
@@ -42,17 +36,12 @@ trait AmfObject extends AmfElement {
   private[amf] def componentId: String
 
   /** Call after object has been adopted by specified parent. */
-  // TODO remove all usages, adoptWithParentId will be used instead.
   final def simpleAdoption(parent: String): this.type = {
     withId(parent + componentId)
   }
 
-  def adoptWithParentId(parent: String): this.type = {
-    setId(parent + componentId)
-  }
-
   /** Call after object has been adopted by specified parent. */
-  // TODO remove all usages, adoptWithParentId will be used instead.
+  // TODO: unify with simpleAdoption, cycle param is not used but subclasses are overriding different methods
   def adopted(parent: String, cycle: Seq[String] = Seq()): this.type = simpleAdoption(parent)
 
   /** Set scalar value. */

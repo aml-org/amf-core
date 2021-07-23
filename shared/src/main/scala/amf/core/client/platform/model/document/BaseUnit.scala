@@ -4,7 +4,6 @@ import amf.core.internal.convert.CoreClientConverters._
 import amf.core.client.platform.config.RenderOptions
 import amf.core.client.platform.model.domain.DomainElement
 import amf.core.client.platform.model.{AmfObjectWrapper, StrField}
-import amf.core.internal.annotations.AliasDeclaration
 import amf.core.client.scala.model.document.{BaseUnit => InternalBaseUnit}
 import amf.core.internal.remote.Spec
 import amf.core.internal.unsafe.PlatformSecrets
@@ -76,9 +75,4 @@ trait BaseUnit extends AmfObjectWrapper with PlatformSecrets {
   def sourceSpec: ClientOption[Spec] = _internal.sourceSpec.asClient
 
   def cloneUnit(): BaseUnit = _internal.cloneUnit()
-
-  def withReferenceAlias(alias: String, fullUrl: String, relativeUrl: String): BaseUnit = {
-    AliasDeclaration(_internal, alias, fullUrl, relativeUrl)
-    this
-  }
 }

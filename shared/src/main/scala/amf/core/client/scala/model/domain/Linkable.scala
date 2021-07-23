@@ -57,7 +57,7 @@ trait Linkable extends AmfObject with AdoptionDependantCalls { this: DomainEleme
     val copied = linkCopy()
     val hash   = buildLinkHash(Option(label.value).map(_.toString).getOrElse(""), annotations) // todo: label.value is sometimes null!
     copied
-      .setId(s"${copied.id}/link-$hash")
+      .withId(s"${copied.id}/link-$hash")
       .withLinkTarget(this)
       .set(LinkableElementModel.Label, label, fieldAnn)
       .add(annotations)

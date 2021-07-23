@@ -49,7 +49,7 @@ class RecursiveShape(override val fields: Fields, override val annotations: Anno
   override def copyElement(): this.type = this
 
   override def copyShape(): this.type = {
-    val copy = super.copyShape().setId(id)
+    val copy = super.copyShape().withId(id)
     fixpointTarget.foreach(copy.withFixpointTarget)
     copy
   }
@@ -65,7 +65,7 @@ object RecursiveShape {
 
   def apply(l: Linkable): RecursiveShape =
     apply(Fields(), l.annotations)
-      .setId(l.id + "/recursive")
+      .withId(l.id + "/recursive")
       .withSupportsRecursion(l.supportsRecursion.value())
       .withFixPoint(l.id)
       .withFixpointTarget(l.effectiveLinkTarget().asInstanceOf[Shape])
@@ -73,7 +73,7 @@ object RecursiveShape {
   def apply(shape: Shape): RecursiveShape =
     apply(Fields(), shape.annotations)
       .withName(shape.name.option().getOrElse("default-recursion"))
-      .setId(shape.id + "/recursive")
+      .withId(shape.id + "/recursive")
       .withSupportsRecursion(shape.supportsRecursion.value())
       .withFixPoint(shape.id)
       .withFixpointTarget(shape)
