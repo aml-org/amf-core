@@ -4,6 +4,7 @@ import amf.core.client.common.{NormalPriority, PluginPriority}
 import amf.core.client.scala.parse.AMFSyntaxParsePlugin
 import amf.core.client.scala.parse.document.{ParsedDocument, ParserContext, SyamlParsedDocument}
 import amf.core.internal.parser.domain.JsonParserFactory
+import amf.core.internal.remote.Mimes._
 import amf.core.internal.unsafe.PlatformSecrets
 import org.yaml.model.{YComment, YDocument, YMap, YNode}
 import org.yaml.parser.YamlParser
@@ -14,7 +15,7 @@ object SyamlSyntaxParsePlugin extends AMFSyntaxParsePlugin with PlatformSecrets 
 
   override def parse(text: CharSequence, mediaType: String, ctx: ParserContext): ParsedDocument = {
     if (text.length() == 0) SyamlParsedDocument(YDocument(YNode.Null))
-    else if ((mediaType == "application/ld+json" || mediaType == "application/json") && !ctx.parsingOptions.isAmfJsonLdSerialization && platform.rdfFramework.isDefined) {
+    else if ((mediaType == `application/ld+json` || mediaType == `application/json`) && !ctx.parsingOptions.isAmfJsonLdSerialization && platform.rdfFramework.isDefined) {
       platform.rdfFramework.get.syntaxToRdfModel(mediaType, text)
     } else {
       val parser = getFormat(mediaType) match {
@@ -38,13 +39,13 @@ object SyamlSyntaxParsePlugin extends AMFSyntaxParsePlugin with PlatformSecrets 
     * media types which specifies vendors that are parsed by this plugin.
     */
   override def mediaTypes: Seq[String] =
-    Seq("application/yaml",
-        "application/x-yaml",
-        "text/yaml",
-        "text/x-yaml",
-        "application/json",
-        "text/json",
-        "text/vnd.yaml")
+    Seq(`application/yaml`,
+        `application/x-yaml`,
+        `text/yaml`,
+        `text/x-yaml`,
+        `application/json`,
+        `text/json`,
+        `text/vnd.yaml`)
 
   override val id: String = "syaml-parse"
 

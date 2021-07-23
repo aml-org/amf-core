@@ -14,16 +14,16 @@ object Syntax {
 
   case object Yaml extends Syntax {
     override val extension: String = "yaml"
-    override val mediaType: String = "application/yaml"
+    override val mediaType: String = `application/yaml`
   }
   case object Json extends Syntax {
     override val extension: String = "json"
-    override val mediaType: String = "application/json"
+    override val mediaType: String = `application/json`
   }
 
   case object JsonLd extends Syntax {
     override val extension: String = "jsonld"
-    override val mediaType: String = "application/ld+json"
+    override val mediaType: String = `application/ld+json`
   }
 
   case object PlainText extends Syntax {
@@ -32,24 +32,24 @@ object Syntax {
   }
 
   private val yamlMimes = Set(
-      `TEXT/YAML`,
-      `TEXT/X-YAML`,
-      `TEXT/VND.YAML`,
-      `APPLICATION/YAML`,
-      `APPLICATION/X-YAML`,
-      `APPLICATION/RAML+YAML`,
-      `APPLICATION/OPENAPI+YAML`,
-      `APPLICATION/SWAGGER+YAML`,
-      `APPLICATION/ASYNCAPI+YAML`,
-      `APPLICATION/ASYNC+YAML`
+      `text/yaml`,
+      `text/x-yaml`,
+      `text/vnd.yaml`,
+      `application/yaml`,
+      `application/x-yaml`,
+      `application/raml+yaml`,
+      `application/openapi+yaml`,
+      `application/swagger+yaml`,
+      `application/asyncapi+yaml`,
+      `application/async+yaml`
   )
 
-  private val jsonMimes = Set(`APPLICATION/JSON`,
-                              `APPLICATION/RAML+JSON`,
-                              `APPLICATION/OPENAPI+JSON`,
-                              `APPLICATION/SWAGGER+JSON`,
-                              `APPLICATION/ASYNCAPI+JSON`,
-                              `APPLICATION/ASYNC+JSON`)
+  private val jsonMimes = Set(`application/json`,
+                              `application/raml+json`,
+                              `application/openapi+json`,
+                              `application/swagger+json`,
+                              `application/asyncapi+json`,
+                              `application/async+json`)
 
   /** Attempt to resolve [[Syntax]] from [[Mimes]]. */
   def unapply(mime: Option[String]): Option[Syntax] = mime match {

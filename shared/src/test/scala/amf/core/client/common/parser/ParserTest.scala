@@ -12,8 +12,10 @@ import amf.core.internal.validation.core.{
   ValidationReport,
   ValidationSpecification
 }
-import amf.core.internal.parser.{LimitedParseConfig, CompilerConfiguration}
+import amf.core.internal.parser.{CompilerConfiguration, LimitedParseConfig}
 import amf.core.internal.plugins.syntax.SyamlSyntaxParsePlugin
+import amf.core.internal.remote.Mimes
+import amf.core.internal.remote.Mimes._
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._
 import org.yaml.model._
@@ -95,7 +97,7 @@ class ParserTest extends FunSuite {
 
   test("Test empty YAML with comment") {
     val context = ParserContext("", Seq.empty, config = LimitedParseConfig(UnhandledErrorHandler))
-    val parsed  = SyamlSyntaxParsePlugin.parse("#%Header", "application/yaml", context)
+    val parsed  = SyamlSyntaxParsePlugin.parse("#%Header", `application/yaml`, context)
     parsed match {
       case p: SyamlParsedDocument =>
         p.document.children.size should be(1)

@@ -1,5 +1,7 @@
 package amf.core.internal.remote
 
+import amf.core.internal.remote.Mimes._
+
 import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
 
 @JSExportTopLevel("Vendor")
@@ -110,7 +112,7 @@ case object Raml10 extends Raml {
 case object AsyncApi extends Async {
   override def version: String = ""
 
-  override val mediaType: String = "application/asyncapi"
+  override val mediaType: String = `application/asyncapi`
 }
 
 case object AsyncApi20 extends Async {
@@ -123,7 +125,7 @@ case object AsyncApi20 extends Async {
 case object Amf extends Vendor {
   override val name: String = "AMF Graph"
 
-  override val mediaType: String = "application/ld+json"
+  override val mediaType: String = `application/ld+json`
 
 }
 

@@ -4,11 +4,6 @@ import amf.core.client.scala.model.document.BaseUnit
 import amf.core.internal.plugins.AMFPlugin
 import org.yaml.builder.DocBuilder
 
-object AMFRenderPlugin {
-  val APPLICATION_YAML = "application/yaml"
-  val APPLICATION_JSON = "application/json"
-}
-
 trait AMFRenderPlugin extends AMFPlugin[RenderInfo] {
   def defaultSyntax(): String
 

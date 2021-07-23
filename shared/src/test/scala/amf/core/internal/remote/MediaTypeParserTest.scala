@@ -1,6 +1,6 @@
 package amf.core.internal.remote
 
-import org.scalatest.{FlatSpec, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 
 class MediaTypeParserTest extends FunSpec with Matchers {
 

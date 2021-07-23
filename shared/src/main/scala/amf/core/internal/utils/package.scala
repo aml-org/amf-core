@@ -3,6 +3,7 @@ package amf.core.internal
 import amf.core.client
 import amf.core.client.common.position
 import amf.core.client.common.position.{Position, Range}
+import amf.core.internal.remote.Mimes._
 import amf.core.internal.unsafe.PlatformSecrets
 import org.mulesoft.common.core._
 import org.mulesoft.lexer.InputRange
@@ -21,9 +22,9 @@ package object utils {
   implicit class MediaTypeMatcher(val content: String) extends AnyVal {
 
     def guessMediaType(isScalar: Boolean): String = { // move to objects
-      if (isXml && !isScalar) "application/xml"
-      else if (isJson && !isScalar) "application/json"
-      else "text/vnd.yaml" // by default, we will try to parse it as YAML
+      if (isXml && !isScalar) `application/xml`
+      else if (isJson && !isScalar) `application/json`
+      else `text/vnd.yaml` // by default, we will try to parse it as YAML
     }
 
     def isXml: Boolean = content.trim.startsWith("<")

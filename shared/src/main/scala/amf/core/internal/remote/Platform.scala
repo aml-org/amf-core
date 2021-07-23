@@ -20,11 +20,11 @@ import scala.concurrent.{ExecutionContext, Future}
 trait FileMediaType {
   def mimeFromExtension(extension: String): Option[String] =
     extension match {
-      case "json"                 => Some(Mimes.`APPLICATION/JSON`)
-      case "yaml" | "yam" | "yml" => Some(Mimes.`APPLICATION/YAML`)
-      case "raml"                 => Some(Mimes.`APPLICATION/RAML+YAML`)
-      case "openapi"              => Some(Mimes.`APPLICATION/OPENAPI+JSON`)
-      case "jsonld" | "amf"       => Some(Mimes.`APPLICATION/LD+JSONLD`)
+      case "json"                 => Some(Mimes.`application/json`)
+      case "yaml" | "yam" | "yml" => Some(Mimes.`application/yaml`)
+      case "raml"                 => Some(Mimes.`application/raml+yaml`)
+      case "openapi"              => Some(Mimes.`application/openapi+json`)
+      case "jsonld" | "amf"       => Some(Mimes.`application/ld+json`)
       case _                      => None
     }
 

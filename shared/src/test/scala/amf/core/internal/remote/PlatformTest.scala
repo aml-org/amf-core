@@ -2,7 +2,7 @@ package amf.core.internal.remote
 
 import java.util.Date
 import amf.core.client.common.remote.Content
-import amf.core.internal.remote.Mimes.`APPLICATION/YAML`
+import amf.core.internal.remote.Mimes.`application/yaml`
 import amf.core.internal.resource.AMFResolvers
 import amf.core.internal.unsafe.PlatformSecrets
 import org.mulesoft.common.test.ListAssertions
@@ -18,7 +18,7 @@ class PlatformTest extends AsyncFunSuite with ListAssertions with PlatformSecret
   test("File") {
     AMFResolvers.predefined().resolveContent("file://shared/src/test/resources/input.yaml") map {
       case Content(content, _, mime) =>
-        mime should contain(`APPLICATION/YAML`)
+        mime should contain(`application/yaml`)
 
         content.toString should be
         """|a: 1

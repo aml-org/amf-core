@@ -4,6 +4,7 @@ import amf.core.client.common.{NormalPriority, PluginPriority}
 import amf.core.client.scala.render.AMFSyntaxRenderPlugin
 import amf.core.client.scala.parse.document.{ParsedDocument, SyamlParsedDocument}
 import amf.core.internal.rdf.RdfModelDocument
+import amf.core.internal.remote.Mimes._
 import amf.core.internal.unsafe.PlatformSecrets
 import org.mulesoft.common.io.Output
 import org.yaml.model.YDocument
@@ -36,13 +37,13 @@ object SyamlSyntaxRenderPlugin extends AMFSyntaxRenderPlugin with PlatformSecret
   override def applies(element: ParsedDocument): Boolean = element.isInstanceOf[SyamlParsedDocument]
 
   override def mediaTypes: Seq[String] =
-    Seq("application/yaml",
-        "application/x-yaml",
-        "text/yaml",
-        "text/x-yaml",
-        "application/json",
-        "text/json",
-        "text/vnd.yaml")
+    Seq(`application/yaml`,
+        `application/x-yaml`,
+        `text/yaml`,
+        `text/x-yaml`,
+        `application/json`,
+        `text/json`,
+        `text/vnd.yaml`)
 
   override val id: String = "syaml-render"
 

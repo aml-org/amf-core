@@ -8,6 +8,7 @@ import amf.core.client.scala.model.domain.ExternalDomainElement
 import amf.core.client.scala.parse.AMFParsePlugin
 import amf.core.client.scala.parse.TaggedReferences._
 import amf.core.client.scala.parse.document.{UnresolvedReference => _, _}
+import amf.core.internal.remote.Mimes._
 import amf.core.internal.remote._
 import amf.core.internal.utils.AmfStrings
 import amf.core.internal.validation.CoreValidations._
@@ -150,15 +151,15 @@ class AMFCompiler(compilerContext: CompilerContext,
 
   private def autodetectSyntax(location: String, stream: CharSequence): Option[String] = {
     if (stream.length() > 2 && stream.charAt(0) == '#' && stream.charAt(1) == '%') {
-      notifyEvent(DetectedSyntaxMediaTypeEvent(location, "application/yaml"))
-      Some("application/yaml")
+      notifyEvent(DetectedSyntaxMediaTypeEvent(location, `application/yaml`))
+      Some(`application/yaml`)
     } else {
       compilerContext.platform.findCharInCharSequence(stream) { c =>
         c != '\n' && c != '\t' && c != '\r' && c != ' '
       } match {
         case Some(c) if c == '{' || c == '[' =>
-          notifyEvent(DetectedSyntaxMediaTypeEvent(location, "application/json"))
-          Some("application/json")
+          notifyEvent(DetectedSyntaxMediaTypeEvent(location, `application/json`))
+          Some(`application/json`)
         case _ => None
       }
     }
