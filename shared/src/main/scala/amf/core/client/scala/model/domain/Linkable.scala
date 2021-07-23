@@ -98,7 +98,8 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
 
   // Unresolved references to things that can be linked
   // TODO: another trait?
-  private[amf] var isUnresolved: Boolean           = false
+  def isUnresolved: Boolean                        = unresolvedState
+  private var unresolvedState: Boolean             = false
   private[amf] var refName                         = ""
   private var unresolvedSeverity: String           = "error"
   private var refAst: Option[YPart]                = None
@@ -106,7 +107,7 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
 
   private[amf] def unresolved(refName: String, refAst: YPart, unresolvedSeverity: String = "error")(
       implicit ctx: UnresolvedComponents) = {
-    isUnresolved = true
+    unresolvedState = true
     this.unresolvedSeverity = unresolvedSeverity
     this.refName = refName
     this.refAst = Some(refAst)
