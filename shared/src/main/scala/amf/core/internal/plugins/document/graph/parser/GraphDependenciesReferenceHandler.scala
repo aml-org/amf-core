@@ -66,7 +66,7 @@ object GraphDependenciesReferenceHandler extends ReferenceHandler {
         val links: IndexedSeq[(String, YNode)] = collectLinks(entry)
         val collector                          = CompilerReferenceCollector()
         links.foreach {
-          case (link, linkEntry) => collector += (link, UnspecifiedReference, linkEntry)
+          case (link, linkEntry) => collector += (link, UnspecifiedReference, linkEntry.location)
         }
         collector
     }

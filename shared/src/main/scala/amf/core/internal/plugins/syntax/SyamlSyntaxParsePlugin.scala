@@ -1,14 +1,39 @@
 package amf.core.internal.plugins.syntax
 
 import amf.core.client.common.{NormalPriority, PluginPriority}
+import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.parse.AMFSyntaxParsePlugin
 import amf.core.client.scala.parse.document.{ParsedDocument, ParserContext, SyamlParsedDocument}
 import amf.core.internal.parser.domain.JsonParserFactory
 import amf.core.internal.remote.Mimes
 import amf.core.internal.remote.Mimes._
 import amf.core.internal.unsafe.PlatformSecrets
-import org.yaml.model.{YComment, YDocument, YMap, YNode}
+import amf.core.internal.validation.CoreValidations.SyamlError
+import org.mulesoft.lexer.SourceLocation
+import org.yaml.model.{IllegalTypeHandler, ParseErrorHandler, SyamlException, YComment, YDocument, YError, YFail, YMap, YNode, YPart, YSuccess}
 import org.yaml.parser.YamlParser
+
+class SYamlAMFErrorHandler(eh: AMFErrorHandler) extends ParseErrorHandler with IllegalTypeHandler  {
+  override def handle[T](error: YError, defaultValue: T): T = {
+    eh.violation(SyamlError, "", error.error, part(error).location)
+    defaultValue
+  }
+
+  final def handle(node: YPart, e: SyamlException): Unit = handle(node.location, e)
+
+  override def handle(location: SourceLocation, e: SyamlException): Unit =
+    eh.violation(SyamlError, "", e.getMessage, location)
+
+  protected def part(error: YError): YPart = {
+    error.node match {
+      case d: YDocument => d
+      case n: YNode     => n
+      case s: YSuccess  => s.node
+      case f: YFail     => part(f.error)
+    }
+  }
+
+}
 
 object SyamlSyntaxParsePlugin extends AMFSyntaxParsePlugin with PlatformSecrets {
 
@@ -19,7 +44,7 @@ object SyamlSyntaxParsePlugin extends AMFSyntaxParsePlugin with PlatformSecrets 
     else {
       val parser = getFormat(mediaType) match {
         case "json" => JsonParserFactory.fromCharsWithSource(text, ctx.rootContextDocument)(ctx.eh)
-        case _      => YamlParser(text, ctx.rootContextDocument)(ctx.eh).withIncludeTag("!include")
+        case _      => YamlParser(text, ctx.rootContextDocument).withIncludeTag("!include")
       }
       val document1 = parser.document()
       val (document, comment) = document1 match {

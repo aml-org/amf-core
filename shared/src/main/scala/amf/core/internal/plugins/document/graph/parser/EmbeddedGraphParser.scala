@@ -67,7 +67,7 @@ class EmbeddedGraphParser()(implicit val ctx: GraphParserContext) extends GraphP
       stringTypes.find(findType(_).isDefined) match {
         case Some(t) => findType(t)
         case None =>
-          ctx.eh.violation(UnableToParseNode, id, s"Error parsing JSON-LD node, unknown @types $stringTypes", map)
+          ctx.eh.violation(UnableToParseNode, id, s"Error parsing JSON-LD node, unknown @types $stringTypes", map.location)
           None
       }
     }

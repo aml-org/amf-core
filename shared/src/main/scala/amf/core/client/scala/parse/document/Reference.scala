@@ -6,8 +6,7 @@ import amf.core.client.scala.parse.document
 import amf.core.internal.parser.{AMFCompiler, CompilerContext}
 import amf.core.internal.remote.Spec
 import amf.core.internal.unsafe.PlatformSecrets
-import org.mulesoft.antlrast.ast.ASTElement
-import org.yaml.model.YNode
+import org.mulesoft.lexer.SourceLocation
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -15,12 +14,8 @@ case class Reference(url: String, refs: Seq[RefContainer]) extends PlatformSecre
 
   def isRemote: Boolean = !url.startsWith("#")
 
-  def +(kind: ReferenceKind, ast: YNode, fragment: Option[String]): Reference = {
-    copy(refs = refs :+ SYamlRefContainer(kind, ast, fragment))
-  }
-
-  def +(kind: ReferenceKind, ast: ASTElement, fragment: Option[String]): Reference = {
-    copy(refs = refs :+ AntlrRefContainer(kind, ast, fragment))
+  def +(kind: ReferenceKind, pos: SourceLocation, fragment: Option[String]): Reference = {
+    copy(refs = refs :+ ASTRefContainer(kind, pos, fragment))
   }
 
   def resolve(compilerContext: CompilerContext, allowedSpecs: Seq[Spec], allowRecursiveRefs: Boolean)(
@@ -76,8 +71,6 @@ case class Reference(url: String, refs: Seq[RefContainer]) extends PlatformSecre
   def isInferred: Boolean = refs.exists(_.linkType == InferredLinkReference)
 }
 object Reference {
-  def apply(url: String, kind: ReferenceKind, node: YNode, fragment: Option[String]): Reference =
-    new Reference(url, Seq(SYamlRefContainer(kind, node, fragment)))
-  def apply(url: String, kind: ReferenceKind, node: ASTElement, fragment: Option[String]): Reference =
-    new Reference(url, Seq(AntlrRefContainer(kind, node, fragment)))
+  def apply(url: String, kind: ReferenceKind, pos: SourceLocation, fragment: Option[String]): Reference =
+    new Reference(url, Seq(ASTRefContainer(kind, pos, fragment)))
 }

@@ -12,13 +12,12 @@ import org.yaml.model.{IllegalTypeHandler, ParseErrorHandler, SyamlException, YE
 
 import scala.collection.mutable
 
-abstract class ErrorHandlingContext(implicit val eh: AMFErrorHandler)
-    extends ParseErrorHandler
-    with IllegalTypeHandler {
-  override def handle(location: SourceLocation, e: SyamlException): Unit = eh.handle(location, e)
+abstract class ErrorHandlingContext(implicit val eh: AMFErrorHandler) {
+  /*
+  override def handle(location: SourceLocation, e: String): Unit = eh.handle(location, e)
 
   override def handle[T](error: YError, defaultValue: T): T = eh.handle(error, defaultValue)
-
+  */
   def violation(violationId: ValidationSpecification, node: String, message: String)
 }
 
@@ -36,8 +35,7 @@ case class ParserContext(rootContextDocument: String = "",
                          futureDeclarations: FutureDeclarations = EmptyFutureDeclarations(),
                          config: ParseConfiguration)
     extends ErrorHandlingContext()(config.eh)
-    with UnresolvedComponents
-    with IllegalTypeHandler {
+    with UnresolvedComponents {
 
   var globalSpace: mutable.Map[String, Any] = mutable.Map()
 
@@ -67,9 +65,11 @@ case class ParserContext(rootContextDocument: String = "",
     context
   }
 
+  /*
   override def handle(location: SourceLocation, e: SyamlException): Unit = eh.handle(location, e)
 
   override def handle[T](error: YError, defaultValue: T): T = eh.handle(error, defaultValue)
+*/
 
   def violation(violationId: ValidationSpecification, node: String, message: String): Unit =
     eh.violation(violationId, node, message, rootContextDocument)

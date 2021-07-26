@@ -3,11 +3,12 @@ package amf.core.internal.plugins.document.graph.parser
 import amf.core.internal.parser._
 import amf.core.internal.plugins.document.graph.JsonLdKeywords
 import amf.core.internal.plugins.document.graph.context.GraphContext
+import amf.core.internal.plugins.syntax.SYamlAMFErrorHandler
 import org.yaml.model._
 
 case class JsonLdGraphContextParser(node: YNode, parserContext: GraphParserContext) {
   val context: GraphContext                     = parserContext.graphContext
-  implicit val errorHandler: IllegalTypeHandler = parserContext
+  implicit val errorHandler: IllegalTypeHandler = new SYamlAMFErrorHandler(parserContext.eh)
 
   def parse(): GraphContext = {
     node.tagType match {

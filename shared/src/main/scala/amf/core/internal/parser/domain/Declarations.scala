@@ -7,7 +7,7 @@ import amf.core.client.scala.model.domain.extensions.CustomDomainProperty
 import amf.core.internal.utils.QName
 import amf.core.internal.parser.domain.SearchScope.{All, Fragments, Named}
 import amf.core.internal.validation.CoreValidations.DeclarationNotFound
-import org.yaml.model.YPart
+import org.mulesoft.lexer.SourceLocation
 
 class Declarations(var libraries: Map[String, Declarations] = Map(),
                    var fragments: Map[String, FragmentRef] = Map(),
@@ -49,17 +49,17 @@ class Declarations(var libraries: Map[String, Declarations] = Map(),
     }
   }
 
-  protected def error(message: String, ast: YPart): Unit =
-    errorHandler.violation(DeclarationNotFound, "", message, ast)
+  protected def error(message: String, pos: SourceLocation): Unit =
+    errorHandler.violation(DeclarationNotFound, "", message, pos)
 
   def declarables(): Seq[DomainElement] =
     annotations.values.toSeq
 
-  def findAnnotationOrError(ast: YPart)(key: String, scope: SearchScope.Scope): CustomDomainProperty =
+  def findAnnotationOrError(pos: SourceLocation)(key: String, scope: SearchScope.Scope): CustomDomainProperty =
     findAnnotation(key, scope) match {
       case Some(result) => result
       case _ =>
-        error(s"Annotation '$key' not found", ast)
+        error(s"Annotation '$key' not found", pos)
         ErrorCustomDomainProperty
     }
 

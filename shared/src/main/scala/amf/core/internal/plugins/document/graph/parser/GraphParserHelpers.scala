@@ -242,7 +242,7 @@ trait GraphParserHelpers extends GraphContextHelper {
         nonDocumentTypes ++ documentTypes
 
       case _ =>
-        ctx.eh.violation(MissingTypeInNode, id, s"No @type declaration on node $map", map)
+        ctx.eh.violation(MissingTypeInNode, id, s"No @type declaration on node $map", map.location)
         Nil
     }
   }
@@ -253,7 +253,7 @@ trait GraphParserHelpers extends GraphContextHelper {
     map.key(JsonLdKeywords.Id) match {
       case Some(entry) => Some(entry.value.as[YScalar].text)
       case _ =>
-        ctx.eh.violation(MissingIdInNode, "", s"No @id declaration on node $map", map)
+        ctx.eh.violation(MissingIdInNode, "", s"No @id declaration on node $map", map.location)
         None
     }
   }

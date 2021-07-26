@@ -1,20 +1,18 @@
 package amf.core.client.scala.errorhandling
 
 import amf.core.client.common.position.Range
-import amf.core.internal.annotations.{LexicalInformation, SourceLocation => AmfSourceLocation}
+import amf.core.client.common.validation.SeverityLevels.{VIOLATION, WARNING}
 import amf.core.client.scala.model.domain.AmfObject
 import amf.core.client.scala.validation.AMFValidationResult
-import amf.core.client.common.validation.SeverityLevels.{VIOLATION, WARNING}
-import amf.core.internal.validation.core.ValidationSpecification
+import amf.core.internal.annotations.{LexicalInformation, SourceLocation => AmfSourceLocation}
 import amf.core.internal.parser.domain.Annotations
-import amf.core.internal.validation.CoreValidations.SyamlError
-import org.mulesoft.lexer.{InputRange, SourceLocation}
-import org.yaml.model._
 import amf.core.internal.utils.AmfStrings
+import amf.core.internal.validation.core.ValidationSpecification
+import org.mulesoft.lexer.{InputRange, SourceLocation}
 
 import scala.collection.mutable
 
-trait AMFErrorHandler extends IllegalTypeHandler with ParseErrorHandler {
+trait AMFErrorHandler {
   protected val results: mutable.LinkedHashSet[AMFValidationResult] = mutable.LinkedHashSet()
 
   def getResults: List[AMFValidationResult] = results.toList
@@ -41,9 +39,9 @@ trait AMFErrorHandler extends IllegalTypeHandler with ParseErrorHandler {
   def reportConstraint(specification: ValidationSpecification,
                        node: String,
                        message: String,
-                       ast: YPart,
+                       pos: SourceLocation,
                        level: String): Unit =
-    reportConstraint(specification.id, node, None, message, lexical(ast.location), level, ast.sourceName.option)
+    reportConstraint(specification.id, node, None, message, lexical(pos), level, pos.sourceName.option)
 
   /** Report constraint failure of severity violation. */
   def violation(specification: ValidationSpecification,
@@ -80,15 +78,15 @@ trait AMFErrorHandler extends IllegalTypeHandler with ParseErrorHandler {
   }
 
   /** Report constraint failure of severity violation. */
-  def violation(spec: ValidationSpecification, node: String, prop: Option[String], msg: String, ast: YPart): Unit =
-    violation(spec, node, prop, msg, ast.location)
+//  def violation(spec: ValidationSpecification, node: String, prop: Option[String], msg: String, ast: YPart): Unit =
+//    violation(spec, node, prop, msg, ast.location)
 
   def violation(spec: ValidationSpecification, n: String, prop: Option[String], msg: String, l: SourceLocation): Unit =
     violation(spec, n, prop, msg, lexical(l), l.sourceName.option)
 
   /** Report constraint failure of severity violation. */
-  def violation(specification: ValidationSpecification, node: String, message: String, ast: YPart): Unit =
-    violation(specification, node, None, message, ast)
+//  def violation(specification: ValidationSpecification, node: String, message: String, ast: YPart): Unit =
+//    violation(specification, node, None, message, ast)
 
   def violation(specification: ValidationSpecification, node: String, message: String, loc: SourceLocation): Unit =
     violation(specification, node, None, message, loc)
@@ -117,16 +115,9 @@ trait AMFErrorHandler extends IllegalTypeHandler with ParseErrorHandler {
               location: SourceLocation): Unit =
     warning(specification, node, property, message, lexical(location), location.sourceName.option)
 
-  def warning(specification: ValidationSpecification,
-              node: String,
-              property: Option[String],
-              message: String,
-              part: YPart): Unit =
-    warning(specification, node, property, message, part.location)
-
   /** Report constraint failure of severity warning. */
-  def warning(specification: ValidationSpecification, node: String, message: String, ast: YPart): Unit =
-    warning(specification, node, None, message, ast.location)
+//  def warning(specification: ValidationSpecification, node: String, message: String, ast: YPart): Unit =
+//    warning(specification, node, None, message, ast.location)
 
   def warning(specification: ValidationSpecification, node: String, message: String, location: SourceLocation): Unit =
     warning(specification, node, None, message, location)
@@ -147,6 +138,7 @@ trait AMFErrorHandler extends IllegalTypeHandler with ParseErrorHandler {
     }
   }
 
+  /*
   override def handle[T](error: YError, defaultValue: T): T = {
     violation(SyamlError, "", error.error, part(error))
     defaultValue
@@ -165,4 +157,5 @@ trait AMFErrorHandler extends IllegalTypeHandler with ParseErrorHandler {
       case f: YFail     => part(f.error)
     }
   }
+   */
 }

@@ -193,7 +193,7 @@ class FlattenedGraphParser(startingPoint: String)(implicit val ctx: GraphParserC
       typeIris.find(findType(_).isDefined) match {
         case Some(t) => findType(t)
         case None =>
-          ctx.eh.violation(UnableToParseNode, id, s"Error parsing JSON-LD node, unknown @types $typeIris", map)
+          ctx.eh.violation(UnableToParseNode, id, s"Error parsing JSON-LD node, unknown @types $typeIris", map.location)
           None
       }
     }

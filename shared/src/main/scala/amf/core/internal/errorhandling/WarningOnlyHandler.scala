@@ -7,6 +7,7 @@ import org.yaml.model.{SyamlException, YError}
 
 case class WarningOnlyHandler(parent: AMFErrorHandler) extends RuntimeWrapperErrorHandler(parent: AMFErrorHandler) {
 
+  /*
   override def handle(location: SourceLocation, e: SyamlException): Unit = {
     warning(SyamlWarning, "", e.getMessage, location)
     warningRegister = true
@@ -17,6 +18,7 @@ case class WarningOnlyHandler(parent: AMFErrorHandler) extends RuntimeWrapperErr
     warningRegister = true
     defaultValue
   }
+  */
 
   private var warningRegister: Boolean = false
 
