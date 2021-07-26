@@ -67,7 +67,7 @@ lazy val syamlLibJS  = "org.mule.syaml" %% "syaml_sjs0.6" % syamlVersion
 
 lazy val antlrv4JVMRef = ProjectRef(workspaceDirectory / "amf-antlr-ast", "antlrastJVM")
 lazy val antlrv4JSRef  = ProjectRef(workspaceDirectory / "amf-antlr-ast", "antlrastJS")
-val antlrv4Version = "0.2.0-SNAPSHOT"
+val antlrv4Version = "0.3.0-SNAPSHOT"
 lazy val antlrv4LibJVM = "com.github.amlorg" %% "antlr-ast" % antlrv4Version
 lazy val antlrv4LibJS  = "com.github.amlorg" %% "antlr-ast_sjs0.6" % antlrv4Version
 

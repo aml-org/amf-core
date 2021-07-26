@@ -6,8 +6,7 @@ import amf.core.internal.metamodel.domain.LinkableElementModel
 import amf.core.internal.parser.domain.{Annotations, DeclarationPromise, Fields, ScalarNode => ScalarNodeObj}
 import amf.core.internal.utils.IdCounter
 import amf.core.internal.validation.CoreValidations.{UnresolvedReference, UnresolvedReferenceWarning}
-import org.mulesoft.antlrast.ast.ASTElement
-import org.yaml.model.YPart
+import org.mulesoft.lexer.SourceLocation
 
 trait Linkable extends AmfObject { this: DomainElement with Linkable =>
 
@@ -98,28 +97,29 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
   private[amf] var refName                         = ""
   private[amf] var refAliases                                        = Seq[String]()
   private var unresolvedSeverity: String           = "error"
-  private var refAst: Option[YPart]                = None
   private var astPos: Option[org.mulesoft.lexer.SourceLocation] = None
   private var refCtx: Option[UnresolvedComponents] = None
 
+  /*
   private[amf] def unresolved(refName: String, refAst: YPart, unresolvedSeverity: String = "error")(
       implicit ctx: UnresolvedComponents) = {
     isUnresolved = true
     this.unresolvedSeverity = unresolvedSeverity
     this.refName = refName
-    this.refAst = Some(refAst)
     this.astPos = Some(refAst.location)
     refCtx = Some(ctx)
     this
   }
+  */
 
-  def unresolvedAntlrAst(refName: String, aliases: Seq[String], file: String, refAst: ASTElement, unresolvedSeverity: String = "error")(
-    implicit ctx: UnresolvedComponents) = {
+  def unresolved(refName: String, aliases: Seq[String], pos: Option[SourceLocation], unresolvedSeverity: String = "error")(
+    implicit ctx: UnresolvedComponents): DomainElement with Linkable = {
     isUnresolved = true
     this.unresolvedSeverity = unresolvedSeverity
     this.refName = refName
     this.refAliases = aliases
-    this.astPos = Some(org.mulesoft.lexer.SourceLocation(file, 0,0,refAst.start.line, refAst.start.column, refAst.end.line, refAst.end.column))
+    this.astPos = pos
+    // this.astPos = Some(org.mulesoft.lexer.SourceLocation(file, 0,0,refAst.start.line, refAst.start.column, refAst.end.line, refAst.end.column))
     refCtx = Some(ctx)
     this
   }
@@ -131,20 +131,10 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
           resolve,
           () =>
             if (unresolvedSeverity == "warning") {
-              refAst match {
-                case Some(ast) =>
-                  ctx.eh.warning(UnresolvedReferenceWarning, id, s"Unresolved reference '$refName'", ast)
-                case _         =>
-                  ctx.eh.warning(UnresolvedReferenceWarning, id, s"Unresolved reference '$refName'", astPos.get)
-              }
+              ctx.eh.warning(UnresolvedReferenceWarning, id, s"Unresolved reference '$refName'", astPos.get)
 
             } else
-              refAst match {
-                case Some(ast) =>
-                  ctx.eh.violation(UnresolvedReference, id, s"Unresolved reference '$refName'", refAst.get)
-                case _         =>
-                  ctx.eh.violation(UnresolvedReference, id, s"Unresolved reference '$refName'", astPos.get)
-              }
+              ctx.eh.violation(UnresolvedReference, id, s"Unresolved reference '$refName'", astPos.get)
         )
         (Seq(refName) ++ refAliases).foreach { ref =>
           ctx.futureDeclarations.futureRef(
