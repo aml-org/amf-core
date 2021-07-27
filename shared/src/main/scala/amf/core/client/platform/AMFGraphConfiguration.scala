@@ -55,12 +55,6 @@ class AMFGraphConfiguration private[amf] (private[amf] val _internal: InternalGr
   def withShapePayloadPlugin(plugin: AMFShapePayloadValidationPlugin): AMFGraphConfiguration =
     _internal.withPlugin(PayloadValidationPluginMatcher.asInternal(plugin))
 
-  /**
-    * Merges two environments taking into account specific attributes that can be merged.
-    * This is currently limited to: registry plugins, registry transformation pipelines.
-    */
-  def merge(other: AMFGraphConfiguration): AMFGraphConfiguration = _internal.merge(other)
-
   private[amf] def getExecutionContext: ExecutionContext = _internal.getExecutionContext
 
 }

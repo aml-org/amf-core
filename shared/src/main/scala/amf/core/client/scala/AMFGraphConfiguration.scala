@@ -139,7 +139,7 @@ class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: A
     * Merges two environments taking into account specific attributes that can be merged.
     * This is currently limited to: registry plugins, registry transformation pipelines.
     */
-  def merge(other: AMFGraphConfiguration): AMFGraphConfiguration = super._merge(other)
+  protected[amf] def merge(other: AMFGraphConfiguration): AMFGraphConfiguration = super._merge(other)
 
   protected def copy(resolvers: AMFResolvers = resolvers,
                      errorHandlerProvider: ErrorHandlerProvider = errorHandlerProvider,
