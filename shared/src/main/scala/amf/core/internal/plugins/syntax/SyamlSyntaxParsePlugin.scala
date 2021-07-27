@@ -4,16 +4,19 @@ import amf.core.client.common.{NormalPriority, PluginPriority}
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.parse.AMFSyntaxParsePlugin
 import amf.core.client.scala.parse.document.{ParsedDocument, ParserContext, SyamlParsedDocument}
+import amf.core.client.scala.validation.AMFValidationResult
 import amf.core.internal.parser.domain.JsonParserFactory
 import amf.core.internal.remote.Mimes
 import amf.core.internal.remote.Mimes._
 import amf.core.internal.unsafe.PlatformSecrets
 import amf.core.internal.validation.CoreValidations.SyamlError
 import org.mulesoft.lexer.SourceLocation
-import org.yaml.model.{IllegalTypeHandler, ParseErrorHandler, SyamlException, YComment, YDocument, YError, YFail, YMap, YNode, YPart, YSuccess}
+import org.yaml.model._
 import org.yaml.parser.YamlParser
 
-class SYamlAMFErrorHandler(eh: AMFErrorHandler) extends ParseErrorHandler with IllegalTypeHandler  {
+import scala.collection.mutable
+
+class SYamlAMFParserErrorHandler(eh: AMFErrorHandler) extends ParseErrorHandler with IllegalTypeHandler  {
   override def handle[T](error: YError, defaultValue: T): T = {
     eh.violation(SyamlError, "", error.error, part(error).location)
     defaultValue
@@ -32,7 +35,16 @@ class SYamlAMFErrorHandler(eh: AMFErrorHandler) extends ParseErrorHandler with I
       case f: YFail     => part(f.error)
     }
   }
+}
 
+class SyamlAMFErrorHandler(val eh: AMFErrorHandler) extends AMFErrorHandler with ParseErrorHandler with IllegalTypeHandler  {
+  val syamleh = new SYamlAMFParserErrorHandler(eh)
+
+  override val results: mutable.LinkedHashSet[AMFValidationResult] = eh.results
+
+  override def handle(location: SourceLocation, e: SyamlException): Unit = syamleh.handle(location, e)
+
+  override def handle[T](error: YError, defaultValue: T): T = syamleh.handle(error, defaultValue)
 }
 
 object SyamlSyntaxParsePlugin extends AMFSyntaxParsePlugin with PlatformSecrets {
@@ -43,8 +55,8 @@ object SyamlSyntaxParsePlugin extends AMFSyntaxParsePlugin with PlatformSecrets 
     if (text.length() == 0) SyamlParsedDocument(YDocument(YNode.Null))
     else {
       val parser = getFormat(mediaType) match {
-        case "json" => JsonParserFactory.fromCharsWithSource(text, ctx.rootContextDocument)(ctx.eh)
-        case _      => YamlParser(text, ctx.rootContextDocument).withIncludeTag("!include")
+        case "json" => JsonParserFactory.fromCharsWithSource(text, ctx.rootContextDocument)(new SyamlAMFErrorHandler(ctx.eh))
+        case _      => YamlParser(text, ctx.rootContextDocument)(new SyamlAMFErrorHandler(ctx.eh)).withIncludeTag("!include")
       }
       val document1 = parser.document()
       val (document, comment) = document1 match {

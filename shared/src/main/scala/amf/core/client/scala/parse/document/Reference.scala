@@ -14,8 +14,8 @@ case class Reference(url: String, refs: Seq[RefContainer]) extends PlatformSecre
 
   def isRemote: Boolean = !url.startsWith("#")
 
-  def +(kind: ReferenceKind, pos: SourceLocation, fragment: Option[String]): Reference = {
-    copy(refs = refs :+ ASTRefContainer(kind, pos, fragment))
+  def +(refContainer: ASTRefContainer): Reference = {
+    copy(refs = refs :+ refContainer)
   }
 
   def resolve(compilerContext: CompilerContext, allowedSpecs: Seq[Spec], allowRecursiveRefs: Boolean)(

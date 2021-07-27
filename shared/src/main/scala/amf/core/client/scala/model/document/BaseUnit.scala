@@ -79,7 +79,7 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
   def addReference(newRef: BaseUnit): Unit = synchronized(withReferences(references :+ newRef))
 
   def withPkg(pkg: String): this.type = set(Package, pkg)
-  def withPkg(pkg: String, annotations: Annotations): this.type = set(Package, pkg, annotations)
+  def withPkg(pkg: String, annotations: Annotations): this.type = set(Package, AmfScalar(pkg,annotations), Annotations.inferred())
 
   /** Returns Unit iterator for specified strategy and scope. */
   def iterator(strategy: IteratorStrategy = DomainElementStrategy,

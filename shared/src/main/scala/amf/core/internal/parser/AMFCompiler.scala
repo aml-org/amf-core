@@ -170,16 +170,16 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
             e match {
               case e: CyclicReferenceException if !domainPlugin.allowRecursiveReferences =>
                 link.refs.head match {
-                  case ASTRefContainer(_, pos, _) =>
-                    compilerContext.violation(CycleReferenceError, link.url, e.getMessage, pos)
+                  case ref: ASTRefContainer =>
+                    compilerContext.violation(CycleReferenceError, link.url, e.getMessage, ref.pos)
                 }
 
                 Future(None)
               case _ =>
                 if (!link.isInferred) {
                   link.refs.foreach {
-                    case ASTRefContainer(_, pos, _) =>
-                      compilerContext.violation(UnresolvedReference, link.url, e.getMessage, pos)
+                    case ref: ASTRefContainer =>
+                      compilerContext.violation(UnresolvedReference, link.url, e.getMessage, ref.pos)
                   }
                 }
                 Future(None)

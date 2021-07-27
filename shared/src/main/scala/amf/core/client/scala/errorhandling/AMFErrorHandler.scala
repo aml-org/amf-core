@@ -13,7 +13,8 @@ import org.mulesoft.lexer.{InputRange, SourceLocation}
 import scala.collection.mutable
 
 trait AMFErrorHandler {
-  protected val results: mutable.LinkedHashSet[AMFValidationResult] = mutable.LinkedHashSet()
+
+  val results: mutable.LinkedHashSet[AMFValidationResult] = mutable.LinkedHashSet()
 
   def getResults: List[AMFValidationResult] = results.toList
 
@@ -138,24 +139,4 @@ trait AMFErrorHandler {
     }
   }
 
-  /*
-  override def handle[T](error: YError, defaultValue: T): T = {
-    violation(SyamlError, "", error.error, part(error))
-    defaultValue
-  }
-
-  final def handle(node: YPart, e: SyamlException): Unit = handle(node.location, e)
-
-  override def handle(location: SourceLocation, e: SyamlException): Unit =
-    violation(SyamlError, "", e.getMessage, location)
-
-  protected def part(error: YError): YPart = {
-    error.node match {
-      case d: YDocument => d
-      case n: YNode     => n
-      case s: YSuccess  => s.node
-      case f: YFail     => part(f.error)
-    }
-  }
-   */
 }

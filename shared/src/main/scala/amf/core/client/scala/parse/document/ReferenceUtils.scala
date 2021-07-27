@@ -15,23 +15,33 @@ trait RefContainer {
   def reduceToLocation(): Range
 }
 
-case class ASTRefContainer(override val linkType: ReferenceKind, pos: SourceLocation, override val uriFragment: Option[String]) extends RefContainer {
+class ASTRefContainer(override val linkType: ReferenceKind, val pos: SourceLocation, override val uriFragment: Option[String]) extends RefContainer {
   override def reduceToLocation(): Range = Range((pos.lineFrom,pos.columnFrom),(pos.lineTo, pos.columnTo))
 }
 
+object ASTRefContainer {
+  def apply(linkType: ReferenceKind, pos: SourceLocation, uriFragment: Option[String]) = new ASTRefContainer(linkType, pos, uriFragment)
+}
 
-case class CompilerReferenceCollector() {
-  private val collector = DefaultReferenceCollector[Reference]()
+class CompilerReferenceCollector() {
+  protected val collector = DefaultReferenceCollector[Reference]()
 
   def +=(key: String, kind: ReferenceKind, pos: SourceLocation): Unit = {
     val (url, fragment) = ReferenceFragmentPartition(key)
     collector.get(url) match {
-      case Some(reference: Reference) => collector += (url, reference + (kind, pos, fragment))
-      case None                       => collector += (url, Reference(url, kind, pos, fragment))
+      case Some(reference: Reference) =>
+        val refContainer =  ASTRefContainer(kind, pos, fragment)
+        collector += (url, reference + refContainer)
+      case None                       =>
+        collector += (url, Reference(url, kind, pos, fragment))
     }
   }
 
   def toReferences: Seq[Reference] = collector.references()
+}
+
+object CompilerReferenceCollector {
+  def apply() = new CompilerReferenceCollector()
 }
 
 object EmptyReferenceCollector extends CompilerReferenceCollector {}

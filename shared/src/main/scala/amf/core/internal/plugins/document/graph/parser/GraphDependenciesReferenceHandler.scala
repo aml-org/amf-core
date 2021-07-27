@@ -1,27 +1,20 @@
 package amf.core.internal.plugins.document.graph.parser
 
 import amf.core.client.scala.errorhandling.AMFErrorHandler
-import amf.core.client.scala.parse.document.{
-  CompilerReferenceCollector,
-  EmptyReferenceCollector,
-  ParsedDocument,
-  ParserContext,
-  ReferenceHandler,
-  SyamlParsedDocument,
-  UnspecifiedReference
-}
+import amf.core.client.scala.parse.document.{CompilerReferenceCollector, EmptyReferenceCollector, ParsedDocument, ParserContext, ReferenceHandler, SyamlParsedDocument, UnspecifiedReference}
 import amf.core.client.scala.vocabulary.Namespace
 import amf.core.internal.plugins.document.graph.JsonLdKeywords
 import org.mulesoft.common.functional.MonadInstances._
 import org.yaml.model._
 import amf.core.internal.parser._
+import amf.core.internal.plugins.syntax.{SYamlAMFParserErrorHandler, SyamlAMFErrorHandler}
 
 object GraphDependenciesReferenceHandler extends ReferenceHandler {
 
   val graphDependenciesPredicate: String = (Namespace.Document + "graphDependencies").iri()
 
   override def collect(inputParsed: ParsedDocument, ctx: ParserContext): CompilerReferenceCollector = {
-    implicit val errorHandler: AMFErrorHandler = ctx.eh
+    implicit val errorHandler: SyamlAMFErrorHandler = new SyamlAMFErrorHandler(ctx.eh)
 
     inputParsed match {
       case parsed: SyamlParsedDocument =>

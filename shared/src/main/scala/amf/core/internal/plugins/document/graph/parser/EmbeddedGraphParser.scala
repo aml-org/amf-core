@@ -16,6 +16,7 @@ import amf.core.client.scala.vocabulary.Namespace
 import amf.core.internal.parser.CompilerConfiguration
 import amf.core.internal.parser.domain.{Annotations, FieldEntry}
 import amf.core.internal.plugins.document.graph.JsonLdKeywords
+import amf.core.internal.plugins.syntax.SyamlAMFErrorHandler
 import amf.core.internal.validation.CoreValidations.{NotLinkable, UnableToParseDocument, UnableToParseNode}
 import org.yaml.convert.YRead.SeqNodeYRead
 import org.yaml.model._
@@ -57,7 +58,7 @@ class EmbeddedGraphParser()(implicit val ctx: GraphParserContext) extends GraphP
       parsedOption match {
         case Some(unit: BaseUnit) => unit.set(Location, location)
         case _ =>
-          ctx.eh.violation(UnableToParseDocument, location, s"Unable to parse $document", document)
+          ctx.eh.violation(UnableToParseDocument, location, s"Unable to parse $document", document.location)
           Document()
       }
     }

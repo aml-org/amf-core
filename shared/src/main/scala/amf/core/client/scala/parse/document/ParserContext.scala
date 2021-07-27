@@ -4,20 +4,13 @@ import amf.core.client.scala.config.ParsingOptions
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.parse.document
-import amf.core.internal.validation.core.ValidationSpecification
 import amf.core.internal.parser.ParseConfiguration
 import amf.core.internal.parser.domain.FutureDeclarations
-import org.mulesoft.lexer.SourceLocation
-import org.yaml.model.{IllegalTypeHandler, ParseErrorHandler, SyamlException, YError}
+import amf.core.internal.validation.core.ValidationSpecification
 
 import scala.collection.mutable
 
 abstract class ErrorHandlingContext(implicit val eh: AMFErrorHandler) {
-  /*
-  override def handle(location: SourceLocation, e: String): Unit = eh.handle(location, e)
-
-  override def handle[T](error: YError, defaultValue: T): T = eh.handle(error, defaultValue)
-  */
   def violation(violationId: ValidationSpecification, node: String, message: String)
 }
 
@@ -64,12 +57,6 @@ case class ParserContext(rootContextDocument: String = "",
     context.globalSpace = this.globalSpace
     context
   }
-
-  /*
-  override def handle(location: SourceLocation, e: SyamlException): Unit = eh.handle(location, e)
-
-  override def handle[T](error: YError, defaultValue: T): T = eh.handle(error, defaultValue)
-*/
 
   def violation(violationId: ValidationSpecification, node: String, message: String): Unit =
     eh.violation(violationId, node, message, rootContextDocument)
