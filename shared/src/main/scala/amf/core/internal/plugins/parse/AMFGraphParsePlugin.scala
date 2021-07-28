@@ -54,4 +54,6 @@ object AMFGraphParsePlugin extends AMFParsePlugin {
     * media types which specifies vendors that may be referenced.
     */
   override def validSpecsToReference: Seq[Spec] = Seq(AMF)
+
+  override def withIdAdoption: Boolean = false
 }

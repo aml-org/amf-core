@@ -31,4 +31,6 @@ trait AMFParsePlugin extends AMFPlugin[Root] {
 
   // move to some spec/dialect configuration?
   def allowRecursiveReferences: Boolean
+
+  def withIdAdoption: Boolean = true
 }

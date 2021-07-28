@@ -38,7 +38,7 @@ abstract class DataNode(annotations: Annotations) extends DomainElement with Nam
 
   def forceAdopted(parent: String): this.type = {
 
-    def isEnum(id: String) = id.split("/").dropRight(1).last == "enum"
+    def isEnum(id: String) = id.split("/").dropRight(1).last == "in"
     // TODO: refactor this. Ids are okay in parsing stage but are lost on trait resolution in domain element merging.
 
     val adoptedId = parent + "/" + name

@@ -80,7 +80,6 @@ object AMFParser {
       .build()
       .map { model =>
         val results = compilerConfig.eh.getResults
-        new IdAdopter(model, model.location().getOrElse(DEFAULT_DOCUMENT_URL)).adopt()
         new AMFParseResult(model, results)
       }
   }
