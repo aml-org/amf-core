@@ -4,11 +4,11 @@ import amf.core.client.scala.model.domain._
 import amf.core.internal.remote._
 
 trait BaseSourceVendor extends SerializableAnnotation {
-  val vendor: Vendor
+  val vendor: SpecId
   override val value: String = vendor.name
 }
 
-case class SourceVendor(override val vendor: Vendor) extends BaseSourceVendor with PerpetualAnnotation {
+case class SourceVendor(override val vendor: SpecId) extends BaseSourceVendor with PerpetualAnnotation {
   override val name: String = "source-vendor"
 }
 
@@ -26,7 +26,7 @@ object SourceVendor extends AnnotationGraphLoader {
     SourceVendor.parse(value)
 }
 
-case class DefinedByVendor(override val vendor: Vendor) extends BaseSourceVendor {
+case class DefinedByVendor(override val vendor: SpecId) extends BaseSourceVendor {
   override val name: String = "defined-by-vendor"
 }
 

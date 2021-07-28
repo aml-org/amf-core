@@ -3,7 +3,7 @@ package amf.core.internal.remote
 import amf.core.client.scala.parse.document.{ReferenceKind, UnspecifiedReference}
 import amf.core.internal.remote.Syntax.{Json, JsonLd, Syntax, Yaml}
 
-case class Hint(vendor: Vendor, syntax: Syntax, kind: ReferenceKind = UnspecifiedReference) {
+case class Hint(vendor: SpecId, syntax: Syntax, kind: ReferenceKind = UnspecifiedReference) {
   def +(k: ReferenceKind): Hint = copy(kind = k)
 
 }

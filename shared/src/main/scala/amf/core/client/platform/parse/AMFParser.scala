@@ -1,8 +1,9 @@
 package amf.core.client.platform.parse
 
-import amf.core.client.platform.{AMFGraphConfiguration, AMFResult}
+import amf.core.client.platform.{AMFGraphConfiguration, AMFParseResult, AMFResult}
 import amf.core.internal.convert.CoreClientConverters._
 import amf.core.client.scala.parse.{AMFParser => InternalAMFParser}
+
 import scala.concurrent.ExecutionContext
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
@@ -16,7 +17,7 @@ object AMFParser {
     * @param configuration [[AMFGraphConfiguration]]
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parse(url: String, configuration: AMFGraphConfiguration): ClientFuture[AMFResult] = {
+  def parse(url: String, configuration: AMFGraphConfiguration): ClientFuture[AMFParseResult] = {
     implicit val context: ExecutionContext = configuration._internal.getExecutionContext
     InternalAMFParser.parse(url, configuration).asClient
   }
@@ -29,7 +30,7 @@ object AMFParser {
     * @param configuration [[AMFGraphConfiguration]]
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parse(url: String, mediaType: String, configuration: AMFGraphConfiguration): ClientFuture[AMFResult] = {
+  def parse(url: String, mediaType: String, configuration: AMFGraphConfiguration): ClientFuture[AMFParseResult] = {
     implicit val context: ExecutionContext = configuration._internal.getExecutionContext
     InternalAMFParser.parse(url, mediaType, configuration).asClient
   }
@@ -40,7 +41,7 @@ object AMFParser {
     * @param configuration [[AMFGraphConfiguration]]
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parseContent(content: String, configuration: AMFGraphConfiguration): ClientFuture[AMFResult] = {
+  def parseContent(content: String, configuration: AMFGraphConfiguration): ClientFuture[AMFParseResult] = {
     implicit val context: ExecutionContext = configuration._internal.getExecutionContext
     InternalAMFParser.parseContent(content, configuration).asClient
   }
@@ -55,7 +56,7 @@ object AMFParser {
     */
   def parseContent(content: String,
                    mediaType: String,
-                   configuration: AMFGraphConfiguration): ClientFuture[AMFResult] = {
+                   configuration: AMFGraphConfiguration): ClientFuture[AMFParseResult] = {
     implicit val context: ExecutionContext = configuration._internal.getExecutionContext
     InternalAMFParser.parseContent(content, mediaType, configuration).asClient
   }

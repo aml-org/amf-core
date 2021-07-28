@@ -6,7 +6,7 @@ import amf.core.client.platform.model.domain.DomainElement
 import amf.core.client.platform.model.{AmfObjectWrapper, StrField}
 import amf.core.internal.annotations.AliasDeclaration
 import amf.core.client.scala.model.document.{BaseUnit => InternalBaseUnit}
-import amf.core.internal.remote.Vendor
+import amf.core.internal.remote.SpecId
 import amf.core.internal.unsafe.PlatformSecrets
 import amf.core.client.scala.vocabulary.Namespace
 
@@ -66,8 +66,7 @@ trait BaseUnit extends AmfObjectWrapper with PlatformSecrets {
   def findByType(typeId: String): ClientList[DomainElement] =
     _internal.findByType(Namespace.defaultAliases.expand(typeId).iri()).asClient
 
-  def sourceMediaType: String            = _internal.sourceMediaType
-  def sourceVendor: ClientOption[Vendor] = _internal.sourceVendor.asClient
+  def sourceVendor: ClientOption[SpecId] = _internal.sourceVendor.asClient
 
   def cloneUnit(): BaseUnit = _internal.cloneUnit()
 

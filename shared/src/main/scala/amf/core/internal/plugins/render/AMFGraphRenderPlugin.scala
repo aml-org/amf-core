@@ -32,7 +32,6 @@ object AMFGraphRenderPlugin extends AMFRenderPlugin {
       .getOrElse(Namespace.defaultAliases)
 
   override def mediaTypes: Seq[String] = Seq(
-      Amf.mediaType,
       `application/ld+json`,
       `application/amf+json`,
       `application/graph`

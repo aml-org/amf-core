@@ -4,8 +4,9 @@ import amf.core.client.platform.model.document.{BaseUnit, Document}
 
 import scala.scalajs.js.annotation.JSExportAll
 import amf.core.internal.convert.CoreClientConverters._
-import amf.core.client.scala.{AMFResult => InternalAMFResult}
+import amf.core.client.scala.{AMFParseResult => InternalAMFParseResult, AMFResult => InternalAMFResult}
 import amf.core.client.platform.validation.AMFValidationResult
+import amf.core.internal.remote.{SpecId, UnknownSpecId}
 
 @JSExportAll
 case class AMFResult(private[amf] val _internal: InternalAMFResult) {
@@ -23,4 +24,8 @@ case class AMFResult(private[amf] val _internal: InternalAMFResult) {
     *  - The most complete unit that could be built, and an [[AMFValidationReport]] report with errors/warnings found
     */
   def baseUnit: BaseUnit = _internal.baseUnit
+}
+
+class AMFParseResult(private[amf] override val _internal: InternalAMFParseResult) extends AMFResult(_internal) {
+  def rootSpec: SpecId = _internal.rootSpec
 }

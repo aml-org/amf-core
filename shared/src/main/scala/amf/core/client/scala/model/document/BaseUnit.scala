@@ -12,7 +12,7 @@ import amf.core.client.scala.model.{BoolField, StrField}
 import amf.core.client.common.validation.ProfileName
 import amf.core.client.scala.rdf.RdfModel
 import amf.core.internal.rdf.RdfModelParser
-import amf.core.internal.remote.{Amf, Vendor}
+import amf.core.internal.remote.{Amf, SpecId}
 import amf.core.client.scala.traversal.iterator._
 import amf.core.client.scala.traversal.{
   DomainElementSelectorAdapter,
@@ -110,7 +110,7 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
 
   def findInReferences(id: String): Option[BaseUnit] = references.find(_.id == id)
 
-  private[amf] def sourceVendor: Option[Vendor] = this match {
+  private[amf] def sourceVendor: Option[SpecId] = this match {
     case e: EncodesModel if Option(e.encodes).isDefined =>
       e.encodes.annotations.find(classOf[SourceVendor]).map(a => a.vendor)
     case d: DeclaresModel => d.annotations.find(classOf[SourceVendor]).map(a => a.vendor)
@@ -118,8 +118,6 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
   }
 
   protected[amf] def profileName: Option[ProfileName] = sourceVendor.map(v => ProfileName.apply(v.name))
-
-  def sourceMediaType: String = sourceVendor.map(_.mediaType).getOrElse(Amf.mediaType)
 
   def cloneUnit(): BaseUnit = cloneElement(mutable.Map.empty).asInstanceOf[BaseUnit]
 

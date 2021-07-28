@@ -13,7 +13,8 @@ import amf.core.internal.plugins.document.graph._
 import amf.core.internal.plugins.render.{AMFGraphRenderPlugin, AMFRenderPlugin, RenderConfiguration, RenderInfo}
 import amf.core.internal.plugins.syntax.RdfSyntaxPlugin
 import amf.core.internal.rdf.RdfModelDocument
-import amf.core.internal.remote.{MediaTypeParser, Platform, Vendor}
+import amf.core.internal.remote.Mimes.`application/ld+json`
+import amf.core.internal.remote.{MediaTypeParser, Mimes, Platform, SpecId}
 import amf.core.internal.unsafe.PlatformSecrets
 import amf.core.internal.validation.CoreValidations
 import org.mulesoft.common.io.Output
@@ -54,7 +55,7 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfigurati
 
   private def render[W: Output](writer: W): Unit = {
     notifyEvent(StartingRenderToWriterEvent(unit, mediaType))
-    if (mediaType == Vendor.AMF.mediaType) emitJsonldToWriter(writer)
+    if (mediaType == `application/ld+json`) emitJsonldToWriter(writer)
     else {
       val renderPlugin = getRenderPlugin
       val ast          = renderAsYDocument(renderPlugin)

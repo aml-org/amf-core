@@ -2,15 +2,15 @@ package amf.core.client.scala.parse
 
 import amf.core.client.scala.resource.ResourceLoader
 import amf.core.internal.convert.CoreClientConverters.platform
-import amf.core.client.scala.{AMFGraphConfiguration, AMFObjectResult, AMFResult}
+import amf.core.client.scala.{AMFGraphConfiguration, AMFObjectResult, AMFParseResult, AMFResult}
 import amf.core.internal.remote.{Cache, Context}
 import amf.core.internal.parser.AmfObjectUnitContainer
 import amf.core.internal.parser.{
   AMFCompiler,
   AMFGraphPartialCompiler,
   AmfObjectUnitContainer,
-  CompilerContextBuilder,
-  CompilerConfiguration
+  CompilerConfiguration,
+  CompilerContextBuilder
 }
 import amf.core.internal.resource.StringResourceLoader
 
@@ -24,7 +24,7 @@ object AMFParser {
     * @param configuration [[AMFGraphConfiguration]]
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parse(url: String, configuration: AMFGraphConfiguration): Future[AMFResult] =
+  def parse(url: String, configuration: AMFGraphConfiguration): Future[AMFParseResult] =
     parseAsync(url, None, configuration)
 
   /**
@@ -36,7 +36,7 @@ object AMFParser {
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
   // check Vendor , only param? ParseParams?
-  def parse(url: String, mediaType: String, configuration: AMFGraphConfiguration): Future[AMFResult] =
+  def parse(url: String, mediaType: String, configuration: AMFGraphConfiguration): Future[AMFParseResult] =
     parseAsync(url, Some(mediaType), configuration)
 
   /**
@@ -45,7 +45,7 @@ object AMFParser {
     * @param configuration [[AMFGraphConfiguration]]
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parseContent(content: String, env: AMFGraphConfiguration): Future[AMFResult] =
+  def parseContent(content: String, env: AMFGraphConfiguration): Future[AMFParseResult] =
     parseContent(content, DEFAULT_DOCUMENT_URL, None, env)
 
   /**
@@ -56,7 +56,7 @@ object AMFParser {
     * @param configuration [[AMFGraphConfiguration]]
     * @return A future that will have a BaseUnit or an error to handle the result of such invocation.
     */
-  def parseContent(content: String, mediaType: String, configuration: AMFGraphConfiguration): Future[AMFResult] =
+  def parseContent(content: String, mediaType: String, configuration: AMFGraphConfiguration): Future[AMFParseResult] =
     parseContent(content, DEFAULT_DOCUMENT_URL, Some(mediaType), configuration)
 
   def parseStartingPoint(graphUrl: String,
@@ -80,7 +80,7 @@ object AMFParser {
   private[amf] def parseContent(content: String,
                                 url: String,
                                 mediaType: Option[String],
-                                env: AMFGraphConfiguration): Future[AMFResult] = {
+                                env: AMFGraphConfiguration): Future[AMFParseResult] = {
     val loader     = fromStream(url, content)
     val withLoader = env.withResourceLoader(loader)
     parseAsync(url, mediaType, withLoader)
@@ -88,7 +88,7 @@ object AMFParser {
 
   private[amf] def parseAsync(url: String,
                               mediaType: Option[String],
-                              amfConfig: AMFGraphConfiguration): Future[AMFResult] = {
+                              amfConfig: AMFGraphConfiguration): Future[AMFParseResult] = {
     val compilerConfig                              = amfConfig.compilerConfiguration
     implicit val executionContext: ExecutionContext = compilerConfig.executionContext
     build(AMFCompiler(url, mediaType, Context(platform), Cache(), compilerConfig), compilerConfig)
@@ -99,7 +99,7 @@ object AMFParser {
       .build()
       .map { model =>
         val results = compilerConfig.eh.getResults
-        AMFResult(model, results)
+        new AMFParseResult(model, results)
       }
   }
 

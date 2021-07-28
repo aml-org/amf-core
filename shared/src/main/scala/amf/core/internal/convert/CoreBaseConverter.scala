@@ -77,11 +77,11 @@ import amf.core.client.scala.validation.payload.{
   ValidatePayloadRequest
 }
 import amf.core.client.scala.validation.{AMFValidationReport, AMFValidationResult}
-import amf.core.client.scala.{AMFGraphConfiguration, AMFResult}
+import amf.core.client.scala.{AMFGraphConfiguration, AMFParseResult, AMFResult}
 import amf.core.internal.convert.PayloadValidatorConverter.PayloadValidatorMatcher
 import amf.core.internal.parser.domain.Annotations
 import amf.core.internal.reference.UnitCacheAdapter
-import amf.core.internal.remote.Vendor
+import amf.core.internal.remote.SpecId
 import amf.core.internal.resource.{ClientResourceLoaderAdapter, InternalResourceLoaderAdapter}
 import amf.core.internal.unsafe.PlatformSecrets
 import amf.core.internal.validation.{ValidationCandidate, ValidationShapeSet}
@@ -121,6 +121,7 @@ trait CoreBaseConverter
     with TransformationStepConverter
     with TransformationPipelineBuilderConverter
     with AMFResultConverter
+    with AMFParseResultConverter
     with AMFEventListenerConverter
     with ValidationProfileConverter
     with ShapeValidationConfigurationConverter
@@ -143,7 +144,7 @@ trait CoreBaseConverter
   implicit object AnyMatcher         extends IdentityMatcher[Any]
   implicit object UnitMatcher        extends IdentityMatcher[Unit]
   implicit object ProfileNameMatcher extends IdentityMatcher[ProfileName]
-  implicit object VendorMatcher      extends IdentityMatcher[Vendor]
+  implicit object VendorMatcher      extends IdentityMatcher[SpecId]
 
   implicit object ContentMatcher extends IdentityMatcher[Content]
 
@@ -660,6 +661,14 @@ trait AMFResultConverter {
     override def asClient(from: AMFResult): platform.AMFResult =
       ClientAMFResult(from)
     override def asInternal(from: platform.AMFResult): AMFResult = from._internal
+  }
+}
+
+trait AMFParseResultConverter {
+  implicit object AMFParseResultMatcher extends BidirectionalMatcher[AMFParseResult, platform.AMFParseResult] {
+    override def asClient(from: AMFParseResult): platform.AMFParseResult =
+      new platform.AMFParseResult(from)
+    override def asInternal(from: platform.AMFParseResult): AMFParseResult = from._internal
   }
 }
 

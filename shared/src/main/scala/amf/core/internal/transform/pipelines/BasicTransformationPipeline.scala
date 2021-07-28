@@ -13,12 +13,12 @@ class BasicTransformationPipeline private (override val name: String) extends Tr
 }
 
 object BasicTransformationPipeline {
-  val name: String           = PipelineName.from(Amf.mediaType, PipelineId.Default)
+  val name: String           = PipelineId.Default
   def apply()                = new BasicTransformationPipeline(name)
   private[amf] def editing() = new BasicTransformationPipeline(BasicEditingTransformationPipeline.name)
 }
 
 object BasicEditingTransformationPipeline {
-  val name: String                         = PipelineName.from(Amf.mediaType, PipelineId.Editing)
+  val name: String                         = PipelineId.Editing
   def apply(): BasicTransformationPipeline = BasicTransformationPipeline.editing()
 }

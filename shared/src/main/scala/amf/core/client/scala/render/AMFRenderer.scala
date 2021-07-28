@@ -4,16 +4,18 @@ import amf.core.client.scala.AMFGraphConfiguration
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.parse.document.ParsedDocument
 import amf.core.internal.plugins.render.AMFGraphRenderPlugin
-import amf.core.internal.remote.Vendor.AMF
+import amf.core.internal.remote.Mimes
+import amf.core.internal.remote.Mimes.`application/ld+json`
+import amf.core.internal.remote.SpecId.AMF
 import amf.core.internal.render.AMFSerializer
 import org.yaml.builder.DocBuilder
 object AMFRenderer {
 
   def render(baseUnit: BaseUnit, configuration: AMFGraphConfiguration): String =
-    render(baseUnit, AMF.mediaType, configuration)
+    render(baseUnit, `application/ld+json`, configuration)
 
   def renderAST(baseUnit: BaseUnit, configuration: AMFGraphConfiguration): ParsedDocument =
-    renderAST(baseUnit, AMF.mediaType, configuration)
+    renderAST(baseUnit, `application/ld+json`, configuration)
 
   def render(baseUnit: BaseUnit, mediaType: String, configuration: AMFGraphConfiguration): String =
     new AMFSerializer(baseUnit, mediaType, configuration.renderConfiguration).renderToString

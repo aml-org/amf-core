@@ -13,13 +13,9 @@ object AMFTransformer {
   }
 
   def transform(unit: BaseUnit, pipelineId: String, conf: AMFGraphConfiguration): AMFResult = {
-    val pipelines              = conf.registry.transformationPipelines
-    val guessedMediaType       = unit.sourceVendor.getOrElse(Amf).mediaType
-    val pipelineWithVendorName = PipelineName.from(guessedMediaType, pipelineId)
-    val pipeline = pipelines
-      .get(pipelineId)
-      .orElse(pipelines.get(pipelineWithVendorName))
-    val handler = conf.errorHandlerProvider.errorHandler()
+    val pipelines = conf.registry.transformationPipelines
+    val pipeline  = pipelines.get(pipelineId)
+    val handler   = conf.errorHandlerProvider.errorHandler()
     val resolved = pipeline match {
       case Some(pipeline) =>
         val runner = TransformationPipelineRunner(handler, conf.listeners.toList)
@@ -29,7 +25,7 @@ object AMFTransformer {
             ResolutionValidation,
             unit.id,
             None,
-            s"Cannot find transformation pipeline with name $pipelineId or $pipelineWithVendorName",
+            s"Cannot find transformation pipeline with name $pipelineId",
             unit.position(),
             unit.location()
         )
