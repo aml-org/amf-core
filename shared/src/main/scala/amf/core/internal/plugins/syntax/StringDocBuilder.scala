@@ -1,7 +1,7 @@
 package amf.core.internal.plugins.syntax
 
 import amf.core.client.common.position.Position
-import amf.core.client.common.position.Position.{FIRST, ZERO}
+import amf.core.client.common.position.Position._
 import amf.core.client.scala.parse.document.StringParsedDocument
 import amf.core.internal.plugins.syntax.StringDocBuilder.INDENTATION_WIDTH
 
