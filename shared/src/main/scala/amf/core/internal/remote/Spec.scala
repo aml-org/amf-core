@@ -24,7 +24,7 @@ object Spec {
   @JSExport("apply")
   def apply(name: String): Spec = name match {
     case Spec(vendor) => vendor
-    case _            => UnknownSpecId(name)
+    case _            => UnknownSpec(name)
   }
 
   @JSExport val RAML08: Spec     = Raml08
@@ -49,8 +49,12 @@ trait Spec {
   val mediaType: String
 }
 
-case class UnknownSpecId(override val id: String) extends Spec {
+case class UnknownSpec(override val id: String) extends Spec {
   override val mediaType: String = "application/unknown"
+}
+
+case class AmlDialectSpec(override val id: String) extends Spec {
+  override val mediaType: String = "application/aml"
 }
 
 private[amf] trait Raml extends Spec {

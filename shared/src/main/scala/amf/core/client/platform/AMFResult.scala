@@ -6,7 +6,7 @@ import scala.scalajs.js.annotation.JSExportAll
 import amf.core.internal.convert.CoreClientConverters._
 import amf.core.client.scala.{AMFParseResult => InternalAMFParseResult, AMFResult => InternalAMFResult}
 import amf.core.client.platform.validation.AMFValidationResult
-import amf.core.internal.remote.{Spec, UnknownSpecId}
+import amf.core.internal.remote.{Spec, UnknownSpec}
 
 @JSExportAll
 case class AMFResult(private[amf] val _internal: InternalAMFResult) {
