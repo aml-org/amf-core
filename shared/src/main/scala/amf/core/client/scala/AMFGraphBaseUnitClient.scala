@@ -27,7 +27,7 @@ class AMFGraphBaseUnitClient private[amf] (protected val configuration: AMFGraph
     * @param url Location of the file to parse
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parse(url: String): Future[AMFResult] = AMFParser.parse(url, configuration)
+  def parse(url: String): Future[AMFParseResult] = AMFParser.parse(url, configuration)
 
   /**
     * Asynchronously generate a BaseUnit from the content located in the given url.
@@ -36,14 +36,14 @@ class AMFGraphBaseUnitClient private[amf] (protected val configuration: AMFGraph
     *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parse(url: String, mediaType: String): Future[AMFResult] = AMFParser.parse(url, mediaType, configuration)
+  def parse(url: String, mediaType: String): Future[AMFParseResult] = AMFParser.parse(url, mediaType, configuration)
 
   /**
     * Asynchronously generate a BaseUnit from a given string.
     * @param content The content as a string
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parseContent(content: String): Future[AMFResult] = AMFParser.parseContent(content, configuration)
+  def parseContent(content: String): Future[AMFParseResult] = AMFParser.parseContent(content, configuration)
 
   /**
     * Asynchronously generate a BaseUnit from a given string.
@@ -52,7 +52,7 @@ class AMFGraphBaseUnitClient private[amf] (protected val configuration: AMFGraph
     *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parseContent(content: String, mediaType: String): Future[AMFResult] =
+  def parseContent(content: String, mediaType: String): Future[AMFParseResult] =
     AMFParser.parseContent(content, mediaType, configuration)
 
   /**

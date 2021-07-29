@@ -31,7 +31,7 @@ object AMFValidator {
 
   def validate(baseUnit: BaseUnit, conf: AMFGraphConfiguration): Future[AMFValidationReport] = {
     val profileName = baseUnit.sourceVendor.map(VendorToProfile.mapOrDefault).getOrElse(AmfProfile)
-    val plugins = conf.registry.plugins.validatePlugins.filter(_.applies(ValidationInfo(baseUnit, profileName)))
+    val plugins = conf.registry.plugins.validatePlugins.filter(_.applies(ValidationInfo(baseUnit, profileName))).sorted
     val constraints = computeApplicableConstraints(profileName, conf.registry.constraintsRules)
     val options = ValidationOptions(profileName, constraints, ValidationConfiguration(conf))
     val runner = FailFastValidationRunner(plugins, options)

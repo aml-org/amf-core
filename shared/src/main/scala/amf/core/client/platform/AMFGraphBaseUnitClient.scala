@@ -30,7 +30,7 @@ class AMFGraphBaseUnitClient private[amf] (private val _internal: InternalAMFGra
     * @param url Location of the file to parse
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parse(url: String): ClientFuture[AMFResult] = _internal.parse(url).asClient
+  def parse(url: String): ClientFuture[AMFParseResult] = _internal.parse(url).asClient
 
   /**
     * Asynchronously generate a BaseUnit from the content located in the given url.
@@ -39,14 +39,14 @@ class AMFGraphBaseUnitClient private[amf] (private val _internal: InternalAMFGra
     *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parse(url: String, mediaType: String): ClientFuture[AMFResult] = _internal.parse(url, mediaType).asClient
+  def parse(url: String, mediaType: String): ClientFuture[AMFParseResult] = _internal.parse(url, mediaType).asClient
 
   /**
     * Asynchronously generate a BaseUnit from a given string.
     * @param content The content as a string
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parseContent(content: String): ClientFuture[AMFResult] = _internal.parseContent(content).asClient
+  def parseContent(content: String): ClientFuture[AMFParseResult] = _internal.parseContent(content).asClient
 
   /**
     * Asynchronously generate a BaseUnit from a given string.
@@ -55,7 +55,7 @@ class AMFGraphBaseUnitClient private[amf] (private val _internal: InternalAMFGra
     *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
     * @return A CompletableFuture of [[AMFResult]]
     */
-  def parseContent(content: String, mediaType: String): ClientFuture[AMFResult] =
+  def parseContent(content: String, mediaType: String): ClientFuture[AMFParseResult] =
     _internal.parseContent(content, mediaType).asClient
 
   /**
