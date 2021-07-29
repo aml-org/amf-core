@@ -19,113 +19,6 @@ import java.net.URISyntaxException
 import scala.concurrent.Future.failed
 import scala.concurrent.{ExecutionContext, Future}
 
-object AMFCompilerRunCount {
-  val NONE: Int = -1
-  var count     = 0
-
-  def nextRun(): Int = synchronized {
-    count += 1
-    count
-  }
-}
-
-class CompilerContext(val url: String,
-                      val parserContext: ParserContext,
-                      val compilerConfig: CompilerConfiguration,
-                      val fileContext: Context,
-                      val allowedMediaTypes: Option[Seq[String]],
-                      cache: Cache) {
-
-  implicit val executionContext: ExecutionContext = compilerConfig.executionContext
-
-  /**
-    * The resolved path that result to be the normalized url
-    */
-  val location: String = fileContext.current
-  val path: String     = url.normalizePath
-
-  def runInCache(fn: () => Future[BaseUnit]): Future[BaseUnit] = cache.getOrUpdate(location, fileContext)(fn)
-
-  lazy val hasCycles: Boolean = fileContext.hasCycles
-
-  lazy val platform: Platform = fileContext.platform
-
-  def resolvePath(url: String): String = fileContext.resolve(fileContext.platform.normalizePath(url))
-
-  def fetchContent(): Future[Content] = compilerConfig.resolveContent(location)
-
-  def forReference(refUrl: String, allowedMediaTypes: Option[Seq[String]] = None)(
-      implicit executionContext: ExecutionContext): CompilerContext = {
-
-    val builder = new CompilerContextBuilder(refUrl, fileContext.platform, compilerConfig)
-      .withFileContext(fileContext)
-      .withBaseParserContext(parserContext)
-      .withCache(cache)
-
-    allowedMediaTypes.foreach(builder.withAllowedMediaTypes)
-    builder.build()
-  }
-
-  def violation(id: ValidationSpecification, node: String, message: String, ast: YPart): Unit =
-    compilerConfig.eh.violation(id, node, message, ast)
-
-  def violation(id: ValidationSpecification, message: String, ast: YPart): Unit = violation(id, "", message, ast)
-}
-
-class CompilerContextBuilder(url: String, platform: Platform, compilerConfig: CompilerConfiguration) {
-
-  private var fileContext: Context                   = Context(platform)
-  private var cache                                  = Cache()
-  private var givenContent: Option[ParserContext]    = None
-  private var allowedMediaTypes: Option[Seq[String]] = None
-
-  def withFileContext(fc: Context): CompilerContextBuilder = {
-    fileContext = fc
-    this
-  }
-
-  def withCache(cache: Cache): CompilerContextBuilder = {
-    this.cache = cache
-    this
-  }
-
-  def withAllowedMediaTypes(allowed: Seq[String]): CompilerContextBuilder = {
-    this.allowedMediaTypes = Some(allowed)
-    this
-  }
-
-  def withBaseParserContext(parserContext: ParserContext): this.type = {
-    givenContent = Some(parserContext)
-    this
-  }
-
-  /**
-    * normalized url
-    * */
-  private def path: String = {
-    try {
-      url.normalizePath
-    } catch {
-      case e: URISyntaxException =>
-        compilerConfig.eh.violation(UriSyntaxError, url, e.getMessage)
-        url
-      case e: Exception => throw new PathResolutionError(e.getMessage)
-    }
-  }
-
-  private def buildFileContext() = fileContext.update(path)
-
-  private def buildParserContext(fc: Context) = givenContent match {
-    case Some(given) => given.forLocation(fc.current)
-    case None        => ParserContext(fc.current, config = compilerConfig.generateParseConfiguration)
-  }
-
-  def build(): CompilerContext = {
-    val fc = buildFileContext()
-    new CompilerContext(url, buildParserContext(fc), compilerConfig, fc, allowedMediaTypes, cache)
-  }
-}
-
 class AMFCompiler(compilerContext: CompilerContext,
                   val mediaType: Option[String],
                   val referenceKind: ReferenceKind = UnspecifiedReference) {
@@ -203,7 +96,6 @@ class AMFCompiler(compilerContext: CompilerContext,
 
   private def parseSyntaxForMediaType(content: Content, mime: String): Option[(String, ParsedDocument)] = {
     val withContentUrl = compilerContext.parserContext.forLocation(content.url)
-    // TODO ARM sort
     compilerContext.compilerConfig.sortedParseSyntax
       .find(_.applies(content.stream))
       .map(p => (mime, p.parse(content.stream, mime, withContentUrl)))
