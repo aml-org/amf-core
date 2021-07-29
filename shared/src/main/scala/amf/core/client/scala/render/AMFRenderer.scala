@@ -6,7 +6,7 @@ import amf.core.client.scala.parse.document.ParsedDocument
 import amf.core.internal.plugins.render.AMFGraphRenderPlugin
 import amf.core.internal.remote.Mimes
 import amf.core.internal.remote.Mimes.`application/ld+json`
-import amf.core.internal.remote.SpecId.AMF
+import amf.core.internal.remote.Spec.AMF
 import amf.core.internal.render.AMFSerializer
 import org.yaml.builder.DocBuilder
 object AMFRenderer {

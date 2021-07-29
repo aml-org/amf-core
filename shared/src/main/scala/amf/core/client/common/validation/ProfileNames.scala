@@ -32,29 +32,29 @@ case class ProfileName(private[amf] val p: String, private val m: MessageStyle =
   def isRaml(): Boolean          = false
 }
 
-object AmfProfile     extends ProfileName(Amf.name)
-object AmlProfile     extends ProfileName(Aml.name)
+object AmfProfile     extends ProfileName(Amf.id)
+object AmlProfile     extends ProfileName(Aml.id)
 object UnknownProfile extends ProfileName("")
 
-object Oas20Profile extends ProfileName(Oas20.name, OASStyle) {
+object Oas20Profile extends ProfileName(Oas20.id, OASStyle) {
   override def isOas(): Boolean = true
 }
 
-object Oas30Profile extends ProfileName(Oas30.name, OASStyle) {
+object Oas30Profile extends ProfileName(Oas30.id, OASStyle) {
   override def isOas(): Boolean = true
 }
 
-object Raml08Profile extends ProfileName(Raml08.name, RAMLStyle) {
+object Raml08Profile extends ProfileName(Raml08.id, RAMLStyle) {
   override def isRaml(): Boolean = true
 }
 
-object Raml10Profile extends ProfileName(Raml10.name, RAMLStyle) {
+object Raml10Profile extends ProfileName(Raml10.id, RAMLStyle) {
   override def isRaml(): Boolean = true
 }
 
-object AsyncProfile   extends ProfileName(AsyncApi.name, OASStyle)
-object Async20Profile extends ProfileName(AsyncApi20.name, OASStyle)
-object PayloadProfile extends ProfileName(Payload.name)
+object AsyncProfile   extends ProfileName(AsyncApi.id, OASStyle)
+object Async20Profile extends ProfileName(AsyncApi20.id, OASStyle)
+object PayloadProfile extends ProfileName(Payload.id)
 
 object ProfileName {
   def unapply(name: String): Option[ProfileName] =
@@ -68,22 +68,22 @@ object ProfileName {
     }
 
   def apply(profile: String): ProfileName = profile match {
-    case Amf.name             => AmfProfile
-    case "OAS" | Oas20.name   => Oas20Profile // for compatibility
-    case Oas30.name           => Oas30Profile
-    case Raml08.name          => Raml08Profile
-    case "RAML" | Raml10.name => Raml10Profile // for compatibility
-    case AsyncApi.name        => AsyncProfile
-    case AsyncApi20.name      => Async20Profile
+    case Amf.`id`             => AmfProfile
+    case "OAS" | Oas20.`id`   => Oas20Profile // for compatibility
+    case Oas30.`id`           => Oas30Profile
+    case Raml08.`id`          => Raml08Profile
+    case "RAML" | Raml10.`id` => Raml10Profile // for compatibility
+    case AsyncApi.`id`        => AsyncProfile
+    case AsyncApi20.`id`      => Async20Profile
     case custom               => new ProfileName(custom)
   }
 }
 
 object MessageStyle {
   def apply(name: String): MessageStyle = name match {
-    case Raml10.name | Raml08.name       => RAMLStyle
-    case Oas20.name | Oas30.name         => OASStyle
-    case AsyncApi.name | AsyncApi20.name => OASStyle
+    case Raml10.`id` | Raml08.`id`       => RAMLStyle
+    case Oas20.`id` | Oas30.`id`         => OASStyle
+    case AsyncApi.`id` | AsyncApi20.`id` => OASStyle
     case _                               => AMFStyle
   }
 }

@@ -1,9 +1,10 @@
 package amf.core.client.scala.parse
 
+import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.resource.ResourceLoader
 import amf.core.internal.convert.CoreClientConverters.platform
 import amf.core.client.scala.{AMFGraphConfiguration, AMFObjectResult, AMFParseResult, AMFResult}
-import amf.core.internal.remote.{Cache, Context}
+import amf.core.internal.remote.{Cache, Context, Spec, UnknownSpecId}
 import amf.core.internal.parser.AmfObjectUnitContainer
 import amf.core.internal.parser.{
   AMFCompiler,
@@ -98,8 +99,9 @@ object AMFParser {
     compiler
       .build()
       .map { model =>
-        val results = compilerConfig.eh.getResults
-        new AMFParseResult(model, results)
+        val results        = compilerConfig.eh.getResults
+        val rootSpec: Spec = model.sourceVendor.getOrElse(UnknownSpecId("unknown"))
+        new AMFParseResult(model, rootSpec, results)
       }
   }
 

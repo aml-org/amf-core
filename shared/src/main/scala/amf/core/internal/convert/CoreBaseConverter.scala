@@ -81,7 +81,7 @@ import amf.core.client.scala.{AMFGraphConfiguration, AMFParseResult, AMFResult}
 import amf.core.internal.convert.PayloadValidatorConverter.PayloadValidatorMatcher
 import amf.core.internal.parser.domain.Annotations
 import amf.core.internal.reference.UnitCacheAdapter
-import amf.core.internal.remote.SpecId
+import amf.core.internal.remote.Spec
 import amf.core.internal.resource.{ClientResourceLoaderAdapter, InternalResourceLoaderAdapter}
 import amf.core.internal.unsafe.PlatformSecrets
 import amf.core.internal.validation.{ValidationCandidate, ValidationShapeSet}
@@ -144,7 +144,7 @@ trait CoreBaseConverter
   implicit object AnyMatcher         extends IdentityMatcher[Any]
   implicit object UnitMatcher        extends IdentityMatcher[Unit]
   implicit object ProfileNameMatcher extends IdentityMatcher[ProfileName]
-  implicit object VendorMatcher      extends IdentityMatcher[SpecId]
+  implicit object VendorMatcher      extends IdentityMatcher[Spec]
 
   implicit object ContentMatcher extends IdentityMatcher[Content]
 

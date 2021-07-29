@@ -11,7 +11,7 @@ import org.yaml.builder.DocBuilder
 
 object AMFGraphRenderPlugin extends AMFRenderPlugin {
 
-  override val id: String = Amf.name
+  override val id: String = Amf.id
 
   override def defaultSyntax(): String = `application/json`
 

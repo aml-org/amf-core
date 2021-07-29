@@ -6,7 +6,7 @@ import scala.scalajs.js.annotation.JSExportAll
 import amf.core.internal.convert.CoreClientConverters._
 import amf.core.client.scala.{AMFParseResult => InternalAMFParseResult, AMFResult => InternalAMFResult}
 import amf.core.client.platform.validation.AMFValidationResult
-import amf.core.internal.remote.{SpecId, UnknownSpecId}
+import amf.core.internal.remote.{Spec, UnknownSpecId}
 
 @JSExportAll
 case class AMFResult(private[amf] val _internal: InternalAMFResult) {
@@ -27,5 +27,5 @@ case class AMFResult(private[amf] val _internal: InternalAMFResult) {
 }
 
 class AMFParseResult(private[amf] override val _internal: InternalAMFParseResult) extends AMFResult(_internal) {
-  def rootSpec: SpecId = _internal.rootSpec
+  def rootSpec: Spec = _internal.rootSpec
 }

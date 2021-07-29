@@ -5,7 +5,7 @@ import amf.core.internal.validation.ValidationConfiguration
 import amf.core.client.scala.AMFGraphConfiguration
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.common.validation.{AmfProfile, Async20Profile, Oas20Profile, Oas30Profile, ProfileName, Raml08Profile, Raml10Profile}
-import amf.core.internal.remote.SpecId
+import amf.core.internal.remote.Spec
 import amf.core.internal.validation.core.ValidationProfile
 import amf.core.internal.validation.FailFastValidationRunner
 import amf.core.internal.plugins.validation.{ValidationInfo, ValidationOptions}
@@ -16,15 +16,15 @@ import scala.concurrent.Future
 object VendorToProfile {
 
   private lazy val vendorProfileMapping = Map(
-      SpecId.ASYNC20 -> Async20Profile,
-      SpecId.RAML10 -> Raml10Profile,
-      SpecId.RAML08 -> Raml08Profile,
-      SpecId.OAS20 -> Oas20Profile,
-      SpecId.OAS30 -> Oas30Profile,
-      SpecId.AMF -> AmfProfile,
+      Spec.ASYNC20 -> Async20Profile,
+      Spec.RAML10 -> Raml10Profile,
+      Spec.RAML08 -> Raml08Profile,
+      Spec.OAS20 -> Oas20Profile,
+      Spec.OAS30 -> Oas30Profile,
+      Spec.AMF -> AmfProfile,
   )
 
-  def mapOrDefault(vendor: SpecId): ProfileName = vendorProfileMapping.getOrElse(vendor, AmfProfile)
+  def mapOrDefault(vendor: Spec): ProfileName = vendorProfileMapping.getOrElse(vendor, AmfProfile)
 }
 
 object AMFValidator {

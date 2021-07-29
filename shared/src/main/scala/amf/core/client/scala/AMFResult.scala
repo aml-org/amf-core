@@ -3,7 +3,7 @@ package amf.core.client.scala
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.model.domain.AmfObject
 import amf.core.client.scala.validation.{AMFValidationResult, ReportConformance}
-import amf.core.internal.remote.{SpecId, UnknownSpecId}
+import amf.core.internal.remote.{Spec, UnknownSpecId}
 
 /**
   *
@@ -14,9 +14,9 @@ import amf.core.internal.remote.{SpecId, UnknownSpecId}
   */
 case class AMFResult(baseUnit: BaseUnit, results: Seq[AMFValidationResult]) extends AMFObjectResult(baseUnit, results)
 
-class AMFParseResult(override val baseUnit: BaseUnit, override val results: Seq[AMFValidationResult])
-    extends AMFResult(baseUnit, results) {
-  def rootSpec: SpecId = baseUnit.sourceVendor.getOrElse(UnknownSpecId("unknown"))
-}
+class AMFParseResult(override val baseUnit: BaseUnit,
+                     val rootSpec: Spec,
+                     override val results: Seq[AMFValidationResult])
+    extends AMFResult(baseUnit, results)
 
 class AMFObjectResult(val element: AmfObject, results: Seq[AMFValidationResult]) extends ReportConformance(results)

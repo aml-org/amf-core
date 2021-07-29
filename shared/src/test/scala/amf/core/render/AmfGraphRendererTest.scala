@@ -7,7 +7,7 @@ import amf.core.io.FileAssertionTest
 import amf.core.internal.metamodel.domain.ArrayNodeModel
 import amf.core.client.scala.model.document.{Document, Module}
 import amf.core.client.scala.model.domain.{ArrayNode, ObjectNode, ScalarNode}
-import amf.core.internal.remote.SpecId.AMF
+import amf.core.internal.remote.Spec.AMF
 import amf.core.client.scala.vocabulary.Namespace
 import org.scalatest.AsyncFunSuite
 

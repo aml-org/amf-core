@@ -9,7 +9,7 @@ import amf.core.client.scala.parse.AMFParsePlugin
 import amf.core.client.scala.parse.document.{ParserContext, ReferenceHandler, SyamlParsedDocument}
 import amf.core.internal.rdf.{RdfModelDocument, RdfModelParser}
 import amf.core.internal.parser.Root
-import amf.core.internal.remote.SpecId
+import amf.core.internal.remote.Spec
 import amf.core.internal.plugins.document.graph.parser.{
   EmbeddedGraphParser,
   FlattenedUnitGraphParser,
@@ -18,7 +18,7 @@ import amf.core.internal.plugins.document.graph.parser.{
 
 object AMFGraphParsePlugin extends AMFParsePlugin {
 
-  override val id: String = SpecId.AMF.name
+  override val id: String = Spec.AMF.id
 
   override def applies(element: Root): Boolean = element.parsed match {
     case parsed: SyamlParsedDocument =>

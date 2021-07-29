@@ -14,7 +14,7 @@ import amf.core.internal.plugins.render.{AMFGraphRenderPlugin, AMFRenderPlugin, 
 import amf.core.internal.plugins.syntax.RdfSyntaxPlugin
 import amf.core.internal.rdf.RdfModelDocument
 import amf.core.internal.remote.Mimes.`application/ld+json`
-import amf.core.internal.remote.{MediaTypeParser, Mimes, Platform, SpecId}
+import amf.core.internal.remote.{MediaTypeParser, Mimes, Platform, Spec}
 import amf.core.internal.unsafe.PlatformSecrets
 import amf.core.internal.validation.CoreValidations
 import org.mulesoft.common.io.Output
