@@ -5,7 +5,6 @@ import amf.core.client.platform.config.AMFEventNames._
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.parse.AMFParsePlugin
 import amf.core.client.scala.parse.document.ParsedDocument
-import amf.core.client.scala.rdf.RdfModel
 import amf.core.client.scala.transform.{TransformationPipeline, TransformationStep}
 import amf.core.client.scala.validation.AMFValidationReport
 import amf.core.internal.plugins.render.AMFRenderPlugin
@@ -151,46 +150,4 @@ case class FinishedRenderingASTEvent(unit: BaseUnit, renderedAST: ParsedDocument
 case class FinishedRenderingSyntaxEvent(unit: BaseUnit) extends AMFEvent with GroupedEvent {
   override val name: String     = FinishedSyntaxRender
   override val groupKey: String = unit.id
-}
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SHACL Events ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-case class ShaclLoadedRdfDataModelEvent(unitId: String, model: RdfModel) extends AMFEvent {
-  override val name: String = ShaclLoadedRdfDataModel
-}
-
-case class ShaclLoadedRdfShapesModelEvent(unitId: String, model: RdfModel) extends AMFEvent {
-  override val name: String = ShaclLoadedRdfShapesModel
-}
-
-case class JenaLoadedModelEvent(unitId: String) extends AMFEvent {
-  override val name: String = JenaModelLoaded
-}
-
-case class ShaclValidationStartedEvent(unitId: String) extends AMFEvent {
-  override val name: String = ShaclValidationStarted
-}
-
-case class ShaclValidationFinishedEvent(unitId: String) extends AMFEvent {
-  override val name: String = ShaclValidationFinished
-}
-
-case class ShaclFinishedEvent(unitId: String) extends AMFEvent {
-  override val name: String = ShaclFinished
-}
-
-case class ShaclStartedEvent(unitId: String) extends AMFEvent {
-  override val name: String = ShaclStarted
-}
-
-case class ShaclReportPrintingStartedEvent(unitId: String) extends AMFEvent {
-  override val name: String = ShaclReportPrintingStarted
-}
-
-case class ShaclReportPrintingFinishedEvent(unitId: String) extends AMFEvent {
-  override val name: String = ShaclReportPrintingFinished
-}
-
-case class ShaclLoadedJsLibrariesEvent(unitId: String) extends AMFEvent {
-  override val name: String = ShaclLoadedJsLibraries
 }

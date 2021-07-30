@@ -1,4 +1,4 @@
-package amf.core.internal.rdf.helper
+package amf.core.internal.rdf
 
 import amf.core.client.scala.model.document.SourceMap
 import amf.core.client.scala.model.domain.{AmfElement, AnnotationGraphLoader}

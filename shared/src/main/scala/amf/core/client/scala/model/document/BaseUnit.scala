@@ -1,18 +1,10 @@
 package amf.core.client.scala.model.document
 
+import amf.core.client.common.validation.ProfileName
 import amf.core.client.scala.errorhandling.AMFErrorHandler
-import amf.core.internal.annotations.SourceVendor
-import amf.core.internal.metamodel.MetaModelTypeMapping
-import amf.core.internal.metamodel.document.BaseUnitModel
-import amf.core.internal.metamodel.document.BaseUnitModel.{Location, ModelVersion, Root, Usage}
-import amf.core.internal.metamodel.document.DocumentModel.References
 import amf.core.client.scala.model.document.FieldsFilter.Local
 import amf.core.client.scala.model.domain._
 import amf.core.client.scala.model.{BoolField, StrField}
-import amf.core.client.common.validation.ProfileName
-import amf.core.client.scala.rdf.RdfModel
-import amf.core.internal.rdf.RdfModelParser
-import amf.core.internal.remote.{Amf, Vendor}
 import amf.core.client.scala.traversal.iterator._
 import amf.core.client.scala.traversal.{
   DomainElementSelectorAdapter,
@@ -20,6 +12,12 @@ import amf.core.client.scala.traversal.{
   TransformationData,
   TransformationTraversal
 }
+import amf.core.internal.annotations.SourceVendor
+import amf.core.internal.metamodel.MetaModelTypeMapping
+import amf.core.internal.metamodel.document.BaseUnitModel
+import amf.core.internal.metamodel.document.BaseUnitModel.{Location, ModelVersion, Root, Usage}
+import amf.core.internal.metamodel.document.DocumentModel.References
+import amf.core.internal.remote.{Amf, Vendor}
 import amf.core.internal.unsafe.PlatformSecrets
 
 import scala.collection.mutable

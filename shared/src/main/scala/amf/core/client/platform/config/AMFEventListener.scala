@@ -59,35 +59,25 @@ object AMFEventNames {
 
 object AMFEventConverter {
   def asClient(e: config.AMFEvent): AMFEvent = e match {
-    case e: config.StartingParsingEvent             => new StartingParsingEvent(e)
-    case e: config.StartingContentParsingEvent      => new StartingContentParsingEvent(e)
-    case e: config.ParsedSyntaxEvent                => new ParsedSyntaxEvent(e)
-    case e: config.ParsedModelEvent                 => new ParsedModelEvent(e)
-    case e: config.FinishedParsingEvent             => new FinishedParsingEvent(e)
-    case e: config.StartingTransformationEvent      => new StartingTransformationEvent(e)
-    case e: config.FinishedTransformationStepEvent  => new FinishedTransformationStepEvent(e)
-    case e: config.FinishedTransformationEvent      => new FinishedTransformationEvent(e)
-    case e: config.StartingValidationEvent          => new StartingValidationEvent(e)
-    case e: config.FinishedValidationPluginEvent    => new FinishedValidationPluginEvent(e)
-    case e: config.FinishedValidationEvent          => new FinishedValidationEvent(e)
-    case e: config.StartingRenderingEvent           => new StartingRenderingEvent(e)
-    case e: config.FinishedRenderingASTEvent        => new FinishedRenderingASTEvent(e)
-    case e: config.FinishedRenderingSyntaxEvent     => new FinishedRenderingSyntaxEvent(e)
-    case e: config.DetectedSyntaxMediaTypeEvent     => DetectedSyntaxMediaTypeEvent(e)
-    case e: config.FoundReferencesEvent             => FoundReferencesEvent(e)
-    case e: config.ShaclLoadedRdfDataModelEvent     => ShaclLoadedRdfDataModelEvent(e)
-    case e: config.ShaclLoadedRdfShapesModelEvent   => ShaclLoadedRdfShapesModelEvent(e)
-    case e: config.JenaLoadedModelEvent             => JenaLoadedModelEvent(e)
-    case e: config.ShaclValidationStartedEvent      => ShaclValidationStartedEvent(e)
-    case e: config.ShaclValidationFinishedEvent     => ShaclValidationFinishedEvent(e)
-    case e: config.ShaclFinishedEvent               => ShaclFinishedEvent(e)
-    case e: config.ShaclStartedEvent                => ShaclStartedEvent(e)
-    case e: config.ShaclReportPrintingStartedEvent  => ShaclReportPrintingStartedEvent(e)
-    case e: config.ShaclReportPrintingFinishedEvent => ShaclReportPrintingFinishedEvent(e)
-    case e: config.ShaclLoadedJsLibrariesEvent      => ShaclLoadedJsLibrariesEvent(e)
-    case e: config.SelectedParsePluginEvent         => SelectedParsePluginEvent(e)
-    case e: config.StartedTransformationStepEvent   => StartedTransformationStepEvent(e)
-    case e: config.StartingRenderToWriterEvent      => StartingRenderToWriterEvent(e)
+    case e: config.StartingParsingEvent            => new StartingParsingEvent(e)
+    case e: config.StartingContentParsingEvent     => new StartingContentParsingEvent(e)
+    case e: config.ParsedSyntaxEvent               => new ParsedSyntaxEvent(e)
+    case e: config.ParsedModelEvent                => new ParsedModelEvent(e)
+    case e: config.FinishedParsingEvent            => new FinishedParsingEvent(e)
+    case e: config.StartingTransformationEvent     => new StartingTransformationEvent(e)
+    case e: config.FinishedTransformationStepEvent => new FinishedTransformationStepEvent(e)
+    case e: config.FinishedTransformationEvent     => new FinishedTransformationEvent(e)
+    case e: config.StartingValidationEvent         => new StartingValidationEvent(e)
+    case e: config.FinishedValidationPluginEvent   => new FinishedValidationPluginEvent(e)
+    case e: config.FinishedValidationEvent         => new FinishedValidationEvent(e)
+    case e: config.StartingRenderingEvent          => new StartingRenderingEvent(e)
+    case e: config.FinishedRenderingASTEvent       => new FinishedRenderingASTEvent(e)
+    case e: config.FinishedRenderingSyntaxEvent    => new FinishedRenderingSyntaxEvent(e)
+    case e: config.DetectedSyntaxMediaTypeEvent    => DetectedSyntaxMediaTypeEvent(e)
+    case e: config.FoundReferencesEvent            => FoundReferencesEvent(e)
+    case e: config.SelectedParsePluginEvent        => SelectedParsePluginEvent(e)
+    case e: config.StartedTransformationStepEvent  => StartedTransformationStepEvent(e)
+    case e: config.StartingRenderToWriterEvent     => StartingRenderToWriterEvent(e)
   }
 }
 
@@ -201,43 +191,6 @@ class FinishedRenderingSyntaxEvent(private val _internal: config.FinishedRenderi
     extends ClientEvent(_internal) {
   def unit: BaseUnit = _internal.unit
 }
-
-@JSExportAll
-case class ShaclLoadedRdfDataModelEvent(private val _internal: config.ShaclLoadedRdfDataModelEvent)
-    extends ClientEvent(_internal) {}
-
-@JSExportAll
-case class ShaclLoadedRdfShapesModelEvent(private val _internal: config.ShaclLoadedRdfShapesModelEvent)
-    extends ClientEvent(_internal) {}
-
-@JSExportAll
-case class JenaLoadedModelEvent(private val _internal: config.JenaLoadedModelEvent) extends ClientEvent(_internal) {}
-
-@JSExportAll
-case class ShaclValidationStartedEvent(private val _internal: config.ShaclValidationStartedEvent)
-    extends ClientEvent(_internal) {}
-
-@JSExportAll
-case class ShaclValidationFinishedEvent(private val _internal: config.ShaclValidationFinishedEvent)
-    extends ClientEvent(_internal) {}
-
-@JSExportAll
-case class ShaclFinishedEvent(private val _internal: config.ShaclFinishedEvent) extends ClientEvent(_internal) {}
-
-@JSExportAll
-case class ShaclStartedEvent(private val _internal: config.ShaclStartedEvent) extends ClientEvent(_internal) {}
-
-@JSExportAll
-case class ShaclReportPrintingStartedEvent(private val _internal: config.ShaclReportPrintingStartedEvent)
-    extends ClientEvent(_internal) {}
-
-@JSExportAll
-case class ShaclReportPrintingFinishedEvent(private val _internal: config.ShaclReportPrintingFinishedEvent)
-    extends ClientEvent(_internal) {}
-
-@JSExportAll
-case class ShaclLoadedJsLibrariesEvent(private val _internal: config.ShaclLoadedJsLibrariesEvent)
-    extends ClientEvent(_internal) {}
 
 @JSExportAll
 case class SelectedParsePluginEvent(private val _internal: config.SelectedParsePluginEvent)

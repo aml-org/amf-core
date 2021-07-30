@@ -9,7 +9,6 @@ import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.model.domain.{AmfObject, DomainElement}
 import amf.core.client.common.validation.ProfileName
 import amf.core.client.scala.resource.ResourceLoader
-import amf.core.internal.rdf.RdfFramework
 import amf.core.internal.validation.core.ValidationSpecification
 import amf.core.client.scala.vocabulary.Namespace
 import org.mulesoft.common.io.{AsyncFile, FileSystem, SyncFile}
@@ -151,9 +150,6 @@ trait Platform extends FileMediaType {
 
   /** normalize path method for file fetching in amf compiler */
   def normalizePath(url: String): String
-
-  // Optional RdfFramework
-  var rdfFramework: Option[RdfFramework] = None
 
   /** Location where the helper functions for custom validations must be retrieved */
   protected def customValidationLibraryHelperLocation: String = "http://a.ml/amf/validation.js"

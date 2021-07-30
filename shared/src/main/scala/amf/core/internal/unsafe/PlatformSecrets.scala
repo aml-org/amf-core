@@ -1,72 +1,16 @@
 package amf.core.internal.unsafe
 
-import amf.core.client.platform.execution.BaseExecutionEnvironment
 import amf.core.client.common.remote.Content
 import amf.core.client.scala.AMFGraphConfiguration
-import amf.core.client.scala.execution.ExecutionEnvironment
-import amf.core.client.scala.model.document.BaseUnit
-import amf.core.client.scala.rdf.RdfModel
 import amf.core.client.scala.resource.ResourceLoader
 import amf.core.internal.remote.{Platform, UnsupportedFileSystem}
-import amf.core.internal.validation.core.{
-  SHACLValidator,
-  ShaclValidationOptions,
-  ValidationReport,
-  ValidationSpecification
-}
+import amf.core.internal.validation.core.{ShaclValidationOptions, ValidationReport, ValidationSpecification}
 import org.mulesoft.common.io.FileSystem
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait PlatformSecrets {
   val platform: Platform = PlatformBuilder()
-}
-
-// TODO: Removed from core @modularization
-/*
-class TrunkDialectsRegistry(platform: Platform) extends PlatformDialectRegistry(platform) {
-  add(VocabularyLanguageDefinition)
-  add(DialectLanguageDefinition)
-
-  override def registerDialect(uri: String) = throw new Exception("Not supported in trunk platform")
-
-  override def registerDialect(uri: String, dialect: String) = throw new Exception("Not supported in trunk platform")
-}
- */
-
-class TrunkValidator extends SHACLValidator {
-  override def validate(data: String, dataMediaType: String, shapes: String, shapesMediaType: String)(
-      implicit executionContext: ExecutionContext) =
-    throw new Exception("Error, validation is not supported")
-
-  override def report(data: String, dataMediaType: String, shapes: String, shapesMediaType: String)(
-      implicit executionContext: ExecutionContext) =
-    throw new Exception("Error, validation is not supported")
-
-  /**
-    * Registers a library in the validator
-    *
-    * @param url
-    * @param code
-    * @return
-    */
-  override def registerLibrary(url: String, code: String): Unit =
-    throw new Exception("Error, validation is not supported")
-
-  override def validate(data: BaseUnit, shapes: Seq[ValidationSpecification], options: ShaclValidationOptions)(
-      implicit executionContext: ExecutionContext): Future[String] =
-    throw new Exception("Error, validation is not supported")
-
-  override def report(data: BaseUnit, shapes: Seq[ValidationSpecification], options: ShaclValidationOptions)(
-      implicit executionContext: ExecutionContext): Future[ValidationReport] =
-    throw new Exception("Error, validation is not supported")
-
-  override def emptyRdfModel(): RdfModel = throw new Exception("Error, validation is not supported")
-
-  override def shapes(shapes: Seq[ValidationSpecification], functionsUrl: String): RdfModel =
-    throw new Exception("Error, validation is not supported")
-
-  override def supportsJSFunctions: Boolean = false
 }
 
 case class TrunkPlatform(content: String,

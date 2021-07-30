@@ -3,7 +3,6 @@ package amf.core.internal.plugins.syntax
 import amf.core.client.common.{NormalPriority, PluginPriority}
 import amf.core.client.scala.render.AMFSyntaxRenderPlugin
 import amf.core.client.scala.parse.document.{ParsedDocument, SyamlParsedDocument}
-import amf.core.internal.rdf.RdfModelDocument
 import amf.core.internal.unsafe.PlatformSecrets
 import org.mulesoft.common.io.Output
 import org.yaml.model.YDocument
@@ -20,8 +19,6 @@ object SyamlSyntaxRenderPlugin extends AMFSyntaxRenderPlugin with PlatformSecret
           else JsonRender.render(ast, writer, options = JsonRenderOptions().withoutNonAsciiEncode)
           Some(writer)
         }
-      case input: RdfModelDocument if platform.rdfFramework.isDefined =>
-        platform.rdfFramework.get.rdfModelToSyntaxWriter(mediaType, input, writer)
       case _ => None
     }
   }

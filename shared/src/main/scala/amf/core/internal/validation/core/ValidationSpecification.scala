@@ -1,11 +1,10 @@
 package amf.core.internal.validation.core
 
 import amf.core.client.common.validation.SeverityLevels
-import SeverityLevels.VIOLATION
-import amf.core.client.scala.rdf.RdfModel
+import amf.core.client.common.validation.SeverityLevels.VIOLATION
+import amf.core.client.scala.vocabulary.Namespace
 import amf.core.internal.validation.core.ValidationSpecification.PARSER_SIDE_VALIDATION
 import amf.core.internal.validation.model.PropertyPath
-import amf.core.client.scala.vocabulary.{Namespace, ValueType}
 import org.yaml.model.YDocument.EntryBuilder
 
 case class FunctionConstraintParameter(path: String, datatype: String)
@@ -69,7 +68,6 @@ case class PropertyConstraint(ramlPropertyId: String,
                               `class`: Seq[String] = Seq(),
                               in: Seq[String] = Seq.empty,
                               custom: Option[(EntryBuilder, String) => Unit] = None,
-                              customRdf: Option[(RdfModel, String) => Any] = None,
                               /**
                                * for qualified constraints
                                */

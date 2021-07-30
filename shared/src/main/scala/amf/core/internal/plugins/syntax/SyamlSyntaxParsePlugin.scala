@@ -14,9 +14,7 @@ object SyamlSyntaxParsePlugin extends AMFSyntaxParsePlugin with PlatformSecrets 
 
   override def parse(text: CharSequence, mediaType: String, ctx: ParserContext): ParsedDocument = {
     if (text.length() == 0) SyamlParsedDocument(YDocument(YNode.Null))
-    else if ((mediaType == "application/ld+json" || mediaType == "application/json") && !ctx.parsingOptions.isAmfJsonLdSerialization && platform.rdfFramework.isDefined) {
-      platform.rdfFramework.get.syntaxToRdfModel(mediaType, text)
-    } else {
+    else {
       val parser = getFormat(mediaType) match {
         case "json" => JsonParserFactory.fromCharsWithSource(text, ctx.rootContextDocument)(ctx.eh)
         case _      => YamlParser(text, ctx.rootContextDocument)(ctx.eh).withIncludeTag("!include")

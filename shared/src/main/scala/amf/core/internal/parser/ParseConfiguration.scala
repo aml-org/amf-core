@@ -1,11 +1,10 @@
 package amf.core.internal.parser
 
-import amf.core.client.common.remote.Content
 import amf.core.client.scala.AMFGraphConfiguration
-import amf.core.client.scala.config.{AMFEvent, ParsingOptions, UnitCache}
+import amf.core.client.scala.config.ParsingOptions
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.parse.AMFParsePlugin
-import amf.core.internal.rdf.helper.{EntitiesFacade, SerializableAnnotationsFacade}
+import amf.core.internal.rdf.SerializableAnnotationsFacade
 import amf.core.internal.registries.{AMFRegistry, RegistryContext}
 
 import scala.collection.immutable
@@ -16,7 +15,6 @@ trait ParseConfiguration {
   def sortedParsePlugins: immutable.Seq[AMFParsePlugin]
   def parsingOptions: ParsingOptions
   def registryContext: RegistryContext
-  def entitiesFacade: EntitiesFacade
   def serializableAnnotationsFacade: SerializableAnnotationsFacade
 }
 
@@ -24,7 +22,6 @@ case class ParseConfig(config: AMFGraphConfiguration, eh: AMFErrorHandler) exten
   val sortedParsePlugins: immutable.Seq[AMFParsePlugin] = config.registry.plugins.parsePlugins.sorted
   val parsingOptions: ParsingOptions                    = config.options.parsingOptions
   lazy val registryContext: RegistryContext             = RegistryContext(config.getRegistry)
-  lazy val entitiesFacade                               = new EntitiesFacade(this)
   lazy val serializableAnnotationsFacade                = new SerializableAnnotationsFacade(this)
 }
 
@@ -40,6 +37,5 @@ case class LimitedParseConfig(eh: AMFErrorHandler) extends ParseConfiguration {
   override def sortedParsePlugins: immutable.Seq[AMFParsePlugin]            = Nil
   override def parsingOptions: ParsingOptions                               = ParsingOptions()
   override def registryContext: RegistryContext                             = RegistryContext(AMFRegistry.empty)
-  override def entitiesFacade: EntitiesFacade                               = new EntitiesFacade(this)
   override def serializableAnnotationsFacade: SerializableAnnotationsFacade = new SerializableAnnotationsFacade(this)
 }
