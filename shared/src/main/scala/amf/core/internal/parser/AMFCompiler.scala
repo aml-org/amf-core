@@ -155,7 +155,7 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
   private[amf] def parseReferences(root: Root, domainPlugin: AMFParsePlugin)(
       implicit executionContext: ExecutionContext): Future[Root] = {
     val handler      = domainPlugin.referenceHandler(compilerContext.compilerConfig.eh)
-    val allowedSpecs = domainPlugin.validSpecsToReference :+ domainPlugin.spec
+    val allowedSpecs = domainPlugin.validSpecsToReference
     val refs         = handler.collect(root.parsed, compilerContext.parserContext)
     notifyEvent(FoundReferencesEvent(root.location, refs.toReferences.size))
     val parsed: Seq[Future[Option[ParsedReference]]] = refs.toReferences

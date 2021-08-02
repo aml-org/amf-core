@@ -5,7 +5,7 @@ import amf.core.internal.validation.ValidationConfiguration
 import amf.core.client.scala.AMFGraphConfiguration
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.common.validation.{AmfProfile, Async20Profile, Oas20Profile, Oas30Profile, ProfileName, Raml08Profile, Raml10Profile}
-import amf.core.internal.remote.Spec
+import amf.core.internal.remote.{AmlDialectSpec, Spec}
 import amf.core.internal.validation.core.ValidationProfile
 import amf.core.internal.validation.FailFastValidationRunner
 import amf.core.internal.plugins.validation.{ValidationInfo, ValidationOptions}
@@ -24,12 +24,19 @@ object VendorToProfile {
       Spec.AMF -> AmfProfile,
   )
 
-  def mapOrDefault(vendor: Spec): ProfileName = vendorProfileMapping.getOrElse(vendor, AmfProfile)
+  def mapOrDefault(spec: Spec): ProfileName = vendorProfileMapping
+    .get(spec)
+    .orElse(spec match {
+      case AmlDialectSpec(id) => Some(ProfileName(id))
+      case _ => None
+    })
+    .getOrElse(AmfProfile)
 }
 
 object AMFValidator {
 
   def validate(baseUnit: BaseUnit, conf: AMFGraphConfiguration): Future[AMFValidationReport] = {
+    // TODO ARM: ValidationProfile election shouldn't be done here.
     val profileName = baseUnit.sourceSpec.map(VendorToProfile.mapOrDefault).getOrElse(AmfProfile)
     val plugins = conf.registry.plugins.validatePlugins.filter(_.applies(ValidationInfo(baseUnit, profileName))).sorted
     val constraints = computeApplicableConstraints(profileName, conf.registry.constraintsRules)

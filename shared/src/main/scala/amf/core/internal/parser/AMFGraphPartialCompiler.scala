@@ -17,6 +17,7 @@ import amf.core.internal.plugins.document.graph.parser.{
   GraphDependenciesReferenceHandler,
   GraphParserContext
 }
+import amf.core.internal.remote.Spec.AMF
 import amf.core.internal.remote.{Mimes, Spec}
 
 class AMFGraphPartialCompiler(compilerContext: CompilerContext, startingPoint: String)
@@ -68,7 +69,12 @@ class AMFGraphPartialCompiler(compilerContext: CompilerContext, startingPoint: S
 
     override def priority: PluginPriority = HighPriority
 
-    override def spec: Spec = Spec.AMF
+    override def spec: Spec = AMF
+
+    /**
+      * media types which specifies vendors that may be referenced.
+      */
+    override def validSpecsToReference: Seq[Spec] = Seq(AMF)
   }
   private val parsePlugin = PartialGraphParsePlugin()
 
