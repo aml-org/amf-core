@@ -28,7 +28,7 @@ object Syntax {
 
   case object PlainText extends Syntax {
     override val extension: String = "txt"
-    override val mediaType: String = "text/plain"
+    override val mediaType: String = Mimes.`text/plain`
   }
 
   private val yamlMimes = Set(
@@ -37,19 +37,10 @@ object Syntax {
       `text/vnd.yaml`,
       `application/yaml`,
       `application/x-yaml`,
-      `application/raml+yaml`,
-      `application/openapi+yaml`,
-      `application/swagger+yaml`,
-      `application/asyncapi+yaml`,
-      `application/async+yaml`
   )
 
   private val jsonMimes = Set(`application/json`,
-                              `application/raml+json`,
-                              `application/openapi+json`,
-                              `application/swagger+json`,
-                              `application/asyncapi+json`,
-                              `application/async+json`)
+                              `application/ld+json`)
 
   /** Attempt to resolve [[Syntax]] from [[Mimes]]. */
   def unapply(mime: Option[String]): Option[Syntax] = mime match {

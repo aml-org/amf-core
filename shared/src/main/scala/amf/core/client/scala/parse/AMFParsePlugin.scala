@@ -5,8 +5,15 @@ import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.parse.document.{ParserContext, ReferenceHandler}
 import amf.core.internal.parser.Root
 import amf.core.internal.plugins.AMFPlugin
+import amf.core.internal.remote.Spec
+
+import scala.collection.GenTraversableOnce
 
 trait AMFParsePlugin extends AMFPlugin[Root] {
+
+  def spec: Spec
+
+  override val id: String = spec.id
 
   def parse(document: Root, ctx: ParserContext): BaseUnit
 
@@ -18,7 +25,7 @@ trait AMFParsePlugin extends AMFPlugin[Root] {
   /**
     * media types which specifies vendors that may be referenced.
     */
-  def validMediaTypesToReference: Seq[String]
+  def validSpecsToReference: Seq[Spec] = Nil
 
   def referenceHandler(eh: AMFErrorHandler): ReferenceHandler
 

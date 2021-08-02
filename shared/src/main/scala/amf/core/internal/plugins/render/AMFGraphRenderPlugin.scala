@@ -33,7 +33,6 @@ object AMFGraphRenderPlugin extends AMFRenderPlugin {
 
   override def mediaTypes: Seq[String] = Seq(
       `application/ld+json`,
-      `application/amf+json`,
       `application/graph`
   )
 

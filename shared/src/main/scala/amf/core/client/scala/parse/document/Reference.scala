@@ -4,6 +4,7 @@ import amf.core.client.scala.exception.CyclicReferenceException
 import amf.core.client.scala.model.document.RecursiveUnit
 import amf.core.client.scala.parse.document
 import amf.core.internal.parser.{AMFCompiler, CompilerContext}
+import amf.core.internal.remote.Spec
 import amf.core.internal.unsafe.PlatformSecrets
 import org.yaml.model.YNode
 
@@ -17,7 +18,7 @@ case class Reference(url: String, refs: Seq[RefContainer]) extends PlatformSecre
     copy(refs = refs :+ RefContainer(kind, ast, fragment))
   }
 
-  def resolve(compilerContext: CompilerContext, allowedMediaTypes: Seq[String], allowRecursiveRefs: Boolean)(
+  def resolve(compilerContext: CompilerContext, allowedSpecs: Seq[Spec], allowRecursiveRefs: Boolean)(
       implicit executionContext: ExecutionContext): Future[ReferenceResolutionResult] = {
     // If there is any ReferenceResolver attached to the environment, then first try to get the cached reference if it exists. If not, load and parse as usual.
     try {
@@ -27,24 +28,22 @@ case class Reference(url: String, refs: Seq[RefContainer]) extends PlatformSecre
           resolver.fetch(compilerContext.resolvePath(url)) flatMap { cachedReference =>
             Future(ReferenceResolutionResult(None, Some(cachedReference.content)))
           } recoverWith {
-            case _ => resolveReference(compilerContext, allowedMediaTypes, allowRecursiveRefs)
+            case _ => resolveReference(compilerContext, allowedSpecs, allowRecursiveRefs)
           }
-        case None => resolveReference(compilerContext, allowedMediaTypes, allowRecursiveRefs)
+        case None => resolveReference(compilerContext, allowedSpecs, allowRecursiveRefs)
       }
     } catch {
-      case _: Throwable => resolveReference(compilerContext, allowedMediaTypes, allowRecursiveRefs)
+      case _: Throwable => resolveReference(compilerContext, allowedSpecs, allowRecursiveRefs)
     }
   }
 
-  private def resolveReference(
-      compilerContext: CompilerContext,
-      allowedMediaTypes: Seq[String],
-      allowRecursiveRefs: Boolean)(implicit executionContext: ExecutionContext): Future[ReferenceResolutionResult] = {
+  private def resolveReference(compilerContext: CompilerContext, allowedSpecs: Seq[Spec], allowRecursiveRefs: Boolean)(
+      implicit executionContext: ExecutionContext): Future[ReferenceResolutionResult] = {
     val kinds = refs.map(_.linkType).distinct
     val kind  = if (kinds.size > 1) UnspecifiedReference else kinds.head
     try {
-      val context = compilerContext.forReference(url, allowedMediaTypes = Some(allowedMediaTypes))
-      val res: Future[Future[ReferenceResolutionResult]] = AMFCompiler.forContext(context, None, kind).build() map {
+      val context = compilerContext.forReference(url, allowedSpecs = allowedSpecs)
+      val res: Future[Future[ReferenceResolutionResult]] = AMFCompiler.forContext(context, kind).build() map {
         eventualUnit =>
           Future(document.ReferenceResolutionResult(None, Some(eventualUnit)))
       } recover {

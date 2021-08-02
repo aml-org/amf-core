@@ -54,7 +54,7 @@ case class UnknownSpec(override val id: String) extends Spec {
 }
 
 case class AmlDialectSpec(override val id: String) extends Spec {
-  override val mediaType: String = "application/aml"
+  override val mediaType: String = `application/yaml`
 }
 
 private[amf] trait Raml extends Spec {
@@ -87,42 +87,42 @@ private[amf] case object Aml extends Spec {
 
   override def toString: String = id.trim
 
-  override val mediaType: String = "application/aml"
+  override val mediaType: String = `application/yaml`
 }
 
 private[amf] case object Oas20 extends Oas {
   override def version: String = "2.0"
 
-  override val mediaType: String = "application/oas20"
+  override val mediaType: String = `application/json`
 }
 
 private[amf] case object Oas30 extends Oas {
   override def version: String = "3.0"
 
-  override val mediaType: String = "application/openapi30"
+  override val mediaType: String = `application/yaml`
 }
 
 private[amf] case object Raml08 extends Raml {
   override def version: String   = "0.8"
-  override val mediaType: String = "application/raml08"
+  override val mediaType: String = `application/yaml`
 }
 
 private[amf] case object Raml10 extends Raml {
   override def version: String = "1.0"
 
-  override val mediaType: String = "application/raml10"
+  override val mediaType: String = `application/yaml`
 }
 
 private[amf] case object AsyncApi extends Async {
   override def version: String = ""
 
-  override val mediaType: String = `application/asyncapi`
+  override val mediaType: String = `application/yaml`
 }
 
 private[amf] case object AsyncApi20 extends Async {
   override def version: String = "2.0"
 
-  override val mediaType: String = "application/asyncapi20"
+  override val mediaType: String = `application/yaml`
 
 }
 
@@ -142,7 +142,13 @@ private[amf] case object Payload extends Spec {
 private[amf] case object JsonSchema extends Spec {
   override val id: String = "JSON Schema"
 
-  override val mediaType: String = "application/schema+json"
+  override val mediaType: String = `application/json`
 
   override def toString: String = id.trim
+}
+
+// keep private?
+private[amf] case object JSONRefs extends Spec {
+  override val id: String        = "JSON + Refs"
+  override val mediaType: String = `application/json`
 }

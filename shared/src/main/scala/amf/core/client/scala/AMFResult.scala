@@ -16,7 +16,7 @@ case class AMFResult(baseUnit: BaseUnit, results: Seq[AMFValidationResult]) exte
 
 class AMFParseResult(override val baseUnit: BaseUnit, override val results: Seq[AMFValidationResult])
     extends AMFResult(baseUnit, results) {
-  def rootSpec: Spec = baseUnit.sourceVendor.getOrElse(Amf)
+  def rootSpec: Spec = baseUnit.sourceSpec.getOrElse(Amf)
 }
 
 class AMFObjectResult(val element: AmfObject, results: Seq[AMFValidationResult]) extends ReportConformance(results)

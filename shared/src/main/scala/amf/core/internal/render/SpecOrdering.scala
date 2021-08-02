@@ -1,6 +1,6 @@
 package amf.core.internal.render
 
-import amf.core.internal.annotations.SourceVendor
+import amf.core.internal.annotations.SourceSpec
 import amf.core.internal.parser.domain.Annotations
 import amf.core.internal.remote.{Amf, Async, Oas, Raml, Spec}
 import amf.core.internal.render.emitters.Emitter
@@ -25,9 +25,9 @@ object SpecOrdering {
   }
 
   def ordering(target: Spec, annotations: Annotations): SpecOrdering = {
-    annotations.find(classOf[SourceVendor]) match {
-      case Some(SourceVendor(source)) if source == Amf || equivalent(source, target) => Lexical
-      case _                                                                         => Default
+    annotations.find(classOf[SourceSpec]) match {
+      case Some(SourceSpec(source)) if source == Amf || equivalent(source, target) => Lexical
+      case _                                                                       => Default
     }
   }
 

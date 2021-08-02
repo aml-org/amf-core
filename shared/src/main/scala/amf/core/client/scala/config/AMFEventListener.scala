@@ -30,9 +30,8 @@ protected[amf] trait GroupedEvent { event: AMFEvent =>
 /**
   * every client invocation to the parsing logic
   * @param url URL of the top level document being parsed
-  * @param mediaType optional media type passed in the invocation
   */
-case class StartingParsingEvent(url: String, mediaType: Option[String]) extends AMFEvent with GroupedEvent {
+case class StartingParsingEvent(url: String) extends AMFEvent with GroupedEvent {
   override val name: String     = StartedParse
   override val groupKey: String = url
 }
@@ -131,12 +130,12 @@ case class FinishedValidationEvent(result: AMFValidationReport) extends AMFEvent
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Render Events ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-case class StartingRenderToWriterEvent(unit: BaseUnit, mediaType: String) extends AMFEvent with GroupedEvent {
+case class StartingRenderToWriterEvent(unit: BaseUnit, mediaType: Option[String]) extends AMFEvent with GroupedEvent {
   override val name: String     = StartedRenderToWriter
   override val groupKey: String = unit.id
 }
 
-case class StartingRenderingEvent(unit: BaseUnit, plugin: AMFRenderPlugin, mediaType: String)
+case class StartingRenderingEvent(unit: BaseUnit, plugin: AMFRenderPlugin, mediaType: Option[String])
     extends AMFEvent
     with GroupedEvent {
   override val name: String     = StartedRender

@@ -9,7 +9,7 @@ import amf.core.client.scala.parse.AMFParsePlugin
 import amf.core.client.scala.parse.document.{ParserContext, ReferenceHandler, SyamlParsedDocument}
 import amf.core.internal.rdf.{RdfModelDocument, RdfModelParser}
 import amf.core.internal.parser.Root
-import amf.core.internal.remote.Spec
+import amf.core.internal.remote.{Mimes, Spec}
 import amf.core.internal.plugins.document.graph.parser.{
   EmbeddedGraphParser,
   FlattenedUnitGraphParser,
@@ -18,7 +18,7 @@ import amf.core.internal.plugins.document.graph.parser.{
 
 object AMFGraphParsePlugin extends AMFParsePlugin {
 
-  override val id: String = Spec.AMF.id
+  override def spec: Spec = Spec.AMF
 
   override def applies(element: Root): Boolean = element.parsed match {
     case parsed: SyamlParsedDocument =>
@@ -40,16 +40,7 @@ object AMFGraphParsePlugin extends AMFParsePlugin {
     case _ => throw UnsupportedParsedDocumentException
   }
 
-  override def mediaTypes: Seq[String] = Seq(
-      "application/graph",
-      "application/ld+json",
-      "application/graph+jsonld",
-      "application/amf",
-      "application/amf+json",
-      "application/amf+jsonld"
-  )
-
-  override def validMediaTypesToReference: Seq[String] = Seq.empty
+  override def mediaTypes: Seq[String] = Seq(Mimes.`application/ld+json`, Mimes.`application/graph`)
 
   override def referenceHandler(eh: AMFErrorHandler): ReferenceHandler = GraphDependenciesReferenceHandler
 

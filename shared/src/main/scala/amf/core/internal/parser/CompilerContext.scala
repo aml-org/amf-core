@@ -3,7 +3,7 @@ package amf.core.internal.parser
 import amf.core.client.common.remote.Content
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.parse.document.ParserContext
-import amf.core.internal.remote.{Cache, Context, Platform}
+import amf.core.internal.remote.{Cache, Context, Platform, Spec}
 import amf.core.internal.utils.AmfStrings
 import amf.core.internal.validation.core.ValidationSpecification
 import org.yaml.model.YPart
@@ -14,7 +14,7 @@ class CompilerContext(val url: String,
                       val parserContext: ParserContext,
                       val compilerConfig: CompilerConfiguration,
                       val fileContext: Context,
-                      val allowedMediaTypes: Option[Seq[String]],
+                      val allowedSpecs: Seq[Spec],
                       cache: Cache) {
 
   implicit val executionContext: ExecutionContext = compilerConfig.executionContext
@@ -35,16 +35,15 @@ class CompilerContext(val url: String,
 
   def fetchContent(): Future[Content] = compilerConfig.resolveContent(location)
 
-  def forReference(refUrl: String, allowedMediaTypes: Option[Seq[String]] = None)(
+  def forReference(refUrl: String, allowedSpecs: Seq[Spec] = Seq.empty)(
       implicit executionContext: ExecutionContext): CompilerContext = {
 
-    val builder = new CompilerContextBuilder(refUrl, fileContext.platform, compilerConfig)
+    new CompilerContextBuilder(refUrl, fileContext.platform, compilerConfig)
       .withFileContext(fileContext)
       .withBaseParserContext(parserContext)
       .withCache(cache)
-
-    allowedMediaTypes.foreach(builder.withAllowedMediaTypes)
-    builder.build()
+      .withAllowedSpecs(allowedSpecs)
+      .build()
   }
 
   def violation(id: ValidationSpecification, node: String, message: String, ast: YPart): Unit =

@@ -8,23 +8,18 @@ import amf.core.internal.parser.Root
 
 trait DomainParsingFallback {
 
-  def chooseFallback(root: Root, mediaType: Option[String], availablePlugins: Seq[AMFParsePlugin]): BaseUnit
+  def chooseFallback(root: Root, availablePlugins: Seq[AMFParsePlugin]): BaseUnit
 }
 
 object ExternalFragmentDomainFallback extends DomainParsingFallback {
-  override def chooseFallback(root: Root, mediaType: Option[String], availablePlugins: Seq[AMFParsePlugin]): BaseUnit = {
-    mediaType match {
-      case Some(definedVendor) =>
-        throw new UnsupportedVendorException(definedVendor)
-      case None =>
-        ExternalFragment()
-          .withId(root.location)
-          .withLocation(root.location)
-          .withEncodes(
-              ExternalDomainElement()
-                .withRaw(root.raw)
-                .withMediaType(root.mediatype))
-    }
+  override def chooseFallback(root: Root, availablePlugins: Seq[AMFParsePlugin]): BaseUnit = {
+    ExternalFragment()
+      .withId(root.location)
+      .withLocation(root.location)
+      .withEncodes(
+          ExternalDomainElement()
+            .withRaw(root.raw)
+            .withMediaType(root.mediatype))
 
   }
 }

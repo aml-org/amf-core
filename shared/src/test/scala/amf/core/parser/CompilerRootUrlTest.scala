@@ -34,7 +34,7 @@ class CompilerRootUrlTest extends AsyncFunSuite with PlatformSecrets with Matche
     val context = new CompilerContextBuilder(url, platform, config.compilerConfiguration)
       .build()
 
-    new AMFCompiler(context, None).root().map { root =>
+    new AMFCompiler(context).root().map { root =>
       val document = root.parsed.asInstanceOf[SyamlParsedDocument]
       root.location shouldBe customUrl
       root.location shouldBe document.document.location.sourceName

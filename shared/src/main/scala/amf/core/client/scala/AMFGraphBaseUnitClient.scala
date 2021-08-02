@@ -1,8 +1,6 @@
 package amf.core.client.scala
 
-import amf.core.client.common.validation.ProfileName
 import amf.core.client.scala.model.document.BaseUnit
-import amf.core.client.common.transform.PipelineName
 import amf.core.client.scala.parse.AMFParser
 import amf.core.client.scala.parse.document.ParsedDocument
 import amf.core.client.scala.render.AMFRenderer
@@ -28,15 +26,6 @@ class AMFGraphBaseUnitClient private[amf] (protected val configuration: AMFGraph
     * @return A CompletableFuture of [[AMFResult]]
     */
   def parse(url: String): Future[AMFParseResult] = AMFParser.parse(url, configuration)
-
-  /**
-    * Asynchronously generate a BaseUnit from the content located in the given url.
-    * @param url Location of the file to parse
-    * @param mediaType The nature and format of the given content. Must be <code>"application/spec"</code> or <code>"application/spec+syntax"</code>.
-    *                  Examples: <code>"application/raml10"</code> or <code>"application/raml10+yaml"</code>
-    * @return A CompletableFuture of [[AMFResult]]
-    */
-  def parse(url: String, mediaType: String): Future[AMFParseResult] = AMFParser.parse(url, mediaType, configuration)
 
   /**
     * Asynchronously generate a BaseUnit from a given string.

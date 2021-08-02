@@ -1,5 +1,5 @@
 package amf.core.client.scala.model
-import amf.core.internal.annotations.{ErrorDeclaration, SourceVendor}
+import amf.core.internal.annotations.{ErrorDeclaration, SourceSpec}
 import amf.core.internal.metamodel.domain.DomainElementModel
 import amf.core.internal.metamodel.{Field, ModelDefaultBuilder, Obj}
 import amf.core.client.scala.model.document.Document
@@ -61,10 +61,10 @@ class ModelCloneTest extends FunSuite with ElementsFixture with Matchers {
   }
 
   test("Test annotations at object") {
-    objectNode.annotations += SourceVendor(Raml10)
+    objectNode.annotations += SourceSpec(Raml10)
     val cloned = objectNode.cloneElement(mutable.Map.empty).asInstanceOf[ObjectNode]
 
-    cloned.annotations.contains(classOf[SourceVendor]) should be(true)
+    cloned.annotations.contains(classOf[SourceSpec]) should be(true)
   }
 
   test("Test clone document with duplicated ids") {

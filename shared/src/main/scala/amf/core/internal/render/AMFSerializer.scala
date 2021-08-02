@@ -25,19 +25,20 @@ import org.yaml.model.{YDocument, YNode}
 import java.io.StringWriter
 import scala.concurrent.{ExecutionContext, Future}
 
-class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfiguration) extends PlatformSecrets {
+class AMFSerializer(unit: BaseUnit, config: RenderConfiguration, mediaType: Option[String]) extends PlatformSecrets {
 
-  private val mediaTypeExp = new MediaTypeParser(mediaType)
-  private val options      = config.renderOptions
+  private val options = config.renderOptions
 
-  def renderAsYDocument(renderPlugin: AMFRenderPlugin): SyamlParsedDocument = {
+  case class RenderResult(document: SyamlParsedDocument, syntax: String)
+
+  def renderAsYDocument(renderPlugin: AMFRenderPlugin): RenderResult = {
 
     val builder = new YDocumentBuilder
     notifyEvent(StartingRenderingEvent(unit, renderPlugin, mediaType))
     if (renderPlugin.emit(unit, builder, config)) {
       val result = SyamlParsedDocument(builder.result.asInstanceOf[YDocument])
       notifyEvent(FinishedRenderingASTEvent(unit, result))
-      result
+      RenderResult(result, mediaType.getOrElse(renderPlugin.defaultSyntax()))
     } else throw new Exception(s"Error unparsing syntax $mediaType with domain plugin ${renderPlugin.id}")
   }
 
@@ -55,15 +56,13 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfigurati
 
   private def render[W: Output](writer: W): Unit = {
     notifyEvent(StartingRenderToWriterEvent(unit, mediaType))
-    if (mediaType == `application/ld+json`) emitJsonldToWriter(writer)
+    if (mediaType.contains(`application/ld+json`)) emitJsonldToWriter(writer)
     else {
       val renderPlugin = getRenderPlugin
-      val ast          = renderAsYDocument(renderPlugin)
-      getSyntaxPlugin(ast, mediaType)
-        .orElse(mediaTypeExp.getSyntaxExp.flatMap(syntax => getSyntaxPlugin(ast, syntax)))
-        .orElse(getSyntaxPlugin(ast, renderPlugin.defaultSyntax())) match {
+      val renderResult = renderAsYDocument(renderPlugin)
+      getSyntaxPlugin(renderResult) match {
         case Some(syntaxPlugin) =>
-          syntaxPlugin.emit(mediaType, ast, writer)
+          syntaxPlugin.emit(renderResult.syntax, renderResult.document, writer)
           notifyEvent(FinishedRenderingSyntaxEvent(unit))
         case None if unit.isInstanceOf[ExternalFragment] =>
           writer.append(unit.asInstanceOf[ExternalFragment].encodes.raw.value())
@@ -73,17 +72,17 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfigurati
   }
 
   def renderAST: ParsedDocument = {
-    renderYDocumentWithPlugins
+    renderYDocumentWithPlugins.document
   }
 
-  private[amf] def renderYDocumentWithPlugins: SyamlParsedDocument = {
+  private[amf] def renderYDocumentWithPlugins: RenderResult = {
     val renderPlugin = getRenderPlugin
     renderAsYDocument(renderPlugin)
   }
 
-  private def getSyntaxPlugin(ast: SyamlParsedDocument, mediaType: String) = {
-    val candidates = config.syntaxPlugin.filter(_.mediaTypes.contains(mediaType))
-    candidates.find(_.applies(ast))
+  private def getSyntaxPlugin(renderResult: RenderResult) = {
+    val candidates = config.syntaxPlugin.filter(_.mediaTypes.contains(renderResult.syntax))
+    candidates.find(_.applies(renderResult.document))
   }
 
   private def emitJsonldToWriter[W: Output](writer: W): Unit = {
@@ -92,7 +91,7 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfigurati
   }
 
   private def emitRdf[W: Output](writer: W): Unit =
-    toRdfModelDoc.foreach(RdfSyntaxPlugin.unparse(mediaType, _, writer))
+    toRdfModelDoc.foreach(RdfSyntaxPlugin.unparse(mediaType.getOrElse(Mimes.`text/rdf+n3`), _, writer))
 
   private def toRdfModelDoc: Option[RdfModelDocument] = {
     platform.rdfFramework match {
@@ -112,7 +111,10 @@ class AMFSerializer(unit: BaseUnit, mediaType: String, config: RenderConfigurati
 
   private[amf] def getRenderPlugin: AMFRenderPlugin = {
     val renderPlugin =
-      config.renderPlugins.filter(_.mediaTypes.contains(mediaType)).sorted.find(_.applies(RenderInfo(unit, mediaType)))
+      config.renderPlugins
+        .filter(p => p.mediaTypes.exists(mt => mediaType.forall(_ == mt)))
+        .sorted
+        .find(p => p.applies(RenderInfo(unit, mediaType.getOrElse(p.defaultSyntax()))))
     renderPlugin.getOrElse {
       throw new Exception(s"Cannot serialize domain model '${unit.location()}' for media type $mediaType")
     }

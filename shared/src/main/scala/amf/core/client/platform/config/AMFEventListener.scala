@@ -102,8 +102,7 @@ abstract class ClientEvent(private val _internal: config.AMFEvent) extends AMFEv
   */
 @JSExportAll
 class StartingParsingEvent(private val _internal: config.StartingParsingEvent) extends ClientEvent(_internal) {
-  def url: String                     = _internal.url
-  def mediaType: ClientOption[String] = _internal.mediaType.asClient
+  def url: String = _internal.url
 }
 
 /**
@@ -186,8 +185,8 @@ class FinishedValidationEvent(private val _internal: config.FinishedValidationEv
 
 @JSExportAll
 class StartingRenderingEvent(private val _internal: config.StartingRenderingEvent) extends ClientEvent(_internal) {
-  def unit: BaseUnit    = _internal.unit
-  def mediaType: String = _internal.mediaType
+  def unit: BaseUnit                  = _internal.unit
+  def mediaType: ClientOption[String] = _internal.mediaType.asClient
 }
 
 @JSExportAll

@@ -1,7 +1,7 @@
 package amf.core.internal.parser
 
 import amf.core.client.scala.parse.document.ParserContext
-import amf.core.internal.remote.{Cache, Context, PathResolutionError, Platform}
+import amf.core.internal.remote.{Cache, Context, PathResolutionError, Platform, Spec}
 import amf.core.internal.utils.AmfStrings
 import amf.core.internal.validation.CoreValidations.UriSyntaxError
 
@@ -9,10 +9,10 @@ import java.net.URISyntaxException
 
 class CompilerContextBuilder(url: String, platform: Platform, compilerConfig: CompilerConfiguration) {
 
-  private var fileContext: Context                   = Context(platform)
-  private var cache                                  = Cache()
-  private var givenContent: Option[ParserContext]    = None
-  private var allowedMediaTypes: Option[Seq[String]] = None
+  private var fileContext: Context                = Context(platform)
+  private var cache                               = Cache()
+  private var givenContent: Option[ParserContext] = None
+  private var allowedSpecs: Seq[Spec]             = Nil
 
   def withFileContext(fc: Context): CompilerContextBuilder = {
     fileContext = fc
@@ -24,8 +24,8 @@ class CompilerContextBuilder(url: String, platform: Platform, compilerConfig: Co
     this
   }
 
-  def withAllowedMediaTypes(allowed: Seq[String]): CompilerContextBuilder = {
-    this.allowedMediaTypes = Some(allowed)
+  def withAllowedSpecs(allowed: Seq[Spec]): CompilerContextBuilder = {
+    this.allowedSpecs = allowed
     this
   }
 
@@ -57,6 +57,6 @@ class CompilerContextBuilder(url: String, platform: Platform, compilerConfig: Co
 
   def build(): CompilerContext = {
     val fc = buildFileContext()
-    new CompilerContext(url, buildParserContext(fc), compilerConfig, fc, allowedMediaTypes, cache)
+    new CompilerContext(url, buildParserContext(fc), compilerConfig, fc, allowedSpecs, cache)
   }
 }
