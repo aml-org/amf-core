@@ -1,6 +1,6 @@
 package amf.core.internal.plugins.render
 
-import amf.core.client.common.{NormalPriority, PluginPriority}
+import amf.core.client.common.{LowPriority, NormalPriority, PluginPriority}
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.vocabulary.{Namespace, NamespaceAliases}
 import amf.core.internal.plugins.document.graph.emitter.{EmbeddedJsonLdEmitter, FlattenedJsonLdEmitter}
@@ -38,5 +38,5 @@ object AMFGraphRenderPlugin extends AMFRenderPlugin {
 
   override def applies(element: RenderInfo): Boolean = true
 
-  override def priority: PluginPriority = NormalPriority
+  override def priority: PluginPriority = LowPriority
 }
