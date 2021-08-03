@@ -56,6 +56,10 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
     plugins.foldLeft(this) { case (registry, plugin) => registry.withPlugin(plugin) }
   }
 
+  def withFallback(plugin: DomainParsingFallback): PluginsRegistry = {
+    copy(domainParsingFallback = plugin)
+  }
+
   def removePlugin(id: String): PluginsRegistry =
     copy(
         parsePlugins = parsePlugins.filterNot(_.id == id),
@@ -69,5 +73,6 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin],
 object PluginsRegistry {
 
   /** Creates an empty PluginsRegistry */
-  val empty: PluginsRegistry = PluginsRegistry(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, ExternalFragmentDomainFallback)
+  val empty: PluginsRegistry =
+    PluginsRegistry(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, ExternalFragmentDomainFallback())
 }

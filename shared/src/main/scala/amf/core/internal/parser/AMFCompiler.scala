@@ -2,7 +2,11 @@ package amf.core.internal.parser
 
 import amf.core.client.common.remote.Content
 import amf.core.client.scala.config._
-import amf.core.client.scala.exception.{CyclicReferenceException, UnsupportedMediaTypeException}
+import amf.core.client.scala.exception.{
+  CyclicReferenceException,
+  UnsupportedMediaTypeException,
+  UnsupportedSyntaxForDocumentException
+}
 import amf.core.client.scala.model.document.{BaseUnit, ExternalFragment}
 import amf.core.client.scala.model.domain.ExternalDomainElement
 import amf.core.client.scala.parse.AMFParsePlugin
@@ -104,28 +108,24 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
   private def parseDomain(parsed: Either[Content, Root])(
       implicit executionContext: ExecutionContext): Future[BaseUnit] = {
     parsed match {
-      case Left(content)   => parseExternalFragment(content)
-      case Right(document) => parseDomain(document)
+      case Left(content) if isRoot => throw UnsupportedSyntaxForDocumentException(content.url)
+      case Left(content)           => parseExternalFragment(content)
+      case Right(document)         => parseDomain(document)
     }
   }
 
   private def isRoot = compilerContext.fileContext.history.length == 1
 
   private def parseDomain(document: Root)(implicit executionContext: ExecutionContext): Future[BaseUnit] = {
-    val domainPluginOption = getDomainPluginFor(document)
-    val futureDocument: Future[BaseUnit] = domainPluginOption match {
-      case Some(domainPlugin) =>
-        notifyEvent(SelectedParsePluginEvent(document.location, domainPlugin))
-        parseReferences(document, domainPlugin) map { documentWithReferences =>
-          val baseUnit =
-            domainPlugin.parse(documentWithReferences, compilerContext.parserContext.copyWithSonsReferences())
-          if (document.location == compilerContext.fileContext.root) baseUnit.withRoot(true)
-          baseUnit.withRaw(document.raw).tagReferences(documentWithReferences)
-        }
-      case None =>
-        Future.successful { compilerContext.compilerConfig.chooseFallback(document) }
-    }
-    futureDocument map { unit =>
+    val domainPlugin =
+      getDomainPluginFor(document).getOrElse(compilerContext.compilerConfig.chooseFallback(document, isRoot))
+    notifyEvent(SelectedParsePluginEvent(document.location, domainPlugin))
+    parseReferences(document, domainPlugin) map { documentWithReferences =>
+      val baseUnit =
+        domainPlugin.parse(documentWithReferences, compilerContext.parserContext.copyWithSonsReferences())
+      if (document.location == compilerContext.fileContext.root) baseUnit.withRoot(true)
+      baseUnit.withRaw(document.raw).tagReferences(documentWithReferences)
+    } map { unit =>
       // we setup the run for the parsed unit
       parsedModelEvent(unit)
       unit

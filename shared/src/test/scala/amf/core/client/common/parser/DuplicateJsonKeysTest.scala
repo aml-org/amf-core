@@ -2,6 +2,7 @@ package amf.core.client.common.parser
 
 import amf.core.internal.convert.NativeOps
 import amf.core.client.scala.AMFGraphConfiguration
+import amf.core.internal.plugins.parse.ExternalFragmentDomainFallback
 import amf.core.internal.unsafe.PlatformSecrets
 import org.scalatest.{AsyncFunSuite, Matchers}
 
@@ -11,9 +12,10 @@ trait DuplicateJsonKeysTest extends AsyncFunSuite with PlatformSecrets with Nati
 
   override implicit def executionContext: ExecutionContext = ExecutionContext.Implicits.global
 
+  // TODO ARM: change this to call directly a plugin or syaml
   test("Parsed JSON with duplicate keys has several warnings") {
 
-    val config = AMFGraphConfiguration.predefined()
+    val config = AMFGraphConfiguration.predefined().withFallback(ExternalFragmentDomainFallback(false))
     val url    = "file://shared/src/test/resources/parser/duplicate-key.json"
     config.baseUnitClient().parse(url).map { r =>
       val errors = r.results

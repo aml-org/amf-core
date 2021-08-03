@@ -13,7 +13,7 @@ case class StringResourceLoader(url: String, content: String, mediaType: Option[
   private val contentType =
     mediaType.getOrElse(if (content.trim.startsWith("{")) Mimes.`application/json` else Mimes.`application/yaml`)
 
-  private val _content = new Content(content, url, content)
+  private val _content = new Content(content, url, contentType)
 
   /** Fetch specified resource and return associated content. Resource should have benn previously accepted. */
   override def fetch(resource: String): Future[Content] = Future.successful(_content)

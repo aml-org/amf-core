@@ -17,7 +17,7 @@ import amf.core.internal.metamodel.ModelDefaultBuilder
 import amf.core.internal.parser.CompilerConfiguration
 import amf.core.internal.plugins.AMFPlugin
 import amf.core.internal.plugins.document.graph.entities.AMFGraphEntities
-import amf.core.internal.plugins.parse.AMFGraphParsePlugin
+import amf.core.internal.plugins.parse.{AMFGraphParsePlugin, DomainParsingFallback}
 import amf.core.internal.plugins.payload.DefaultShapePayloadValidatorFactory
 import amf.core.internal.plugins.render.{AMFGraphRenderPlugin, DefaultRenderConfiguration}
 import amf.core.internal.plugins.syntax.{SyamlSyntaxParsePlugin, SyamlSyntaxRenderPlugin}
@@ -105,6 +105,8 @@ class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: A
   def withUnitCache(cache: UnitCache): AMFGraphConfiguration =
     super._withUnitCache(cache)
 
+  def withFallback(plugin: DomainParsingFallback): AMFGraphConfiguration = super._withFallback(plugin)
+
   def withPlugin(amfPlugin: AMFPlugin[_]): AMFGraphConfiguration = super._withPlugin(amfPlugin)
 
   def withPlugins(plugins: List[AMFPlugin[_]]): AMFGraphConfiguration = super._withPlugins(plugins)
@@ -186,6 +188,9 @@ sealed abstract class BaseAMFConfigurationSetter(private[amf] val resolvers: AMF
 
   protected def _withPlugin[T](amfPlugin: AMFPlugin[_]): T =
     copy(registry = registry.withPlugin(amfPlugin)).asInstanceOf[T]
+
+  protected def _withFallback[T](plugin: DomainParsingFallback): T =
+    copy(registry = registry.withFallback(plugin)).asInstanceOf[T]
 
   protected def _withPlugins[T](plugins: List[AMFPlugin[_]]): T =
     copy(registry = registry.withPlugins(plugins)).asInstanceOf[T]

@@ -30,6 +30,8 @@ private[amf] case class AMFRegistry(plugins: PluginsRegistry,
 
   def withPlugins(amfPlugins: List[AMFPlugin[_]]): AMFRegistry = copy(plugins = plugins.withPlugins(amfPlugins))
 
+  def withFallback(plugin: DomainParsingFallback): AMFRegistry = copy(plugins = plugins.withFallback(plugin))
+
   def withConstraints(profile: ValidationProfile): AMFRegistry =
     copy(constraintsRules = constraintsRules + (profile.name -> profile))
 

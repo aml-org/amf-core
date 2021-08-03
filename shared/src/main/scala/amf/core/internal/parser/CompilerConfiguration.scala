@@ -27,9 +27,9 @@ case class CompilerConfiguration(private val config: AMFGraphConfiguration) {
   val sortedParseSyntax: immutable.Seq[AMFSyntaxParsePlugin] = config.registry.plugins.syntaxParsePlugins.sorted
   def notifyEvent(e: AMFEvent): Unit                         = config.listeners.foreach(_.notifyEvent(e))
 
-  def chooseFallback(document: Root): BaseUnit = {
+  def chooseFallback(document: Root, isRoot: Boolean): AMFParsePlugin = {
     val fallback = config.registry.plugins.domainParsingFallback
-    fallback.chooseFallback(document, sortedParsePlugins)
+    fallback.chooseFallback(document, sortedParsePlugins, isRoot)
   }
 
   def getUnitsCache: Option[UnitCache] = config.getUnitsCache
