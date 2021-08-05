@@ -1,11 +1,13 @@
 package amf.core.client.scala
 
 import amf.core.client.scala.model.document.BaseUnit
+import amf.core.client.scala.model.domain.AmfObject
 import amf.core.client.scala.parse.AMFParser
 import amf.core.client.scala.parse.document.ParsedDocument
 import amf.core.client.scala.render.AMFRenderer
 import amf.core.client.scala.transform.AMFTransformer
 import amf.core.client.scala.validation.{AMFValidationReport, AMFValidator}
+import amf.core.internal.adoption.IdAdopter
 import org.yaml.builder.DocBuilder
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -106,4 +108,7 @@ class AMFGraphBaseUnitClient private[amf] (protected val configuration: AMFGraph
     * @return an [[AMFValidationReport]]
     */
   def validate(bu: BaseUnit): Future[AMFValidationReport] = AMFValidator.validate(bu, configuration)
+
+  /** defines base uri of the BaseUnit, adopting ids of all nested nodes. */
+  def setBaseUri(unit: BaseUnit, base: String): Unit = new IdAdopter(unit, base).adoptFromRoot()
 }

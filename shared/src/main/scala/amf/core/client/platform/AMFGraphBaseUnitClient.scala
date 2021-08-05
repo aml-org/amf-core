@@ -1,6 +1,7 @@
 package amf.core.client.platform
 
 import amf.core.client.common.validation.ProfileName
+import amf.core.client.platform.model.AmfObjectWrapper
 import amf.core.client.platform.model.document.BaseUnit
 import amf.core.client.platform.validation.AMFValidationReport
 import amf.core.client.scala.{AMFGraphBaseUnitClient => InternalAMFGraphBaseUnitClient}
@@ -93,4 +94,7 @@ class AMFGraphBaseUnitClient private[amf] (private val _internal: InternalAMFGra
     * @return an [[AMFValidationReport]]
     */
   def validate(bu: BaseUnit): ClientFuture[AMFValidationReport] = _internal.validate(bu).asClient
+
+  /** defines base uri of the BaseUnit, adopting ids of all nested nodes. */
+  def setBaseUri(unit: BaseUnit, base: String): Unit = _internal.setBaseUri(unit, base)
 }

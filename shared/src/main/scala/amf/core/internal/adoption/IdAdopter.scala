@@ -9,52 +9,52 @@ import amf.core.internal.utils.IdCounter
 import org.mulesoft.common.collections.FilterType
 import scala.collection.mutable
 
-class IdAdopter(root: AmfElement, rootId: String) {
+class IdAdopter(root: AmfObject, rootId: String) {
 
   val visited: mutable.Map[String, AmfObject] = mutable.Map.empty
   val idGenerator                             = new IdCounter()
 
-  def adopt(): Unit = {
-    root match {
-      case obj: AmfObject =>
-        val fieldOrdering = getFieldOrdering(obj)
-        obj.withId(rootId)
-        visited += obj.id -> obj
-        while (fieldOrdering.hasPendingFields) adoptInner(fieldOrdering.nextField(), rootId)
-      case _ => // Nothing to do
-    }
+  def adoptFromRoot(): Unit     = adopt(isRoot = true)
+  def adoptFromRelative(): Unit = adopt(isRoot = false)
+
+  private def adopt(isRoot: Boolean): Unit = {
+    adoptInnerElement(root, rootId, isRoot)
     visited.values.filterType[AdoptionDependantCalls].foreach(_.run())
   }
 
-  private def adoptInner(field: FieldEntry, parentId: String): Unit =
-    if (isAllowedField(field.field)) adoptInnerElement(field.element, parentId, detectName(field))
+  private def adoptInner(field: FieldEntry, parentId: String): Unit = {
+    val generatedId = makeId(parentId, relativeName(field))
+    adoptInnerElement(field.element, generatedId)
+  }
 
-  private def adoptInnerElement(element: AmfElement, parent: String, name: String): Unit = {
-    val id = makeId(parent, name)
+  private def adoptInnerElement(element: AmfElement, elementId: String, isRoot: Boolean = false): Unit = {
     element match {
       case obj: AmfObject =>
         if (notVisited(obj)) {
           val fieldOrdering = getFieldOrdering(obj)
-          obj.withId(id)
+          obj.withId(elementId)
           visited += obj.id -> obj
-          while (fieldOrdering.hasPendingFields) adoptInner(fieldOrdering.nextField(), id)
+          while (fieldOrdering.hasPendingFields) adoptInner(fieldOrdering.nextField(),
+                                                            parentId = elementId + withFragment(isRoot))
         }
       case array: AmfArray =>
         array.values.zipWithIndex.foreach {
           // TODO check to change the default 'i' with something more meaningful
           case (item, i) =>
-            adoptInnerElement(item, id, detectName(item).getOrElse(i.toString))
+            adoptInnerElement(item, makeId(elementId, componentId(item).getOrElse(i.toString)))
         }
       case _ => // Nothing to do
     }
   }
 
+  private def withFragment(isRoot: Boolean) = if (isRoot) "#" else ""
+
   private def notVisited(obj: AmfObject): Boolean = !visited.contains(obj.id)
 
-  private def detectName(field: FieldEntry): String = detectName(field.element).getOrElse(field.field.doc.displayName)
+  private def relativeName(field: FieldEntry): String =
+    componentId(field.element).getOrElse(field.field.doc.displayName)
 
-  private def detectName(element: AmfElement): Option[String] = element match {
-//    case named: NamedDomainElement if named.name.nonEmpty => Some(named.name.value()) -> leads to duplicate ids
+  private def componentId(element: AmfElement): Option[String] = element match {
     case obj: AmfObject if obj.componentId.nonEmpty => Some(obj.componentId.stripPrefix("/"))
     case _                                          => None
   }
@@ -70,10 +70,4 @@ class IdAdopter(root: AmfElement, rootId: String) {
     case other       => new GenericFieldAdoptionOrdering(other)
   }
 
-  // List of fields to avoid link adoption
-  private val blockedFields = Seq(
-//      LinkableElementModel.Target -> there where links that where only referenced from a single target
-  )
-
-  private def isAllowedField(field: Field) = !blockedFields.contains(field)
 }

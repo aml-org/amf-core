@@ -126,7 +126,7 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
         domainPlugin.parse(documentWithReferences, compilerContext.parserContext.copyWithSonsReferences())
       if (document.location == compilerContext.fileContext.root) baseUnit.withRoot(true)
       baseUnit.withRaw(document.raw).tagReferences(documentWithReferences)
-      if (isRoot && domainPlugin.withIdAdoption) new IdAdopter(baseUnit, document.location).adopt()
+      if (isRoot && domainPlugin.withIdAdoption) new IdAdopter(baseUnit, document.location).adoptFromRoot()
       baseUnit
     } map { unit =>
       // we setup the run for the parsed unit

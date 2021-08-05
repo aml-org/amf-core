@@ -7,5 +7,8 @@ trait AdoptionDependantCalls {
   private var afterAdoption: Option[() => Unit] = None
 
   private[amf] def callAfterAdoption(func: () => Unit): Unit = afterAdoption = Some(func)
-  private[amf] def run(): Unit                               = afterAdoption.foreach(_.apply())
+  private[amf] def run(): Unit = {
+    afterAdoption.foreach(_.apply())
+    afterAdoption = None
+  }
 }
