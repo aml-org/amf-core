@@ -1,9 +1,8 @@
 package amf.core.internal.adoption
 
 import amf.core.client.scala.model.document.BaseUnit
-import amf.core.client.scala.model.domain.{AmfArray, AmfElement, AmfObject, NamedDomainElement}
-import amf.core.internal.metamodel.Field
-import amf.core.internal.metamodel.domain.LinkableElementModel
+import amf.core.client.scala.model.domain.{AmfArray, AmfElement, AmfObject}
+import amf.core.internal.utils.AmfStrings
 import amf.core.internal.parser.domain.FieldEntry
 import amf.core.internal.utils.IdCounter
 import org.mulesoft.common.collections.FilterType
@@ -52,7 +51,7 @@ class IdAdopter(root: AmfObject, rootId: String) {
   private def notVisited(obj: AmfObject): Boolean = !visited.contains(obj.id)
 
   private def relativeName(field: FieldEntry): String =
-    componentId(field.element).getOrElse(field.field.doc.displayName)
+    componentId(field.element).getOrElse(field.field.doc.displayName.urlComponentEncoded)
 
   private def componentId(element: AmfElement): Option[String] = element match {
     case obj: AmfObject if obj.componentId.nonEmpty => Some(obj.componentId.stripPrefix("/"))

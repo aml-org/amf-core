@@ -21,7 +21,7 @@ case class ExternalDomainElement(fields: Fields, annotations: Annotations) exten
   var parsed: Option[YNode] = None
 
   /** Value , path + field value that is used to compose the id when the object its adopted */
-  private[amf] override def componentId: String = "#/external"
+  private[amf] override def componentId: String = "/external"
 }
 
 object ExternalDomainElement {
