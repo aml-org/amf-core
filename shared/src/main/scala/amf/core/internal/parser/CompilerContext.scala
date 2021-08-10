@@ -6,7 +6,7 @@ import amf.core.client.scala.parse.document.ParserContext
 import amf.core.internal.remote.{Cache, Context, Platform, Spec}
 import amf.core.internal.utils.AmfStrings
 import amf.core.internal.validation.core.ValidationSpecification
-import org.yaml.model.YPart
+import org.mulesoft.lexer.SourceLocation
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -46,8 +46,9 @@ class CompilerContext(val url: String,
       .build()
   }
 
-  def violation(id: ValidationSpecification, node: String, message: String, ast: YPart): Unit =
-    compilerConfig.eh.violation(id, node, message, ast)
+  def violation(id: ValidationSpecification, node: String, message: String, location: SourceLocation): Unit =
+    compilerConfig.eh.violation(id, node, message, location)
 
-  def violation(id: ValidationSpecification, message: String, ast: YPart): Unit = violation(id, "", message, ast)
+  def violation(id: ValidationSpecification, message: String, location: SourceLocation): Unit =
+    violation(id, "", message, location)
 }

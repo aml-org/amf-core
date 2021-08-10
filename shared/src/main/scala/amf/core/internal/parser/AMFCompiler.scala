@@ -161,7 +161,6 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
     val parsed: Seq[Future[Option[ParsedReference]]] = refs.toReferences
       .filter(_.isRemote)
       .map { link =>
-        val nodes = link.refs.map(_.node)
         link.resolve(compilerContext, allowedSpecs, domainPlugin.allowRecursiveReferences) flatMap {
           case ReferenceResolutionResult(_, Some(unit)) =>
             val reference = ParsedReference(unit, link)

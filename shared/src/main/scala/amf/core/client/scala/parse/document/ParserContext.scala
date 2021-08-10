@@ -6,9 +6,17 @@ import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.parse.document
 import amf.core.internal.parser.ParseConfiguration
 import amf.core.internal.parser.domain.FutureDeclarations
+import amf.core.internal.plugins.syntax.SYamlBasedErrorHandler
 import amf.core.internal.validation.core.ValidationSpecification
 
 import scala.collection.mutable
+
+class SyamlBasedParserErrorHandler(override val rootContextDocument: String = "",
+                                   override val refs: Seq[ParsedReference] = Seq.empty,
+                                   override val futureDeclarations: FutureDeclarations = EmptyFutureDeclarations(),
+                                   override val config: ParseConfiguration)
+    extends ParserContext(rootContextDocument, refs, futureDeclarations, config)
+    with SYamlBasedErrorHandler
 
 abstract class ErrorHandlingContext(implicit val eh: AMFErrorHandler) {
   def violation(violationId: ValidationSpecification, node: String, message: String)

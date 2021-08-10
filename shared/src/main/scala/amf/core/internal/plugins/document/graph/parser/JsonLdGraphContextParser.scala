@@ -8,7 +8,7 @@ import org.yaml.model._
 
 case class JsonLdGraphContextParser(node: YNode, parserContext: GraphParserContext) {
   val context: GraphContext                     = parserContext.graphContext
-  implicit val errorHandler: IllegalTypeHandler = new SYamlAMFParserErrorHandler(parserContext.eh)
+  implicit val errorHandler: IllegalTypeHandler = parserContext
 
   def parse(): GraphContext = {
     node.tagType match {

@@ -2,11 +2,6 @@ package amf.core.client.scala.model.document
 
 import amf.core.client.common.validation.ProfileName
 import amf.core.client.scala.errorhandling.AMFErrorHandler
-import amf.core.internal.annotations.SourceSpec
-import amf.core.internal.metamodel.MetaModelTypeMapping
-import amf.core.internal.metamodel.document.BaseUnitModel
-import amf.core.internal.metamodel.document.BaseUnitModel.{Location, ModelVersion, Root, Usage, Package}
-import amf.core.internal.metamodel.document.DocumentModel.References
 import amf.core.client.scala.model.document.FieldsFilter.Local
 import amf.core.client.scala.model.domain._
 import amf.core.client.scala.model.{BoolField, StrField}
@@ -19,6 +14,13 @@ import amf.core.client.scala.traversal.{
   TransformationData,
   TransformationTraversal
 }
+import amf.core.internal.annotations.SourceSpec
+import amf.core.internal.metamodel.MetaModelTypeMapping
+import amf.core.internal.metamodel.document.BaseUnitModel
+import amf.core.internal.metamodel.document.BaseUnitModel.{Location, ModelVersion, Package, Root, Usage}
+import amf.core.internal.metamodel.document.DocumentModel.References
+import amf.core.internal.parser.domain.Annotations
+import amf.core.internal.remote.Spec
 import amf.core.internal.unsafe.PlatformSecrets
 
 import scala.collection.mutable
@@ -79,7 +81,8 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
   def addReference(newRef: BaseUnit): Unit = synchronized(withReferences(references :+ newRef))
 
   def withPkg(pkg: String): this.type = set(Package, pkg)
-  def withPkg(pkg: String, annotations: Annotations): this.type = set(Package, AmfScalar(pkg,annotations), Annotations.inferred())
+  def withPkg(pkg: String, annotations: Annotations): this.type =
+    set(Package, AmfScalar(pkg, annotations), Annotations.inferred())
 
   /** Returns Unit iterator for specified strategy and scope. */
   def iterator(strategy: IteratorStrategy = DomainElementStrategy,

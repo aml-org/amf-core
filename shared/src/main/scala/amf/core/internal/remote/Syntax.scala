@@ -19,10 +19,12 @@ object Syntax {
 
   case object Protobuf extends Syntax {
     override val extension: String = "proto"
+    override val mediaType: String = `application/protobuf`
   }
 
   case object GraphQL extends Syntax {
     override val extension: String = "graphql"
+    override val mediaType: String = `application/graphql`
   }
 
   case object Json extends Syntax {
@@ -51,10 +53,10 @@ object Syntax {
   private val jsonMimes = Set(`application/json`,
                               `application/ld+json`)
 
-  val proto3Mimes  = Set(`APPLICATION/GRPC`, `APPLICATION/GRPC+PROTO`, `APPLICATION/X-PROTOBUF`,
-    `APPLICATION/PROTOBUF`, `APPLICATION/PROTOBUF_`, `APPLICATION/VND_GOOGLE`)
+  val proto3Mimes  = Set(`application/x-protobuf`,
+    `application/protobuf`, `application/protobuf_`, `application/vnd_google`)
 
-  val graphQLMimes  = Set(`APPLICATION/GRAPHQL`)
+  val graphQLMimes  = Set(`application/graphql`)
 
   /** Attempt to resolve [[Syntax]] from [[Mimes]]. */
   def unapply(mime: Option[String]): Option[Syntax] = mime match {
