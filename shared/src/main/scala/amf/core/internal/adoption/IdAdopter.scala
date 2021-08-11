@@ -1,11 +1,13 @@
 package amf.core.internal.adoption
 
 import amf.core.client.scala.model.document.BaseUnit
-import amf.core.client.scala.model.domain.{AmfArray, AmfElement, AmfObject}
+import amf.core.client.scala.model.domain.{AmfArray, AmfElement, AmfObject, AmfScalar}
+import amf.core.internal.annotations.DomainExtensionAnnotation
 import amf.core.internal.utils.AmfStrings
 import amf.core.internal.parser.domain.FieldEntry
 import amf.core.internal.utils.IdCounter
 import org.mulesoft.common.collections.FilterType
+
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -45,6 +47,8 @@ class IdAdopter(initialElem: AmfObject, initialId: String) {
           }
         case array: AmfArray =>
           traverseArrayValues(array, dequeued.elementId).foreach(queue.enqueue(_))
+        case scalar: AmfScalar if scalar.annotations.contains(classOf[DomainExtensionAnnotation]) =>
+          traverseDomainExtensionAnnotation(scalar, dequeued.elementId).foreach(queue.enqueue(_))
         case _ => // Nothing to do
       }
     }
@@ -67,6 +71,18 @@ class IdAdopter(initialElem: AmfObject, initialId: String) {
       results += PendingAdoption(field.element, generatedId)
     }
     results
+  }
+
+  /** this is done specifically because of RAML scalar valued nodes, extension is only stored in annotation contained in AmfScalar
+    * and needs to have id defined due to potential validations
+    */
+  private def traverseDomainExtensionAnnotation(scalar: AmfScalar, id: String): Seq[PendingAdoption] = {
+    scalar.annotations.collect[PendingAdoption] {
+      case domainAnnotation: DomainExtensionAnnotation =>
+        val extension   = domainAnnotation.extension
+        val generatedId = makeId(id, extension.componentId)
+        PendingAdoption(extension, generatedId)
+    }
   }
 
   private def withFragment(isRoot: Boolean) = if (isRoot) "#" else ""
