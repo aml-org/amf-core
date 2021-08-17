@@ -1,10 +1,11 @@
 package amf.core.internal.plugins.render
 
-import amf.core.client.common.{LowPriority, NormalPriority, PluginPriority}
+import amf.core.client.common.{LowPriority, PluginPriority}
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.vocabulary.{Namespace, NamespaceAliases}
 import amf.core.internal.plugins.document.graph.emitter.{EmbeddedJsonLdEmitter, FlattenedJsonLdEmitter}
 import amf.core.internal.plugins.document.graph.{EmbeddedForm, JsonLdSerialization}
+import amf.core.internal.plugins.syntax.ASTBuilder
 import amf.core.internal.remote.Amf
 import amf.core.internal.remote.Mimes._
 import org.yaml.builder.DocBuilder
@@ -15,7 +16,15 @@ object AMFGraphRenderPlugin extends AMFRenderPlugin {
 
   override def defaultSyntax(): String = `application/json`
 
-  override def emit[T](unit: BaseUnit, builder: DocBuilder[T], renderConfig: RenderConfiguration): Boolean = {
+  override def emit[T](unit: BaseUnit, builder: ASTBuilder[T], renderConfig: RenderConfiguration): Boolean = {
+    builder match {
+      case yDocBuilder: DocBuilder[_] =>
+        emitToYDocBuilder(unit, yDocBuilder, renderConfig)
+      case _ => false
+    }
+  }
+
+  def emitToYDocBuilder[T](unit: BaseUnit, builder: DocBuilder[T], renderConfig: RenderConfiguration): Boolean = {
     val options          = renderConfig.renderOptions
     val namespaceAliases = generateNamespaceAliasesFromPlugins(unit, renderConfig)
     options.toGraphSerialization match {
@@ -39,4 +48,6 @@ object AMFGraphRenderPlugin extends AMFRenderPlugin {
   override def applies(element: RenderInfo): Boolean = true
 
   override def priority: PluginPriority = LowPriority
+
+  override def getDefaultBuilder: ASTBuilder[_] = new SYAMLASTBuilder
 }

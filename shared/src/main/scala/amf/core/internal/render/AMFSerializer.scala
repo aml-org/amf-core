@@ -19,17 +19,13 @@ class AMFSerializer(unit: BaseUnit, config: RenderConfiguration, mediaType: Opti
 
   private val options = config.renderOptions
 
-  case class RenderResult(document: SyamlParsedDocument, syntax: String)
+  case class RenderResult(document: ParsedDocument, syntax: String)
 
   def renderAsYDocument(renderPlugin: AMFRenderPlugin): RenderResult = {
-
-    val builder = new YDocumentBuilder
     notifyEvent(StartingRenderingEvent(unit, renderPlugin, mediaType))
-    if (renderPlugin.emit(unit, builder, config)) {
-      val result = SyamlParsedDocument(builder.result.asInstanceOf[YDocument])
-      notifyEvent(FinishedRenderingASTEvent(unit, result))
-      RenderResult(result, mediaType.getOrElse(renderPlugin.defaultSyntax()))
-    } else throw new Exception(s"Error unparsing syntax $mediaType with domain plugin ${renderPlugin.id}")
+    val result = renderPlugin.emit(unit, config)
+    notifyEvent(FinishedRenderingASTEvent(unit, result))
+    RenderResult(result, mediaType.getOrElse(renderPlugin.defaultSyntax()))
   }
 
   private def notifyEvent(e: AMFEvent): Unit = config.listeners.foreach(_.notifyEvent(e))
@@ -77,7 +73,7 @@ class AMFSerializer(unit: BaseUnit, config: RenderConfiguration, mediaType: Opti
 
   private def emitJsonldToWriter[W: Output](writer: W): Unit = {
     val b = JsonOutputBuilder[W](writer, options.isPrettyPrint)
-    AMFGraphRenderPlugin.emit(unit, b, config)
+    AMFGraphRenderPlugin.emitToYDocBuilder(unit, b, config)
   }
 
   private[amf] def render(): String = {

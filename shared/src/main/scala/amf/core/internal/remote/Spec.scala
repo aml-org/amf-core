@@ -37,6 +37,7 @@ object Spec {
   @JSExport val AML: Spec        = Aml
   @JSExport val JSONSCHEMA: Spec = JsonSchema
   @JSExport val PROTO3: Spec     = Proto3
+  @JSExport val GRPC: Spec       = Grpc
 }
 
 @JSExportAll
@@ -162,5 +163,5 @@ private[amf] case object Proto3 extends Spec {
 
 private[amf] case object Grpc extends Spec {
   override val id: String        = "Grpc"
-  override val mediaType: String = `application/protobuf`
+  override val mediaType: String = `application/grpc`
 }

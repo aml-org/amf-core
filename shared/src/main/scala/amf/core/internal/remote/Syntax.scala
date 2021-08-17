@@ -54,7 +54,7 @@ object Syntax {
                               `application/ld+json`)
 
   val proto3Mimes  = Set(`application/x-protobuf`,
-    `application/protobuf`, `application/protobuf_`, `application/vnd_google`)
+    `application/protobuf`, `application/protobuf_`, `application/vnd_google`, `application/grpc`)
 
   val graphQLMimes  = Set(`application/graphql`)
 

@@ -21,6 +21,8 @@ object Mimes {
   val `text/plain`                     = "text/plain"
   val `application/x-protobuf`: String = "application/x-protobuf"
   val `application/protobuf`: String   = "application/protobuf"
+  val `application/grpc`: String       = "application/grpc"
+
   val `application/protobuf_` : String = "application/protobuf; proto=org.some.Message"
   val `application/vnd_google`: String = "application/vnd.google.protobuf"
   val `application/graphql`: String    = "application/graphql"
