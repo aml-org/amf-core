@@ -1,19 +1,14 @@
 package amf.core.client.scala.errorhandling
 
+import amf.core.client.scala.validation.AMFValidationResult
 import amf.core.internal.annotations.LexicalInformation
 
 trait UnhandledErrorHandler extends AMFErrorHandler {
 
-  override def reportConstraint(id: String,
-                                node: String,
-                                property: Option[String],
-                                message: String,
-                                lexical: Option[LexicalInformation],
-                                level: String,
-                                location: Option[String]): Unit = {
+  override def report(result: AMFValidationResult): Unit =
     throw new Exception(
-        s"  Message: $message\n  Target: $node\nProperty: ${property.getOrElse("")}\n  Position: $lexical\n at location: $location")
-  }
+        s"  Message: ${result.message}\n  Target: ${result.targetNode}\nProperty: ${result.targetProperty
+          .getOrElse("")}\n  Position: ${result.position}\n at location: ${result.location}")
 }
 
 object UnhandledErrorHandler extends UnhandledErrorHandler {}

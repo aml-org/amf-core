@@ -3,6 +3,7 @@ package amf.core.client.scala.parse.document
 import amf.core.client.scala.config.ParsingOptions
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.model.document.BaseUnit
+import amf.core.client.scala.model.domain.AmfObject
 import amf.core.client.scala.parse.document
 import amf.core.internal.parser.ParseConfiguration
 import amf.core.internal.parser.domain.FutureDeclarations
@@ -20,6 +21,8 @@ class SyamlBasedParserErrorHandler(override val rootContextDocument: String = ""
 
 abstract class ErrorHandlingContext(implicit val eh: AMFErrorHandler) {
   def violation(violationId: ValidationSpecification, node: String, message: String)
+
+  def violation(violationId: ValidationSpecification, node: AmfObject, message: String)
 }
 
 trait UnresolvedComponents {
@@ -67,6 +70,9 @@ case class ParserContext(rootContextDocument: String = "",
   }
 
   def violation(violationId: ValidationSpecification, node: String, message: String): Unit =
+    eh.violation(violationId, node, message, rootContextDocument)
+
+  override def violation(violationId: ValidationSpecification, node: AmfObject, message: String): Unit =
     eh.violation(violationId, node, message, rootContextDocument)
 
   def parsingOptions: ParsingOptions = config.parsingOptions

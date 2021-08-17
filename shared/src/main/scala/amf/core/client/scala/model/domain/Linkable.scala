@@ -128,10 +128,10 @@ trait Linkable extends AmfObject with AdoptionDependantCalls { this: DomainEleme
             resolve,
             () =>
               if (unresolvedSeverity == "warning") {
-                ctx.eh.warning(UnresolvedReferenceWarning, id, s"Unresolved reference '$refName'", astPos.get)
+                ctx.eh.warning(UnresolvedReferenceWarning, this, s"Unresolved reference '$refName'", astPos.get)
 
               } else
-                ctx.eh.violation(UnresolvedReference, id, s"Unresolved reference '$refName'", astPos.get)
+                ctx.eh.violation(UnresolvedReference, this, s"Unresolved reference '$refName'", astPos.get)
         )
         (Seq(refName) ++ refAliases).foreach { ref =>
           ctx.futureDeclarations.futureRef(

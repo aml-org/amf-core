@@ -21,14 +21,15 @@ trait AmfObject extends AmfElement {
   /** Set element unique identifier. */
   def withId(value: String): this.type = {
     def replaceSlashes(value: String) = if (value.contains("//")) value.replace("//", "/") else value
-    val idx                           = value.indexOf("://")
-    id =
-      if (idx == -1) replaceSlashes(value)
-      else {
-        val n = idx + 3
-        value.substring(0, n) + replaceSlashes(value.substring(n))
-      }
-
+    if (value != null) {
+      val idx = value.indexOf("://")
+      id =
+        if (idx == -1) replaceSlashes(value)
+        else {
+          val n = idx + 3
+          value.substring(0, n) + replaceSlashes(value.substring(n))
+        }
+    }
     this
   }
 

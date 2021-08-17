@@ -2,7 +2,7 @@ package amf.core.client.scala.validation
 
 import amf.core.client.common.position.{Position, Range}
 import amf.core.client.scala.model.document.BaseUnit
-import amf.core.client.scala.model.domain.{AmfArray, DomainElement}
+import amf.core.client.scala.model.domain.{AmfArray, AmfObject, DomainElement}
 import amf.core.internal.annotations.{LexicalInformation, SourceLocation}
 import amf.core.internal.parser.domain.Annotations
 import amf.core.internal.validation.core.ValidationResult
@@ -10,15 +10,21 @@ import amf.core.internal.validation.core.ValidationResult
 import java.io.StringWriter
 import java.util.Objects
 
-case class AMFValidationResult(message: String,
-                               severityLevel: String,
-                               targetNode: String,
-                               targetProperty: Option[String],
-                               validationId: String,
-                               position: Option[LexicalInformation],
-                               location: Option[String],
-                               source: Any)
+case class AMFValidationResult private[amf] (message: String,
+                                             severityLevel: String,
+                                             private val targetNodeValue: Either[AmfObject, String],
+                                             targetProperty: Option[String], // TODO: is it used??
+                                             validationId: String,
+                                             position: Option[LexicalInformation],
+                                             location: Option[String],
+                                             source: Any)
     extends Ordered[AMFValidationResult] {
+
+  def targetNode: String =
+    targetNodeValue match {
+      case Left(obj) => obj.id
+      case Right(id) => id
+    }
 
   override def toString: String = AMFValidationReportPrinter.print(this)
 
@@ -98,7 +104,24 @@ object AMFValidationResult {
             position: Option[LexicalInformation],
             location: Option[String],
             source: Any): AMFValidationResult =
-    new AMFValidationResult(message, level, targetNode, targetProperty, validationId, position, location, source)
+    new AMFValidationResult(message,
+                            level,
+                            Right(targetNode),
+                            targetProperty,
+                            validationId,
+                            position,
+                            location,
+                            source)
+
+  def apply(message: String,
+            level: String,
+            targetNode: AmfObject,
+            targetProperty: Option[String],
+            validationId: String,
+            position: Option[LexicalInformation],
+            location: Option[String],
+            source: Any): AMFValidationResult =
+    new AMFValidationResult(message, level, Left(targetNode), targetProperty, validationId, position, location, source)
 
   def fromSHACLValidation(model: BaseUnit,
                           message: String,
