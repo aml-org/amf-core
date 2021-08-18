@@ -16,7 +16,7 @@ import org.yaml.parser.YamlParser
 
 import scala.collection.mutable
 
-class SYamlAMFParserErrorHandler(eh: AMFErrorHandler) extends ParseErrorHandler with IllegalTypeHandler  {
+class SYamlAMFParserErrorHandler(eh: AMFErrorHandler) extends ParseErrorHandler with IllegalTypeHandler {
   override def handle[T](error: YError, defaultValue: T): T = {
     eh.violation(SyamlError, "", error.error, part(error).location)
     defaultValue
@@ -37,7 +37,10 @@ class SYamlAMFParserErrorHandler(eh: AMFErrorHandler) extends ParseErrorHandler 
   }
 }
 
-class SyamlAMFErrorHandler(val eh: AMFErrorHandler) extends AMFErrorHandler with ParseErrorHandler with IllegalTypeHandler  {
+class SyamlAMFErrorHandler(val eh: AMFErrorHandler)
+    extends AMFErrorHandler
+    with ParseErrorHandler
+    with IllegalTypeHandler {
   val syamleh = new SYamlAMFParserErrorHandler(eh)
 
   override val results: mutable.LinkedHashSet[AMFValidationResult] = eh.results
@@ -52,11 +55,12 @@ object SyamlSyntaxParsePlugin extends AMFSyntaxParsePlugin with PlatformSecrets 
   private def getFormat(mediaType: String): String = if (mediaType.contains("json")) "json" else "yaml"
 
   override def parse(text: CharSequence, mediaType: String, ctx: ParserContext): ParsedDocument = {
+    val syamlEH = new SyamlAMFErrorHandler(ctx.eh)
     if (text.length() == 0) SyamlParsedDocument(YDocument(YNode.Null))
     else {
       val parser = getFormat(mediaType) match {
-        case "json" => JsonParserFactory.fromCharsWithSource(text, ctx.rootContextDocument)(new SyamlAMFErrorHandler(ctx.eh))
-        case _      => YamlParser(text, ctx.rootContextDocument)(new SyamlAMFErrorHandler(ctx.eh)).withIncludeTag("!include")
+        case "json" => JsonParserFactory.fromCharsWithSource(text, ctx.rootContextDocument)(syamlEH)
+        case _      => YamlParser(text, ctx.rootContextDocument)(syamlEH).withIncludeTag("!include")
       }
       val document1 = parser.document()
       val (document, comment) = document1 match {

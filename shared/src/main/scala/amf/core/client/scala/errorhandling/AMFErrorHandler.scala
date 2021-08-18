@@ -78,16 +78,8 @@ trait AMFErrorHandler {
     violation(specification, node, None, message, None, location.option)
   }
 
-  /** Report constraint failure of severity violation. */
-//  def violation(spec: ValidationSpecification, node: String, prop: Option[String], msg: String, ast: YPart): Unit =
-//    violation(spec, node, prop, msg, ast.location)
-
   def violation(spec: ValidationSpecification, n: String, prop: Option[String], msg: String, l: SourceLocation): Unit =
     violation(spec, n, prop, msg, lexical(l), l.sourceName.option)
-
-  /** Report constraint failure of severity violation. */
-//  def violation(specification: ValidationSpecification, node: String, message: String, ast: YPart): Unit =
-//    violation(specification, node, None, message, ast)
 
   def violation(specification: ValidationSpecification, node: String, message: String, loc: SourceLocation): Unit =
     violation(specification, node, None, message, loc)
@@ -115,10 +107,6 @@ trait AMFErrorHandler {
               message: String,
               location: SourceLocation): Unit =
     warning(specification, node, property, message, lexical(location), location.sourceName.option)
-
-  /** Report constraint failure of severity warning. */
-//  def warning(specification: ValidationSpecification, node: String, message: String, ast: YPart): Unit =
-//    warning(specification, node, None, message, ast.location)
 
   def warning(specification: ValidationSpecification, node: String, message: String, location: SourceLocation): Unit =
     warning(specification, node, None, message, location)

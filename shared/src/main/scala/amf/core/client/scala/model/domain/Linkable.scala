@@ -93,55 +93,44 @@ trait Linkable extends AmfObject { this: DomainElement with Linkable =>
 
   // Unresolved references to things that can be linked
   // TODO: another trait?
-  private[amf] var isUnresolved: Boolean           = false
-  private[amf] var refName                         = ""
-  private[amf] var refAliases                                        = Seq[String]()
-  private var unresolvedSeverity: String           = "error"
+  private[amf] var isUnresolved: Boolean                        = false
+  private[amf] var refName                                      = ""
+  private[amf] var refAliases                                   = Seq[String]()
+  private var unresolvedSeverity: String                        = "error"
   private var astPos: Option[org.mulesoft.lexer.SourceLocation] = None
-  private var refCtx: Option[UnresolvedComponents] = None
+  private var refCtx: Option[UnresolvedComponents]              = None
 
-  /*
-  private[amf] def unresolved(refName: String, refAst: YPart, unresolvedSeverity: String = "error")(
-      implicit ctx: UnresolvedComponents) = {
-    isUnresolved = true
-    this.unresolvedSeverity = unresolvedSeverity
-    this.refName = refName
-    this.astPos = Some(refAst.location)
-    refCtx = Some(ctx)
-    this
-  }
-  */
-
-  def unresolved(refName: String, aliases: Seq[String], pos: Option[SourceLocation], unresolvedSeverity: String = "error")(
-    implicit ctx: UnresolvedComponents): DomainElement with Linkable = {
+  def unresolved(
+      refName: String,
+      aliases: Seq[String],
+      pos: Option[SourceLocation],
+      unresolvedSeverity: String = "error")(implicit ctx: UnresolvedComponents): DomainElement with Linkable = {
     isUnresolved = true
     this.unresolvedSeverity = unresolvedSeverity
     this.refName = refName
     this.refAliases = aliases
     this.astPos = pos
-    // this.astPos = Some(org.mulesoft.lexer.SourceLocation(file, 0,0,refAst.start.line, refAst.start.column, refAst.end.line, refAst.end.column))
     refCtx = Some(ctx)
     this
   }
-
 
   private[amf] def toFutureRef(resolve: Linkable => Unit): Unit = {
     refCtx match {
       case Some(ctx) =>
         val promise = DeclarationPromise(
-          resolve,
-          () =>
-            if (unresolvedSeverity == "warning") {
-              ctx.eh.warning(UnresolvedReferenceWarning, id, s"Unresolved reference '$refName'", astPos.get)
+            resolve,
+            () =>
+              if (unresolvedSeverity == "warning") {
+                ctx.eh.warning(UnresolvedReferenceWarning, id, s"Unresolved reference '$refName'", astPos.get)
 
-            } else
-              ctx.eh.violation(UnresolvedReference, id, s"Unresolved reference '$refName'", astPos.get)
+              } else
+                ctx.eh.violation(UnresolvedReference, id, s"Unresolved reference '$refName'", astPos.get)
         )
         (Seq(refName) ++ refAliases).foreach { ref =>
           ctx.futureDeclarations.futureRef(
-            id,
-            ref,
-            promise
+              id,
+              ref,
+              promise
           )
         }
       case _ => throw new Exception("Cannot create unresolved reference with missing parsing context")
