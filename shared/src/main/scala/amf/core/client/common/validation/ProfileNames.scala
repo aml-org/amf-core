@@ -61,10 +61,6 @@ object GrpcProfile extends ProfileName(Grpc.id, AMFStyle) {
   override def isRaml(): Boolean = false
 }
 
-object Proto3Profile extends ProfileName(Proto3.id, AMFStyle) {
-  override def isRaml(): Boolean = false
-}
-
 object ProfileName {
   def unapply(name: String): Option[ProfileName] =
     name match {

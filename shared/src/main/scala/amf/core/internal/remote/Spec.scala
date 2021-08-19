@@ -36,7 +36,6 @@ object Spec {
   @JSExport val PAYLOAD: Spec    = Payload
   @JSExport val AML: Spec        = Aml
   @JSExport val JSONSCHEMA: Spec = JsonSchema
-  @JSExport val PROTO3: Spec     = Proto3
   @JSExport val GRPC: Spec       = Grpc
 }
 
@@ -153,12 +152,6 @@ private[amf] case object JsonSchema extends Spec {
 private[amf] case object JSONRefs extends Spec {
   override val id: String        = "JSON + Refs"
   override val mediaType: String = `application/json`
-}
-
-// keep private?
-private[amf] case object Proto3 extends Spec {
-  override val id: String        = "Proto3"
-  override val mediaType: String = `application/protobuf`
 }
 
 private[amf] case object Grpc extends Spec {
