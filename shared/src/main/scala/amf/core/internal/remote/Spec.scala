@@ -8,17 +8,18 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
 object Spec {
   def unapply(name: String): Option[Spec] = {
     name match {
-      case Raml10.id     => Some(Raml10)
-      case Raml08.id     => Some(Raml08)
-      case Oas20.id      => Some(Oas20)
-      case Oas30.id      => Some(Oas30)
-      case AsyncApi20.id => Some(AsyncApi20)
-      case Amf.id        => Some(Amf)
-      case Payload.id    => Some(Payload)
-      case Aml.id        => Some(Aml)
-      case JsonSchema.id => Some(JsonSchema)
-      case Grpc.id       => Some(Grpc)
-      case _             => None
+      case Raml10.id            => Some(Raml10)
+      case Raml08.id            => Some(Raml08)
+      case Oas20.id             => Some(Oas20)
+      case Oas30.id             => Some(Oas30)
+      case AsyncApi20.id        => Some(AsyncApi20)
+      case Amf.id               => Some(Amf)
+      case Payload.id           => Some(Payload)
+      case Aml.id               => Some(Aml)
+      case JsonSchema.id        => Some(JsonSchema)
+      case Grpc.id              => Some(Grpc)
+      case JsonSchemaDialect.id => Some(JsonSchemaDialect)
+      case _                    => None
     }
   }
 
@@ -28,16 +29,17 @@ object Spec {
     case _          => UnknownSpec(name)
   }
 
-  @JSExport val RAML08: Spec     = Raml08
-  @JSExport val RAML10: Spec     = Raml10
-  @JSExport val OAS20: Spec      = Oas20
-  @JSExport val OAS30: Spec      = Oas30
-  @JSExport val ASYNC20: Spec    = AsyncApi20
-  @JSExport val AMF: Spec        = Amf
-  @JSExport val PAYLOAD: Spec    = Payload
-  @JSExport val AML: Spec        = Aml
-  @JSExport val JSONSCHEMA: Spec = JsonSchema
-  @JSExport val GRPC: Spec       = Grpc
+  @JSExport val RAML08: Spec            = Raml08
+  @JSExport val RAML10: Spec            = Raml10
+  @JSExport val OAS20: Spec             = Oas20
+  @JSExport val OAS30: Spec             = Oas30
+  @JSExport val ASYNC20: Spec           = AsyncApi20
+  @JSExport val AMF: Spec               = Amf
+  @JSExport val PAYLOAD: Spec           = Payload
+  @JSExport val AML: Spec               = Aml
+  @JSExport val JSONSCHEMA: Spec        = JsonSchema
+  @JSExport val GRPC: Spec              = Grpc
+  @JSExport val JSONSCHEMADIALECT: Spec = JsonSchemaDialect
 }
 
 @JSExportAll
@@ -163,4 +165,9 @@ private[amf] case object Grpc extends Spec {
 private[amf] case object GraphQL extends Spec {
   override val id: String        = "GraphQL"
   override val mediaType: String = `application/graphql`
+}
+
+private[amf] case object JsonSchemaDialect extends Spec {
+  override val id: String        = "JSON Schema Dialect"
+  override val mediaType: String = `application/semantics+schema+json`
 }
