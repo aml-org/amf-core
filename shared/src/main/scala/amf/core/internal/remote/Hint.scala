@@ -10,6 +10,8 @@ case class Hint(spec: Spec, syntax: Syntax, kind: ReferenceKind = UnspecifiedRef
 
 object GrpcProtoHint extends Hint(Grpc, Protobuf)
 
+object AmlHint extends Hint(Aml, Yaml)
+
 object Raml10YamlHint extends Hint(Raml10, Yaml)
 
 object Raml08YamlHint extends Hint(Raml08, Yaml)
