@@ -12,6 +12,8 @@ object GraphQLHint extends Hint(GraphQL, GraphQLSyntax)
 
 object GrpcProtoHint extends Hint(Grpc, Protobuf)
 
+object AmlHint extends Hint(Aml, Yaml)
+
 object Raml10YamlHint extends Hint(Raml10, Yaml)
 
 object Raml08YamlHint extends Hint(Raml08, Yaml)
