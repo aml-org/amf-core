@@ -49,4 +49,6 @@ object DummyParsePlugin extends AMFParsePlugin {
   override def applies(element: Root): Boolean = true
 
   override def priority: PluginPriority = HighPriority
+
+  override def withIdAdoption: Boolean = false
 }

@@ -3,13 +3,15 @@ package amf.core.internal.adoption
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.model.domain.{AmfArray, AmfElement, AmfObject, AmfScalar}
 import amf.core.internal.annotations.DomainExtensionAnnotation
+import amf.core.internal.metamodel.Field
 import amf.core.internal.utils.AmfStrings
 import amf.core.internal.parser.domain.FieldEntry
 import amf.core.internal.utils.IdCounter
 import org.mulesoft.common.collections.FilterType
+import org.mulesoft.common.core.CachedFunction
+import org.mulesoft.common.functional.MonadInstances.{Identity, identityMonad}
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 class IdAdopter(initialElem: AmfObject, initialId: String) {
 
@@ -63,14 +65,10 @@ class IdAdopter(initialElem: AmfObject, initialId: String) {
   }
 
   private def traverseObjFields(obj: AmfObject, isRoot: Boolean): Seq[PendingAdoption] = {
-    val fieldOrdering                        = getFieldOrdering(obj)
-    val results: ListBuffer[PendingAdoption] = ListBuffer()
-    while (fieldOrdering.hasPendingFields) {
-      val field       = fieldOrdering.nextField()
+    getOrderedFields(obj).map { field =>
       val generatedId = makeId(obj.id + withFragment(isRoot), relativeName(field))
-      results += PendingAdoption(field.element, generatedId)
-    }
-    results
+      PendingAdoption(field.element, generatedId)
+    }.toList
   }
 
   /** this is done specifically because of RAML scalar valued nodes, extension is only stored in annotation contained in AmfScalar
@@ -88,7 +86,11 @@ class IdAdopter(initialElem: AmfObject, initialId: String) {
   private def withFragment(isRoot: Boolean) = if (isRoot) "#" else ""
 
   private def relativeName(field: FieldEntry): String =
-    componentId(field.element).getOrElse(field.field.doc.displayName.urlComponentEncoded)
+    componentId(field.element).getOrElse(fieldDisplayName.runCached(field.field))
+
+  val fieldDisplayName: CachedFunction[Field, String, Identity] = CachedFunction.from[Field, String] { field =>
+    field.doc.displayName.urlComponentEncoded
+  }
 
   private def componentId(element: AmfElement): Option[String] = element match {
     case obj: AmfObject if obj.componentId.nonEmpty => Some(obj.componentId.stripPrefix("/"))
@@ -107,9 +109,11 @@ class IdAdopter(initialElem: AmfObject, initialId: String) {
     result
   }
 
-  private def getFieldOrdering(obj: AmfObject) = obj match {
-    case b: BaseUnit => new BaseUnitFieldAdoptionOrdering(b)
-    case other       => new GenericFieldAdoptionOrdering(other)
+  private def getOrderedFields(obj: AmfObject): Iterable[FieldEntry] = {
+    val criteria = obj match {
+      case _: BaseUnit => BaseUnitFieldAdoptionOrdering
+      case _           => GenericFieldAdoptionOrdering
+    }
+    criteria.fields(obj)
   }
-
 }

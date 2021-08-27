@@ -45,13 +45,13 @@ object AMFValidationReportPrinter {
 
   def print[W: Output](result: AMFValidationResult, writer: W): Unit = {
 
-    val AMFValidationResult(message, severityLevel, targetNode, targetProperty, validationId, position, location, _) =
+    val AMFValidationResult(message, severityLevel, _targetNode, targetProperty, validationId, position, location, _) =
       result
 
     writer.append(s"- Source: $validationId\n")
     writer.append(s"  Message: $message\n")
     writer.append(s"  Level: $severityLevel\n")
-    writer.append(s"  Target: $targetNode\n")
+    writer.append(s"  Target: ${result.targetNode}\n")
     writer.append(s"  Property: ${targetProperty.getOrElse("")}\n")
     writer.append(s"  Position: $position\n")
     writer.append(s"  Location: ${location.getOrElse("")}\n")
