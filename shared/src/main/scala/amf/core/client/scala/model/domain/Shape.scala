@@ -133,21 +133,21 @@ abstract class Shape extends DomainElement with Linkable with NamedDomainElement
     this.fields.foreach {
       case (f, v) =>
         val clonedValue = v.value match {
-          case s: Shape if s.id != this.id && traversal.canTraverse(s.id) =>
+          case s: Shape if s != this =>
             traversal.runNested((t: ModelTraversalRegistry) => {
               s.cloneShape(recursionErrorHandler, recursionBase, t)
             })
-          case s: Shape if s.id == this.id => s
+          case s: Shape if s == this => s
           case a: AmfArray =>
             AmfArray(
                 a.values.map {
-                  case e: Shape if e.id != this.id && traversal.canTraverse(e.id) =>
+                  case e: Shape if e != this =>
                     traversal.runNested((t: ModelTraversalRegistry) => {
                       e.cloneShape(recursionErrorHandler, recursionBase, t)
                     })
 //                e.cloneShape(recursionErrorHandler, recursionBase, traversed.push(prevBaseId),Some(prevBaseId))
-                  case e: Shape if e.id == this.id => e
-                  case o                           => o
+                  case e: Shape if e == this => e
+                  case o                     => o
                 },
                 a.annotations
             )

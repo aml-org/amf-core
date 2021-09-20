@@ -16,24 +16,10 @@ case class ModelTraversalRegistry() {
   // IDs of elements that do not throw recursion errors
   private var whiteList: Set[String] = Set()
 
-
-  private var allowedCycleClasses : Seq[Class[_]] = Seq()
-
-  // Function that skips elements
-  private var skipFn: String => Boolean = (_: String) => false
-
-  def withSkipFn(fn: String => Boolean): this.type = {
-    skipFn = fn
-    this
-  }
+  private var allowedCycleClasses: Seq[Class[_]] = Seq()
 
   def withAllowedCyclesInstances(classes: Seq[Class[_]]): this.type = {
     allowedCycleClasses = classes
-    this
-  }
-
-  def resetSkipFn(): this.type = {
-    skipFn = (_: String) => false
     this
   }
 
@@ -48,7 +34,7 @@ case class ModelTraversalRegistry() {
       val a = (alias.aliasId.equals(shape.id) && currentPath.nonEmpty || isInCurrentPath(shape.id))
       val b = !isAllowedToCycle(shape)
       a && b
-    case None =>isInCurrentPath(shape.id) && !isAllowedToCycle(shape)
+    case None => isInCurrentPath(shape.id) && !isAllowedToCycle(shape)
   }
 
   def avoidError(id: String): Boolean = whiteList.contains(id)
@@ -59,8 +45,6 @@ case class ModelTraversalRegistry() {
   def isInCurrentPath(id: String): Boolean = currentPath.contains(id)
 
   def isAllowedToCycle(shape: Shape): Boolean = allowedCycleClasses.contains(shape.getClass)
-
-  def canTraverse(id: String): Boolean = !skipFn(id)
 
   def runWithIgnoredId(fnc: () => Shape, shapeId: String): Shape = runWithIgnoredIds(fnc, Set(shapeId))
 
@@ -82,7 +66,7 @@ case class ModelTraversalRegistry() {
   // Runs a function and restores the currentPath to its original state after the run
   def runNested[T](fnc: ModelTraversalRegistry => T): T = {
     val previousPath = currentPath
-    val element = fnc(this)
+    val element      = fnc(this)
     currentPath = previousPath
     element
   }
