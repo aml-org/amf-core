@@ -8,17 +8,20 @@ import org.mulesoft.common.functional.MonadInstances._
 /** Context for handling plugins registration. */
 case class RegistryContext private[amf] (private val amfRegistry: AMFRegistry) {
 
+  def getRegistry: AMFRegistry = amfRegistry
+
+  /** Find matching type given type IRI. */
   def findType(`type`: String): Option[ModelDefaultBuilder] = findType.runCached(`type`)
 
   /** Return instance builder given type. */
   def findAnnotation(annotationID: String): Option[AnnotationGraphLoader] = findAnnotation.runCached(annotationID)
 
-  /** Find matching type given type IRI. */
   private val findType = CachedFunction.fromMonadic { `type`: String =>
-    amfRegistry.entitiesRegistry.findType(`type`)
+    amfRegistry.getEntitiesRegistry.findType(`type`)
   }
+
   private val findAnnotation = CachedFunction.fromMonadic { id: String =>
-    amfRegistry.entitiesRegistry.findAnnotation(id)
+    amfRegistry.getEntitiesRegistry.findAnnotation(id)
   }
 
 }

@@ -27,7 +27,7 @@ object AMFParser {
     * @return A CompletableFuture of [[AMFResult]]
     */
   def parseContent(content: String, configuration: AMFGraphConfiguration): Future[AMFParseResult] = {
-    val preferredSyntaxPlugin = configuration.registry.plugins.syntaxParsePlugins.sorted.headOption
+    val preferredSyntaxPlugin = configuration.registry.getPluginsRegistry.syntaxParsePlugins.sorted.headOption
     val defaultMediaType      = preferredSyntaxPlugin.map(_.mainMediaType)
     parseContent(content, DEFAULT_DOCUMENT_URL, defaultMediaType, configuration)
   }
