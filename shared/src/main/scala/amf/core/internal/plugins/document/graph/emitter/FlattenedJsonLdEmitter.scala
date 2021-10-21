@@ -30,16 +30,18 @@ object FlattenedJsonLdEmitter {
   def emit[T](unit: BaseUnit,
               builder: DocBuilder[T],
               renderOptions: RenderOptions = config.RenderOptions(),
-              namespaceAliases: NamespaceAliases = Namespace.defaultAliases): Boolean = {
+              namespaceAliases: NamespaceAliases = Namespace.defaultAliases,
+              extensionModels: Map[String, Obj]): Boolean = {
     implicit val ctx: GraphEmitterContext =
       FlattenedGraphEmitterContext(unit, renderOptions, namespaceAliases = namespaceAliases)
-    new FlattenedJsonLdEmitter[T](builder, renderOptions).root(unit)
+    new FlattenedJsonLdEmitter[T](builder, renderOptions, extensionModels).root(unit)
     true
   }
 }
 
-class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderOptions)(
-    implicit ctx: GraphEmitterContext)
+class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T],
+                                val options: RenderOptions,
+                                val extensionModels: Map[String, Obj])(implicit ctx: GraphEmitterContext)
     extends CommonEmitter
     with MetaModelTypeMapping {
 
@@ -254,6 +256,7 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
     val obj = metaModel(amfObject)
     createTypeNode(b, obj)
     traverseMetaModel(id, amfObject, sources, obj, b)
+    traverseExtensions(id, amfObject, sources, obj, b)
 
     createCustomExtensions(amfObject, b)
 
@@ -277,6 +280,20 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T], val options: RenderO
 
     emitFields(id, element, sources, b, modelFields)
 
+  }
+
+  private def traverseExtensions(id: String, element: AmfObject, sources: SourceMap, obj: Obj, b: Entry[T]): Unit = {
+    val fieldsNotInObj  = diffByIri(element.fields.fieldsMeta(), obj.fields)
+    val extensionFields = fieldsNotInObj.filter(x => extensionModels.contains(x.value.iri()))
+    emitFields(id, element, sources, b, extensionFields)
+  }
+
+  // TODO: had to do this because when implementing hashCode in the Field case class, a lot of other entries popped up in JSON-LD
+  private def diffByIri(fields: List[Field], otherFields: List[Field]): List[Field] = {
+    val similar = (a: Field, b: Field) => a.equals(b)
+    fields.filterNot { a =>
+      otherFields.exists(b => similar(a, b))
+    }
   }
 
   private def emitFields(id: String,

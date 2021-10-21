@@ -30,7 +30,7 @@ object AMFGraphRenderPlugin extends AMFRenderPlugin {
     options.toGraphSerialization match {
       case JsonLdSerialization(EmbeddedForm) => EmbeddedJsonLdEmitter.emit(unit, builder, options, namespaceAliases)
       // defaults to flatten
-      case _ => FlattenedJsonLdEmitter.emit(unit, builder, options, namespaceAliases)
+      case _ => FlattenedJsonLdEmitter.emit(unit, builder, options, namespaceAliases, renderConfig.extensionModels)
     }
   }
 

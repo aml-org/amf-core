@@ -4,6 +4,7 @@ import amf.core.client.scala.AMFGraphConfiguration
 import amf.core.client.scala.config.{AMFEventListener, RenderOptions}
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.render.AMFSyntaxRenderPlugin
+import amf.core.internal.metamodel.Obj
 import amf.core.internal.plugins.namespace.NamespaceAliasesPlugin
 
 trait RenderConfiguration {
@@ -13,6 +14,7 @@ trait RenderConfiguration {
   def errorHandler: AMFErrorHandler
   def listeners: Set[AMFEventListener]
   def syntaxPlugin: List[AMFSyntaxRenderPlugin]
+  def extensionModels: Map[String, Obj]
 }
 
 private[amf] case class DefaultRenderConfiguration(renderPlugins: List[AMFRenderPlugin],
@@ -20,7 +22,8 @@ private[amf] case class DefaultRenderConfiguration(renderPlugins: List[AMFRender
                                                    namespacePlugins: List[NamespaceAliasesPlugin],
                                                    renderOptions: RenderOptions,
                                                    errorHandler: AMFErrorHandler,
-                                                   listeners: Set[AMFEventListener])
+                                                   listeners: Set[AMFEventListener],
+                                                   extensionModels: Map[String, Obj])
     extends RenderConfiguration {}
 
 object DefaultRenderConfiguration {
@@ -31,7 +34,8 @@ object DefaultRenderConfiguration {
         config.registry.getPluginsRegistry.namespacePlugins,
         config.options.renderOptions,
         config.errorHandlerProvider.errorHandler(),
-        config.listeners
+        config.listeners,
+        config.registry.getEntitiesRegistry.extensions
     )
   }
 }
