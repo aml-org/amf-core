@@ -1,27 +1,25 @@
 package amf.core.internal.plugins.document.graph.parser
 import amf.core.client.scala.errorhandling.IgnoringErrorHandler
+import amf.core.client.scala.model.document._
+import amf.core.client.scala.model.domain._
+import amf.core.client.scala.model.domain.extensions.{CustomDomainProperty, DomainExtension}
+import amf.core.client.scala.parse.document.SyamlParsedDocument
+import amf.core.client.scala.vocabulary.Namespace.XsdTypes.xsdBoolean
+import amf.core.client.scala.vocabulary.{Namespace, ValueType}
 import amf.core.internal.annotations.DomainExtensionAnnotation
 import amf.core.internal.metamodel.Type.{Array, Bool, Iri, LiteralUri, RegExp, SortedArray, Str}
 import amf.core.internal.metamodel.document.BaseUnitModel
 import amf.core.internal.metamodel.domain.extensions.DomainExtensionModel
 import amf.core.internal.metamodel.domain.{DomainElementModel, ExternalSourceElementModel, LinkableElementModel}
 import amf.core.internal.metamodel.{Field, ModelDefaultBuilder, Obj, Type}
-import amf.core.client.scala.model.document._
-import amf.core.client.scala.model.domain._
-import amf.core.client.scala.model.domain.extensions.{CustomDomainProperty, DomainExtension}
 import amf.core.internal.parser._
-import amf.core.client.scala.parse.document.SyamlParsedDocument
-import amf.core.client.scala.vocabulary.Namespace.XsdTypes.xsdBoolean
-import amf.core.client.scala.vocabulary.{Namespace, ValueType}
-import amf.core.internal.parser.CompilerConfiguration
 import amf.core.internal.parser.domain.{Annotations, FieldEntry}
 import amf.core.internal.plugins.document.graph.JsonLdKeywords
 import amf.core.internal.plugins.document.graph.MetaModelHelper._
 import amf.core.internal.plugins.document.graph.context.ExpandedTermDefinition
 import amf.core.internal.validation.CoreValidations.{NotLinkable, UnableToParseDocument, UnableToParseNode}
-import org.mulesoft.common.core.CachedFunction
-import org.mulesoft.common.functional.MonadInstances._
 import org.yaml.model._
+
 import scala.collection.mutable
 import scala.language.implicitConversions
 
@@ -244,9 +242,22 @@ class FlattenedGraphParser(startingPoint: String)(implicit val ctx: GraphParserC
       val builder = buildType(model, annotations(nodes, sources, transformedId))
       cache(id) = builder
       val fields = fieldsFrom(model)
-      parseNodeFields(map, fields, sources, transformedId, builder)
+      parseNodeFields(map, fields, sources, transformedId, builder).map { instance =>
+        parseExtensions(map, sources, fields, instance)
+      }
     }
 
+    private def parseExtensions(map: _root_.org.yaml.model.YMap,
+                                sources: _root_.amf.core.client.scala.model.document.SourceMap,
+                                fields: scala.Seq[_root_.amf.core.internal.metamodel.Field],
+                                instance: _root_.amf.core.client.scala.model.domain.AmfObject) = {
+      val notParsedKeys               = map.entries.map(_.key.as[String]).diff(fields.map(_.value.iri()))
+      val extensions                  = getExtensions
+      val keysInMapLinkedToExtensions = notParsedKeys.map(expandUriFromContext(_)).filter(extensions.contains)
+      val fieldsToParse               = keysInMapLinkedToExtensions.map(key => Field(Type.ObjType, ValueType(key)))
+      traverseFields(map, fieldsToParse, instance, sources)
+      instance
+    }
     private def parseNodeFields(node: YMap,
                                 fields: Seq[Field],
                                 sources: SourceMap,
@@ -279,6 +290,14 @@ class FlattenedGraphParser(startingPoint: String)(implicit val ctx: GraphParserC
 
       nodes = nodes + (transformedId -> instance)
       Some(instance)
+    }
+
+    // TODO: had to do this because when implementing hashCode in the Field case class, a lot of other entries popped up in JSON-LD
+    private def diffByIri(fields: Seq[Field], otherFields: Seq[Field]): Seq[Field] = {
+      val similar = (a: Field, b: Field) => a.equals(b)
+      fields.filterNot { a =>
+        otherFields.exists(b => similar(a, b))
+      }
     }
 
     private def traverseFields(map: YMap, fields: Seq[Field], instance: AmfObject, sources: SourceMap): Unit = {
@@ -544,6 +563,10 @@ class FlattenedGraphParser(startingPoint: String)(implicit val ctx: GraphParserC
       instance.annotations ++= ann
       instance
     }
+  }
+
+  private def getExtensions = {
+    ctx.config.registryContext.getRegistry.getEntitiesRegistry.extensions
   }
 }
 
