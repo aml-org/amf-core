@@ -26,9 +26,9 @@ private[amf] case class DefaultRenderConfiguration(renderPlugins: List[AMFRender
 object DefaultRenderConfiguration {
   def apply(config: AMFGraphConfiguration): RenderConfiguration = {
     DefaultRenderConfiguration(
-        config.registry.plugins.renderPlugins,
-        config.registry.plugins.syntaxRenderPlugins,
-        config.registry.plugins.namespacePlugins,
+        config.registry.getPluginsRegistry.renderPlugins,
+        config.registry.getPluginsRegistry.syntaxRenderPlugins,
+        config.registry.getPluginsRegistry.namespacePlugins,
         config.options.renderOptions,
         config.errorHandlerProvider.errorHandler(),
         config.listeners

@@ -13,21 +13,22 @@ import scala.concurrent.Future
 object VendorToProfile {
 
   private lazy val vendorProfileMapping = Map(
-      Spec.ASYNC20 -> Async20Profile,
-      Spec.RAML10 -> Raml10Profile,
-      Spec.RAML08 -> Raml08Profile,
-      Spec.OAS20 -> Oas20Profile,
-      Spec.OAS30 -> Oas30Profile,
-      Spec.AMF -> AmfProfile,
+    Spec.ASYNC20 -> Async20Profile,
+    Spec.RAML10  -> Raml10Profile,
+    Spec.RAML08  -> Raml08Profile,
+    Spec.OAS20   -> Oas20Profile,
+    Spec.OAS30   -> Oas30Profile,
+    Spec.AMF     -> AmfProfile,
   )
 
-  def mapOrDefault(spec: Spec): ProfileName = vendorProfileMapping
-    .get(spec)
-    .orElse(spec match {
-      case AmlDialectSpec(id) => Some(ProfileName(id))
-      case _ => None
-    })
-    .getOrElse(AmfProfile)
+  def mapOrDefault(spec: Spec): ProfileName =
+    vendorProfileMapping
+      .get(spec)
+      .orElse(spec match {
+        case AmlDialectSpec(id) => Some(ProfileName(id))
+        case _                  => None
+      })
+      .getOrElse(AmfProfile)
 }
 
 object AMFValidator {
@@ -40,6 +41,6 @@ object AMFValidator {
   }
 
   private def computeApplicablePlugins(baseUnit: BaseUnit, conf: AMFGraphConfiguration) = {
-    conf.registry.plugins.validatePlugins.filter(_.applies(ValidationInfo(baseUnit))).sorted
+    conf.registry.getPluginsRegistry.validatePlugins.filter(_.applies(ValidationInfo(baseUnit))).sorted
   }
 }

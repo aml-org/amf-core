@@ -18,12 +18,12 @@ case class CompilerConfiguration(private val config: AMFGraphConfiguration) {
   val executionContext: ExecutionContext           = config.resolvers.executionEnv.context
   def resolveContent(url: String): Future[Content] = config.resolvers.resolveContent(url)
 
-  val sortedParsePlugins: Seq[AMFParsePlugin]      = config.registry.plugins.parsePlugins.sorted
-  val sortedParseSyntax: Seq[AMFSyntaxParsePlugin] = config.registry.plugins.syntaxParsePlugins.sorted
+  val sortedParsePlugins: Seq[AMFParsePlugin]      = config.registry.getPluginsRegistry.parsePlugins.sorted
+  val sortedParseSyntax: Seq[AMFSyntaxParsePlugin] = config.registry.getPluginsRegistry.syntaxParsePlugins.sorted
   def notifyEvent(e: AMFEvent): Unit               = config.listeners.foreach(_.notifyEvent(e))
 
   def chooseFallback(document: Root, isRoot: Boolean): AMFParsePlugin = {
-    val fallback = config.registry.plugins.domainParsingFallback
+    val fallback = config.registry.getPluginsRegistry.domainParsingFallback
     fallback.chooseFallback(document, sortedParsePlugins, isRoot)
   }
 

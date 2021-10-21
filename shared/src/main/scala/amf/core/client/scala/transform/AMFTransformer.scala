@@ -1,10 +1,9 @@
 package amf.core.client.scala.transform
 
-import amf.core.client.common.transform.{PipelineId, PipelineName}
-import amf.core.client.scala.{AMFGraphConfiguration, AMFResult}
+import amf.core.client.common.transform.PipelineId
 import amf.core.client.scala.model.document.BaseUnit
-import amf.core.internal.remote.Amf
 import amf.core.internal.validation.CoreValidations.TransformationValidation
+import amf.core.client.scala.{AMFGraphConfiguration, AMFResult}
 
 object AMFTransformer {
 
@@ -26,7 +25,7 @@ object AMFTransformer {
     * @return [[AMFResult]]
     */
   def transform(unit: BaseUnit, pipelineName: String, configuration: AMFGraphConfiguration): AMFResult = {
-    val pipelines = configuration.registry.transformationPipelines
+    val pipelines = configuration.registry.getTransformationPipelines
     val pipeline  = pipelines.get(pipelineName)
     val handler   = configuration.errorHandlerProvider.errorHandler()
     val resolved = pipeline match {

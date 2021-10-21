@@ -35,5 +35,5 @@ object TransformationPipelineBuilder {
   }
 
   def fromPipeline(pipelineName: String, conf: AMFGraphConfiguration): Option[TransformationPipelineBuilder] =
-    conf.registry.transformationPipelines.get(pipelineName).map(pipeline => fromPipeline(pipeline))
+    conf.registry.getTransformationPipelines.get(pipelineName).map(pipeline => fromPipeline(pipeline))
 }

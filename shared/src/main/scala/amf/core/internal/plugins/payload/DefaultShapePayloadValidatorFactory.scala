@@ -13,7 +13,7 @@ import amf.core.client.scala.validation.payload.{
 case class DefaultShapePayloadValidatorFactory private[amf] (config: AMFGraphConfiguration)
     extends ShapePayloadValidatorFactory {
 
-  private lazy val plugins          = config.registry.plugins.payloadPlugins
+  private lazy val plugins          = config.registry.getPluginsRegistry.payloadPlugins
   private lazy val validationConfig = ShapeValidationConfiguration(config)
 
   def createFor(shape: Shape, mediaType: String, mode: ValidationMode): AMFShapePayloadValidator = {
