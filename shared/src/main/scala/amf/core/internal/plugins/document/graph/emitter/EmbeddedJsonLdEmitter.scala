@@ -116,7 +116,7 @@ private[amf] class EmbeddedJsonLdEmitter[T] private (val builder: DocBuilder[T],
   def traverseMetaModel(id: String, element: AmfObject, sources: SourceMap, obj: Obj, b: Entry[T]): Unit = {
     createTypeNode(b, obj)
 
-    val modelFields = getMetaModelFields(element, obj)
+    val modelFields = getMetaModelFields(element, obj, Set.empty)
 
     // no longer necessary?
     element match {

@@ -38,11 +38,27 @@ trait CommonEmitter {
     }
   }
 
-  def getMetaModelFields(element: AmfObject, obj: Obj): Seq[Field] = {
+  def getMetaModelFields(element: AmfObject, obj: Obj, extensionIris: Set[String]): Seq[Field] = {
     val fields = MetaModelHelper.fieldsFrom(obj)
-    element match {
+
+    val filteredFields = element match {
       case e: ExternalSourceElement if e.isLinkToSource => fields.filter(f => f != ExternalSourceElementModel.Raw)
       case _                                            => fields
+    }
+
+    filteredFields ++ getExtensionFields(element, obj, extensionIris)
+  }
+
+  private def getExtensionFields(element: AmfObject, obj: Obj, extensionIris: Set[String]): Seq[Field] = {
+    val fieldsNotInObj = diffByIri(element.fields.fieldsMeta(), obj.fields)
+    fieldsNotInObj.filter(x => extensionIris.contains(x.value.iri()))
+  }
+
+  // TODO: had to do this because when implementing hashCode in the Field case class, a lot of other entries popped up in JSON-LD
+  private def diffByIri(fields: List[Field], otherFields: List[Field]): List[Field] = {
+    val similar = (a: Field, b: Field) => a.equals(b)
+    fields.filterNot { a =>
+      otherFields.exists(b => similar(a, b))
     }
   }
 
