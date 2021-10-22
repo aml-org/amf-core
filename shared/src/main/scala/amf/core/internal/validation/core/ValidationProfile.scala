@@ -22,21 +22,22 @@ case class ValidationProfile(name: ProfileName,
   }
 }
 
-case class SeverityMapping() {
-  // TODO: merge this in a single map
-  var violation: Seq[ValidationName] = Seq.empty
-  var warning: Seq[ValidationName]   = Seq.empty
-  var info: Seq[ValidationName]      = Seq.empty
-  var disabled: Seq[ValidationName]  = Seq.empty
-  var default: SeverityLevel         = SeverityLevels.VIOLATION
+object SeverityMapping {
+  val empty: SeverityMapping = SeverityMapping()
+}
 
-  def set(validations: Seq[ValidationName], severity: SeverityLevel): this.type = {
+case class SeverityMapping private (violation: Seq[ValidationName] = Seq.empty,
+                                    warning: Seq[ValidationName] = Seq.empty,
+                                    info: Seq[ValidationName] = Seq.empty,
+                                    disabled: Seq[ValidationName] = Seq.empty,
+                                    default: SeverityLevel = SeverityLevels.VIOLATION) {
+
+  def set(validations: Seq[ValidationName], severity: SeverityLevel): SeverityMapping = {
     severity match {
-      case SeverityLevels.INFO      => info = validations
-      case SeverityLevels.WARNING   => warning = validations
-      case SeverityLevels.VIOLATION => violation = validations
+      case SeverityLevels.INFO      => copy(info = validations)
+      case SeverityLevels.WARNING   => copy(warning = validations)
+      case SeverityLevels.VIOLATION => copy(violation = validations)
     }
-    this
   }
 
   def getSeverityOf(name: ValidationName): Option[String] = {
@@ -46,9 +47,16 @@ case class SeverityMapping() {
     else None
   }
 
-  def disable(validations: Seq[ValidationName]): this.type = {
-    disabled = validations
-    this
+  def disable(validations: Seq[ValidationName]): SeverityMapping = {
+    copy(disabled = validations)
+  }
+
+  def concat(mapping: SeverityMapping): SeverityMapping = {
+    copy(violation ++ mapping.violation,
+         warning ++ mapping.warning,
+         info ++ mapping.info,
+         disabled ++ mapping.disabled,
+         default)
   }
 }
 
