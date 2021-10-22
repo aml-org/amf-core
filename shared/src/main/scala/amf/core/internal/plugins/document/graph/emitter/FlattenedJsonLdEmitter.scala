@@ -31,7 +31,7 @@ object FlattenedJsonLdEmitter {
               builder: DocBuilder[T],
               renderOptions: RenderOptions = config.RenderOptions(),
               namespaceAliases: NamespaceAliases = Namespace.defaultAliases,
-              extensionModels: Map[String, Obj]): Boolean = {
+              extensionModels: Map[String, Type]): Boolean = {
     implicit val ctx: GraphEmitterContext =
       FlattenedGraphEmitterContext(unit, renderOptions, namespaceAliases = namespaceAliases)
     new FlattenedJsonLdEmitter[T](builder, renderOptions, extensionModels).root(unit)
@@ -41,12 +41,13 @@ object FlattenedJsonLdEmitter {
 
 class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T],
                                 val options: RenderOptions,
-                                val extensionModels: Map[String, Obj])(implicit ctx: GraphEmitterContext)
+                                val extensionModels: Map[String, Type])(implicit ctx: GraphEmitterContext)
     extends CommonEmitter
     with MetaModelTypeMapping {
 
-  val pending: EmissionQueue[T] = EmissionQueue()
-  var root: Part[T]             = _
+  val pending: EmissionQueue[T]  = EmissionQueue()
+  var root: Part[T]              = _
+  private lazy val extensionIris = extensionModels.keySet
 
   def root(unit: BaseUnit): Unit = {
     builder.obj { ob =>
@@ -196,10 +197,10 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T],
           val sources = SourceMap(id, unit)
 
           // Emit both unit and unit.encodes fields to the same node
-          emitFields(id, u.encodes, sources, b, getMetaModelFields(u.encodes, encodedObj))
+          emitFields(id, u.encodes, sources, b, getMetaModelFields(u.encodes, encodedObj, extensionIris))
 
           pending.skip(id) // Skip emitting encodes node (since it is the same as this node)
-          emitFields(id, u, sources, b, getMetaModelFields(u, unitObj))
+          emitFields(id, u, sources, b, getMetaModelFields(u, unitObj, extensionIris))
 
           createCustomExtensions(u, b)
 
@@ -256,7 +257,6 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T],
     val obj = metaModel(amfObject)
     createTypeNode(b, obj)
     traverseMetaModel(id, amfObject, sources, obj, b)
-    traverseExtensions(id, amfObject, sources, obj, b)
 
     createCustomExtensions(amfObject, b)
 
@@ -265,7 +265,7 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T],
   }
 
   def traverseMetaModel(id: String, element: AmfObject, sources: SourceMap, obj: Obj, b: Entry[T]): Unit = {
-    val modelFields: Seq[Field] = getMetaModelFields(element, obj)
+    val modelFields: Seq[Field] = getMetaModelFields(element, obj, extensionIris)
 
     // no longer necessary?
     element match {
@@ -280,20 +280,6 @@ class FlattenedJsonLdEmitter[T](val builder: DocBuilder[T],
 
     emitFields(id, element, sources, b, modelFields)
 
-  }
-
-  private def traverseExtensions(id: String, element: AmfObject, sources: SourceMap, obj: Obj, b: Entry[T]): Unit = {
-    val fieldsNotInObj  = diffByIri(element.fields.fieldsMeta(), obj.fields)
-    val extensionFields = fieldsNotInObj.filter(x => extensionModels.contains(x.value.iri()))
-    emitFields(id, element, sources, b, extensionFields)
-  }
-
-  // TODO: had to do this because when implementing hashCode in the Field case class, a lot of other entries popped up in JSON-LD
-  private def diffByIri(fields: List[Field], otherFields: List[Field]): List[Field] = {
-    val similar = (a: Field, b: Field) => a.equals(b)
-    fields.filterNot { a =>
-      otherFields.exists(b => similar(a, b))
-    }
   }
 
   private def emitFields(id: String,
