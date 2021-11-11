@@ -16,7 +16,7 @@ name := "amf-core"
 //
 //  if (branch.contains("master")) s"$major.$minor.$build" else s"$major.${minor + 1}.0-SNAPSHOT"
 //}
-ThisBuild / version := "5.0.0"
+ThisBuild / version := "5.0.1"
 
 publish := {}
 
