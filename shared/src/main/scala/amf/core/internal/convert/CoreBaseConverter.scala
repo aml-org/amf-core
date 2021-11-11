@@ -307,11 +307,11 @@ trait CollectionConverter {
 //
 //  protected def toClientOptionWithEC[E](from: Option[E])(implicit executionContext: ExecutionContext): ClientOption[E]
 
-  private[convert] def asClientList[Internal, Client](from: Seq[Internal],
-                                                      m: InternalClientMatcher[Internal, Client]): ClientList[Client]
+  protected def asClientList[Internal, Client](from: Seq[Internal],
+                                               m: InternalClientMatcher[Internal, Client]): ClientList[Client]
 
-  private[convert] def asClientListWithEC[Internal, Client](from: Seq[Internal],
-                                                            m: InternalClientMatcherWithEC[Internal, Client])(
+  protected def asClientListWithEC[Internal, Client](from: Seq[Internal],
+                                                     m: InternalClientMatcherWithEC[Internal, Client])(
       implicit executionContext: ExecutionContext): ClientList[Client]
 
   protected def asClientMap[Internal, Client](from: mutable.Map[String, Internal],

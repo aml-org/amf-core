@@ -33,12 +33,11 @@ trait CoreBaseClientConverter extends CoreBaseConverter {
       implicit executionContext: ExecutionContext): ClientOption[Client] =
     from.map(matcher.asClient).orUndefined
 
-  override private[convert] def asClientList[A, B](from: Seq[A], matcher: InternalClientMatcher[A, B]): js.Array[B] =
+  override protected def asClientList[A, B](from: Seq[A], matcher: InternalClientMatcher[A, B]): js.Array[B] =
     from.map(matcher.asClient).toJSArray
 
-  override private[convert] def asClientListWithEC[Internal, Client](
-      from: Seq[Internal],
-      matcher: InternalClientMatcherWithEC[Internal, Client])(
+  override protected def asClientListWithEC[Internal, Client](from: Seq[Internal],
+                                                              matcher: InternalClientMatcherWithEC[Internal, Client])(
       implicit executionContext: ExecutionContext): ClientList[Client] =
     from.map(matcher.asClient).toJSArray
 
