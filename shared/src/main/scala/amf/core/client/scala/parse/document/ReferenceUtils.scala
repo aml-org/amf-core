@@ -15,12 +15,16 @@ trait RefContainer {
   def reduceToLocation(): Range
 }
 
-class ASTRefContainer(override val linkType: ReferenceKind, val pos: SourceLocation, override val uriFragment: Option[String]) extends RefContainer {
-  override def reduceToLocation(): Range = Range((pos.lineFrom,pos.columnFrom),(pos.lineTo, pos.columnTo))
+class ASTRefContainer(override val linkType: ReferenceKind,
+                      val pos: SourceLocation,
+                      override val uriFragment: Option[String])
+    extends RefContainer {
+  override def reduceToLocation(): Range = Range((pos.lineFrom, pos.columnFrom), (pos.lineTo, pos.columnTo))
 }
 
 object ASTRefContainer {
-  def apply(linkType: ReferenceKind, pos: SourceLocation, uriFragment: Option[String]) = new ASTRefContainer(linkType, pos, uriFragment)
+  def apply(linkType: ReferenceKind, pos: SourceLocation, uriFragment: Option[String]) =
+    new ASTRefContainer(linkType, pos, uriFragment)
 }
 
 class CompilerReferenceCollector() {
@@ -30,9 +34,9 @@ class CompilerReferenceCollector() {
     val (url, fragment) = ReferenceFragmentPartition(key)
     collector.get(url) match {
       case Some(reference: Reference) =>
-        val refContainer =  ASTRefContainer(kind, pos, fragment)
+        val refContainer = ASTRefContainer(kind, pos, fragment)
         collector += (url, reference + refContainer)
-      case None                       =>
+      case None =>
         collector += (url, Reference(url, kind, pos, fragment))
     }
   }
@@ -44,7 +48,10 @@ object CompilerReferenceCollector {
   def apply() = new CompilerReferenceCollector()
 }
 
-object EmptyReferenceCollector extends CompilerReferenceCollector {}
+object EmptyReferenceCollector extends CompilerReferenceCollector {
+  override def +=(key: String, kind: ReferenceKind, pos: SourceLocation): Unit = {}
+  override def toReferences: Seq[Reference]                                    = Seq.empty
+}
 
 /**
   * Splits references between their base url and local path
@@ -63,8 +70,7 @@ object ReferenceFragmentPartition {
           val str = url.substring(0, url.length - 1 - other.last.length)
           (str, Some(other.last))
       }
-    }
-    else (url, None)
+    } else (url, None)
   }
 
   /**
@@ -73,7 +79,8 @@ object ReferenceFragmentPartition {
     * @return
     */
   private def isExternalReference(referenceLocator: String) = {
-    (referenceLocator.normalizeUrl.startsWith(FILE_PROTOCOL) || referenceLocator.startsWith(HTTPS_PROTOCOL) || referenceLocator
+    (referenceLocator.normalizeUrl.startsWith(FILE_PROTOCOL) || referenceLocator
+      .startsWith(HTTPS_PROTOCOL) || referenceLocator
       .startsWith(HTTP_PROTOCOL)) && !referenceLocator
       .startsWith("#")
   }

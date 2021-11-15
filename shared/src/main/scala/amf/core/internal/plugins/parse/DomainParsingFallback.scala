@@ -6,7 +6,12 @@ import amf.core.client.scala.exception.UnsupportedDomainForDocumentException
 import amf.core.client.scala.model.document.{BaseUnit, ExternalFragment}
 import amf.core.client.scala.model.domain.ExternalDomainElement
 import amf.core.client.scala.parse.AMFParsePlugin
-import amf.core.client.scala.parse.document.{ParserContext, ReferenceHandler, SimpleReferenceHandler}
+import amf.core.client.scala.parse.document.{
+  ParserContext,
+  ReferenceHandler,
+  SimpleReferenceHandler,
+  SyamlParsedDocument
+}
 import amf.core.internal.parser.Root
 import amf.core.internal.remote.{Spec, UnknownSpec}
 import amf.core.internal.validation.CoreParserValidations.CantReferenceSpecInFileTree
@@ -27,13 +32,20 @@ case class ExternalFragmentDomainFallback(strict: Boolean = true) extends Domain
     override def spec: Spec = UnknownSpec("external-fragment")
 
     override def parse(document: Root, ctx: ParserContext): BaseUnit = {
+      val ast = document.parsed match {
+        case syamlDoc: SyamlParsedDocument => Some(syamlDoc.document.node)
+        case _                             => None
+      }
+      val domainElement = ExternalDomainElement()
+        .withRaw(root.raw)
+        .withMediaType(root.mediatype)
+
+      domainElement.parsed = ast
+
       ExternalFragment()
         .withId(root.location)
         .withLocation(root.location)
-        .withEncodes(
-            ExternalDomainElement()
-              .withRaw(root.raw)
-              .withMediaType(root.mediatype))
+        .withEncodes(domainElement)
     }
 
     /**
