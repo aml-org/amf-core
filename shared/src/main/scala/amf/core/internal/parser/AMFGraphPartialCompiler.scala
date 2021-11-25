@@ -71,10 +71,7 @@ class AMFGraphPartialCompiler(compilerContext: CompilerContext, startingPoint: S
 
     override def spec: Spec = AMF
 
-    /**
-      * media types which specifies vendors that may be referenced.
-      */
-    override def validSpecsToReference: Seq[Spec] = Seq(AMF)
+    override def referencePlugins: Seq[AMFParsePlugin] = List(this)
   }
   private val parsePlugin = PartialGraphParsePlugin()
 

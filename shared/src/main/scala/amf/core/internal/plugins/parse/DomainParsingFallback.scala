@@ -43,6 +43,8 @@ case class ExternalFragmentDomainFallback(strict: Boolean = true) extends Domain
 
     override def referenceHandler(eh: AMFErrorHandler): ReferenceHandler = SimpleReferenceHandler
 
+    override def referencePlugins: Seq[AMFParsePlugin] = Nil
+
     override def allowRecursiveReferences: Boolean = false
 
     override def applies(element: Root): Boolean = true

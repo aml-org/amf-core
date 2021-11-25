@@ -111,8 +111,7 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
   private def isRoot = compilerContext.fileContext.history.length == 1
 
   private def parseDomain(document: Root)(implicit executionContext: ExecutionContext): Future[BaseUnit] = {
-    val domainPlugin =
-      getDomainPluginFor(document).getOrElse(compilerContext.compilerConfig.chooseFallback(document, isRoot))
+    val domainPlugin = getDomainPluginFor(document).getOrElse(obtainFallback(document))
     notifyEvent(SelectedParsePluginEvent(document.location, domainPlugin))
     parseReferences(document, domainPlugin) map { documentWithReferences =>
       val baseUnit = domainPlugin.parse(documentWithReferences, compilerContext.parserContext.copyWithSonsReferences())
@@ -128,17 +127,17 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
     }
   }
 
+  private def obtainFallback(document: Root) = {
+    val parsePlugins = compilerContext.applicableParsePlugins
+    compilerContext.compilerConfig.parsingFallback.chooseFallback(document, parsePlugins, isRoot)
+  }
+
   private def parsedModelEvent(baseUnit: BaseUnit): Unit = {
     notifyEvent(ParsedModelEvent(compilerContext.path, baseUnit))
   }
 
   private[amf] def getDomainPluginFor(document: Root): Option[AMFParsePlugin] = {
-    val allowed =
-      if (isRoot) compilerContext.compilerConfig.sortedParsePlugins
-      else {
-        filterByAllowed(compilerContext.compilerConfig.sortedParsePlugins, compilerContext.allowedSpecs)
-      }
-    allowed.find(_.applies(document))
+    compilerContext.applicableParsePlugins.find(_.applies(document))
   }
 
   /**
@@ -150,14 +149,13 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
 
   private[amf] def parseReferences(root: Root, domainPlugin: AMFParsePlugin)(
       implicit executionContext: ExecutionContext): Future[Root] = {
-    val handler      = domainPlugin.referenceHandler(compilerContext.compilerConfig.eh)
-    val allowedSpecs = domainPlugin.validSpecsToReference
-    val refs         = handler.collect(root.parsed, compilerContext.parserContext)
+    val handler = domainPlugin.referenceHandler(compilerContext.compilerConfig.eh)
+    val refs    = handler.collect(root.parsed, compilerContext.parserContext)
     notifyEvent(FoundReferencesEvent(root.location, refs.toReferences.size))
     val parsed: Seq[Future[Option[ParsedReference]]] = refs.toReferences
       .filter(_.isRemote)
       .map { link =>
-        link.resolve(compilerContext, allowedSpecs, domainPlugin.allowRecursiveReferences) flatMap {
+        link.parseReference(compilerContext, domainPlugin.referencePlugins, domainPlugin.allowRecursiveReferences) flatMap {
           case ReferenceResolutionResult(_, Some(unit)) =>
             val reference = ParsedReference(unit, link)
             handler.update(reference, compilerContext).map(Some(_))
@@ -191,7 +189,7 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
 
   def root()(implicit executionContext: ExecutionContext): Future[Root] = fetchContent().map(parseSyntax).flatMap {
     case Right(document: Root) =>
-      val parsePlugin = compilerContext.compilerConfig.sortedParsePlugins.find(_.applies(document))
+      val parsePlugin = getDomainPluginFor(document)
       parsePlugin match {
         case Some(domainPlugin) =>
           parseReferences(document, domainPlugin)
@@ -208,20 +206,19 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
 
 object AMFCompiler {
 
-  // interface used by amf-service
   def apply(url: String,
             base: Context,
             cache: Cache,
-            parserConfig: CompilerConfiguration,
+            compilerConfig: CompilerConfiguration,
+            applicablePlugins: Seq[AMFParsePlugin],
             referenceKind: ReferenceKind = UnspecifiedReference): AMFCompiler = {
-    val context = new CompilerContextBuilder(url, base.platform, parserConfig)
+    val context: CompilerContext = new CompilerContextBuilder(url, applicablePlugins, base.platform, compilerConfig)
       .withCache(cache)
       .withFileContext(base)
       .build()
     forContext(context, referenceKind)
   }
 
-  // could not add new environment in this method as it forces breaking changes in ReferenceHandler
   def forContext(compilerContext: CompilerContext, referenceKind: ReferenceKind = UnspecifiedReference): AMFCompiler = {
     new AMFCompiler(compilerContext, referenceKind)
   }

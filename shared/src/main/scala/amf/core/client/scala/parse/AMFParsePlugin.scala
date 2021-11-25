@@ -22,10 +22,7 @@ trait AMFParsePlugin extends AMFPlugin[Root] {
     */
   def mediaTypes: Seq[String]
 
-  /**
-    * media types which specifies vendors that may be referenced.
-    */
-  def validSpecsToReference: Seq[Spec] = Nil
+  def referencePlugins: Seq[AMFParsePlugin]
 
   def referenceHandler(eh: AMFErrorHandler): ReferenceHandler
 

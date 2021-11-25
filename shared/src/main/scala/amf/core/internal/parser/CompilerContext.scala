@@ -2,6 +2,7 @@ package amf.core.internal.parser
 
 import amf.core.client.common.remote.Content
 import amf.core.client.scala.model.document.BaseUnit
+import amf.core.client.scala.parse.AMFParsePlugin
 import amf.core.client.scala.parse.document.ParserContext
 import amf.core.internal.remote.{Cache, Context, Platform, Spec}
 import amf.core.internal.utils.AmfStrings
@@ -14,7 +15,7 @@ class CompilerContext(val url: String,
                       val parserContext: ParserContext,
                       val compilerConfig: CompilerConfiguration,
                       val fileContext: Context,
-                      val allowedSpecs: Seq[Spec],
+                      val applicableParsePlugins: Seq[AMFParsePlugin],
                       cache: Cache) {
 
   implicit val executionContext: ExecutionContext = compilerConfig.executionContext
@@ -35,14 +36,13 @@ class CompilerContext(val url: String,
 
   def fetchContent(): Future[Content] = compilerConfig.resolveContent(location)
 
-  def forReference(refUrl: String, allowedSpecs: Seq[Spec] = Seq.empty)(
+  def forReference(refUrl: String, applicablePlugins: Seq[AMFParsePlugin])(
       implicit executionContext: ExecutionContext): CompilerContext = {
 
-    new CompilerContextBuilder(refUrl, fileContext.platform, compilerConfig)
+    new CompilerContextBuilder(refUrl, applicablePlugins, fileContext.platform, compilerConfig)
       .withFileContext(fileContext)
       .withBaseParserContext(parserContext)
       .withCache(cache)
-      .withAllowedSpecs(allowedSpecs)
       .build()
   }
 

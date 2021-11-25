@@ -41,6 +41,8 @@ object AMFGraphParsePlugin extends AMFParsePlugin {
 
   override def referenceHandler(eh: AMFErrorHandler): ReferenceHandler = GraphDependenciesReferenceHandler
 
+  override def referencePlugins: Seq[AMFParsePlugin] = List(this)
+
   override def allowRecursiveReferences: Boolean = true
 
   private def effectiveUnitUrl(location: String, options: ParsingOptions): String = {
@@ -49,11 +51,6 @@ object AMFGraphParsePlugin extends AMFParsePlugin {
       case None      => location
     }
   }
-
-  /**
-    * media types which specifies vendors that may be referenced.
-    */
-  override def validSpecsToReference: Seq[Spec] = Seq(AMF)
 
   override def withIdAdoption: Boolean = false
 }

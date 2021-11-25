@@ -1,5 +1,6 @@
 package amf.core.internal.parser
 
+import amf.core.client.scala.parse.AMFParsePlugin
 import amf.core.client.scala.parse.document.ParserContext
 import amf.core.internal.remote.{Cache, Context, PathResolutionError, Platform, Spec}
 import amf.core.internal.utils.AmfStrings
@@ -7,12 +8,15 @@ import amf.core.internal.validation.CoreValidations.UriSyntaxError
 
 import java.net.URISyntaxException
 
-class CompilerContextBuilder(url: String, platform: Platform, compilerConfig: CompilerConfiguration) {
+class CompilerContextBuilder(url: String,
+                             applicablePlugins: Seq[AMFParsePlugin],
+                             platform: Platform,
+                             compilerConfig: CompilerConfiguration) {
 
-  private var fileContext: Context                = Context(platform)
-  private var cache                               = Cache()
-  private var givenContent: Option[ParserContext] = None
-  private var allowedSpecs: Seq[Spec]             = Nil
+  private var fileContext: Context                        = Context(platform)
+  private var cache                                       = Cache()
+  private var givenContent: Option[ParserContext]         = None
+  private var applicableParsePlugins: Seq[AMFParsePlugin] = applicablePlugins
 
   def withFileContext(fc: Context): CompilerContextBuilder = {
     fileContext = fc
@@ -24,13 +28,13 @@ class CompilerContextBuilder(url: String, platform: Platform, compilerConfig: Co
     this
   }
 
-  def withAllowedSpecs(allowed: Seq[Spec]): CompilerContextBuilder = {
-    this.allowedSpecs = allowed
+  def withBaseParserContext(parserContext: ParserContext): this.type = {
+    givenContent = Some(parserContext)
     this
   }
 
-  def withBaseParserContext(parserContext: ParserContext): this.type = {
-    givenContent = Some(parserContext)
+  def withApplicablePlugins(plugins: Seq[AMFParsePlugin]): this.type = {
+    applicableParsePlugins = plugins
     this
   }
 
@@ -57,6 +61,6 @@ class CompilerContextBuilder(url: String, platform: Platform, compilerConfig: Co
 
   def build(): CompilerContext = {
     val fc = buildFileContext()
-    new CompilerContext(url, buildParserContext(fc), compilerConfig, fc, allowedSpecs, cache)
+    new CompilerContext(url, buildParserContext(fc), compilerConfig, fc, applicableParsePlugins.sorted, cache)
   }
 }

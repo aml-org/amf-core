@@ -40,6 +40,8 @@ case class DummyParsePlugin(override val id: String, specName: String, priority:
 
   override def referenceHandler(eh: AMFErrorHandler): ReferenceHandler = SimpleReferenceHandler
 
+  override def referencePlugins: Seq[AMFParsePlugin] = Nil
+
   override def allowRecursiveReferences: Boolean = true
 
   override def applies(element: Root): Boolean = true
