@@ -38,6 +38,9 @@ private[amf] class AMFRegistry(plugins: PluginsRegistry,
 
   def withPlugin(amfPlugin: AMFPlugin[_]): AMFRegistry = copy(plugins = plugins.withPlugin(amfPlugin))
 
+  def withReferenceParsePlugin(parsePlugin: AMFParsePlugin): AMFRegistry =
+    copy(plugins = plugins.withReferenceParsePlugin(parsePlugin))
+
   def removePlugin(id: String): AMFRegistry = copy(plugins = plugins.removePlugin(id))
 
   def withPlugins(amfPlugins: List[AMFPlugin[_]]): AMFRegistry = copy(plugins = plugins.withPlugins(amfPlugins))

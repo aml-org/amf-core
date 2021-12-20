@@ -129,9 +129,9 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
 
   private[amf] def getDomainPluginFor(document: Root): Option[AMFParsePlugin] = {
     val allowed =
-      if (isRoot) compilerContext.compilerConfig.sortedParsePlugins
+      if (isRoot) compilerContext.compilerConfig.rootSortedParsePlugins
       else {
-        filterByAllowed(compilerContext.compilerConfig.sortedParsePlugins, compilerContext.allowedSpecs)
+        filterByAllowed(compilerContext.compilerConfig.allSortedParsePlugins, compilerContext.allowedSpecs)
       }
     allowed.find(_.applies(document))
   }
@@ -186,7 +186,7 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
 
   def root()(implicit executionContext: ExecutionContext): Future[Root] = fetchContent().map(parseSyntax).flatMap {
     case Right(document: Root) =>
-      val parsePlugin = compilerContext.compilerConfig.sortedParsePlugins.find(_.applies(document))
+      val parsePlugin = compilerContext.compilerConfig.rootSortedParsePlugins.find(_.applies(document))
       parsePlugin match {
         case Some(domainPlugin) =>
           parseReferences(document, domainPlugin)

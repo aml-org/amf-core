@@ -16,14 +16,16 @@ import amf.core.internal.plugins.validation.AMFValidatePlugin
   * @param renderPlugins         a list of [[AMFRenderPlugin]]
   * @param domainParsingFallback [[DomainParsingFallback]]
   */
-case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin] = Nil,
-                                         validatePlugins: List[AMFValidatePlugin] = Nil,
-                                         renderPlugins: List[AMFRenderPlugin] = Nil,
-                                         payloadPlugins: List[AMFShapePayloadValidationPlugin] = Nil,
-                                         syntaxParsePlugins: List[AMFSyntaxParsePlugin] = Nil,
-                                         syntaxRenderPlugins: List[AMFSyntaxRenderPlugin] = Nil,
-                                         elementRenderPlugins: List[AMFElementRenderPlugin] = Nil,
-                                         domainParsingFallback: DomainParsingFallback) {
+case class PluginsRegistry private[amf] (
+    parsePlugins: List[AMFParsePlugin] = Nil, // parse root files & references
+    referenceParsePlugins: List[AMFParsePlugin] = Nil, // parse references exclusively
+    validatePlugins: List[AMFValidatePlugin] = Nil,
+    renderPlugins: List[AMFRenderPlugin] = Nil,
+    payloadPlugins: List[AMFShapePayloadValidationPlugin] = Nil,
+    syntaxParsePlugins: List[AMFSyntaxParsePlugin] = Nil,
+    syntaxRenderPlugins: List[AMFSyntaxRenderPlugin] = Nil,
+    elementRenderPlugins: List[AMFElementRenderPlugin] = Nil,
+    domainParsingFallback: DomainParsingFallback) {
 
   lazy val allPlugins: List[AMFPlugin[_]] = parsePlugins ++ validatePlugins ++ renderPlugins ++ payloadPlugins ++
     syntaxParsePlugins ++ syntaxRenderPlugins ++ elementRenderPlugins
@@ -46,6 +48,10 @@ case class PluginsRegistry private[amf] (parsePlugins: List[AMFParsePlugin] = Ni
         copy(elementRenderPlugins = elementRenderPlugins.filter(_.id != r.id) :+ r)
       case _ => this
     }
+  }
+
+  def withReferenceParsePlugin(plugin: AMFParsePlugin): PluginsRegistry = {
+    copy(referenceParsePlugins = referenceParsePlugins.filter(_.id != plugin.id) :+ plugin)
   }
 
   def withPlugins(plugins: Seq[AMFPlugin[_]]): PluginsRegistry = {

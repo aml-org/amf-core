@@ -5,6 +5,7 @@ import amf.core.client.scala.config._
 import amf.core.client.scala.errorhandling.{AMFErrorHandler, DefaultErrorHandlerProvider, ErrorHandlerProvider}
 import amf.core.client.scala.execution.ExecutionEnvironment
 import amf.core.client.scala.model.domain.AnnotationGraphLoader
+import amf.core.client.scala.parse.AMFParsePlugin
 import amf.core.client.scala.resource.ResourceLoader
 import amf.core.client.scala.transform.TransformationPipeline
 import amf.core.internal.annotations.serializable.CoreSerializableAnnotations
@@ -107,6 +108,9 @@ class AMFGraphConfiguration private[amf] (override private[amf] val resolvers: A
 
   def withPlugin(amfPlugin: AMFPlugin[_]): AMFGraphConfiguration = super._withPlugin(amfPlugin)
 
+  def withReferenceParsePlugin(amfPlugin: AMFParsePlugin): AMFGraphConfiguration =
+    super._withReferenceParsePlugin(amfPlugin)
+
   def withPlugins(plugins: List[AMFPlugin[_]]): AMFGraphConfiguration = super._withPlugins(plugins)
 
   private[amf] def withEntities(entities: Map[String, ModelDefaultBuilder]): AMFGraphConfiguration =
@@ -185,6 +189,9 @@ sealed abstract class BaseAMFConfigurationSetter(private[amf] val resolvers: AMF
 
   protected def _withPlugin[T](amfPlugin: AMFPlugin[_]): T =
     copy(registry = registry.withPlugin(amfPlugin)).asInstanceOf[T]
+
+  protected def _withReferenceParsePlugin[T](plugin: AMFParsePlugin): T =
+    copy(registry = registry.withReferenceParsePlugin(plugin)).asInstanceOf[T]
 
   protected def _withFallback[T](plugin: DomainParsingFallback): T =
     copy(registry = registry.withFallback(plugin)).asInstanceOf[T]
