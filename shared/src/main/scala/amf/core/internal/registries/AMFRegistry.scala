@@ -41,8 +41,6 @@ private[amf] class AMFRegistry(plugins: PluginsRegistry,
   def withReferenceParsePlugin(parsePlugin: AMFParsePlugin): AMFRegistry =
     copy(plugins = plugins.withReferenceParsePlugin(parsePlugin))
 
-  def removePlugin(id: String): AMFRegistry = copy(plugins = plugins.removePlugin(id))
-
   def withPlugins(amfPlugins: List[AMFPlugin[_]]): AMFRegistry = copy(plugins = plugins.withPlugins(amfPlugins))
 
   def withFallback(plugin: DomainParsingFallback): AMFRegistry = copy(plugins = plugins.withFallback(plugin))
@@ -95,9 +93,6 @@ private[amf] class AMFRegistry(plugins: PluginsRegistry,
                     effectiveValidations,
                     namespaceAliases)
 
-  private[amf] def getAllPlugins(): List[AMFPlugin[_]] = plugins.allPlugins
-
-  private[amf] lazy val sortedParsePlugins: List[AMFParsePlugin]                 = plugins.parsePlugins.sorted
   private[amf] lazy val sortedElementRenderPlugins: List[AMFElementRenderPlugin] = plugins.elementRenderPlugins.sorted
 
   private[amf] def getParsingFallback(): DomainParsingFallback = plugins.domainParsingFallback

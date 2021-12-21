@@ -18,12 +18,15 @@ class PluginRegistryTest extends FunSuite with Matchers {
     val secondPlugin = DummyParsePlugin("1", "Second Parse Plugin")
     val registry     = PluginsRegistry.empty.withPlugin(firstPlugin)
 
-    registry.parsePlugins should have size 1
-    registry.parsePlugins.head.asInstanceOf[DummyParsePlugin].specName shouldBe firstPlugin.specName
+    registry.rootParsePlugins should have size 1
+    registry.referenceParsePlugins should have size 1
+    registry.rootParsePlugins.head.asInstanceOf[DummyParsePlugin].specName shouldBe firstPlugin.specName
 
     val finalRegistry = registry.withPlugin(secondPlugin)
-    finalRegistry.parsePlugins should have size 1
-    finalRegistry.parsePlugins.head.asInstanceOf[DummyParsePlugin].specName shouldBe secondPlugin.specName
+    finalRegistry.rootParsePlugins should have size 1
+    finalRegistry.referenceParsePlugins should have size 1
+    finalRegistry.rootParsePlugins.head.asInstanceOf[DummyParsePlugin].specName shouldBe secondPlugin.specName
+    finalRegistry.referenceParsePlugins.head.asInstanceOf[DummyParsePlugin].specName shouldBe secondPlugin.specName
   }
 }
 

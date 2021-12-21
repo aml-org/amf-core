@@ -18,20 +18,17 @@ case class CompilerConfiguration(private val config: AMFGraphConfiguration) {
   val executionContext: ExecutionContext           = config.resolvers.executionEnv.context
   def resolveContent(url: String): Future[Content] = config.resolvers.resolveContent(url)
 
-  val rootSortedParsePlugins: Seq[AMFParsePlugin] = config.registry.getPluginsRegistry.parsePlugins.sorted
+  val rootSortedParsePlugins: Seq[AMFParsePlugin] = config.registry.getPluginsRegistry.rootParsePlugins.sorted
+  lazy val referenceSortedParsePlugins: Seq[AMFParsePlugin] =
+    config.registry.getPluginsRegistry.referenceParsePlugins.sorted
 
-  // includes registered parse plugins + reference exclusive parse plugins
-  lazy val allSortedParsePlugins: Seq[AMFParsePlugin] = {
-    val registry   = config.registry.getPluginsRegistry
-    val allPlugins = registry.parsePlugins ++ registry.referenceParsePlugins
-    allPlugins.sorted
-  }
   val sortedParseSyntax: Seq[AMFSyntaxParsePlugin] = config.registry.getPluginsRegistry.syntaxParsePlugins.sorted
   def notifyEvent(e: AMFEvent): Unit               = config.listeners.foreach(_.notifyEvent(e))
 
   def chooseFallback(document: Root, isRoot: Boolean): AMFParsePlugin = {
     val fallback = config.registry.getPluginsRegistry.domainParsingFallback
-    fallback.chooseFallback(document, allSortedParsePlugins, isRoot)
+    val plugins  = if (isRoot) rootSortedParsePlugins else referenceSortedParsePlugins
+    fallback.chooseFallback(document, plugins, isRoot)
   }
 
   def getUnitsCache: Option[UnitCache] = config.getUnitsCache

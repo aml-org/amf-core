@@ -16,24 +16,22 @@ import amf.core.internal.plugins.validation.AMFValidatePlugin
   * @param renderPlugins         a list of [[AMFRenderPlugin]]
   * @param domainParsingFallback [[DomainParsingFallback]]
   */
-case class PluginsRegistry private[amf] (
-    parsePlugins: List[AMFParsePlugin] = Nil, // parse root files & references
-    referenceParsePlugins: List[AMFParsePlugin] = Nil, // parse references exclusively
-    validatePlugins: List[AMFValidatePlugin] = Nil,
-    renderPlugins: List[AMFRenderPlugin] = Nil,
-    payloadPlugins: List[AMFShapePayloadValidationPlugin] = Nil,
-    syntaxParsePlugins: List[AMFSyntaxParsePlugin] = Nil,
-    syntaxRenderPlugins: List[AMFSyntaxRenderPlugin] = Nil,
-    elementRenderPlugins: List[AMFElementRenderPlugin] = Nil,
-    domainParsingFallback: DomainParsingFallback) {
-
-  lazy val allPlugins: List[AMFPlugin[_]] = parsePlugins ++ validatePlugins ++ renderPlugins ++ payloadPlugins ++
-    syntaxParsePlugins ++ syntaxRenderPlugins ++ elementRenderPlugins
+case class PluginsRegistry private[amf] (rootParsePlugins: List[AMFParsePlugin] = Nil,
+                                         referenceParsePlugins: List[AMFParsePlugin] = Nil,
+                                         validatePlugins: List[AMFValidatePlugin] = Nil,
+                                         renderPlugins: List[AMFRenderPlugin] = Nil,
+                                         payloadPlugins: List[AMFShapePayloadValidationPlugin] = Nil,
+                                         syntaxParsePlugins: List[AMFSyntaxParsePlugin] = Nil,
+                                         syntaxRenderPlugins: List[AMFSyntaxRenderPlugin] = Nil,
+                                         elementRenderPlugins: List[AMFElementRenderPlugin] = Nil,
+                                         domainParsingFallback: DomainParsingFallback) {
 
   def withPlugin(plugin: AMFPlugin[_]): PluginsRegistry = {
     plugin match {
       case p: AMFParsePlugin =>
-        copy(parsePlugins = parsePlugins.filter(_.id != p.id) :+ p)
+        val updatedRootPlugins      = rootParsePlugins.filter(_.id != p.id) :+ p
+        val updatedReferencePlugins = referenceParsePlugins.filter(_.id != p.id) :+ p
+        copy(rootParsePlugins = updatedRootPlugins, referenceParsePlugins = updatedReferencePlugins)
       case v: AMFValidatePlugin =>
         copy(validatePlugins = validatePlugins.filter(_.id != v.id) :+ v)
       case r: AMFRenderPlugin =>
@@ -61,13 +59,6 @@ case class PluginsRegistry private[amf] (
   def withFallback(plugin: DomainParsingFallback): PluginsRegistry = {
     copy(domainParsingFallback = plugin)
   }
-
-  def removePlugin(id: String): PluginsRegistry =
-    copy(
-        parsePlugins = parsePlugins.filterNot(_.id == id),
-        validatePlugins = validatePlugins.filterNot(_.id == id),
-        renderPlugins = renderPlugins.filterNot(_.id == id)
-    )
 
 }
 

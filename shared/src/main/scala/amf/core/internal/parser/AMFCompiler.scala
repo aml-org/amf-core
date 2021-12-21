@@ -131,7 +131,7 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
     val allowed =
       if (isRoot) compilerContext.compilerConfig.rootSortedParsePlugins
       else {
-        filterByAllowed(compilerContext.compilerConfig.allSortedParsePlugins, compilerContext.allowedSpecs)
+        filterByAllowed(compilerContext.compilerConfig.referenceSortedParsePlugins, compilerContext.allowedSpecs)
       }
     allowed.find(_.applies(document))
   }
