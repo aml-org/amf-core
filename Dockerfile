@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 ARG USER_HOME_DIR="/root"
 
 ENV SCALA_VERSION 2.12.11
-ENV SBT_VERSION 1.3.9
+ENV SBT_VERSION 1.6.1
 
 # Update the repository sources list and install dependencies
 RUN apt-get update
