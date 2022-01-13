@@ -5,6 +5,8 @@ ARG USER_HOME_DIR="/root"
 ENV SCALA_VERSION 2.12.11
 ENV SBT_VERSION 1.6.1
 
+WORKDIR /home
+
 # Update the repository sources list and install dependencies
 RUN apt-get update
 
