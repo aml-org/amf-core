@@ -136,6 +136,11 @@ object CoreValidations extends Validations {
       "Unhandled domain element for given spec"
   )
 
+  val ExceededMaxYamlReferences = validation(
+      "max-yaml-references",
+      "Exceeded maximum yaml references threshold"
+  )
+
   override val levels: Map[String, Map[ProfileName, String]] = Map(
       SyamlWarning.id               -> all(WARNING),
       UnresolvedReferenceWarning.id -> all(WARNING),
@@ -169,6 +174,7 @@ object CoreValidations extends Validations {
       InvalidFragmentRef,
       RecursiveShapeSpecification,
       TransformationValidation,
-      UnhandledDomainElement
+      UnhandledDomainElement,
+      ExceededMaxYamlReferences
   )
 }
