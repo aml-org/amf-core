@@ -18,7 +18,7 @@ class PlatformTest extends AsyncFunSuite with Matchers with ListAssertions with 
 
   test("File") {
     AMFResolvers.predefined().resolveContent("file://shared/src/test/resources/input.yaml") map {
-      case Content(content, _, mime) =>
+      case InternalContent(content, _, mime) =>
         mime should contain(`application/yaml`)
 
         content.toString should be

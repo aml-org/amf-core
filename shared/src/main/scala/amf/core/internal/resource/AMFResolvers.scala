@@ -5,7 +5,7 @@ import amf.core.client.platform.resource.{LoaderWithExecutionContext => Platform
 import amf.core.client.scala.config.UnitCache
 import amf.core.client.scala.execution.ExecutionEnvironment
 import amf.core.client.scala.resource.{LoaderWithExecutionContext, ResourceLoader}
-import amf.core.internal.remote.UnsupportedUrlScheme
+import amf.core.internal.remote.{InternalContent, UnsupportedUrlScheme}
 import amf.core.internal.unsafe.PlatformSecrets
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -74,8 +74,10 @@ private[amf] case class AMFResolvers(resourceLoaders: List[ResourceLoader],
     * @param executionContext
     * @return
     */
-  def resolveContent(url: String): Future[Content] = {
-    loaderConcat(url, resourceLoaders.filter(_.accepts(url)))(executionEnv.context)
+  def resolveContent(url: String): Future[InternalContent] = {
+    implicit val context: ExecutionContext = executionEnv.context
+    val clientContent                      = loaderConcat(url, resourceLoaders.filter(_.accepts(url)))
+    clientContent.map(InternalContent.withUrl(_, url))
   }
 
   private def loaderConcat(url: String, loaders: Seq[ResourceLoader])(

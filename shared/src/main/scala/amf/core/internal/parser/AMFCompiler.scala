@@ -11,10 +11,10 @@ import amf.core.client.scala.parse.document.{UnresolvedReference => _, _}
 import amf.core.internal.remote.Mimes._
 import amf.core.internal.adoption.IdAdopter
 import amf.core.internal.remote._
-import amf.core.internal.utils.AmfStrings
 import amf.core.internal.validation.CoreValidations._
 import scala.concurrent.Future.failed
 import scala.concurrent.{ExecutionContext, Future}
+import amf.core.internal.convert.CoreClientConverters.InternalContentMatcher
 
 class AMFCompiler(compilerContext: CompilerContext, val referenceKind: ReferenceKind = UnspecifiedReference) {
 
@@ -53,8 +53,8 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
     }
   }
 
-  private[amf] def parseSyntax(input: Content): Either[Content, Root] = {
-    notifyEvent(StartingContentParsingEvent(compilerContext.path, input))
+  private[amf] def parseSyntax(input: InternalContent): Either[InternalContent, Root] = {
+    notifyEvent(StartingContentParsingEvent(compilerContext.path, InternalContentMatcher.asClient(input)))
     val parsed: Option[(String, ParsedDocument)] =
       input.mime
         .flatMap(mime => parseSyntaxForMediaType(input, mime))
@@ -68,37 +68,38 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
 
     parsed match {
       case Some((effective, document)) =>
-        notifyEvent(ParsedSyntaxEvent(compilerContext.path, input, document))
+        notifyEvent(ParsedSyntaxEvent(compilerContext.path, InternalContentMatcher.asClient(input), document))
         Right(Root(document, input.url, effective, Seq(), referenceKind, input.stream.toString))
       case None =>
         Left(input)
     }
   }
 
-  private def inferMediaTypeFromFileExtension(content: Content): Option[String] = {
+  private def inferMediaTypeFromFileExtension(content: InternalContent): Option[String] = {
     FileMediaType
       .extension(content.url)
       .flatMap(FileMediaType.mimeFromExtension)
   }
 
-  private def parseSyntaxForMediaType(content: Content, mime: String): Option[(String, ParsedDocument)] = {
+  private def parseSyntaxForMediaType(content: InternalContent, mime: String): Option[(String, ParsedDocument)] = {
     val withContentUrl = compilerContext.parserContext.forLocation(content.url)
     compilerContext.compilerConfig.sortedParseSyntax
       .find(_.applies(content.stream))
       .map(p => (mime, p.parse(content.stream, mime, withContentUrl)))
   }
 
-  def parseExternalFragment(content: Content)(implicit executionContext: ExecutionContext): Future[BaseUnit] = Future {
-    val result = ExternalDomainElement().withId(content.url + "#/").withRaw(content.stream.toString)
-    content.mime.foreach(mime => result.withMediaType(mime))
-    ExternalFragment()
-      .withLocation(content.url)
-      .withId(content.url)
-      .withEncodes(result)
-      .withLocation(content.url)
-  }
+  def parseExternalFragment(content: InternalContent)(implicit executionContext: ExecutionContext): Future[BaseUnit] =
+    Future {
+      val result = ExternalDomainElement().withId(content.url + "#/").withRaw(content.stream.toString)
+      content.mime.foreach(mime => result.withMediaType(mime))
+      ExternalFragment()
+        .withLocation(content.url)
+        .withId(content.url)
+        .withEncodes(result)
+        .withLocation(content.url)
+    }
 
-  private def parseDomain(parsed: Either[Content, Root])(
+  private def parseDomain(parsed: Either[InternalContent, Root])(
       implicit executionContext: ExecutionContext): Future[BaseUnit] = {
     parsed match {
       case Left(content) if isRoot => throw UnsupportedSyntaxForDocumentException(content.url)
@@ -181,7 +182,7 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
     Future.sequence(parsed).map(rs => root.copy(references = rs.flatten))
   }
 
-  private[amf] def fetchContent()(implicit executionContext: ExecutionContext): Future[Content] =
+  private[amf] def fetchContent()(implicit executionContext: ExecutionContext): Future[InternalContent] =
     compilerContext.fetchContent()
 
   def root()(implicit executionContext: ExecutionContext): Future[Root] = fetchContent().map(parseSyntax).flatMap {

@@ -3,6 +3,8 @@ package amf.core.client.scala.validation.payload
 import amf.core.client.common.remote.Content
 import amf.core.client.scala.AMFGraphConfiguration
 import amf.core.client.scala.errorhandling.AMFErrorHandler
+import amf.core.internal.remote.InternalContent
+import amf.core.internal.convert.CoreClientConverters._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -16,5 +18,6 @@ case class ShapeValidationConfiguration(private[amf] val config: AMFGraphConfigu
   val maxYamlReferences: Option[Int]     = config.options.parsingOptions.maxYamlReferences
 
   // Necessary for Java XML Payload Validator
-  def fetchContent(url: String): Future[Content] = config.resolvers.resolveContent(url)
+  def fetchContent(url: String): Future[Content] =
+    config.resolvers.resolveContent(url).map(InternalContentMatcher.asClient(_))(config.getExecutionContext)
 }

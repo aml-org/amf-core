@@ -60,8 +60,8 @@ import amf.core.client.scala.model.document.{
   BaseUnit,
   BaseUnitProcessingData,
   BaseUnitSourceInformation,
-  LocationInformation,
   Document,
+  LocationInformation,
   Module,
   PayloadFragment
 }
@@ -85,7 +85,7 @@ import amf.core.client.scala.{AMFGraphConfiguration, AMFObjectResult, AMFParseRe
 import amf.core.internal.convert.PayloadValidatorConverter.PayloadValidatorMatcher
 import amf.core.internal.parser.domain.Annotations
 import amf.core.internal.reference.UnitCacheAdapter
-import amf.core.internal.remote.Spec
+import amf.core.internal.remote.{InternalContent, Spec}
 import amf.core.internal.resource.{ClientResourceLoaderAdapter, InternalResourceLoaderAdapter}
 import amf.core.internal.unsafe.PlatformSecrets
 import amf.core.internal.validation.{ValidationCandidate, ValidationShapeSet}
@@ -134,7 +134,8 @@ trait CoreBaseConverter
     with AmfObjectResultConverter
     with BaseUnitProcessingDataConverter
     with BaseUnitSourceInformationConverter
-    with LocationInformationConverter {
+    with LocationInformationConverter
+    with ContentConverter {
 
   implicit def asClient[Internal, Client](from: Internal)(
       implicit m: InternalClientMatcher[Internal, Client]): Client =
@@ -774,5 +775,11 @@ trait LocationInformationConverter extends PlatformSecrets {
 
     override def asClient(from: LocationInformation): model.document.LocationInformation =
       platform.wrap(from)
+  }
+}
+
+trait ContentConverter extends PlatformSecrets {
+  implicit object InternalContentMatcher extends InternalClientMatcher[InternalContent, Content] {
+    override def asClient(from: InternalContent): Content = Content(from.stream, Some(from.url), from.mime)
   }
 }

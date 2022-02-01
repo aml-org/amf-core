@@ -5,6 +5,7 @@ import amf.core.client.scala.AMFGraphConfiguration
 import amf.core.client.scala.config.{AMFEvent, UnitCache}
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.parse.{AMFParsePlugin, AMFSyntaxParsePlugin}
+import amf.core.internal.remote.InternalContent
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -15,8 +16,8 @@ case class CompilerConfiguration(private val config: AMFGraphConfiguration) {
 
   val eh: AMFErrorHandler = config.errorHandlerProvider.errorHandler()
 
-  val executionContext: ExecutionContext           = config.resolvers.executionEnv.context
-  def resolveContent(url: String): Future[Content] = config.resolvers.resolveContent(url)
+  val executionContext: ExecutionContext                   = config.resolvers.executionEnv.context
+  def resolveContent(url: String): Future[InternalContent] = config.resolvers.resolveContent(url)
 
   val rootSortedParsePlugins: Seq[AMFParsePlugin] = config.registry.getPluginsRegistry.rootParsePlugins.sorted
   lazy val referenceSortedParsePlugins: Seq[AMFParsePlugin] =
