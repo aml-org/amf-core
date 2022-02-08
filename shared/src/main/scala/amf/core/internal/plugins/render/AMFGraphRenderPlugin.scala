@@ -21,7 +21,10 @@ object AMFGraphRenderPlugin extends AMFRenderPlugin {
 
   override def defaultSyntax(): String = `application/json`
 
-  override def emit[T](unit: BaseUnit, builder: ASTBuilder[T], renderConfig: RenderConfiguration): Boolean = {
+  override def emit[T](unit: BaseUnit,
+                       builder: ASTBuilder[T],
+                       renderConfig: RenderConfiguration,
+                       mediaType: String): Boolean = {
     builder match {
       case yDocBuilder: DocBuilder[_] =>
         emitToYDocBuilder(unit, yDocBuilder, renderConfig)

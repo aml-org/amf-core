@@ -23,7 +23,7 @@ class AMFSerializer(unit: BaseUnit, config: RenderConfiguration, mediaType: Opti
 
   def renderAsYDocument(renderPlugin: AMFRenderPlugin): RenderResult = {
     notifyEvent(StartingRenderingEvent(unit, renderPlugin, mediaType))
-    val result = renderPlugin.emit(unit, config)
+    val result = renderPlugin.emit(unit, config, mediaType.getOrElse(renderPlugin.defaultSyntax()))
     notifyEvent(FinishedRenderingASTEvent(unit, result))
     RenderResult(result, mediaType.getOrElse(renderPlugin.defaultSyntax()))
   }
