@@ -164,7 +164,7 @@ private[datanode] case class DataPropertyEmitter(
 
   private def getAstFrom(annotations: Annotations) =
     annotations
-      .find(classOf[SourceAST])
+      .find(classOf[SourceAST[_]])
       .map(_.ast)
       .collectFirst({ case e: YMapEntry => Annotations(e.key) })
 

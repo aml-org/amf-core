@@ -63,8 +63,7 @@ class TransformationTraversal private[amf] (val transformation: TransformationDa
 
   private def lexicalAnnotationsOf(value: Value) =
     value.annotations.copyFiltering(a =>
-      a.isInstanceOf[LexicalInformation] || a.isInstanceOf[SourceAST] || a.isInstanceOf[SourceNode]
-    )
+      a.isInstanceOf[LexicalInformation] || a.isInstanceOf[SourceAST[_]] || a.isInstanceOf[SourceNode])
 
   protected def traverseArrayEntry(element: AmfObject, traversalPath: TraversalPath, fieldEntry: FieldEntry) = {
     val FieldEntry(field, value) = fieldEntry

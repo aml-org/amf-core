@@ -3,7 +3,7 @@ package amf.core.internal.transform
 import amf.core.client.scala.model.domain.templates.Variable
 import amf.core.client.scala.model.domain.{DataNode, ScalarNode}
 import amf.core.internal.transform.stages.helpers.ResolvedLinkNode
-import amf.core.internal.annotations.{ErrorRegistered, SourceAST}
+import amf.core.internal.annotations.{ErrorRegistered, SourceAST, SourceYPart}
 import org.yaml.model.{QuotedMark, YScalar}
 import org.yaml.render.YamlRender
 import amf.core.internal.utils.InflectorBase._
@@ -88,7 +88,7 @@ object VariableReplacer {
       .flatMap {
         case v: ScalarNode =>
           v.annotations
-            .find(classOf[SourceAST])
+            .find(classOf[SourceYPart])
             .map(_.ast)
             .collectFirst({
               case s: YScalar if s.mark.isInstanceOf[QuotedMark] =>

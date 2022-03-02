@@ -4,7 +4,11 @@ import amf.core.client.scala.model.domain.{Annotation, PerpetualAnnotation}
 import org.yaml.model.YNode.MutRef
 import org.yaml.model.{YNode, YPart}
 
-case class SourceAST(ast: YPart) extends Annotation
+trait SourceAST[T] extends Annotation {
+  val ast: T
+}
+
+case class SourceYPart(override val ast: YPart) extends SourceAST[YPart]
 
 case class SourceNode(node: YNode) extends Annotation
 

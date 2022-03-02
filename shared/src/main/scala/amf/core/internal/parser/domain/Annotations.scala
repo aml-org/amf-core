@@ -16,6 +16,7 @@ import amf.core.internal.annotations.{
   ResolvedLinkTargetAnnotation,
   SourceAST,
   SourceNode,
+  SourceYPart,
   SynthesizedField,
   TrackedElement,
   VirtualElement,
@@ -131,9 +132,8 @@ object Annotations {
   }
 
   def apply(ast: YPart): Annotations = {
-    val annotations = new Annotations() ++= Set(
-        LexicalInformation(ast),
-        SourceAST(ast),
+    val annotations = new Annotations() ++= Set(LexicalInformation(ast),
+                                                SourceYPart(ast),
 //      AmfSourceLocation(ast.sourceName))
         AmfSourceLocation(ast)
     )
