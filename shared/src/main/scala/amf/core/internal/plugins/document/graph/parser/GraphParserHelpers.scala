@@ -17,9 +17,11 @@ import amf.core.internal.parser._
 import amf.core.client.scala.parse.document.ParserContext
 import amf.core.client.scala.vocabulary.Namespace.SourceMaps
 import amf.core.client.scala.vocabulary._
+import amf.core.internal.parser.domain.Annotations
 import amf.core.internal.plugins.document.graph.JsonLdKeywords
 import amf.core.internal.plugins.document.graph.context.{
   ExpandedTermDefinition,
+  GraphContext,
   GraphContextOperations,
   TermDefinition
 }
@@ -44,6 +46,18 @@ trait GraphParserHelpers extends GraphContextHelper {
   }
 
   protected def str(node: YNode)(implicit errorHandler: IllegalTypeHandler): AmfScalar = AmfScalar(stringValue(node))
+  protected def typedValue(node: YNode, context: GraphContext)(implicit errorHandler: IllegalTypeHandler): AmfScalar = {
+    val map          = node.as[YMap]
+    val expandedIri  = map.key(JsonLdKeywords.Type).map(_.value.as[String]).map(expand(_)(context))
+    val detectedType = expandedIri.getOrElse(DataType.String)
+    detectedType match {
+      case DataType.Boolean => bool(node)
+      case DataType.Integer => int(node)
+      case DataType.Double  => double(node)
+      case DataType.Float   => double(node)
+      case _                => str(node)
+    }
+  }
 
   private def stringValue(node: YNode)(implicit errorHandler: IllegalTypeHandler): String =
     node.tagType match {

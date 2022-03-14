@@ -26,6 +26,24 @@ trait Obj extends Type {
 
 object Type {
 
+  object Literal {
+    def apply(dataType: String): Option[Scalar] = dataType match {
+      case _ if dataType == Str.`type`.head.iri()        => Some(Str)
+      case _ if dataType == Int.`type`.head.iri()        => Some(Int)
+      case _ if dataType == Float.`type`.head.iri()      => Some(Float)
+      case _ if dataType == Double.`type`.head.iri()     => Some(Double)
+      case _ if dataType == RegExp.`type`.head.iri()     => Some(RegExp)
+      case _ if dataType == Time.`type`.head.iri()       => Some(Time)
+      case _ if dataType == Date.`type`.head.iri()       => Some(Date)
+      case _ if dataType == DateTime.`type`.head.iri()   => Some(DateTime)
+      case _ if dataType == Iri.`type`.head.iri()        => Some(Iri)
+      case _ if dataType == EncodedIri.`type`.head.iri() => Some(EncodedIri)
+      case _ if dataType == LiteralUri.`type`.head.iri() => Some(LiteralUri)
+      case _ if dataType == Bool.`type`.head.iri()       => Some(Bool)
+      case _                                             => None
+    }
+  }
+
   case class Scalar(id: String) extends Type {
     override val `type`: List[ValueType] = List(Xsd + id)
   }

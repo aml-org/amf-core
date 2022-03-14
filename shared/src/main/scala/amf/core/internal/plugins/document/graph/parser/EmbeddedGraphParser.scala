@@ -90,7 +90,8 @@ class EmbeddedGraphParser(private val aliases: Map[String, String])(implicit val
       }
       buffer.flatMap { n =>
         listElement match {
-          case _: Obj => parse(n.as[YMap])
+          case _: Obj   => parse(n.as[YMap])
+          case Type.Any => Some(typedValue(n, ctx.graphContext))
           case _ =>
             try { Some(str(value(listElement, n))) } catch {
               case _: Exception => None

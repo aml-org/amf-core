@@ -229,7 +229,8 @@ class FlattenedGraphParser(startingPoint: String, overrideAliases: Map[String, S
           // Parse members
           members.sortBy(key).flatMap { entry =>
             listElement match {
-              case _: Obj => parse(entry.value.as[YMap])
+              case _: Obj   => parse(entry.value.as[YMap])
+              case Type.Any => Some(typedValue(entry.value, ctx.graphContext))
               case _ =>
                 try { Some(str(value(listElement, entry.value))) } catch {
                   case _: Exception => None

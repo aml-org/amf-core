@@ -66,7 +66,7 @@ case class PropertyConstraint(ramlPropertyId: String,
                                 * Objects of this property must have this class
                                 */
                               `class`: Seq[String] = Seq(),
-                              in: Seq[String] = Seq.empty,
+                              in: Set[Any] = Set.empty,
                               custom: Option[(EntryBuilder, String) => Unit] = None,
                               /**
                                * for qualified constraints
