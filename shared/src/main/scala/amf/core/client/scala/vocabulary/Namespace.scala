@@ -16,6 +16,7 @@ object Namespace {
 
   val Document: Namespace         = Namespace("http://a.ml/vocabularies/document#")
   val ApiContract: Namespace      = Namespace("http://a.ml/vocabularies/apiContract#")
+  val Query: Namespace            = Namespace("http://a.ml/vocabularies/query#")
   val ApiBinding: Namespace       = Namespace("http://a.ml/vocabularies/apiBinding#")
   val Security: Namespace         = Namespace("http://a.ml/vocabularies/security#")
   val Shapes: Namespace           = Namespace("http://a.ml/vocabularies/shapes#")
