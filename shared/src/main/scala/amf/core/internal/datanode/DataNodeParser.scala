@@ -5,7 +5,6 @@ import amf.core.client.scala.model.document.{EncodesModel, ExternalFragment}
 import amf.core.client.scala.model.domain.ScalarNode.forDataType
 import amf.core.client.scala.model.domain.extensions.CustomDomainProperty
 import amf.core.client.scala.model.domain.{
-  AmfObject,
   DataNode,
   LinkNode,
   ScalarNode,
@@ -16,12 +15,11 @@ import amf.core.client.scala.parse.document.{ErrorHandlingContext, ParsedReferen
 import amf.core.internal.annotations.{ReferenceId, ScalarType}
 import amf.core.internal.metamodel.domain.ScalarNodeModel
 import amf.core.internal.parser.domain
-import amf.core.internal.parser.domain.{Annotations, _}
+import amf.core.internal.parser.domain._
 import amf.core.internal.utils._
-import amf.core.internal.validation.CoreValidations.SyamlError
-import amf.core.internal.validation.CoreValidations.ExceededMaxYamlReferences
+import amf.core.internal.validation.CoreValidations.{ExceededMaxYamlReferences, SyamlError}
+import org.mulesoft.common.client.lexical.PositionRange
 import org.mulesoft.common.time.SimpleDateTime
-import org.mulesoft.lexer.InputRange
 import org.yaml.model.YNode.MutRef
 import org.yaml.model._
 import org.yaml.parser.YamlParser
@@ -200,9 +198,6 @@ case class ScalarNodeParser(hook: OnScalarParseHook = NothingOnScalarParseHook, 
         parseLink(node.value.toString, nodeLocation)
     }
   }
-
-  private def inputRangeString(range: InputRange): String =
-    s"[(${range.lineFrom},${range.columnFrom})-(${range.lineTo},${range.columnTo})]"
 
   def parseIncludedAST(raw: String, node: YNode): DataNode = {
     val n = YamlParser(raw, node.sourceName).withIncludeTag("!include").document().node

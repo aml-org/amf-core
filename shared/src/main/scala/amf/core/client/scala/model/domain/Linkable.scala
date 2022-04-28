@@ -7,7 +7,7 @@ import amf.core.internal.parser.domain.{Annotations, DeclarationPromise, Fields,
 import amf.core.internal.utils.IdCounter
 import amf.core.internal.adoption.AdoptionDependantCalls
 import amf.core.internal.validation.CoreValidations.{UnresolvedReference, UnresolvedReferenceWarning}
-import org.mulesoft.lexer.SourceLocation
+import org.mulesoft.common.client.lexical.SourceLocation
 
 trait Linkable extends AmfObject with AdoptionDependantCalls { this: DomainElement with Linkable =>
 
@@ -104,12 +104,12 @@ trait Linkable extends AmfObject with AdoptionDependantCalls { this: DomainEleme
 
   // Unresolved references to things that can be linked
   // TODO: another trait?
-  private[amf] var isUnresolved: Boolean                        = false
-  private[amf] var refName                                      = ""
-  private[amf] var refAliases                                   = Seq[String]()
-  private var unresolvedSeverity: String                        = "error"
-  private var astPos: Option[org.mulesoft.lexer.SourceLocation] = None
-  private var refCtx: Option[UnresolvedComponents]              = None
+  private[amf] var isUnresolved: Boolean           = false
+  private[amf] var refName                         = ""
+  private[amf] var refAliases                      = Seq[String]()
+  private var unresolvedSeverity: String           = "error"
+  private var astPos: Option[SourceLocation]       = None
+  private var refCtx: Option[UnresolvedComponents] = None
 
   def unresolved(
       refName: String,

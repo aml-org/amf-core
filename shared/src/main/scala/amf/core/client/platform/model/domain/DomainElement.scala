@@ -1,10 +1,10 @@
 package amf.core.client.platform.model.domain
 
-import amf.core.internal.convert.CoreClientConverters._
 import amf.core.client.platform.model.{AmfObjectWrapper, BoolField}
-import amf.core.client.common.position.Range
-import amf.core.client.scala.model.domain.{DomainElement => InternalDomainElement, Graph => InternalGraph}
+import amf.core.client.scala.model.domain.{DomainElement => InternalDomainElement}
+import amf.core.internal.convert.CoreClientConverters._
 import amf.core.internal.unsafe.PlatformSecrets
+import org.mulesoft.common.client.lexical.PositionRange
 
 import scala.scalajs.js.annotation.JSExportAll
 
@@ -18,7 +18,7 @@ trait DomainElement extends AmfObjectWrapper with PlatformSecrets with Customiza
   override def customDomainProperties: ClientList[DomainExtension] = _internal.customDomainProperties.asClient
   def extendsNode: ClientList[DomainElement]                       = _internal.extend.asClient
   def id: String                                                   = _internal.id
-  def position: Range                                              = _internal.position().map(_.range).orNull
+  def position: PositionRange                                      = _internal.position().map(_.range).orNull
 
   override def withCustomDomainProperties(extensions: ClientList[DomainExtension]): this.type = {
     _internal.withCustomDomainProperties(extensions.asInternal)

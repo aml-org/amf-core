@@ -1,11 +1,9 @@
 package amf.core.internal
 
-import amf.core.client.common.position
-import amf.core.client.common.position.{Position, Range}
 import amf.core.internal.remote.Mimes._
 import amf.core.internal.unsafe.PlatformSecrets
+import org.mulesoft.common.client.lexical.{Position, PositionRange}
 import org.mulesoft.common.core._
-import org.mulesoft.lexer.InputRange
 import org.yaml.model.YNode
 import org.yaml.model.YNode.Alias
 
@@ -151,9 +149,8 @@ package object utils {
     def reset(): Unit = c = 0
   }
 
-  implicit class RangeOps(val range: InputRange) extends AnyVal {
+  implicit class RangeOps(val range: PositionRange) extends AnyVal {
     def toOffset: Position = Position(range.lineFrom, range.columnFrom)
-    def toRange: Range     = position.Range(range)
   }
 
   /** Common utility to convert regex into common java grounds.

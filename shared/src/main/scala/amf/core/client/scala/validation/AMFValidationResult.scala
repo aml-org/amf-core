@@ -1,13 +1,12 @@
 package amf.core.client.scala.validation
 
-import amf.core.client.common.position.{Position, Range}
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.model.domain.{AmfArray, AmfObject, DomainElement}
 import amf.core.internal.annotations.{LexicalInformation, SourceLocation}
 import amf.core.internal.parser.domain.Annotations
 import amf.core.internal.validation.core.ValidationResult
+import org.mulesoft.common.client.lexical.{Position, PositionRange}
 
-import java.io.StringWriter
 import java.util.Objects
 
 case class AMFValidationResult private[amf] (
@@ -153,7 +152,7 @@ object AMFValidationResult {
             targetNode = model.id,
             targetProperty = Option(validation.path),
             validation.sourceShape,
-            position = Some(LexicalInformation.apply(Range.NONE)),
+            position = Some(LexicalInformation.apply(PositionRange.NONE)),
             location = model.location(),
             source = validation
         )

@@ -1,6 +1,5 @@
 package amf.core.internal.datanode
 
-import amf.core.client.common.position.Position
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.model.domain._
 import amf.core.client.scala.vocabulary.Namespace
@@ -12,6 +11,7 @@ import amf.core.internal.render.SpecOrdering
 import amf.core.internal.render.emitters.{Emitter, EntryEmitter, PartEmitter}
 import amf.core.internal.utils.AmfStrings
 import amf.core.internal.validation.RenderSideValidations.RenderValidation
+import org.mulesoft.common.client.lexical.Position
 import org.yaml.model.YDocument.{EntryBuilder, PartBuilder}
 import org.yaml.model.{YMapEntry, YNode, YScalar, YType}
 
@@ -164,7 +164,7 @@ private[datanode] case class DataPropertyEmitter(
 
   private def getAstFrom(annotations: Annotations) =
     annotations
-      .find(classOf[SourceAST[_]])
+      .find(classOf[SourceAST])
       .map(_.ast)
       .collectFirst({ case e: YMapEntry => Annotations(e.key) })
 

@@ -1,12 +1,12 @@
 package amf.core.internal.render
 
-import amf.core.client.common.position.Position.ZERO
-import amf.core.client.common.position.Position
 import amf.core.client.scala.model.domain.{AmfElement, AmfObject, AmfScalar}
 import amf.core.internal.metamodel.{Field, Type}
 import amf.core.internal.annotations.{LexicalInformation, ReferenceId, SingleValueArray}
 import amf.core.internal.parser.domain.{Annotations, FieldEntry, Value}
 import amf.core.internal.render.emitters.{EntryEmitter, PartEmitter}
+import org.mulesoft.common.client.lexical.Position
+import org.mulesoft.common.client.lexical.Position.ZERO
 import org.yaml.model.YDocument.{EntryBuilder, PartBuilder}
 import org.yaml.model.{YMap, YNode, YScalar, YType}
 

@@ -7,7 +7,7 @@ import amf.core.client.scala.model.domain.extensions.CustomDomainProperty
 import amf.core.internal.utils.QName
 import amf.core.internal.parser.domain.SearchScope.{All, Fragments, Named}
 import amf.core.internal.validation.CoreValidations.DeclarationNotFound
-import org.mulesoft.lexer.SourceLocation
+import org.mulesoft.common.client.lexical.SourceLocation
 
 class Declarations(
     var libraries: Map[String, Declarations] = Map(),

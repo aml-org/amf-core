@@ -3,7 +3,7 @@ package amf.core.internal.plugins.syntax
 import amf.core.client.scala.parse.document.ErrorHandlingContext
 import amf.core.internal.validation.CoreValidations.SyamlError
 import amf.core.internal.validation.core.ValidationSpecification
-import org.mulesoft.lexer.SourceLocation
+import org.mulesoft.common.client.lexical.SourceLocation
 import org.yaml.model.{
   IllegalTypeHandler,
   ParseErrorHandler,

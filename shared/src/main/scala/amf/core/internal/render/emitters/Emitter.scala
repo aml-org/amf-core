@@ -1,6 +1,6 @@
 package amf.core.internal.render.emitters
 
-import amf.core.client.common.position.Position
+import org.mulesoft.common.client.lexical.Position
 import org.yaml.model.YDocument.{EntryBuilder, PartBuilder}
 
 /** Created by pedro.colunga on 8/22/17.

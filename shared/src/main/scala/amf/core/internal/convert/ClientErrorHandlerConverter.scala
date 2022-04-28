@@ -2,17 +2,17 @@ package amf.core.internal.convert
 
 import amf.core.client.platform.errorhandling.ClientErrorHandler
 import amf.core.client.platform.validation.{AMFValidationResult => ClientAMFValidationResult}
-import amf.core.client.common.position.Range
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.validation.AMFValidationResult
 import amf.core.internal.annotations.LexicalInformation
 import CoreClientConverters._
+import org.mulesoft.common.client.lexical.PositionRange
 object ClientErrorHandlerConverter {
 
-  implicit object RangeToLexicalConverter extends BidirectionalMatcher[LexicalInformation, Range] {
+  implicit object RangeToLexicalConverter extends BidirectionalMatcher[LexicalInformation, PositionRange] {
 
-    override def asInternal(from: Range): LexicalInformation = LexicalInformation(from)
-    override def asClient(from: LexicalInformation): Range   = from.range
+    override def asInternal(from: PositionRange): LexicalInformation = LexicalInformation(from)
+    override def asClient(from: LexicalInformation): PositionRange   = from.range
   }
 
   implicit object ErrorHandlerConverter extends BidirectionalMatcher[AMFErrorHandler, ClientErrorHandler] {

@@ -1,8 +1,8 @@
 package amf.core.client.scala.validation
 
-import amf.core.client.common.position.{Position, Range}
 import amf.core.client.common.validation.SeverityLevels.{INFO, VIOLATION, WARNING}
 import amf.core.internal.annotations.LexicalInformation
+import org.mulesoft.common.client.lexical.{Position, PositionRange}
 import org.mulesoft.common.io.Output
 import org.mulesoft.common.io.Output._
 
@@ -62,9 +62,9 @@ object AMFValidationReportPrinter {
   private def serialize(maybeLexical: Option[LexicalInformation]): String = {
     maybeLexical
       .map { lexical =>
-        val Range(start, end)             = lexical.range
-        val Position(startLine, startCol) = start
-        val Position(endLine, endCol)     = end
+        val PositionRange(start, end)        = lexical.range
+        val Position(startLine, startCol, _) = start
+        val Position(endLine, endCol, _)     = end
         s"[($startLine,$startCol)-($endLine,$endCol)]"
       }
       .getOrElse("")

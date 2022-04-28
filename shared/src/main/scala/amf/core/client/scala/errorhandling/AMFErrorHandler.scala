@@ -1,6 +1,5 @@
 package amf.core.client.scala.errorhandling
 
-import amf.core.client.common.position.Range
 import amf.core.client.common.validation.SeverityLevels.{VIOLATION, WARNING}
 import amf.core.client.scala.model.domain.AmfObject
 import amf.core.client.scala.validation.AMFValidationResult
@@ -8,7 +7,7 @@ import amf.core.internal.annotations.{LexicalInformation, SourceLocation => AmfS
 import amf.core.internal.parser.domain.Annotations
 import amf.core.internal.utils.AmfStrings
 import amf.core.internal.validation.core.ValidationSpecification
-import org.mulesoft.lexer.{InputRange, SourceLocation}
+import org.mulesoft.common.client.lexical.{PositionRange, SourceLocation}
 
 import scala.collection.mutable
 
@@ -226,9 +225,9 @@ trait AMFErrorHandler {
     )
 
   private def lexical(loc: SourceLocation): Option[LexicalInformation] = {
-    loc.inputRange match {
-      case InputRange.Zero => None
-      case range           => Some(LexicalInformation(Range(range)))
+    loc.range match {
+      case PositionRange.ZERO => None
+      case range              => Some(LexicalInformation(range))
     }
   }
 

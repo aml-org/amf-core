@@ -2,7 +2,7 @@ package amf.core.client.scala.errorhandling
 import amf.core.client.scala.validation.AMFValidationResult
 import amf.core.internal.annotations.LexicalInformation
 import amf.core.internal.validation.core.ValidationSpecification
-import org.mulesoft.lexer.SourceLocation
+import org.mulesoft.common.client.lexical.SourceLocation
 import org.yaml.model.{SyamlException, YError}
 
 /** Error handler that ignores errors */

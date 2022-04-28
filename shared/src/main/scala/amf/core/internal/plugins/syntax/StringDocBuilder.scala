@@ -1,10 +1,9 @@
 package amf.core.internal.plugins.syntax
 
-import amf.core.client.common.position.Position
-import amf.core.client.common.position.Position._
 import amf.core.client.scala.parse.document.{ParsedDocument, StringParsedDocument}
 import amf.core.internal.plugins.syntax.StringDocBuilder.INDENTATION_WIDTH
-import org.yaml.builder.DocBuilder
+import org.mulesoft.common.client.lexical.Position
+import org.mulesoft.common.client.lexical.Position.{FIRST, ZERO}
 
 import scala.collection.mutable
 

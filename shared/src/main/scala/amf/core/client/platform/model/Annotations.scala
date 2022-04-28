@@ -1,9 +1,9 @@
 package amf.core.client.platform.model
 
-import amf.core.client.common.position.Range
 import amf.core.client.platform.model.domain.DomainExtension
 import amf.core.internal.convert.CoreClientConverters._
 import amf.core.internal.parser.domain.{Annotations => InternalAnnotations}
+import org.mulesoft.common.client.lexical.PositionRange
 
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
@@ -13,7 +13,7 @@ case class Annotations(protected[amf] val _internal: InternalAnnotations) {
   @JSExportTopLevel("Annotations")
   def this() = this(InternalAnnotations())
 
-  def lexical(): Range = _internal.lexical()
+  def lexical(): PositionRange = _internal.lexical()
 
   def custom(): ClientList[DomainExtension] = _internal.custom().asClient
 

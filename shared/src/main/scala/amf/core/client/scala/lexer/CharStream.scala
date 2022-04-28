@@ -1,6 +1,6 @@
 package amf.core.client.scala.lexer
 
-import amf.core.client.common.position.Position
+import org.mulesoft.common.client.lexical.Position
 
 /** A source of characters for a Lexer.
   */

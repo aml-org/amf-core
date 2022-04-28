@@ -1,6 +1,5 @@
 package amf.core.internal.parser.domain
 
-import amf.core.client.common.position.Range
 import amf.core.client.scala.model.domain.extensions.DomainExtension
 import amf.core.client.scala.model.domain.{Annotation, EternalSerializedAnnotation, SerializableAnnotation}
 import amf.core.internal.annotations.{
@@ -14,7 +13,6 @@ import amf.core.internal.annotations.{
   LexicalInformation,
   ResolvedLinkAnnotation,
   ResolvedLinkTargetAnnotation,
-  SourceAST,
   SourceNode,
   SourceYPart,
   SynthesizedField,
@@ -22,7 +20,7 @@ import amf.core.internal.annotations.{
   VirtualElement,
   SourceLocation => AmfSourceLocation
 }
-import org.mulesoft.lexer.{InputRange, SourceLocation}
+import org.mulesoft.common.client.lexical.{PositionRange, SourceLocation}
 import org.yaml.model.{YMapEntry, YNode, YPart}
 
 import scala.collection.mutable.ListBuffer
@@ -50,8 +48,8 @@ class Annotations() {
   def sourceLocation: SourceLocation = {
     val sourceName = find(classOf[AmfSourceLocation]).map(_.location).getOrElse("")
     val range = find(classOf[LexicalInformation])
-      .map(r => InputRange(r.range.start.line, r.range.start.column, r.range.end.line, r.range.end.column))
-      .getOrElse(InputRange.Zero)
+      .map(r => PositionRange(r.range.start.line, r.range.start.column, r.range.end.line, r.range.end.column))
+      .getOrElse(PositionRange.ZERO)
     SourceLocation(sourceName, range)
   }
 
@@ -94,7 +92,7 @@ class Annotations() {
   def nonEmpty: Boolean = annotations.nonEmpty
 
   /** Client Methods */
-  def lexical(): Range = find(classOf[LexicalInformation]).map(_.range).getOrElse(Range.NONE)
+  def lexical(): PositionRange = find(classOf[LexicalInformation]).map(_.range).getOrElse(PositionRange.NONE)
 
   def custom(): Seq[DomainExtension] = collect { case d: DomainExtensionAnnotation => d }.map(_.extension)
 

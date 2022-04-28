@@ -1,26 +1,25 @@
 package amf.core.client.scala.parse.document
 
-import amf.core.client.common.position.Range
 import amf.core.client.scala.model.document._
 import amf.core.internal.remote.File.FILE_PROTOCOL
 import amf.core.internal.remote.HttpParts.{HTTPS_PROTOCOL, HTTP_PROTOCOL}
 import amf.core.internal.utils.AmfStrings
-import org.mulesoft.lexer.SourceLocation
+import org.mulesoft.common.client.lexical.{PositionRange, SourceLocation}
 
 case class ReferenceResolutionResult(exception: Option[Throwable], unit: Option[BaseUnit])
 
 trait RefContainer {
   val linkType: ReferenceKind
   val uriFragment: Option[String]
-  def reduceToLocation(): Range
+  def reduceToLocation(): PositionRange
 }
 
-class ASTRefContainer(
-    override val linkType: ReferenceKind,
-    val pos: SourceLocation,
-    override val uriFragment: Option[String]
-) extends RefContainer {
-  override def reduceToLocation(): Range = Range((pos.lineFrom, pos.columnFrom), (pos.lineTo, pos.columnTo))
+class ASTRefContainer(override val linkType: ReferenceKind,
+                      val pos: SourceLocation,
+                      override val uriFragment: Option[String])
+    extends RefContainer {
+  override def reduceToLocation(): PositionRange =
+    PositionRange((pos.lineFrom, pos.columnFrom), (pos.lineTo, pos.columnTo))
 }
 
 object ASTRefContainer {

@@ -7,7 +7,7 @@ import amf.core.client.scala.parse.document
 import amf.core.internal.parser.{AMFCompiler, CompilerContext}
 import amf.core.internal.remote.Spec
 import amf.core.internal.unsafe.PlatformSecrets
-import org.mulesoft.lexer.SourceLocation
+import org.mulesoft.common.client.lexical.SourceLocation
 
 import scala.concurrent.{ExecutionContext, Future}
 

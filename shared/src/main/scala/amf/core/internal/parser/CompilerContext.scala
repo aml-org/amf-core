@@ -6,7 +6,7 @@ import amf.core.client.scala.parse.document.ParserContext
 import amf.core.internal.remote.{Cache, Context, Platform, Spec}
 import amf.core.internal.utils.{AmfStrings, UriUtils}
 import amf.core.internal.validation.core.ValidationSpecification
-import org.mulesoft.lexer.SourceLocation
+import org.mulesoft.common.client.lexical.SourceLocation
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -1,10 +1,10 @@
 package amf.core.client.scala.parse
 
-import amf.core.client.common.position.Range
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.parse.document.Reference
 import amf.core.internal.annotations.ReferenceTargets
 import amf.core.internal.parser.Root
+import org.mulesoft.common.client.lexical.PositionRange
 
 object TaggedReferences {
 
@@ -29,6 +29,6 @@ object TaggedReferences {
 
   }
 
-  def taggedReferences(location: String, r: Reference): Map[String, Seq[Range]] =
+  def taggedReferences(location: String, r: Reference): Map[String, Seq[PositionRange]] =
     Map(location -> r.refs.map(_.reduceToLocation()))
 }
