@@ -117,6 +117,9 @@ class AMFGraphConfiguration private[amf] (
 
   def withPlugins(plugins: List[AMFPlugin[_]]): AMFGraphConfiguration = super._withPlugins(plugins)
 
+  def withRootParsePlugin(amfParsePlugin: AMFParsePlugin): AMFGraphConfiguration =
+    super._withRootParsePlugin(amfParsePlugin)
+
   private[amf] def withEntities(entities: Map[String, ModelDefaultBuilder]): AMFGraphConfiguration =
     super._withEntities(entities)
 
@@ -210,6 +213,9 @@ sealed abstract class BaseAMFConfigurationSetter(
 
   protected def _withPlugins[T](plugins: List[AMFPlugin[_]]): T =
     copy(registry = registry.withPlugins(plugins)).asInstanceOf[T]
+
+  protected def _withRootParsePlugin[T](amfParsePlugin: AMFParsePlugin): T =
+    copy(registry = registry.withRootParsePlugin(amfParsePlugin)).asInstanceOf[T]
 
   protected def _withEntities[T](entities: Map[String, ModelDefaultBuilder]): T =
     copy(registry = registry.withEntities(entities)).asInstanceOf[T]
