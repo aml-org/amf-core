@@ -1,5 +1,6 @@
 package amf.core.client.scala.model.domain
 
+import amf.core.internal.annotations.TrackedElement
 import amf.core.internal.metamodel.{Field, ModelDefaultBuilder, Obj}
 import amf.core.internal.parser.domain.{Annotations, Fields}
 
@@ -120,12 +121,23 @@ trait AmfObject extends AmfElement {
       case _ =>
         val obj = newInstance()
         obj.id = id
-        obj.annotations ++= annotations
         branch.put(this, obj)
+        obj.annotations ++= replaceAnnotations(branch)
         fields.cloneFields(branch).into(obj.fields)
         obj
     }
   }
+
+  private def replaceAnnotations(branch: mutable.Map[AmfObject, AmfObject]) = {
+    val updated = annotations.find(classOf[TrackedElement]).map(updateTrackedElement(branch))
+    annotations.copyFiltering(!_.isInstanceOf[TrackedElement]) ++= updated
+  }
+
+  private def updateTrackedElement(branch: mutable.Map[AmfObject, AmfObject])(trackedElement: TrackedElement) =
+    trackedElement.elements match {
+      case Right(ids)    => TrackedElement(ids.flatMap(id => branch.find(_._1.id == id).map(_._2.id)))
+      case Left(parents) => TrackedElement.fromInstances(parents.flatMap(obj => branch.get(obj)))
+    }
 
   private[amf] def newInstance(): AmfObject =
     meta.asInstanceOf[ModelDefaultBuilder].modelInstance // make meta be model default builder also

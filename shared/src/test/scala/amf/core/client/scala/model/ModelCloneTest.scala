@@ -3,7 +3,7 @@ import amf.core.client.scala.model.document.Document
 import amf.core.client.scala.model.domain._
 import amf.core.client.scala.vocabulary.Namespace.{Data, XsdTypes}
 import amf.core.client.scala.vocabulary.ValueType
-import amf.core.internal.annotations.{DefinedBySpec, ErrorDeclaration}
+import amf.core.internal.annotations.{DefinedBySpec, ErrorDeclaration, TrackedElement}
 import amf.core.internal.metamodel.domain.DomainElementModel
 import amf.core.internal.metamodel.{Field, ModelDefaultBuilder, Obj}
 import amf.core.internal.parser.domain.{Annotations, Fields}
@@ -160,6 +160,20 @@ class ModelCloneTest extends AnyFunSuite with ElementsFixture with Matchers {
     val unit = doc.cloneUnit()
     val head = unit.asInstanceOf[Document].declares.head
     head.id should be(error.id)
+  }
+
+  test("Test clone object with TrackedElement at branch") {
+    scalarNode2.annotations += TrackedElement.fromInstance(objectNode)
+    val cloned: ObjectNode = objectNode.cloneElement(mutable.Map.empty).asInstanceOf[ObjectNode]
+    cloned.id = "http://cloned#id"
+    val maybeElement = scalarNode2.annotations.find(classOf[TrackedElement])
+    maybeElement.isDefined shouldBe (true)
+    maybeElement.get.elements.left.get.head.id shouldBe ("amf://id2")
+
+    val clonedTrackedElement =
+      cloned.allProperties().head.asInstanceOf[ArrayNode].members.head.annotations.find(classOf[TrackedElement])
+    clonedTrackedElement.isDefined shouldBe (true)
+    clonedTrackedElement.get.elements.left.get.head.id shouldBe ("http://cloned#id")
   }
 
 }

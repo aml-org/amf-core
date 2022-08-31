@@ -5,7 +5,7 @@ import amf.core.client.scala.model.domain._
 /** TrackedElement is used to register the original location of an example (parameter, payload, etc). This information
   * has to be saved as it is lost when examples are propagated to their corresponding shapes.
   */
-class TrackedElement private (private val elements: Either[Set[AmfObject], Set[String]])
+class TrackedElement private (val elements: Either[Set[AmfObject], Set[String]])
     extends EternalSerializedAnnotation
     with UriAnnotation {
 
