@@ -1,0 +1,33 @@
+[
+  {
+    "@id": "amf://id1",
+    "@type": [
+      "http://a.ml/vocabularies/document#Document",
+      "http://a.ml/vocabularies/document#Fragment",
+      "http://a.ml/vocabularies/document#Module",
+      "http://a.ml/vocabularies/document#Unit"
+    ],
+    "http://a.ml/vocabularies/document#encodes": [
+      {
+        "@id": "amf://id2",
+        "@type": [
+          "http://a.ml/vocabularies/data#myNode",
+          "http://a.ml/vocabularies/document#DomainElement"
+        ],
+        "http://a.ml/vocabularies/data#myseq": [
+          {
+            "@value": 1
+          },
+          {
+            "@value": 2
+          }
+        ]
+      }
+    ],
+    "http://a.ml/vocabularies/document#version": [
+      {
+        "@value": "2.0.0"
+      }
+    ]
+  }
+]

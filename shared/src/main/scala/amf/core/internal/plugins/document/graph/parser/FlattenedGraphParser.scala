@@ -556,52 +556,37 @@ class FlattenedGraphParser(startingPoint: String, overrideAliases: Map[String, S
     }
 
     private def doTraverse(instance: AmfObject, f: Field, node: YNode, sources: SourceMap, key: String) = {
-      f.`type` match {
-        case _: Obj =>
-          parse(node.as[YMap]).foreach(n => instance.setWithoutId(f, n, annotations(nodes, sources, key)))
-          instance
-        case Iri =>
-          instance.setWithoutId(f, iri(node), annotations(nodes, sources, key))
-        case Str | RegExp | LiteralUri =>
-          instance.setWithoutId(f, str(node), annotations(nodes, sources, key))
-        case Bool =>
-          instance.setWithoutId(f, bool(node), annotations(nodes, sources, key))
-        case Type.Int =>
-          instance.setWithoutId(f, int(node), annotations(nodes, sources, key))
-        case Type.Float =>
-          instance.setWithoutId(f, double(node), annotations(nodes, sources, key))
-        case Type.Double =>
-          instance.setWithoutId(f, double(node), annotations(nodes, sources, key))
-        case Type.Long =>
-          instance.setWithoutId(f, long(node), annotations(nodes, sources, key))
-        case Type.DateTime =>
-          instance.setWithoutId(f, date(node), annotations(nodes, sources, key))
-        case Type.Date =>
-          instance.setWithoutId(f, date(node), annotations(nodes, sources, key))
-        case Type.Any =>
-          instance.setWithoutId(f, any(node), annotations(nodes, sources, key))
-        case l: SortedArray =>
-          val parsed = parseSortedArray(l.element, node.as[YMap])
-          instance.setArrayWithoutId(f, parsed, annotations(nodes, sources, key))
+      parseAtTraversion(node, f.`type`).foreach { e => instance.setWithoutId(f, e, annotations(nodes, sources, key)) }
+      instance
+    }
+    private def parseAtTraversion(node: YNode, `type`: Type): Option[AmfElement] = {
+      `type` match {
+        case _: Obj                    => parse(node.as[YMap])
+        case Iri                       => Some(iri(node))
+        case Str | RegExp | LiteralUri => Some(str(node))
+        case Bool                      => Some(bool(node))
+        case Type.Int                  => Some(int(node))
+        case Type.Float                => Some(double(node))
+        case Type.Double               => Some(double(node))
+        case Type.Long                 => Some(long(node))
+        case Type.DateTime             => Some(date(node))
+        case Type.Date                 => Some(date(node))
+        case Type.Any                  => Some(any(node))
+        case l: SortedArray            => Some(AmfArray(parseSortedArray(l.element, node.as[YMap])))
         case a: Array =>
           (node.tagType, a.element) match {
             case (YType.Seq, _) =>
               val rawItems = node.as[Seq[YNode]]
-              val values: Seq[AmfElement] = a.element match {
-                case _: Obj => rawItems.flatMap(n => parse(n.as[YMap]))
-                case Str    => rawItems.map(n => str(value(a.element, n)))
-                case Iri    => rawItems.map(n => iri(value(a.element, n)))
+              val values = rawItems.flatMap { ri =>
+                parseAtTraversion(value(a.element, ri), a.element)
               }
-              instance.setArrayWithoutId(f, values, annotations(nodes, sources, key))
+              Some(AmfArray(values))
             case (YType.Map, _: Obj) =>
               val rawHead = node.as[YMap]
-              parse(rawHead) match {
-                case Some(head) => instance.setArrayWithoutId(f, Seq(head), annotations(nodes, sources, key))
-                case None       => instance // Ignore
-              }
+              parse(rawHead).map(o => AmfArray(Seq(o)))
             case (YType.Str, Str | Iri) =>
-              instance.setArrayWithoutId(f, Seq(str(node)), annotations(nodes, sources, key))
-            case _ => instance
+              Some(AmfArray(Seq(str(node))))
+            case _ => None
           }
       }
     }

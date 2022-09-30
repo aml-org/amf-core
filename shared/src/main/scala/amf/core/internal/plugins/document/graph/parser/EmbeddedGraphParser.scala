@@ -7,7 +7,7 @@ import amf.core.client.scala.parse.document.SyamlParsedDocument
 import amf.core.client.scala.vocabulary.Namespace
 import amf.core.internal.annotations.DomainExtensionAnnotation
 import amf.core.internal.metamodel.Type.{Array, Bool, Iri, LiteralUri, RegExp, SortedArray, Str}
-import amf.core.internal.metamodel._
+import amf.core.internal.metamodel.{Obj, Type, _}
 import amf.core.internal.metamodel.document.BaseUnitModel.Location
 import amf.core.internal.metamodel.domain._
 import amf.core.internal.metamodel.domain.extensions.DomainExtensionModel
@@ -343,40 +343,27 @@ class EmbeddedGraphParser(private val aliases: Map[String, String])(implicit val
     }
 
     private def doTraverse(instance: AmfObject, f: Field, node: YNode, sources: SourceMap, key: String) = {
-      f.`type` match {
-        case _: Obj =>
-          parse(node.as[YMap]).foreach(n => instance.setWithoutId(f, n, annotations(nodes, sources, key)))
-          instance
-        case Iri =>
-          instance.setWithoutId(f, iri(node), annotations(nodes, sources, key))
-        case Str | RegExp | LiteralUri =>
-          instance.setWithoutId(f, str(node), annotations(nodes, sources, key))
-        case Bool =>
-          instance.setWithoutId(f, bool(node), annotations(nodes, sources, key))
-        case Type.Int =>
-          instance.setWithoutId(f, int(node), annotations(nodes, sources, key))
-        case Type.Long =>
-          instance.setWithoutId(f, long(node), annotations(nodes, sources, key))
-        case Type.Float =>
-          instance.setWithoutId(f, double(node), annotations(nodes, sources, key))
-        case Type.Double =>
-          instance.setWithoutId(f, double(node), annotations(nodes, sources, key))
-        case Type.DateTime =>
-          instance.setWithoutId(f, date(node), annotations(nodes, sources, key))
-        case Type.Date =>
-          instance.setWithoutId(f, date(node), annotations(nodes, sources, key))
-        case Type.Any =>
-          instance.setWithoutId(f, any(node), annotations(nodes, sources, key))
-        case l: SortedArray =>
-          instance.setArrayWithoutId(f, parseList(l.element, node.as[YMap]), annotations(nodes, sources, key))
+      parseAtTraversion(node, f.`type`).foreach(r => instance.setWithoutId(f, r, annotations(nodes, sources, key)))
+    }
+
+    private def parseAtTraversion(node: YNode, `type`: Type): Option[AmfElement] = {
+      `type` match {
+        case _: Obj                    => parse(node.as[YMap])
+        case Iri                       => Some(iri(node))
+        case Str | RegExp | LiteralUri => Some(str(node))
+        case Bool                      => Some(bool(node))
+        case Type.Int                  => Some(int(node))
+        case Type.Long                 => Some(long(node))
+        case Type.Float                => Some(double(node))
+        case Type.Double               => Some(double(node))
+        case Type.DateTime             => Some(date(node))
+        case Type.Date                 => Some(date(node))
+        case Type.Any                  => Some(any(node))
+        case l: SortedArray            => Some(AmfArray(parseList(l.element, node.as[YMap])))
         case a: Array =>
-          val items = node.as[Seq[YNode]]
-          val values: Seq[AmfElement] = a.element match {
-            case _: Obj => items.flatMap(n => parse(n.as[YMap]))
-            case Str    => items.map(n => str(value(a.element, n)))
-            case Iri    => items.map(n => iri(value(a.element, n)))
-          }
-          instance.setArrayWithoutId(f, values, annotations(nodes, sources, key))
+          val items  = node.as[Seq[YNode]]
+          val values = items.flatMap { i => parseAtTraversion(value(a.element, i), a.element) }
+          Some(AmfArray(values))
       }
     }
   }

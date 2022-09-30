@@ -1,0 +1,52 @@
+{
+  "@graph": [
+    {
+      "@id": "./",
+      "@type": [
+        "doc:Document",
+        "doc:Fragment",
+        "doc:Module",
+        "doc:Unit"
+      ],
+      "doc:encodes": {
+        "@id": "amf://id2"
+      },
+      "doc:version": "1.0.0",
+      "doc:root": true
+    },
+    {
+      "@id": "amf://id2",
+      "@type": [
+        "data:myNode",
+        "doc:DomainElement"
+      ],
+      "data:myseq": [
+        {
+          "@value": 1
+        },
+        {
+          "@value": 2
+        }
+      ]
+    },
+    {
+        "@id": "amf://id3",
+      "@type": [
+        "data:myNode",
+        "doc:DomainElement"
+      ],
+      "data:mynode": [
+        {
+          "@id": "http://www.w3.org/2001/XMLSchema#String"
+        }
+      ]
+    }
+  ],
+  "@context": {
+    "@base": "amf://id1",
+    "shacl": "http://www.w3.org/ns/shacl#",
+    "data": "http://a.ml/vocabularies/data#",
+    "doc": "http://a.ml/vocabularies/document#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  }
+}
