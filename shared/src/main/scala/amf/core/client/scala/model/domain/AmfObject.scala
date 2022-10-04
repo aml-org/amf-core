@@ -135,7 +135,7 @@ trait AmfObject extends AmfElement {
 
   private def updateTrackedElement(branch: mutable.Map[AmfObject, AmfObject])(trackedElement: TrackedElement) =
     trackedElement.elements match {
-      case Right(ids)    => TrackedElement(ids.flatMap(id => branch.find(_._1.id == id).map(_._2.id)))
+      case Right(ids)    => TrackedElement(ids.map(id => branch.find(_._1.id == id).map(_._2.id).getOrElse(id)))
       case Left(parents) => TrackedElement.fromInstances(parents.flatMap(obj => branch.get(obj)))
     }
 

@@ -176,4 +176,17 @@ class ModelCloneTest extends AnyFunSuite with ElementsFixture with Matchers {
     clonedTrackedElement.get.elements.left.get.head.id shouldBe ("http://cloned#id")
   }
 
+  test("Test clone object with TrackedElement Id out of branch") {
+    scalarNode2.annotations.clear()
+    scalarNode2.annotations += TrackedElement.apply("amf://idMissed")
+    val cloned: ObjectNode = objectNode.cloneElement(mutable.Map.empty).asInstanceOf[ObjectNode]
+    val maybeElement       = scalarNode2.annotations.find(classOf[TrackedElement])
+    maybeElement.isDefined shouldBe (true)
+    maybeElement.get.elements.right.get.head shouldBe ("amf://idMissed")
+
+    val clonedTrackedElement =
+      cloned.allProperties().head.asInstanceOf[ArrayNode].members.head.annotations.find(classOf[TrackedElement])
+    clonedTrackedElement.isDefined shouldBe (true)
+    clonedTrackedElement.get.elements.right.get.head shouldBe ("amf://idMissed")
+  }
 }
