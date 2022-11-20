@@ -70,6 +70,9 @@ case class RenderOptions(private[amf] val _internal: InternalRenderOptions) {
   /** Include a reduced version of source maps when rendering to graph. */
   def withGovernanceMode: RenderOptions = _internal.withGovernanceMode
 
+  /** Always render `type` facade on types even if the type is already clear by a unique facade. */
+  def withoutImplicitRamlTypes(): RenderOptions = _internal.withoutImplicitRamlTypes
+
   def isWithDocumentation: Boolean     = _internal.isWithDocumentation
   def isWithCompactedEmission: Boolean = _internal.isWithCompactedEmission
   def schemaVersion: JSONSchemaVersion = _internal.schemaVersion

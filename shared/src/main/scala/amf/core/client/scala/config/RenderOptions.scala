@@ -23,7 +23,8 @@ case class RenderOptions(
     emitWarningForUnsupportedValidationFacets: Boolean = false,
     schema: JSONSchemaVersion = JSONSchemaVersions.Unspecified,
     rawFieldEmission: Boolean = false,
-    governanceMode: Boolean = false
+    governanceMode: Boolean = false,
+    implicitRamlTypes: Boolean = true
 ) {
 
   /** Include PrettyPrint when rendering to graph. */
@@ -108,6 +109,9 @@ case class RenderOptions(
 
   /** Include a reduced version of source maps when rendering to graph. */
   def withGovernanceMode: RenderOptions = copy(governanceMode = true)
+
+  /** Always render `type` facade on types even if the type is already clear by a unique facade. */
+  def withoutImplicitRamlTypes: RenderOptions = copy(implicitRamlTypes = true)
 
   def isWithDocumentation: Boolean                             = documentation
   def isWithCompactedEmission: Boolean                         = compactedEmission
