@@ -26,4 +26,5 @@ case class Graph(private[amf] val _internal: InternalGraph) {
 
   def propertyLexical(uri: String): PositionRange = _internal.propertyLexical(uri)
 
+  def propertyLocation(uri: String): Option[String] = _internal.propertyLocation(uri)
 }
