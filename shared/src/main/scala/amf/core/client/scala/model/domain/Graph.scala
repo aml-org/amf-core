@@ -72,4 +72,7 @@ case class Graph(e: DomainElement) {
 
   def propertyLexical(uri: String): PositionRange =
     getField(uri).map(f => annotationsForValue(f.field).lexical()).getOrElse(PositionRange.ZERO)
+
+  def propertyLocation(uri: String): Option[String] =
+    getField(uri).flatMap(f => annotationsForValue(f.field).location())
 }
