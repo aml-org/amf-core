@@ -15,6 +15,7 @@ import scala.collection.mutable
 class IdAdopter(
     initialElem: AmfObject,
     initialId: String,
+    private val idMaker: IdMaker = new DefaultIdMaker(),
     private val adopted: mutable.Map[String, AmfObject] = mutable.Map.empty
 ) {
 
@@ -59,15 +60,14 @@ class IdAdopter(
 
   private def traverseArrayValues(array: AmfArray, id: String): Seq[PendingAdoption] = {
     array.values.zipWithIndex.map { case (item, i) =>
-      val element     = componentId(item).getOrElse(i.toString)
-      val generatedId = makeId(id, element)
+      val generatedId = idMaker.makeArrayElementId(id, i, item)
       PendingAdoption(item, generatedId)
     }
   }
 
   private def traverseObjFields(obj: AmfObject, isRoot: Boolean): Seq[PendingAdoption] = {
     getOrderedFields(obj).map { field =>
-      val generatedId = makeId(obj.id + withFragment(isRoot), relativeName(field))
+      val generatedId = idMaker.makeId(obj, field, isRoot)
       PendingAdoption(field.element, generatedId)
     }.toList
   }
@@ -78,34 +78,9 @@ class IdAdopter(
   private def traverseDomainExtensionAnnotation(scalar: AmfScalar, id: String): Seq[PendingAdoption] = {
     scalar.annotations.collect[PendingAdoption] { case domainAnnotation: DomainExtensionAnnotation =>
       val extension   = domainAnnotation.extension
-      val generatedId = makeId(id, extension.componentId)
+      val generatedId = idMaker.makeId(id, extension.componentId)
       PendingAdoption(extension, generatedId)
     }
-  }
-
-  private def withFragment(isRoot: Boolean) = if (isRoot) "#" else ""
-
-  private def relativeName(field: FieldEntry): String =
-    componentId(field.element).getOrElse(fieldDisplayName.runCached(field.field))
-
-  val fieldDisplayName: CachedFunction[Field, String, Identity] = CachedFunction.from[Field, String] { field =>
-    field.doc.displayName.urlComponentEncoded
-  }
-
-  private def componentId(element: AmfElement): Option[String] = element match {
-    case obj: AmfObject if obj.componentId.nonEmpty => Some(obj.componentId.stripPrefix("/"))
-    case _                                          => None
-  }
-
-  val createdIds: mutable.Set[String] = mutable.Set.empty
-  val idGenerator                     = new IdCounter()
-
-  private def makeId(parent: String, element: String): String = {
-    val newId = parent + "/" + element
-    val finalId =
-      if (createdIds.contains(newId)) idGenerator.genId(newId) else newId // ensures no duplicate ids will be created
-    createdIds.add(finalId)
-    finalId
   }
 
   private def getOrderedFields(obj: AmfObject): Iterable[FieldEntry] = {
