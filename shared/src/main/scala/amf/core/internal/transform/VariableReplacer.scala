@@ -34,6 +34,8 @@ object VariableReplacer {
                 )
               )
             )
+            s.annotations.clear()
+            s.annotations ++= scalar.annotations
             s
           case Some(_) if transformations.nonEmpty =>
             errorFunction(s"Cannot apply transformations '$transformations' to variable '$name'.")
