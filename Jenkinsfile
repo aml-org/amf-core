@@ -62,6 +62,7 @@ pipeline {
                 anyOf {
                     branch 'master'
                     branch 'develop'
+                    branch 'fhir-improvements'
                 }
             }
             steps {
