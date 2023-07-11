@@ -74,8 +74,8 @@ object ExternalModelVocabularies {
 trait DomainElementModel extends ModelDefaultBuilder {
 
   /** Entity that is going to be extended overlaying or adding additional information The type of the relationship
-    * provide the semantics about thow the referenced and referencer elements must be combined when generating the
-    * domain model from the document model.
+    * provide the semantics about how the referenced and referencer elements must be combined when generating the domain
+    * model from the document model.
     */
   lazy val Extends = Field(
     Array(DomainElementModel),
