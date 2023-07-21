@@ -1,4 +1,4 @@
-package amf.core.internal.adoption
+package amf.core.client.scala.adoption
 
 import amf.core.client.scala.model.domain.{AmfElement, AmfObject}
 import amf.core.internal.metamodel.Field

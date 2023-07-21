@@ -1,6 +1,7 @@
 package amf.core.internal.parser
 
 import amf.core.client.common.remote.Content
+import amf.core.client.scala.adoption.IdAdopter
 import amf.core.client.scala.config._
 import amf.core.client.scala.exception.{CyclicReferenceException, UnsupportedSyntaxForDocumentException}
 import amf.core.client.scala.model.document.{BaseUnit, ExternalFragment}
@@ -9,7 +10,6 @@ import amf.core.client.scala.parse.AMFParsePlugin
 import amf.core.client.scala.parse.TaggedReferences._
 import amf.core.client.scala.parse.document.{UnresolvedReference => _, _}
 import amf.core.internal.remote.Mimes._
-import amf.core.internal.adoption.IdAdopter
 import amf.core.internal.remote._
 import amf.core.internal.utils.AmfStrings
 import amf.core.internal.validation.CoreValidations._
@@ -119,7 +119,8 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
       val baseUnit = domainPlugin.parse(documentWithReferences, compilerContext.parserContext.copyWithSonsReferences())
       if (document.location == compilerContext.fileContext.root) baseUnit.withRoot(true)
       baseUnit.withRaw(document.raw).tagReferences(documentWithReferences)
-      if (isRoot && domainPlugin.withIdAdoption) new IdAdopter(baseUnit, document.location).adoptFromRoot()
+      if (isRoot && domainPlugin.withIdAdoption)
+        compilerContext.parserContext.config.idAdopterProvider.adoptFromRoot(baseUnit, document.location)
       parsedModelEvent(baseUnit)
       baseUnit
     }

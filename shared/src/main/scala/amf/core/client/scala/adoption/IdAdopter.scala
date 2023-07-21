@@ -1,37 +1,36 @@
-package amf.core.internal.adoption
+package amf.core.client.scala.adoption
 
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.model.domain.{AmfArray, AmfElement, AmfObject, AmfScalar}
+import amf.core.internal.adoption.{AdoptionDependantCalls, BaseUnitFieldAdoptionOrdering, GenericFieldAdoptionOrdering}
 import amf.core.internal.annotations.DomainExtensionAnnotation
-import amf.core.internal.metamodel.Field
 import amf.core.internal.parser.domain.FieldEntry
-import amf.core.internal.utils.{AmfStrings, IdCounter}
 import org.mulesoft.common.collections.FilterType
-import org.mulesoft.common.core.CachedFunction
-import org.mulesoft.common.functional.MonadInstances.{Identity, identityMonad}
 
 import scala.collection.mutable
 
+
 class IdAdopter(
-    initialElem: AmfObject,
-    initialId: String,
-    private val idMaker: IdMaker = new DefaultIdMaker(),
-    private val adopted: mutable.Map[String, AmfObject] = mutable.Map.empty
-) {
+                 initialId: String,
+                 private val idMaker: IdMaker = new DefaultIdMaker(),
+                 private val adopted: mutable.Map[String, AmfObject] = mutable.Map.empty
+               ) {
 
-  def adoptFromRoot(): Unit     = adopt(isRoot = true)
-  def adoptFromRelative(): Unit = adopt(isRoot = false)
+  def adoptFromRoot(initialElem: AmfObject): Unit = adopt(initialElem, isRoot = true)
 
-  private def adopt(isRoot: Boolean): Unit = {
-    adoptElement(isRoot)
+  def adoptFromRelative(initialElem: AmfObject): Unit = adopt(initialElem, isRoot = false)
+
+  private[amf] def adopt(initialElem: AmfObject, isRoot: Boolean): Unit = {
+    adoptElement(initialElem, isRoot)
     adopted.values.filterType[AdoptionDependantCalls].foreach(_.run())
   }
 
   /** adopts the initial element and all of its nested element in a BFS manner
-    * @param isRoot:
-    *   if the initialElement is the root base unit, used to place fragment in id.
-    */
-  private def adoptElement(isRoot: Boolean): Unit = {
+   *
+   * @param isRoot :
+   *               if the initialElement is the root base unit, used to place fragment in id.
+   */
+  private def adoptElement(initialElem: AmfObject, isRoot: Boolean): Unit = {
     val adoptionQueue: mutable.Queue[PendingAdoption] = new mutable.Queue()
     adoptionQueue.enqueue(PendingAdoption(initialElem, initialId, isRoot))
     adoptQueue(adoptionQueue)
@@ -73,11 +72,11 @@ class IdAdopter(
   }
 
   /** this is done specifically because of RAML scalar valued nodes, extension is only stored in annotation contained in
-    * AmfScalar and needs to have id defined due to potential validations
-    */
+   * AmfScalar and needs to have id defined due to potential validations
+   */
   private def traverseDomainExtensionAnnotation(scalar: AmfScalar, id: String): Seq[PendingAdoption] = {
     scalar.annotations.collect[PendingAdoption] { case domainAnnotation: DomainExtensionAnnotation =>
-      val extension   = domainAnnotation.extension
+      val extension = domainAnnotation.extension
       val generatedId = idMaker.makeId(id, extension.componentId)
       PendingAdoption(extension, generatedId)
     }
@@ -86,7 +85,7 @@ class IdAdopter(
   private def getOrderedFields(obj: AmfObject): Iterable[FieldEntry] = {
     val criteria = obj match {
       case _: BaseUnit => BaseUnitFieldAdoptionOrdering
-      case _           => GenericFieldAdoptionOrdering
+      case _ => GenericFieldAdoptionOrdering
     }
     criteria.fields(obj)
   }
