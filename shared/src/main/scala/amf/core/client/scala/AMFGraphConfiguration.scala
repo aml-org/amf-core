@@ -1,6 +1,7 @@
 package amf.core.client.scala
 
 import amf.core.client.common.validation.ProfileName
+import amf.core.client.scala.adoption.{DefaultIdAdopterProvider, IdAdopterProvider}
 import amf.core.client.scala.config._
 import amf.core.client.scala.errorhandling.{AMFErrorHandler, DefaultErrorHandlerProvider, ErrorHandlerProvider}
 import amf.core.client.scala.execution.ExecutionEnvironment
@@ -36,7 +37,8 @@ object AMFGraphConfiguration {
       DefaultErrorHandlerProvider,
       AMFRegistry.empty,
       Set.empty,
-      AMFOptions.default()
+      AMFOptions.default(),
+      new DefaultIdAdopterProvider()
     )
   }
 
@@ -55,7 +57,8 @@ object AMFGraphConfiguration {
         .withEntities(CoreEntities.entities ++ DataNodeEntities.entities)
         .withAnnotations(CoreSerializableAnnotations.annotations),
       Set.empty,
-      AMFOptions.default()
+      AMFOptions.default(),
+      new DefaultIdAdopterProvider()
     ).withRootParsePlugin(AMFGraphParsePlugin())
       .withPlugins(List(AMFGraphRenderPlugin, SyamlSyntaxParsePlugin, SyamlSyntaxRenderPlugin))
       .withTransformationPipeline(BasicTransformationPipeline())
@@ -84,8 +87,9 @@ class AMFGraphConfiguration private[amf] (
     override private[amf] val errorHandlerProvider: ErrorHandlerProvider,
     override private[amf] val registry: AMFRegistry,
     override private[amf] val listeners: Set[AMFEventListener],
-    override private[amf] val options: AMFOptions
-) extends BaseAMFConfigurationSetter(resolvers, errorHandlerProvider, registry, listeners, options) { // break platform into more specific classes?
+    override private[amf] val options: AMFOptions,
+    override private[amf] val idAdopterProvider: IdAdopterProvider
+) extends BaseAMFConfigurationSetter(resolvers, errorHandlerProvider, registry, listeners, options, idAdopterProvider) { // break platform into more specific classes?
 
   /** Contains common AMF graph operations associated to documents */
   def baseUnitClient(): AMFGraphBaseUnitClient = new AMFGraphBaseUnitClient(this)
@@ -164,6 +168,9 @@ class AMFGraphConfiguration private[amf] (
   def withExecutionEnvironment(executionEnv: ExecutionEnvironment): AMFGraphConfiguration =
     super._withExecutionEnvironment(executionEnv)
 
+  def withIdAdopterProvider(idAdopterProvider: IdAdopterProvider): AMFGraphConfiguration =
+    super._withIdAdopterProvider(idAdopterProvider)
+
   protected[amf] def emptyPlugins(): AMFGraphConfiguration = copy(registry = registry.emptyPlugins())
 
   protected def copy(
@@ -171,9 +178,10 @@ class AMFGraphConfiguration private[amf] (
       errorHandlerProvider: ErrorHandlerProvider = errorHandlerProvider,
       registry: AMFRegistry = registry,
       listeners: Set[AMFEventListener] = Set.empty,
-      options: AMFOptions = options
+      options: AMFOptions = options,
+      idAdopterProvider: IdAdopterProvider = idAdopterProvider
   ): AMFGraphConfiguration = {
-    new AMFGraphConfiguration(resolvers, errorHandlerProvider, registry, listeners, options)
+    new AMFGraphConfiguration(resolvers, errorHandlerProvider, registry, listeners, options, idAdopterProvider)
   }
 
   private[amf] def emptyEntities(): AMFGraphConfiguration   = super._emptyEntities()
@@ -194,7 +202,8 @@ sealed abstract class BaseAMFConfigurationSetter(
     private[amf] val errorHandlerProvider: ErrorHandlerProvider,
     private[amf] val registry: AMFRegistry,
     private[amf] val listeners: Set[AMFEventListener],
-    private[amf] val options: AMFOptions
+    private[amf] val options: AMFOptions,
+    private[amf] val idAdopterProvider: IdAdopterProvider
 ) {
   protected def _withParsingOptions[T](parsingOptions: ParsingOptions): T =
     copy(options = options.copy(parsingOptions = parsingOptions)).asInstanceOf[T]
@@ -266,12 +275,16 @@ sealed abstract class BaseAMFConfigurationSetter(
   protected def _withExecutionEnvironment[T](executionEnv: ExecutionEnvironment): T =
     copy(resolvers = resolvers.withExecutionEnvironment(executionEnv)).asInstanceOf[T]
 
+  protected def _withIdAdopterProvider[T](idAdopterProvider: IdAdopterProvider): T =
+    copy(idAdopterProvider = idAdopterProvider).asInstanceOf[T]
+
   protected def copy(
       resolvers: AMFResolvers = resolvers,
       errorHandlerProvider: ErrorHandlerProvider = errorHandlerProvider,
       registry: AMFRegistry = registry,
       listeners: Set[AMFEventListener] = Set.empty,
-      options: AMFOptions = options
+      options: AMFOptions = options,
+      idAdopterProvider: IdAdopterProvider = idAdopterProvider
   ): BaseAMFConfigurationSetter
 
 }

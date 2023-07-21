@@ -1,6 +1,7 @@
 package amf.core.internal.parser
 
 import amf.core.client.scala.AMFGraphConfiguration
+import amf.core.client.scala.adoption.{DefaultIdAdopterProvider, IdAdopterProvider}
 import amf.core.client.scala.config.ParsingOptions
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.parse.AMFParsePlugin
@@ -15,6 +16,8 @@ trait ParseConfiguration {
   def parsingOptions: ParsingOptions
   def registryContext: RegistryContext
   def serializableAnnotationsFacade: SerializableAnnotationsFacade
+
+  def idAdopterProvider: IdAdopterProvider
 }
 
 case class ParseConfig(config: AMFGraphConfiguration, eh: AMFErrorHandler) extends ParseConfiguration {
@@ -25,6 +28,7 @@ case class ParseConfig(config: AMFGraphConfiguration, eh: AMFErrorHandler) exten
   val parsingOptions: ParsingOptions        = config.options.parsingOptions
   lazy val registryContext: RegistryContext = RegistryContext(config.getRegistry)
   lazy val serializableAnnotationsFacade    = new SerializableAnnotationsFacade(this)
+  val idAdopterProvider: IdAdopterProvider  = config.idAdopterProvider
 }
 
 object ParseConfig {
@@ -42,6 +46,8 @@ case class LimitedParseConfig(eh: AMFErrorHandler, registry: AMFRegistry = AMFRe
   override def parsingOptions: ParsingOptions                               = ParsingOptions()
   override def registryContext: RegistryContext                             = RegistryContext(registry)
   override def serializableAnnotationsFacade: SerializableAnnotationsFacade = new SerializableAnnotationsFacade(this)
+
+  override def idAdopterProvider: IdAdopterProvider = new DefaultIdAdopterProvider()
 }
 
 object ParseConfigOverride {
@@ -52,7 +58,8 @@ object ParseConfigOverride {
       parseConfig.sortedReferenceParsePlugins,
       parseConfig.parsingOptions,
       parseConfig.registryContext,
-      parseConfig.serializableAnnotationsFacade
+      parseConfig.serializableAnnotationsFacade,
+      parseConfig.idAdopterProvider
     )
   }
 }
@@ -63,5 +70,6 @@ case class ParseConfigOverride(
     sortedReferenceParsePlugins: Seq[AMFParsePlugin],
     parsingOptions: ParsingOptions,
     registryContext: RegistryContext,
-    serializableAnnotationsFacade: SerializableAnnotationsFacade
+    serializableAnnotationsFacade: SerializableAnnotationsFacade,
+    idAdopterProvider: IdAdopterProvider
 ) extends ParseConfiguration
