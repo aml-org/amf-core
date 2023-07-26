@@ -53,6 +53,7 @@ import amf.core.client.platform.validation.{
   ValidationShapeSet => ClientValidationShapeSet
 }
 import amf.core.client.platform.{config, model, transform, AMFResult => ClientAMFResult}
+import amf.core.client.scala.adoption.{DefaultIdMaker, IdAdopter, IdAdopterProvider, IdMaker}
 import amf.core.client.scala.config._
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.model._
@@ -72,12 +73,17 @@ import amf.core.client.scala.transform.{TransformationPipelineBuilder, Transform
 import amf.core.client.scala.validation.payload.{ShapeValidationConfiguration, ValidatePayloadRequest}
 import amf.core.client.scala.validation.{AMFValidationReport, AMFValidationResult}
 import amf.core.client.scala.{AMFGraphConfiguration, AMFObjectResult, AMFParseResult, AMFResult}
-import amf.core.internal.parser.domain.Annotations
+import amf.core.internal.parser.domain.{Annotations, FieldEntry}
 import amf.core.internal.reference.UnitCacheAdapter
 import amf.core.internal.remote.Spec
 import amf.core.internal.resource.{ClientResourceLoaderAdapter, InternalResourceLoaderAdapter}
 import amf.core.internal.unsafe.PlatformSecrets
 import amf.core.internal.validation.{ValidationCandidate, ValidationShapeSet}
+import amf.core.client.platform.adoption.{
+  IdAdopter => ClientIdAdopter,
+  IdMaker => ClientIdMaker,
+  IdAdopterProvider => ClientIdAdopterProvider
+}
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
@@ -125,7 +131,8 @@ trait CoreBaseConverter
     with BaseUnitSourceInformationConverter
     with LocationInformationConverter
     with ShapeFederationMetadataConverter
-    with PropertyShapePathConverter {
+    with PropertyShapePathConverter
+    with IdAdopterConverter {
 
   implicit def asClient[Internal, Client](from: Internal)(implicit m: InternalClientMatcher[Internal, Client]): Client =
     m.asClient(from)
@@ -825,5 +832,48 @@ trait PropertyShapePathConverter extends PlatformSecrets {
       platform.wrap[amf.core.client.platform.model.domain.PropertyShapePath](from)
     override def asInternal(from: amf.core.client.platform.model.domain.PropertyShapePath): PropertyShapePath =
       from._internal
+  }
+}
+
+trait IdAdopterConverter {
+  implicit object IdAdopterMatcher extends BidirectionalMatcher[IdAdopter, ClientIdAdopter] {
+    override def asClient(from: IdAdopter): ClientIdAdopter = new ClientIdAdopter(from)
+
+    override def asInternal(from: ClientIdAdopter): IdAdopter = from._internal
+  }
+
+  implicit object IdMakerMatcher extends BidirectionalMatcher[IdMaker, ClientIdMaker] {
+    override def asClient(from: IdMaker): ClientIdMaker = (parent: String, element: String) =>
+      from.makeId(parent, element)
+
+    override def asInternal(from: ClientIdMaker): IdMaker = new IdMaker {
+      val inner = new DefaultIdMaker()
+
+      override def makeId(parent: AmfObject, field: FieldEntry, isRoot: Boolean): String =
+        inner.makeId(parent, field, isRoot)
+
+      override def makeId(parent: String, element: String): String = from.makeId(parent, element)
+
+      override def makeArrayElementId(parent: String, index: Int, element: AmfElement): String =
+        inner.makeArrayElementId(parent, index, element)
+    }
+  }
+
+  implicit object IdAdopterProviderConverterMatcher
+      extends BidirectionalMatcher[IdAdopterProvider, ClientIdAdopterProvider] {
+    override def asClient(from: IdAdopterProvider): ClientIdAdopterProvider = new ClientIdAdopterProvider {
+      override def idAdopter(initialId: String): ClientIdAdopter = new ClientIdAdopter(from.idAdopter(initialId))
+
+      override def idAdopter(initialId: String, idMaker: ClientIdMaker): ClientIdAdopter = new ClientIdAdopter(
+        from.idAdopter(initialId, IdMakerMatcher.asInternal(idMaker))
+      )
+    }
+
+    override def asInternal(from: ClientIdAdopterProvider): IdAdopterProvider = new IdAdopterProvider {
+      override def idAdopter(initialId: String): IdAdopter = from.idAdopter(initialId)._internal
+
+      override def idAdopter(initialId: String, idMaker: IdMaker): IdAdopter =
+        from.idAdopter(initialId, IdMakerMatcher.asClient(idMaker))._internal
+    }
   }
 }

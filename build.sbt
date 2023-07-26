@@ -6,7 +6,7 @@ val ivyLocal = Resolver.file("ivy", file(Path.userHome.absolutePath + "/.ivy2/lo
 
 name                     := "amf-core"
 ThisBuild / scalaVersion := "2.12.15"
-ThisBuild / version      := "5.4.0"
+ThisBuild / version      := "5.4.1"
 
 publish := {}
 
@@ -29,7 +29,7 @@ lazy val workspaceDirectory: File =
     case _       => Path.userHome / "mulesoft"
   }
 
-val syamlVersion = "2.0.332"
+val syamlVersion = "2.0.334"
 
 lazy val syamlJVMRef = ProjectRef(workspaceDirectory / "syaml", "syamlJVM")
 lazy val syamlJSRef  = ProjectRef(workspaceDirectory / "syaml", "syamlJS")
@@ -62,6 +62,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
     Compile / fullOptJS / artifactPath := baseDirectory.value / "target" / "artifact" / "amf-core-module.js"
   )
   .disablePlugins(SonarPlugin)
+  .settings(AutomaticModuleName.settings("amf.core"))
 
 lazy val coreJVM = core.jvm
   .in(file("./jvm"))
