@@ -1,0 +1,71 @@
+[
+  {
+    "@id": "",
+    "@type": [
+      "doc:Document",
+      "doc:Fragment",
+      "doc:Module",
+      "doc:Unit"
+    ],
+    "doc:encodes": [
+      {
+        "@id": "/encodes/obj1/",
+        "@type": [
+          "data:Object",
+          "data:Node",
+          "doc:DomainElement"
+        ],
+        "data:myProp1": [
+          {
+            "@id": "/encodes/obj1/myProp1/scalar",
+            "@type": [
+              "data:Scalar",
+              "data:Node",
+              "doc:DomainElement"
+            ],
+            "data:value": [
+              {
+                "@value": "http://a.aml.org#/path"
+              }
+            ],
+            "shacl:datatype": [
+              {
+                "@id": "http://www.w3.org/2001/XMLSchema#URI"
+              }
+            ],
+            "core:name": [
+              {
+                "@value": "myProp1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "doc:root": [
+      {
+        "@value": true
+      }
+    ],
+    "doc:processingData": [
+      {
+        "@id": "null/BaseUnitProcessingData",
+        "@type": [
+          "doc:BaseUnitProcessingData"
+        ],
+        "doc:transformed": [
+          {
+            "@value": false
+          }
+        ]
+      }
+    ],
+    "@context": {
+      "@base": "urn:ms:acme:asset::acme:valkyr-for-humans-api:1.0.1",
+      "shacl": "http://www.w3.org/ns/shacl#",
+      "data": "http://a.ml/vocabularies/data#",
+      "doc": "http://a.ml/vocabularies/document#",
+      "core": "http://a.ml/vocabularies/core#"
+    }
+  }
+]
