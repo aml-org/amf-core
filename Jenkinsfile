@@ -62,6 +62,7 @@ pipeline {
                 anyOf {
                     branch 'master'
                     branch 'develop'
+                    branch 'support/5.4.1'
                 }
             }
             steps {
@@ -89,6 +90,7 @@ pipeline {
             when {
                 anyOf {
                     branch 'master'
+                    branch 'support/5.4.1'
                 }
             }
             steps {
