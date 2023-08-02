@@ -6,6 +6,7 @@ import amf.core.client.scala.vocabulary.ValueType
 import amf.core.internal.metamodel.Type._
 import amf.core.internal.metamodel.{Field, Obj, Type}
 import amf.core.internal.annotations.{Inferred, SynthesizedField}
+import org.mulesoft.common.time.SimpleDateTime
 
 import scala.collection.immutable.ListMap
 import scala.collection.mutable
@@ -62,7 +63,9 @@ class Fields {
         case Type.Double  => DoubleFieldImpl(f.defaultValue.asInstanceOf[Option[Double]], Annotations(), f)
         case Type.Any     => AnyFieldImpl(f.defaultValue, Annotations(), f)
         case ArrayLike(_) => Nil
-        case _: Obj       => null
+        case Type.Date | Type.DateTime =>
+          DateFieldImpl(f.defaultValue.asInstanceOf[Option[SimpleDateTime]], Annotations(), f)
+        case _: Obj => null
       }).asInstanceOf[T]
 
     fs.get(f).map(v => typed(f.`type`, v.value)).fold(empty())(_.asInstanceOf[T])
@@ -226,6 +229,12 @@ class Fields {
       extends DoubleField
       with FieldRemover {
     def this(s: AmfScalar, f: Field) = this(s.toNumberOption.map(_.asInstanceOf[Double]), s.annotations, f)
+  }
+
+  private case class DateFieldImpl(option: Option[SimpleDateTime], annotations: Annotations, field: Field)
+      extends DateField
+      with FieldRemover {
+    def this(s: AmfScalar, f: Field) = this(SimpleDateTime.unapply(s.value.toString), s.annotations, f)
   }
 
   private case class AnyFieldImpl(option: Option[Any], annotations: Annotations, field: Field)
