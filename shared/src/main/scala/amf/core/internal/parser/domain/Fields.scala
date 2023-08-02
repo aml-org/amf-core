@@ -34,13 +34,14 @@ class Fields {
     def typed(t: Type, e: AmfElement): Any = e match {
       case s: AmfScalar =>
         t match {
-          case Str | Iri   => new StrFieldImpl(s, f)
-          case Bool        => new BoolFieldImpl(s, f)
-          case Type.Int    => new IntFieldImpl(s, f)
-          case Type.Float  => new DoubleFieldImpl(s, f)
-          case Type.Double => new DoubleFieldImpl(s, f)
-          case Type.Any    => new AnyFieldImpl(s, f)
-          case _           => throw new Exception(s"Invalid value '$s' of type '$t'")
+          case Str | Iri                 => new StrFieldImpl(s, f)
+          case Bool                      => new BoolFieldImpl(s, f)
+          case Type.Int                  => new IntFieldImpl(s, f)
+          case Type.Float                => new DoubleFieldImpl(s, f)
+          case Type.Double               => new DoubleFieldImpl(s, f)
+          case Type.Any                  => new AnyFieldImpl(s, f)
+          case Type.Date | Type.DateTime => new DateFieldImpl(s, f)
+          case _                         => throw new Exception(s"Invalid value '$s' of type '$t'")
         }
       case o: AmfObject =>
         t match {
