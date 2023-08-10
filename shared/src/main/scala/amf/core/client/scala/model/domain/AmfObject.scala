@@ -32,6 +32,13 @@ trait AmfObject extends AmfElement {
     }
     this
   }
+  def findObjectFieldValue(iri: String): Option[AmfObject] = fields
+    .getValueAsOption(iri)
+    .map(_.value)
+    .flatMap {
+      case obj: AmfObject => Some(obj)
+      case _              => None
+    }
 
   /** Value , path + field value that is used to compose the id when the object its adopted */
   def componentId: String
