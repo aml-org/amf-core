@@ -12,4 +12,5 @@ trait AmfObjectWrapper extends Annotable {
   private[amf] val _internal: InternalAmfObject
 
   override def annotations(): Annotations = _internal.annotations
+  def findObjectFieldValue(iri: String): ClientOption[AmfObjectWrapper] = _internal.findObjectFieldValue(iri).asClient
 }
