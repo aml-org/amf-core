@@ -12,6 +12,7 @@ object Spec {
       case Raml08.id            => Some(Raml08)
       case Oas20.id             => Some(Oas20)
       case Oas30.id             => Some(Oas30)
+      case AwsOas30.id          => Some(AwsOas30)
       case AsyncApi20.id        => Some(AsyncApi20)
       case Amf.id               => Some(Amf)
       case Payload.id           => Some(Payload)
@@ -36,6 +37,7 @@ object Spec {
   @JSExport val RAML10: Spec             = Raml10
   @JSExport val OAS20: Spec              = Oas20
   @JSExport val OAS30: Spec              = Oas30
+  @JSExport val AWS_OAS30: Spec          = AwsOas30
   @JSExport val ASYNC20: Spec            = AsyncApi20
   @JSExport val AMF: Spec                = Amf
   @JSExport val PAYLOAD: Spec            = Payload
@@ -108,6 +110,14 @@ private[amf] case object Oas20 extends Oas {
 
 private[amf] case object Oas30 extends Oas {
   override def version: String = "3.0"
+
+  override val mediaType: String = `application/yaml`
+}
+
+private[amf] case object AwsOas30 extends Oas {
+  override def version: String = "3.0"
+
+  override val id: String = ("AWS OAS " + version).trim
 
   override val mediaType: String = `application/yaml`
 }

@@ -100,14 +100,17 @@ class GraphEmitterContext(
   def emitId(uri: String): String = {
     if (shouldCompact) {
       if (uri.startsWith(base)) uri.replace(base, "")
-      else if (uri.startsWith(baseParent)) uri.replace(s"$baseParent/", "./")
-      else uri
+      else tryBaseParentReplacement(uri)
     } else uri
   }
 
-  private def baseParent: String = {
+  private def tryBaseParentReplacement(uri: String) = {
     val idx = base.lastIndexOf("/")
-    base.substring(0, idx)
+    if (idx > 0) {
+      val baseParent = base.substring(0, idx)
+      if (uri.startsWith(baseParent)) uri.replace(s"$baseParent/", "./")
+      else uri
+    } else uri
   }
 
   def setupContextBase(location: String): Unit = {
