@@ -30,10 +30,11 @@ abstract class Shape
       if (!compactId) this.id
       else {
         val start = this.id.indexOf("#")
-        this.id.substring(start)
+        if (start < 0) this.id else this.id.substring(start)
       }
     s"$clazz@$memoryAddress: $id"
   }
+
   override protected def nameField: Field = Name
 
   def displayName: StrField                              = fields.field(DisplayName)
