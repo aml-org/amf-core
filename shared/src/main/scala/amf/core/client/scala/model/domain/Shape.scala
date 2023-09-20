@@ -2,11 +2,7 @@ package amf.core.client.scala.model.domain
 
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.model.domain.extensions.{PropertyShape, ShapeExtension}
-import amf.core.client.scala.model.domain.federation.{
-  HasFederationMetadata,
-  HasShapeFederationMetadata,
-  ShapeFederationMetadata
-}
+import amf.core.client.scala.model.domain.federation.HasShapeFederationMetadata
 import amf.core.client.scala.model.{BoolField, StrField}
 import amf.core.client.scala.traversal.ShapeTraversalRegistry
 import amf.core.internal.annotations.LexicalInformation
@@ -26,6 +22,18 @@ abstract class Shape
     with NamedDomainElement
     with ShapeHelper
     with HasShapeFederationMetadata {
+
+  private[amf] def debugInfo(compactId: Boolean = true): String = {
+    val clazz         = this.getClass.getSimpleName
+    val memoryAddress = System.identityHashCode(this)
+    val id =
+      if (!compactId) this.id
+      else {
+        val start = this.id.indexOf("#")
+        if (start < 0) this.id else this.id.substring(start)
+      }
+    s"$clazz@$memoryAddress: $id"
+  }
 
   override protected def nameField: Field = Name
 
