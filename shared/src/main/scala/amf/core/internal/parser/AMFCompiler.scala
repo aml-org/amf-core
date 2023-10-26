@@ -116,7 +116,10 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
       getDomainPluginFor(document).getOrElse(compilerContext.compilerConfig.chooseFallback(document, isRoot))
     notifyEvent(SelectedParsePluginEvent(document.location, domainPlugin))
     parseReferences(document, domainPlugin) map { documentWithReferences =>
-      val baseUnit = domainPlugin.parse(documentWithReferences, compilerContext.parserContext.copyWithSonsReferences())
+      val baseUnit = domainPlugin.parse(
+        documentWithReferences,
+        compilerContext.parserContext.copyWithSonsReferences().forLocation(document.location)
+      )
       if (document.location == compilerContext.fileContext.root) baseUnit.withRoot(true)
       baseUnit.withRaw(document.raw).tagReferences(documentWithReferences)
       if (isRoot && domainPlugin.withIdAdoption)
