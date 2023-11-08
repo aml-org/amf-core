@@ -1,6 +1,7 @@
 package amf.core.internal.utils
 
 import amf.core.internal.unsafe.PlatformSecrets
+
 import java.net.URI
 
 object UriUtils extends PlatformSecrets {
@@ -56,12 +57,22 @@ object UriUtils extends PlatformSecrets {
   }
 
   /** normalize path method for file fetching in amf compiler */
-  def normalizePath(url: String): String = fixFilePrefix(new URI(platform.encodeURI(url)).normalize.toString)
+  def normalizePath(url: String): String = fixFilePrefix(normalizeWithPrefixExtraction(platform.encodeURI(url)))
 
   /** Test path resolution. */
   def resolvePath(path: String): String = {
-    val res = new URI(path).normalize.toString
-    fixFilePrefix(res)
+    val normalized = normalizeWithPrefixExtraction(path)
+    fixFilePrefix(normalized)
+  }
+
+  private def normalizeWithPrefixExtraction(path: String): String = {
+    path match {
+      case Absolute(_) =>
+        // The prefixes, in some cases (when multiple), generate problems with the path normalization. We remove them, normalize, and then add them again.
+        val (prefix, rawPath) = path.splitAt(path.lastIndexOf(':') + 1)
+        prefix + new URI(rawPath).normalize.toString
+      case _ => new URI(path).normalize.toString
+    }
   }
 
   private def fixFilePrefix(res: String): String = {
