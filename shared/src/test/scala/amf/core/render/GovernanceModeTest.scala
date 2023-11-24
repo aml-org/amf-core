@@ -8,13 +8,10 @@ import amf.core.internal.annotations.{DeclaredElement, TrackedElement, VirtualEl
 import amf.core.internal.parser.domain.Annotations
 import amf.core.internal.remote.Spec.AMF
 import amf.core.io.FileAssertionTest
-import org.scalatest.funsuite.AsyncFunSuite
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class GovernanceModeTest extends AsyncFunSuite with FileAssertionTest {
-
-  override implicit val executionContext: ExecutionContext = ExecutionContext.Implicits.global
+class GovernanceModeTest extends FileAssertionTest {
 
   protected val allowedAnnotations: Annotations =
     Annotations() += TrackedElement(Set("")) += DeclaredElement() += VirtualElement()

@@ -1,11 +1,11 @@
 package amf.core.client.common.parser
 
 import amf.core.client.scala.model.document.Document
-import amf.core.client.scala.{AMFGraphConfiguration, AMFParseResult}
 import amf.core.client.scala.model.domain.{AmfObject, DomainElement}
 import amf.core.client.scala.vocabulary.Namespace.Data
 import amf.core.client.scala.vocabulary.ValueType
-import amf.core.internal.convert.{BaseUnitConverter, NativeOps}
+import amf.core.client.scala.{AMFGraphConfiguration, AMFParseResult}
+import amf.core.internal.convert.BaseUnitConverter
 import amf.core.internal.metamodel.domain.DomainElementModel
 import amf.core.internal.metamodel.{Field, ModelDefaultBuilder, Obj, Type}
 import amf.core.internal.parser.domain.{Annotations, Fields}
@@ -14,16 +14,12 @@ import amf.core.render.ElementsFixture
 import org.scalatest.funsuite.AsyncFunSuite
 import org.scalatest.matchers.should.Matchers
 
-import scala.concurrent.{ExecutionContext, Future}
-
 class InternalSeqAtGraphParserTest()
     extends AsyncFunSuite
     with FileAssertionTest
     with BaseUnitConverter
     with Matchers
     with ElementsFixture {
-
-  override implicit val executionContext: ExecutionContext = ExecutionContext.Implicits.global
 
   private def parseDynamic(source: String, seqType: Type) = {
     val golden = s"shared/src/test/resources/parser/$source"

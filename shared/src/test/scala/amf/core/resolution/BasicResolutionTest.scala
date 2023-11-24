@@ -6,20 +6,14 @@ import amf.core.client.scala.model.domain.extensions.CustomDomainProperty
 import amf.core.internal.convert.{BaseUnitConverter, NativeOps}
 import amf.core.io.FileAssertionTest
 import amf.core.render.ElementsFixture
-import org.scalatest.funsuite.AsyncFunSuite
 import org.scalatest.matchers.should.Matchers
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
-
 trait BasicResolutionTest
-    extends AsyncFunSuite
+    extends FileAssertionTest
     with NativeOps
-    with FileAssertionTest
     with BaseUnitConverter
     with Matchers
     with ElementsFixture {
-
-  override implicit val executionContext: ExecutionContextExecutor = ExecutionContext.global
 
   test("test basic link resolution") {
 

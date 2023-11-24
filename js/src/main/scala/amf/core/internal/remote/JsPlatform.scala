@@ -1,10 +1,6 @@
 package amf.core.internal.remote
 
-import java.net.URI
-
-import amf.core.client.platform.execution.{DefaultExecutionEnvironment, ExecutionEnvironment}
-import amf.core.internal.remote.server.Path
-
+import scala.concurrent.ExecutionContext
 import scala.scalajs.js.URIUtils
 
 trait JsPlatform extends Platform {
@@ -24,5 +20,7 @@ trait JsPlatform extends Platform {
 
   /** decodes a uri component */
   override def decodeURIComponent(url: String): String = URIUtils.decodeURIComponent(url)
+
+  override val globalExecutionContext: ExecutionContext = scala.scalajs.concurrent.JSExecutionContext.queue
 
 }

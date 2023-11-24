@@ -1,33 +1,24 @@
 package amf.core.parser
 
-import amf.core.client.common.{HighPriority, PluginPriority}
 import amf.core.client.common.remote.Content
+import amf.core.client.common.{HighPriority, PluginPriority}
 import amf.core.client.scala.AMFGraphConfiguration
 import amf.core.client.scala.adoption.{IdAdopter, IdAdopterProvider, IdMaker}
-import amf.core.client.scala.config.ParsingOptions
 import amf.core.client.scala.errorhandling.AMFErrorHandler
 import amf.core.client.scala.model.document.{BaseUnit, Document}
-import amf.core.client.scala.model.domain.{AmfObject, ScalarNode}
+import amf.core.client.scala.model.domain.ScalarNode
 import amf.core.client.scala.parse.AMFParsePlugin
-import amf.core.client.scala.parse.document.{
-  ParserContext,
-  ReferenceHandler,
-  SimpleReferenceHandler,
-  SyamlParsedDocument
-}
+import amf.core.client.scala.parse.document.{ParserContext, ReferenceHandler, SimpleReferenceHandler, SyamlParsedDocument}
 import amf.core.client.scala.resource.ResourceLoader
 import amf.core.client.scala.vocabulary.Namespace.XsdTypes
+import amf.core.common.AsyncFunSuiteWithPlatformGlobalExecutionContext
 import amf.core.internal.parser.{AMFCompiler, CompilerContextBuilder, Root}
 import amf.core.internal.remote.Spec
-import amf.core.internal.unsafe.PlatformSecrets
-import org.scalatest.funsuite.AsyncFunSuite
 import org.scalatest.matchers.should.Matchers
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class CompilerRootUrlTest extends AsyncFunSuite with PlatformSecrets with Matchers {
-
-  override implicit def executionContext: ExecutionContext = ExecutionContext.Implicits.global
+class CompilerRootUrlTest extends AsyncFunSuiteWithPlatformGlobalExecutionContext with Matchers {
 
   class CustomContentUrlResourceLoader(customUrl: String) extends ResourceLoader {
     override def fetch(resource: String): Future[Content] = Future.successful(

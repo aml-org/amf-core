@@ -1,9 +1,8 @@
 package amf.core.internal.remote.browser
 
-import amf.core.client.platform.execution.BaseExecutionEnvironment
 import amf.core.client.scala.resource.ResourceLoader
-import amf.core.internal.resource.InternalResourceLoaderAdapter
 import amf.core.internal.remote._
+import amf.core.internal.resource.InternalResourceLoaderAdapter
 import org.mulesoft.common.io.FileSystem
 
 import scala.concurrent.ExecutionContext

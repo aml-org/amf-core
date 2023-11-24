@@ -1,20 +1,16 @@
 package amf.core.internal.remote
 
 import amf.core.client.common.remote.Content
+import amf.core.common.AsyncFunSuiteWithPlatformGlobalExecutionContext
 import amf.core.internal.remote.Mimes.`application/yaml`
 import amf.core.internal.resource.AMFResolvers
-import amf.core.internal.unsafe.PlatformSecrets
 import org.mulesoft.common.test.ListAssertions
 import org.scalatest.Assertion
-import org.scalatest.funsuite.AsyncFunSuite
 import org.scalatest.matchers.should.Matchers
 
 import java.util.Date
-import scala.concurrent.{ExecutionContext, Future}
 
-class PlatformTest extends AsyncFunSuite with Matchers with ListAssertions with PlatformSecrets {
-
-  override implicit def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+class PlatformTest extends AsyncFunSuiteWithPlatformGlobalExecutionContext with Matchers with ListAssertions {
 
   test("File") {
     AMFResolvers.predefined().resolveContent("file://shared/src/test/resources/input.yaml") map {
