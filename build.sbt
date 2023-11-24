@@ -5,8 +5,11 @@ import sbtsonar.SonarPlugin.autoImport.sonarProperties
 val ivyLocal = Resolver.file("ivy", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns)
 
 name                     := "amf-core"
-ThisBuild / scalaVersion := "2.12.15"
+ThisBuild / scalaVersion := "2.12.18"
 ThisBuild / version      := "5.5.0-SNAPSHOT"
+
+val syamlVersion = "2.1.0-JAVA21-INTERNAL"
+val scalaCommonTestVersion = "0.2.0-JAVA21-INTERNAL"
 
 publish := {}
 
@@ -17,7 +20,7 @@ val settings = Common.settings ++ Common.publish ++ Seq(
     resolvers ++= List(ivyLocal, Common.releases, Common.snapshots, Resolver.mavenLocal, Resolver.mavenCentral),
     credentials ++= Common.credentials(),
     libraryDependencies ++= Seq(
-        "org.mule.common" %%% "scala-common-test" % "0.1.13" % Test
+        "org.mule.common" %%% "scala-common-test" % scalaCommonTestVersion % Test
     )
 )
 
@@ -28,8 +31,6 @@ lazy val workspaceDirectory: File =
     case Some(x) => file(x)
     case _       => Path.userHome / "mulesoft"
   }
-
-val syamlVersion = "2.0.334"
 
 lazy val syamlJVMRef = ProjectRef(workspaceDirectory / "syaml", "syamlJVM")
 lazy val syamlJSRef  = ProjectRef(workspaceDirectory / "syaml", "syamlJS")
@@ -51,7 +52,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(settings)
   .jvmSettings(
       libraryDependencies += "org.scala-js"          %% "scalajs-stubs"           % "1.1.0" % "provided",
-      libraryDependencies += "org.scala-lang.modules" % "scala-java8-compat_2.12" % "0.8.0",
+      libraryDependencies += "org.scala-lang.modules" % "scala-java8-compat_2.12" % "1.0.2",
       Compile / packageDoc / artifactPath := baseDirectory.value / "target" / "artifact" / "amf-core-javadoc.jar"
   )
   .jsSettings(
