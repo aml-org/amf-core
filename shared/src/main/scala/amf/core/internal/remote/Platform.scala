@@ -35,6 +35,8 @@ object FileMediaType extends FileMediaType
 /** */
 trait Platform extends FileMediaType {
 
+  val globalExecutionContext: ExecutionContext
+
   def name: String = "gen"
 
   def findCharInCharSequence(s: CharSequence)(p: Char => Boolean): Option[Char]

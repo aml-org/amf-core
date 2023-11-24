@@ -1,17 +1,12 @@
 package amf.core.client.common.parser
 
 import amf.core.client.scala.AMFGraphConfiguration
+import amf.core.common.AsyncFunSuiteWithPlatformGlobalExecutionContext
 import amf.core.internal.convert.NativeOps
 import amf.core.internal.plugins.parse.ExternalFragmentDomainFallback
-import amf.core.internal.unsafe.PlatformSecrets
-import org.scalatest.funsuite.AsyncFunSuite
 import org.scalatest.matchers.should.Matchers
 
-import scala.concurrent.ExecutionContext
-
-trait DuplicateJsonKeysTest extends AsyncFunSuite with PlatformSecrets with NativeOps with Matchers {
-
-  override implicit def executionContext: ExecutionContext = ExecutionContext.Implicits.global
+trait DuplicateJsonKeysTest extends AsyncFunSuiteWithPlatformGlobalExecutionContext with NativeOps with Matchers {
 
   test("Parsed JSON with duplicate keys has several warnings") {
 

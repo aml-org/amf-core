@@ -9,18 +9,14 @@ import amf.core.internal.convert.{BaseUnitConverter, NativeOps}
 import amf.core.internal.metamodel.domain.ArrayNodeModel
 import amf.core.internal.remote.Spec.AMF
 import amf.core.io.FileAssertionTest
-import org.scalatest.funsuite.AsyncFunSuite
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait AmfGraphRendererTest
-    extends AsyncFunSuite
+    extends FileAssertionTest
     with NativeOps
-    with FileAssertionTest
     with BaseUnitConverter
     with ElementsFixture {
-
-  override implicit val executionContext: ExecutionContext = ExecutionContext.Implicits.global
 
   test("Test render simple document") {
     val golden = "shared/src/test/resources/parser/simple-document.jsonld"

@@ -4,8 +4,7 @@ import amf.core.client.common.remote.Content
 import amf.core.client.platform.resource.BaseHttpResourceLoader
 import amf.core.internal.remote.{NetworkError, UnexpectedStatusCode}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Promise
+import scala.concurrent.{ExecutionContext, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
 import scala.scalajs.js.JSConverters._
@@ -14,6 +13,8 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 @JSExportTopLevel("JsServerHttpResourceLoader")
 @JSExportAll
 case class JsServerHttpResourceLoader() extends BaseHttpResourceLoader {
+
+  implicit def executionContext: ExecutionContext = scala.scalajs.concurrent.JSExecutionContext.queue
 
   override def fetch(resource: String): js.Promise[Content] = {
     val promise: Promise[Content] = Promise()
