@@ -8,9 +8,9 @@ import org.mulesoft.common.io.{FileSystem, Fs}
 
 import scala.concurrent.ExecutionContext
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel, JSImport}
+import scala.scalajs.js.annotation.{JSExportAll, JSImport}
 
-/** */
+@JSExportAll/** */
 class JsServerPlatform extends JsPlatform {
 
   /** Underlying file system for platform. */
@@ -38,11 +38,10 @@ class JsServerPlatform extends JsPlatform {
   }
 }
 
-@JSExportTopLevel("JsServerPlatform")
 object JsServerPlatform {
+
   private var singleton: Option[JsServerPlatform] = None
 
-  @JSExport
   def instance(): JsServerPlatform = singleton match {
     case Some(p) => p
     case None =>
