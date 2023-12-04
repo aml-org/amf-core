@@ -9,12 +9,11 @@ import org.mulesoft.common.collections.FilterType
 
 import scala.collection.mutable
 
-
 class IdAdopter(
-                 initialId: String,
-                 private val idMaker: IdMaker = new DefaultIdMaker(),
-                 private val adopted: mutable.Map[String, AmfObject] = mutable.Map.empty
-               ) {
+    initialId: String,
+    private val idMaker: IdMaker = new DefaultIdMaker(),
+    private val adopted: mutable.Map[String, AmfObject] = mutable.Map.empty
+) {
 
   def adoptFromRoot(initialElem: AmfObject): Unit = adopt(initialElem, isRoot = true)
 
@@ -26,10 +25,10 @@ class IdAdopter(
   }
 
   /** adopts the initial element and all of its nested element in a BFS manner
-   *
-   * @param isRoot :
-   *               if the initialElement is the root base unit, used to place fragment in id.
-   */
+    *
+    * @param isRoot
+    *   : if the initialElement is the root base unit, used to place fragment in id.
+    */
   private def adoptElement(initialElem: AmfObject, isRoot: Boolean): Unit = {
     val adoptionQueue: mutable.Queue[PendingAdoption] = new mutable.Queue()
     adoptionQueue.enqueue(PendingAdoption(initialElem, initialId, isRoot))
@@ -72,20 +71,21 @@ class IdAdopter(
   }
 
   /** this is done specifically because of RAML scalar valued nodes, extension is only stored in annotation contained in
-   * AmfScalar and needs to have id defined due to potential validations
-   */
+    * AmfScalar and needs to have id defined due to potential validations
+    */
   private def traverseDomainExtensionAnnotation(scalar: AmfScalar, id: String): Seq[PendingAdoption] = {
     scalar.annotations.collect[PendingAdoption] { case domainAnnotation: DomainExtensionAnnotation =>
-      val extension = domainAnnotation.extension
+      val extension   = domainAnnotation.extension
       val generatedId = idMaker.makeId(id, extension.componentId)
       PendingAdoption(extension, generatedId)
     }
   }
 
-  private def getOrderedFields(obj: AmfObject): Iterable[FieldEntry] = {
+  // Need to override this filter from APB in order to avoid re-adopt modules from dependencies
+  protected def getOrderedFields(obj: AmfObject): Iterable[FieldEntry] = {
     val criteria = obj match {
       case _: BaseUnit => BaseUnitFieldAdoptionOrdering
-      case _ => GenericFieldAdoptionOrdering
+      case _           => GenericFieldAdoptionOrdering
     }
     criteria.fields(obj)
   }
