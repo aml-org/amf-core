@@ -3,10 +3,10 @@ package amf.core.parser
 import amf.core.client.common.{HighPriority, PluginPriority}
 import amf.core.client.common.remote.Content
 import amf.core.client.scala.AMFGraphConfiguration
-import amf.core.client.scala.adoption.{IdAdopter, IdAdopterProvider, IdMaker}
+import amf.core.client.scala.adoption.{DefaultIdMaker, IdAdopter, IdAdopterProvider, IdMaker}
 import amf.core.client.scala.config.ParsingOptions
 import amf.core.client.scala.errorhandling.AMFErrorHandler
-import amf.core.client.scala.model.document.{BaseUnit, Document}
+import amf.core.client.scala.model.document.{BaseUnit, Document, Module}
 import amf.core.client.scala.model.domain.{AmfObject, ScalarNode}
 import amf.core.client.scala.parse.AMFParsePlugin
 import amf.core.client.scala.parse.document.{
@@ -17,6 +17,9 @@ import amf.core.client.scala.parse.document.{
 }
 import amf.core.client.scala.resource.ResourceLoader
 import amf.core.client.scala.vocabulary.Namespace.XsdTypes
+import amf.core.internal.adoption.{BaseUnitFieldAdoptionOrdering, FieldOrderingCriteria}
+import amf.core.internal.metamodel.document.DocumentModel
+import amf.core.internal.parser.domain.FieldEntry
 import amf.core.internal.parser.{AMFCompiler, CompilerContextBuilder, Root}
 import amf.core.internal.remote.Spec
 import amf.core.internal.unsafe.PlatformSecrets
@@ -61,24 +64,7 @@ class CompilerRootUrlTest extends AsyncFunSuite with PlatformSecrets with Matche
   }
 
   test("Test custom IdAdopter") {
-    val parseplugin = new AMFParsePlugin {
-      override def spec: Spec = Spec("Test")
-
-      override def parse(document: Root, ctx: ParserContext): BaseUnit =
-        Document().withEncodes(ScalarNode("test", Some(XsdTypes.xsdString.iri()))).withLocation(document.location)
-
-      /** media types which specifies vendors that are parsed by this plugin.
-        */
-      override def mediaTypes: Seq[String] = Seq("application/json")
-
-      override def referenceHandler(eh: AMFErrorHandler): ReferenceHandler = SimpleReferenceHandler
-
-      override def allowRecursiveReferences: Boolean = false
-
-      override def applies(element: Root): Boolean = true
-
-      override def priority: PluginPriority = HighPriority
-    }
+    val parseplugin = new CustomParsePlugin(Document().withEncodes(ScalarNode("test", Some(XsdTypes.xsdString.iri()))))
 
     val urn = "urn:ms:an-org-id:api-contract:mulesoft:asset:g/a/v"
     val config = AMFGraphConfiguration
@@ -94,9 +80,67 @@ class CompilerRootUrlTest extends AsyncFunSuite with PlatformSecrets with Matche
     }
   }
 
+  test("Test override filter of custom IdAdopter") {
+    val moduleId = "amf://module-id"
+    val module   = Module().withId(moduleId)
+    val parseplugin = new CustomParsePlugin(
+      Document()
+        .withEncodes(ScalarNode("test", Some(XsdTypes.xsdString.iri())))
+        .setArrayWithoutId(DocumentModel.References, Seq(module))
+    )
+
+    val urn = "urn:ms:an-org-id:api-contract:mulesoft:asset:g/a/v"
+    val config = AMFGraphConfiguration
+      .predefined()
+      .withResourceLoaders(List(customLoader))
+      .withRootParsePlugin(parseplugin)
+      .withIdAdopterProvider(SkipReferencesIdAdopterProvider())
+
+    config.baseUnitClient().parse(url).map { result =>
+      val module = result.baseUnit.references.head
+      module.id shouldBe moduleId
+    }
+  }
+
+  class CustomParsePlugin(doc: Document) extends AMFParsePlugin {
+    override def spec: Spec = Spec("Test")
+
+    override def parse(document: Root, ctx: ParserContext): BaseUnit = doc.withLocation(document.location)
+
+    /** media types which specifies vendors that are parsed by this plugin.
+      */
+    override def mediaTypes: Seq[String] = Seq("application/json")
+
+    override def referenceHandler(eh: AMFErrorHandler): ReferenceHandler = SimpleReferenceHandler
+
+    override def allowRecursiveReferences: Boolean = false
+
+    override def applies(element: Root): Boolean = true
+
+    override def priority: PluginPriority = HighPriority
+  }
+
   case class CustomTestIdAdopterProvider(urn: String) extends IdAdopterProvider {
     override def idAdopter(initialId: String): IdAdopter = new IdAdopter(urn)
 
     override def idAdopter(initialId: String, idMaker: IdMaker): IdAdopter = new IdAdopter(urn, idMaker)
   }
+
+  case class SkipReferencesIdAdopterProvider() extends IdAdopterProvider {
+
+    case class CustomIdAdopter(initialId: String, idMaker: IdMaker = new DefaultIdMaker())
+        extends IdAdopter(initialId, idMaker) {
+      override def getOrderedFields(obj: AmfObject): Iterable[FieldEntry] = {
+        obj match {
+          case _: BaseUnit => BaseUnitFieldAdoptionOrdering.fields(obj).filterNot(_.field == DocumentModel.References)
+          case _           => super.getOrderedFields(obj)
+        }
+      }
+    }
+
+    override def idAdopter(initialId: String): IdAdopter = CustomIdAdopter(initialId)
+
+    override def idAdopter(initialId: String, idMaker: IdMaker): IdAdopter = CustomIdAdopter(initialId, idMaker)
+  }
+
 }
