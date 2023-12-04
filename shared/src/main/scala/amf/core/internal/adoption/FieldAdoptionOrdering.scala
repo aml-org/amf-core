@@ -28,6 +28,7 @@ object BaseUnitFieldAdoptionOrdering extends FieldOrderingCriteria {
     obj.fields.fields().filterNot(f => ordered.contains(f.field)).foreach(result += _)
     result
   }
+
 }
 
 // The fields are in a random order
