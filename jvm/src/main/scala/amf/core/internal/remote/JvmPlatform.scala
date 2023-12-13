@@ -2,12 +2,14 @@ package amf.core.internal.remote
 
 import amf.core.client.platform.resource.{FileResourceLoader, HttpResourceLoader}
 import amf.core.client.scala.resource.ResourceLoader
+import amf.core.internal.remote.platform.PlatformRegex
 import amf.core.internal.resource.InternalResourceLoaderAdapter
 import amf.core.internal.unsafe.PlatformBuilder
 import org.mulesoft.common.io.{FileSystem, Fs}
 
 import java.util.regex.Pattern
 import scala.concurrent.ExecutionContext
+import scala.util.matching.Regex
 
 class JvmPlatform extends Platform {
 
@@ -56,6 +58,8 @@ class JvmPlatform extends Platform {
   }
 
   override val globalExecutionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+
+  override def regex(regex: String): PlatformRegex = JvmNativeRegex(regex)
 }
 
 object JvmPlatform {
@@ -67,4 +71,14 @@ object JvmPlatform {
       singleton = Some(PlatformBuilder())
       singleton.get
   }
+}
+
+object JvmNativeRegex {
+  def apply(pattern: String): PlatformRegex = JvmNativeRegex(pattern.r)
+}
+
+case class JvmNativeRegex(private val regex: Regex) extends PlatformRegex {
+  override def test(value: String): Boolean = regex.regex.matches(value)
+
+  override def findFirstIn(value: String): Option[String] = regex.findFirstIn(value)
 }

@@ -1,5 +1,6 @@
 package amf.core.internal
 
+import amf.core.internal.unsafe.PlatformSecrets
 import org.yaml.convert.YRead
 import org.yaml.convert.YRead.error
 import org.yaml.model.{YError, YMap, YMapEntry, YNode, YNodeLike, YScalar}
@@ -8,7 +9,7 @@ import scala.util.matching.Regex
 
 package object parser {
 
-  implicit class YMapOps(map: YMap) {
+  implicit class YMapOps(map: YMap) extends PlatformSecrets {
 
     def hasEntry(key: String, value: Any): Boolean = {
       map.entries.exists { entry =>
@@ -34,10 +35,10 @@ package object parser {
     }
 
     def regex(expression: String): Iterable[YMapEntry] = {
-      val path: Regex = expression.r
+      val path = platform.regex(expression)
       map.entries.filter { entry =>
         entry.key.value match {
-          case s: YScalar => path.unapplySeq(s.text).nonEmpty
+          case s: YScalar => path.findFirstIn(s.text).nonEmpty
           case _          => false
         }
       }

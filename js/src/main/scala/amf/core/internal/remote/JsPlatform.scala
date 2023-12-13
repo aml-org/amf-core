@@ -1,6 +1,9 @@
 package amf.core.internal.remote
 
+import amf.core.internal.remote.platform.PlatformRegex
+
 import scala.concurrent.ExecutionContext
+import scala.scalajs.js
 import scala.scalajs.js.URIUtils
 
 trait JsPlatform extends Platform {
@@ -23,4 +26,15 @@ trait JsPlatform extends Platform {
 
   override val globalExecutionContext: ExecutionContext = scala.scalajs.concurrent.JSExecutionContext.queue
 
+  override def regex(regex: String): PlatformRegex = JsNativeRegex(regex)
+}
+
+object JsNativeRegex {
+  def apply(pattern: String): PlatformRegex = JsNativeRegex(js.RegExp(pattern))
+}
+
+case class JsNativeRegex(private val regex: js.RegExp) extends PlatformRegex {
+  override def test(value: String): Boolean = regex.test(value)
+
+  override def findFirstIn(value: String): Option[String] = regex.exec(value).head.toOption
 }

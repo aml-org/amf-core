@@ -8,7 +8,7 @@ import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.model.domain.{AmfObject, DomainElement}
 import amf.core.client.scala.resource.ResourceLoader
 import amf.core.internal.metamodel.Obj
-import amf.core.internal.remote.platform.{PlatformIO, PlatformResourceOps, PlatformWrapperOps}
+import amf.core.internal.remote.platform.{PlatformIO, PlatformRegexCompiler, PlatformResourceOps, PlatformWrapperOps}
 import org.mulesoft.common.io.{AsyncFile, FileSystem, SyncFile}
 
 import scala.collection.mutable
@@ -18,7 +18,7 @@ object Platform {
   def base(url: String): Option[String] = Some(url.substring(0, url.lastIndexOf('/')))
 }
 
-trait Platform extends PlatformWrapperOps with PlatformIO with PlatformResourceOps {
+trait Platform extends PlatformWrapperOps with PlatformIO with PlatformResourceOps with PlatformRegexCompiler {
 
   val globalExecutionContext: ExecutionContext
 
