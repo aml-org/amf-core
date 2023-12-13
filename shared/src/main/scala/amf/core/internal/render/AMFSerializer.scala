@@ -36,10 +36,6 @@ class AMFSerializer(unit: BaseUnit, config: RenderConfiguration, mediaType: Opti
   /** Print ast to string. */
   def renderToString: String = render()
 
-  /** Print ast to file. */
-  def renderToFile(remote: Platform, path: String)(implicit executor: ExecutionContext): Future[Unit] =
-    remote.write(path, renderToString)
-
   private def render[W: Output](writer: W): Unit = {
     notifyEvent(StartingRenderToWriterEvent(unit, mediaType))
     if (mediaType.contains(`application/ld+json`)) emitJsonldToWriter(writer)

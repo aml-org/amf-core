@@ -6,6 +6,7 @@ import amf.core.internal.resource.InternalResourceLoaderAdapter
 import org.mulesoft.common.io.FileSystem
 
 import scala.concurrent.ExecutionContext
+import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportAll
 
 /** */
@@ -25,7 +26,6 @@ class JsBrowserPlatform extends JsPlatform {
   }
 
   override def operativeSystem(): String = "web"
-
 }
 
 @JSExportAll

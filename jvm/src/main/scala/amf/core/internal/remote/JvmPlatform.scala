@@ -6,6 +6,7 @@ import amf.core.internal.resource.InternalResourceLoaderAdapter
 import amf.core.internal.unsafe.PlatformBuilder
 import org.mulesoft.common.io.{FileSystem, Fs}
 
+import java.util.regex.Pattern
 import scala.concurrent.ExecutionContext
 
 class JvmPlatform extends Platform {
@@ -26,9 +27,6 @@ class JvmPlatform extends Platform {
   /** Return temporary directory. */
   override def tmpdir(): String = System.getProperty("java.io.tmpdir")
 
-  /** Location where the helper functions for custom validations must be retrieved */
-  override def customValidationLibraryHelperLocation: String = "classpath:validations/amf_validation.js"
-
   override def findCharInCharSequence(stream: CharSequence)(p: Char => Boolean): Option[Char] = {
     stream.chars().filter(c => p(c.toChar)).findFirst() match {
       case optInt if optInt.isPresent => Some(optInt.getAsInt.toChar)
@@ -47,8 +45,6 @@ class JvmPlatform extends Platform {
 
   /** decodes a URI component */
   override def decodeURIComponent(url: String): String = EcmaEncoder.decode(url, fullUri = false)
-
-  private def replaceWhiteSpaces(url: String) = url.replaceAll(" ", "%20")
 
   /** Return the OS (win, mac, nux). */
   override def operativeSystem(): String = {

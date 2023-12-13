@@ -44,18 +44,12 @@ trait Platform extends FileMediaType {
   /** Underlying file system for platform. */
   val fs: FileSystem
 
-  def exit(code: Int): Unit = System.exit(code)
-
   def stdout(text: String): Unit = System.out.println(text)
 
   def stdout(e: Throwable): Unit = System.out.println(e)
 
-  def stderr(text: String): Unit = System.err.println(text)
-
-  def stderr(ex: Exception): Unit = System.err.println(ex)
-
-  val wrappersRegistry: mutable.HashMap[String, (AmfObject) => AmfObjectWrapper]             = mutable.HashMap.empty
-  val wrappersRegistryFn: mutable.HashMap[(Obj) => Boolean, (AmfObject) => AmfObjectWrapper] = mutable.HashMap.empty
+  private val wrappersRegistry: mutable.HashMap[String, AmfObject => AmfObjectWrapper]           = mutable.HashMap.empty
+  private val wrappersRegistryFn: mutable.HashMap[Obj => Boolean, AmfObject => AmfObjectWrapper] = mutable.HashMap.empty
 
   def registerWrapper(model: Obj)(builder: (AmfObject) => AmfObjectWrapper): Option[AmfObject => AmfObjectWrapper] =
     wrappersRegistry.put(model.`type`.head.iri(), builder)
@@ -129,7 +123,7 @@ trait Platform extends FileMediaType {
   def encodeURIComponent(url: String): String
 
   /** decodes a uri component */
-  def decodeURIComponent(url: String): String
+  protected def decodeURIComponent(url: String): String
 
   /** either decodes a uri component or returns raw url */
   def safeDecodeURIComponent(url: String): Either[String, String] =
@@ -139,27 +133,11 @@ trait Platform extends FileMediaType {
       case _: Throwable => Left(url)
     }
 
-  /** Location where the helper functions for custom validations must be retrieved */
-  protected def customValidationLibraryHelperLocation: String = "http://a.ml/amf/validation.js"
-
-  /** Write specified content on given url. */
-  def write(url: String, content: String)(implicit executionContext: ExecutionContext): Future[Unit] = {
-    url match {
-      case File(path) => writeFile(path, content)
-      case _          => Future.failed(new Exception(s"Unsupported write operation: $url"))
-    }
-  }
-
   /** Return temporary directory. */
   def tmpdir(): String
 
   /** Return the OS (win, mac, nux). */
   def operativeSystem(): String
-
-  /** Write specified content on specified file path. */
-  protected def writeFile(path: String, content: String)(implicit executionContext: ExecutionContext): Future[Unit] =
-    fs.asyncFile(path).write(content)
-
 }
 
 object Platform {

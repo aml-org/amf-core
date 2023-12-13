@@ -10,15 +10,12 @@ import scala.concurrent.ExecutionContext
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExportAll, JSImport}
 
-@JSExportAll/** */
+@JSExportAll
+/** */
 class JsServerPlatform extends JsPlatform {
 
   /** Underlying file system for platform. */
   override val fs: FileSystem = Fs
-
-  override def exit(code: Int): Unit = {
-    js.Dynamic.global.process.exit(code)
-  }
 
   override def loaders()(implicit executionContext: ExecutionContext): Seq[ResourceLoader] = Seq(
     InternalResourceLoaderAdapter(JsServerFileResourceLoader()),

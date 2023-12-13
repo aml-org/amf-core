@@ -49,9 +49,4 @@ class PlatformTest extends AsyncFunSuiteWithPlatformGlobalExecutionContext with 
         )
       })
   }
-
-  ignore("Write") {
-    val path = "file:///tmp/" + new Date().getTime
-    platform.write(path, "{\n\"name\" : \"Jason Bourne\"\n}").map[Assertion](unit => path should not be null)
-  }
 }
