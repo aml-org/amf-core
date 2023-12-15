@@ -9,22 +9,16 @@ import org.mulesoft.common.client.lexical.{Position, PositionRange}
 
 import java.util.Objects
 
-case class AMFValidationResult private[amf] (
+case class AMFValidationResult(
     message: String,
     severityLevel: String,
-    private val targetNodeValue: Either[AmfObject, String],
+    targetNode: String,
     targetProperty: Option[String], // TODO: is it used??
     validationId: String,
     position: Option[LexicalInformation],
     location: Option[String],
     source: Any
 ) extends Ordered[AMFValidationResult] {
-
-  def targetNode: String =
-    targetNodeValue match {
-      case Left(obj) => obj.id
-      case Right(id) => id
-    }
 
   override def toString: String = AMFValidationReportPrinter.print(this)
 
@@ -106,7 +100,7 @@ object AMFValidationResult {
       location: Option[String],
       source: Any
   ): AMFValidationResult =
-    new AMFValidationResult(message, level, Right(targetNode), targetProperty, validationId, position, location, source)
+    new AMFValidationResult(message, level, targetNode, targetProperty, validationId, position, location, source)
 
   def apply(
       message: String,
@@ -118,7 +112,7 @@ object AMFValidationResult {
       location: Option[String],
       source: Any
   ): AMFValidationResult =
-    new AMFValidationResult(message, level, Left(targetNode), targetProperty, validationId, position, location, source)
+    new AMFValidationResult(message, level, targetNode.id, targetProperty, validationId, position, location, source)
 
   private[amf] def fromSHACLValidation(
       model: String,
