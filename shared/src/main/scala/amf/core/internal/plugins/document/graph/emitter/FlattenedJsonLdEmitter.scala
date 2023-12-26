@@ -90,12 +90,7 @@ class FlattenedJsonLdEmitter[T](
           }
 
           // Check added declarations
-          while (pending.hasPendingEmissions) {
-            val emission = pending.nextEmission()
-            ctx.emittingDeclarations = emission.isDeclaration
-            ctx.emittingReferences = emission.isReference
-            emission.fn(root)
-          }
+          checkPendingEmissions()
 
           // Now process external links, not declared as part of the unit
           while (pending.hasPendingExternalEmissions) {
@@ -105,15 +100,19 @@ class FlattenedJsonLdEmitter[T](
             emission.fn(root)
           }
           // new regular nodes might have been generated, annotations for example
-          while (pending.hasPendingEmissions) {
-            val emission = pending.nextEmission()
-            ctx.emittingDeclarations = emission.isDeclaration
-            ctx.emittingReferences = emission.isReference
-            emission.fn(root)
-          }
+          checkPendingEmissions()
         }
       )
       ctx.emitContext(ob)
+    }
+  }
+
+  private def checkPendingEmissions(): Unit = {
+    while (pending.hasPendingEmissions) {
+      val emission = pending.nextEmission()
+      ctx.emittingDeclarations = emission.isDeclaration
+      ctx.emittingReferences = emission.isReference
+      emission.fn(root)
     }
   }
 
