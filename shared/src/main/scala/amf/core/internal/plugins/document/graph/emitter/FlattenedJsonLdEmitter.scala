@@ -10,7 +10,7 @@ import amf.core.internal.metamodel.Type._
 import amf.core.internal.metamodel._
 import amf.core.internal.metamodel.document.{BaseUnitModel, FragmentModel, ModuleModel, SourceMapModel}
 import amf.core.internal.metamodel.domain.extensions.DomainExtensionModel
-import amf.core.internal.parser.domain.{FieldEntry, Value}
+import amf.core.internal.parser.domain.{Annotations, FieldEntry, Value}
 import amf.core.internal.plugins.document.graph.JsonLdKeywords
 import amf.core.internal.plugins.document.graph.emitter.flattened.utils.{Emission, EmissionQueue, Metadata}
 import org.yaml.builder.DocBuilder
@@ -280,6 +280,21 @@ class FlattenedJsonLdEmitter[T](
     pending.tryEnqueue(e)
   }
 
+  def createArrayLikeValues(seq: AmfArray, b: Part[T]): Unit = seq.values.foreach { v =>
+    emitArrayMember(v, b)
+  }
+
+  def emitArrayMember(element: AmfElement, b: Part[T]): Unit = {
+    element match {
+      case obj: AmfObject    => emitObjMember(obj, b, inArray = true)
+      case scalar: AmfScalar => emitScalarMember(scalar, b)
+      case arr: AmfArray =>
+        b.list { b =>
+          createArrayValues(Type.Array(Type.Any), arr, b, Value(arr, Annotations()))
+        }
+    }
+  }
+
   override protected def createSortedArray(
       a: Type,
       v: Value,
@@ -287,29 +302,39 @@ class FlattenedJsonLdEmitter[T](
       parent: String,
       sources: Value => Unit
   ): Unit = {
-    val seq = v.value.asInstanceOf[AmfArray].values
-    sources(v)
-    b.obj { b =>
-      val id = s"$parent/list"
-      createIdNode(b, id)
-      val e = new Emission((part: Part[T]) => {
-        part.obj { rb =>
-          createIdNode(rb, id)
-          rb.entry(JsonLdKeywords.Type, ctx.emitIri((Namespace.Rdfs + "Seq").iri()))
-          seq.zipWithIndex.foreach { case (e, i) =>
-            rb.entry(
-              ctx.emitIri((Namespace.Rdfs + s"_${i + 1}").iri()),
-              { b =>
-                emitArrayMember(a, e, b)
-              }
-            )
+    if (options.governanceMode) {
+      def emitList: Part[T] => Unit = (b: Part[T]) => {
+        val seq = v.value.asInstanceOf[AmfArray]
+        sources(v)
+        createArrayLikeValues(seq, b)
+      }
+
+      b.obj(_.entry("@list", _.list(emitList)))
+    } else {
+      val seq = v.value.asInstanceOf[AmfArray].values
+      sources(v)
+      b.obj { b =>
+        val id = s"$parent/list"
+        createIdNode(b, id)
+        val e = new Emission((part: Part[T]) => {
+          part.obj { rb =>
+            createIdNode(rb, id)
+            rb.entry(JsonLdKeywords.Type, ctx.emitIri((Namespace.Rdfs + "Seq").iri()))
+            seq.zipWithIndex.foreach { case (e, i) =>
+              rb.entry(
+                ctx.emitIri((Namespace.Rdfs + s"_${i + 1}").iri()),
+                { b =>
+                  emitArrayMember(a, e, b)
+                }
+              )
+            }
           }
-        }
-      }) with Metadata
-      e.id = Some(id)
-      e.isDeclaration = ctx.emittingDeclarations
-      e.isReference = ctx.emittingReferences
-      pending.tryEnqueue(e)
+        }) with Metadata
+        e.id = Some(id)
+        e.isDeclaration = ctx.emittingDeclarations
+        e.isReference = ctx.emittingReferences
+        pending.tryEnqueue(e)
+      }
     }
   }
 

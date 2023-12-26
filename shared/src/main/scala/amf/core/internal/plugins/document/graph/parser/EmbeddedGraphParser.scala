@@ -78,24 +78,16 @@ class EmbeddedGraphParser(private val aliases: Map[String, String])(implicit val
     findType(stringTypes, id, map)
   }
 
-  private def parseList(listElement: Type, node: YMap): Seq[AmfElement] = {
-    val buffer = ListBuffer[YNode]()
-    node.entries.sortBy(_.key.as[String]).foreach { entry =>
-      if (entry.key.as[String].startsWith(compactUriFromContext((Namespace.Rdfs + "_").iri()))) {
-        buffer += entry.value.as[Seq[YNode]].head
-      }
+  private def parseSortedArray(listType: Type, rawNode: YMap): Seq[AmfElement] = {
+    val members: List[YNode] = rawNode.key(JsonLdKeywords.List) match {
+      case Some(node) =>
+        // get members of the @list
+        getListMembers(node)
+      case None =>
+        // get members of the sorted array implementation that uses a map with entries with _i for index
+        getArrayMapMembers(rawNode)
     }
-    buffer.flatMap { n =>
-      listElement match {
-        case _: Obj   => parse(n.as[YMap])
-        case Type.Any => Some(typedValue(n, ctx.graphContext))
-        case _ =>
-          try { Some(str(value(listElement, n))) }
-          catch {
-            case _: Exception => None
-          }
-      }
-    }
+    parseListMembers(members, listType)
   }
 
   override protected def parseLinkableProperties(map: YMap, instance: DomainElement with Linkable): Unit = {
@@ -143,7 +135,7 @@ class EmbeddedGraphParser(private val aliases: Map[String, String])(implicit val
       case Type.DateTime             => Some(date(node))
       case Type.Date                 => Some(date(node))
       case Type.Any                  => Some(any(node))
-      case l: SortedArray            => Some(AmfArray(parseList(l.element, node.as[YMap])))
+      case l: SortedArray            => Some(AmfArray(parseSortedArray(l.element, node.as[YMap])))
       case a: Array                  => yNodeSeq(node, a)
     }
   }
