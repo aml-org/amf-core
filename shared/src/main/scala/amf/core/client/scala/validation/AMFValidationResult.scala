@@ -9,7 +9,7 @@ import org.mulesoft.common.client.lexical.{Position, PositionRange}
 
 import java.util.Objects
 
-case class AMFValidationResult private[amf] (
+case class AMFValidationResult(
     message: String,
     severityLevel: String,
     private val targetNodeValue: Either[AmfObject, String],
@@ -25,7 +25,6 @@ case class AMFValidationResult private[amf] (
       case Left(obj) => obj.id
       case Right(id) => id
     }
-
   override def toString: String = AMFValidationReportPrinter.print(this)
 
   override def equals(obj: Any): Boolean = obj match {
