@@ -274,17 +274,14 @@ class FlattenedJsonLdEmitter[T](
         emitObject(extension.extension, rb)
       }
     }) with Metadata
-    e.id = Some(extension.extension.id)
-    e.isDeclaration = ctx.emittingDeclarations
-    e.isReference = ctx.emittingReferences
-    pending.tryEnqueue(e)
+    setEmissionMetadata(extension.extension.id, e)
   }
 
-  def createArrayLikeValues(seq: AmfArray, b: Part[T]): Unit = seq.values.foreach { v =>
+  private def createArrayLikeValues(seq: AmfArray, b: Part[T]): Unit = seq.values.foreach { v =>
     emitArrayMember(v, b)
   }
 
-  def emitArrayMember(element: AmfElement, b: Part[T]): Unit = {
+  private def emitArrayMember(element: AmfElement, b: Part[T]): Unit = {
     element match {
       case obj: AmfObject    => emitObjMember(obj, b, inArray = true)
       case scalar: AmfScalar => emitScalarMember(scalar, b)
@@ -330,10 +327,7 @@ class FlattenedJsonLdEmitter[T](
             }
           }
         }) with Metadata
-        e.id = Some(id)
-        e.isDeclaration = ctx.emittingDeclarations
-        e.isReference = ctx.emittingReferences
-        pending.tryEnqueue(e)
+        setEmissionMetadata(id, e)
       }
     }
   }
@@ -363,6 +357,10 @@ class FlattenedJsonLdEmitter[T](
         createAnnotationNodes(id, rb, filteredSources.eternals)
       }
     }) with Metadata
+    setEmissionMetadata(id, e)
+  }
+
+  private def setEmissionMetadata(id: String, e: Emission[T] with Metadata): Unit = {
     e.id = Some(id)
     e.isDeclaration = ctx.emittingDeclarations
     e.isReference = ctx.emittingReferences
@@ -378,11 +376,7 @@ class FlattenedJsonLdEmitter[T](
         createAnnotationNodes(id, rb, sources.eternals)
       }
     }) with Metadata
-
-    e.id = Some(id)
-    e.isDeclaration = ctx.emittingDeclarations
-    e.isReference = ctx.emittingReferences
-    pending.tryEnqueue(e)
+    setEmissionMetadata(id, e)
   }
 
   override protected def createAnnotationValueNode(id: String, b: Part[T], annotationEntry: (String, String)): Unit =
@@ -398,10 +392,7 @@ class FlattenedJsonLdEmitter[T](
             b.entry(ctx.emitIri(SourceMapModel.Value.value.iri()), emitScalar(_, v))
           }
         }) with Metadata
-        e.id = Some(id)
-        e.isDeclaration = ctx.emittingDeclarations
-        e.isReference = ctx.emittingReferences
-        pending.tryEnqueue(e)
+        setEmissionMetadata(id, e)
     }
 
   override protected def scalar(b: Part[T], content: String, t: SType): Unit = b += Scalar(t, content)
