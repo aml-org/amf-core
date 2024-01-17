@@ -113,4 +113,21 @@ class GovernanceModeTest extends AsyncFunSuite with FileAssertionTest {
       result <- assertDifferences(file, golden)
     } yield result
   }
+
+  test("lists with @list should be parsed even if not using Governance Mode") {
+    val golden = "file://shared/src/test/resources/render/without-governance-list-emission.jsonld"
+    val client = AMFGraphConfiguration
+      .predefined()
+      .withRenderOptions(
+        RenderOptions().withPrettyPrint.withoutSourceMaps.withoutSourceInformation
+      )
+      .baseUnitClient()
+
+    for {
+      parsed <- client.parse(golden)
+      rendered = client.render(parsed.baseUnit)
+      file   <- writeTemporaryFile(golden)(rendered)
+      result <- assertDifferences(file, golden)
+    } yield result
+  }
 }
