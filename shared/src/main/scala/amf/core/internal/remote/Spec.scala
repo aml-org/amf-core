@@ -14,6 +14,12 @@ object Spec {
       case Oas30.id             => Some(Oas30)
       case AwsOas30.id          => Some(AwsOas30)
       case AsyncApi20.id        => Some(AsyncApi20)
+      case AsyncApi21.id        => Some(AsyncApi21)
+      case AsyncApi22.id        => Some(AsyncApi22)
+      case AsyncApi23.id        => Some(AsyncApi23)
+      case AsyncApi24.id        => Some(AsyncApi24)
+      case AsyncApi25.id        => Some(AsyncApi25)
+      case AsyncApi26.id        => Some(AsyncApi26)
       case Amf.id               => Some(Amf)
       case Payload.id           => Some(Payload)
       case Aml.id               => Some(Aml)
@@ -39,6 +45,12 @@ object Spec {
   @JSExport val OAS30: Spec              = Oas30
   @JSExport val AWS_OAS30: Spec          = AwsOas30
   @JSExport val ASYNC20: Spec            = AsyncApi20
+  @JSExport val ASYNC21: Spec            = AsyncApi21
+  @JSExport val ASYNC22: Spec            = AsyncApi22
+  @JSExport val ASYNC23: Spec            = AsyncApi23
+  @JSExport val ASYNC24: Spec            = AsyncApi24
+  @JSExport val ASYNC25: Spec            = AsyncApi25
+  @JSExport val ASYNC26: Spec            = AsyncApi26
   @JSExport val AMF: Spec                = Amf
   @JSExport val PAYLOAD: Spec            = Payload
   @JSExport val AML: Spec                = Aml
@@ -141,6 +153,48 @@ private[amf] case object AsyncApi extends Async {
 
 private[amf] case object AsyncApi20 extends Async {
   override def version: String = "2.0"
+
+  override val mediaType: String = `application/yaml`
+
+}
+
+private[amf] case object AsyncApi21 extends Async {
+  override def version: String = "2.1"
+
+  override val mediaType: String = `application/yaml`
+
+}
+
+private[amf] case object AsyncApi22 extends Async {
+  override def version: String = "2.2"
+
+  override val mediaType: String = `application/yaml`
+
+}
+
+private[amf] case object AsyncApi23 extends Async {
+  override def version: String = "2.3"
+
+  override val mediaType: String = `application/yaml`
+
+}
+
+private[amf] case object AsyncApi24 extends Async {
+  override def version: String = "2.4"
+
+  override val mediaType: String = `application/yaml`
+
+}
+
+private[amf] case object AsyncApi25 extends Async {
+  override def version: String = "2.5"
+
+  override val mediaType: String = `application/yaml`
+
+}
+
+private[amf] case object AsyncApi26 extends Async {
+  override def version: String = "2.6"
 
   override val mediaType: String = `application/yaml`
 
