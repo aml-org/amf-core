@@ -1,9 +1,14 @@
 package amf.core.client.scala.traversal.iterator
+import amf.core.client.scala.model.document.FieldsFilter
 import amf.core.client.scala.model.domain.{AmfArray, AmfElement, AmfObject, DomainElement}
 
-import scala.collection.mutable
+import scala.annotation.tailrec
 
-case class DomainElementIterator private (var buffer: List[AmfElement], visited: VisitedCollector) extends AmfIterator {
+case class DomainElementIterator private (
+    var buffer: List[AmfElement],
+    visited: VisitedCollector,
+    fieldsFilter: FieldsFilter
+) extends AmfIterator {
 
   override def hasNext: Boolean = buffer.nonEmpty
 
@@ -14,6 +19,7 @@ case class DomainElementIterator private (var buffer: List[AmfElement], visited:
     current
   }
 
+  @tailrec
   private def advance(): Unit = {
     if (buffer.nonEmpty) {
       val current = buffer.head
@@ -23,16 +29,7 @@ case class DomainElementIterator private (var buffer: List[AmfElement], visited:
       } else {
         current match {
           case obj: AmfObject =>
-            val elements = obj.fields.fields().map(_.element).toList
-            visited += obj
-            obj match {
-              case domain: DomainElement =>
-                buffer = domain :: elements ++ buffer
-              // advance finishes here because a non visited domain element was found
-              case _ =>
-                buffer = elements ++ buffer
-                advance()
-            }
+            advanceObject(obj)
           case arr: AmfArray =>
             buffer = arr.values.toList ++ buffer
             advance()
@@ -43,12 +40,36 @@ case class DomainElementIterator private (var buffer: List[AmfElement], visited:
     }
   }
 
+  private def advanceObject(obj: AmfObject): Unit = {
+    val elements = fieldsFilter.filter(obj.fields)
+    visited += obj
+    obj match {
+      case domain: DomainElement =>
+        buffer = domain :: elements ++ buffer
+      // advance finishes here because a non visited domain element was found
+      case _ =>
+        buffer = elements ++ buffer
+        advance()
+    }
+  }
 }
 
 object DomainElementIterator {
+  def apply(
+      elements: List[AmfElement],
+      visited: VisitedCollector = IdCollector()
+  ): DomainElementIterator = {
+    val iterator = new DomainElementIterator(elements, visited, FieldsFilter.All)
+    iterator.advance()
+    iterator
+  }
 
-  def apply(elements: List[AmfElement], visited: VisitedCollector = IdCollector()): DomainElementIterator = {
-    val iterator = new DomainElementIterator(elements, visited)
+  def withFilter(
+      elements: List[AmfElement],
+      visited: VisitedCollector = IdCollector(),
+      fieldsFilter: FieldsFilter = FieldsFilter.Local
+  ): DomainElementIterator = {
+    val iterator = new DomainElementIterator(elements, visited, fieldsFilter)
     iterator.advance()
     iterator
   }
