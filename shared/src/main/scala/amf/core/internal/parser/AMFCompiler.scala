@@ -3,7 +3,7 @@ package amf.core.internal.parser
 import amf.core.client.common.remote.Content
 import amf.core.client.scala.adoption.IdAdopter
 import amf.core.client.scala.config._
-import amf.core.client.scala.exception.{CyclicReferenceException, UnsupportedSyntaxForDocumentException}
+import amf.core.client.scala.exception.{AmfUnhandledException, CyclicReferenceException, UnsupportedSyntaxForDocumentException}
 import amf.core.client.scala.model.document.{BaseUnit, ExternalFragment}
 import amf.core.client.scala.model.domain.ExternalDomainElement
 import amf.core.client.scala.parse.AMFParsePlugin
@@ -13,6 +13,7 @@ import amf.core.internal.remote.Mimes._
 import amf.core.internal.remote._
 import amf.core.internal.utils.AmfStrings
 import amf.core.internal.validation.CoreValidations._
+
 import scala.concurrent.Future.failed
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -171,6 +172,8 @@ class AMFCompiler(compilerContext: CompilerContext, val referenceKind: Reference
                 }
 
                 Future(None)
+              case ue: AmfUnhandledException =>
+                throw ue
               case _ =>
                 if (!link.isInferred) {
                   link.refs.foreach { case ref: ASTRefContainer =>
