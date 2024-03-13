@@ -29,17 +29,17 @@ class UrlShortenerStage() extends TransformationStep {
     ids ++ model.references.flatMap(obtainNestedReferenceIds)
   }
 
-  def shorten(element: AmfElement, ids: Set[String]): Unit = {
+  private def shorten(element: AmfElement, ids: Set[String]): Unit = {
     element match {
       case o: AmfObject =>
-        val shorthenId = shortener.shorten(o.id)
-        if (!shorthenId.equals(o.id)) {
+        val shortedId = shortener.shorten(o.id)
+        if (!shortedId.equals(o.id)) {
           o.withId(shortener.shorten(o.id))
           o.fields.fields().foreach {
             case FieldEntry(f, value: Value) if f == LinkableElementModel.Target =>
               value.value match {
-                case o: AmfObject => o.withId(shortener.shorten(o.id))
-                case _            => // ignore
+                case target: AmfObject => target.withId(shortener.shorten(target.id))
+                case _                 => // ignore
               }
             case FieldEntry(f, value: Value) if f.`type` == Iri =>
               shorten(value.annotations)
@@ -78,7 +78,7 @@ class UrlShortenerStage() extends TransformationStep {
       .flatMap(Namespace.find)
       .isEmpty
   }
-  def shorten(annotations: Annotations): Unit = {
+  private def shorten(annotations: Annotations): Unit = {
     annotations.map {
       case a: UriAnnotation => a.shorten(shortener.shorten)
       case other            => other
