@@ -19,15 +19,40 @@ class Cache {
     dependencyGraph.update(to, fromNodes.+(from))
   }
 
-  protected def findCycles(node: String, acc: Set[String] = Set()): Boolean = {
-    if (acc.contains(node)) {
-      true
-    } else {
-      val sources = dependencyGraph.getOrElse(node, Set())
-      sources.exists { source =>
-        findCycles(source, acc + node)
+  protected def findCycles(initialNode: String): Boolean = {
+    // Mutable collections are used to improve performance
+    val allVisited   = mutable.Set[String]()
+    val visitedStack = mutable.Stack[String]()
+
+    def innerFindCycles(currentNode: String): Boolean = {
+      if (visitedStack.contains(currentNode)) {
+        // There is a cycle
+        return true
       }
+
+      if (allVisited.contains(currentNode)) {
+        // This node has already been visited
+        return false
+      }
+
+      allVisited.add(currentNode)
+      visitedStack.push(currentNode)
+
+      val newNodes = dependencyGraph.getOrElse(currentNode, Set())
+      for (newNode <- newNodes) {
+        if (findCycles(newNode)) {
+          // Cycle found
+          visitedStack.pop()
+          return true
+        }
+      }
+
+      // So far no cycles
+      visitedStack.pop()
+      false
     }
+
+    innerFindCycles(initialNode)
   }
 
   protected def beforeLast(elms: List[String]): Option[String] = {
