@@ -1,13 +1,12 @@
 package amf.core.internal.transform.stages
 import amf.core.client.scala.AMFGraphConfiguration
 import amf.core.client.scala.errorhandling.AMFErrorHandler
-import amf.core.internal.metamodel.Type.{ArrayLike, Iri}
-import amf.core.internal.metamodel.domain.LinkableElementModel
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.model.domain._
 import amf.core.client.scala.transform.TransformationStep
-import amf.core.internal.parser.domain.FieldEntry
 import amf.core.client.scala.vocabulary.Namespace
+import amf.core.internal.metamodel.Type.{ArrayLike, Iri}
+import amf.core.internal.metamodel.domain.LinkableElementModel
 import amf.core.internal.parser.domain.{Annotations, FieldEntry, Value}
 
 import scala.collection.mutable
@@ -19,17 +18,23 @@ class UrlShortenerStage() extends TransformationStep {
       errorHandler: AMFErrorHandler,
       configuration: AMFGraphConfiguration
   ): BaseUnit = {
-    val ids: Set[String] = Set(model.id) ++ obtainNestedReferenceIds(model)
+    val ids: mutable.Set[String] = mutable.Set()
+    collectNestedReferenceIdsInSet(model, ids)
+    ids.add(model.id)
+
     shorten(model, ids)
     model.withId(base)
   }
 
-  private def obtainNestedReferenceIds[T <: BaseUnit](model: T): Seq[String] = {
-    val ids = model.references.map(_.id)
-    ids ++ model.references.flatMap(obtainNestedReferenceIds)
+  private def collectNestedReferenceIdsInSet[T <: BaseUnit](model: T, set: mutable.Set[String]): Unit = {
+    if (!set.contains(model.id)) {
+      set += model.id
+
+      model.references.foreach(collectNestedReferenceIdsInSet(_, set))
+    }
   }
 
-  def shorten(element: AmfElement, ids: Set[String]): Unit = {
+  def shorten(element: AmfElement, ids: Traversable[String]): Unit = {
     element match {
       case o: AmfObject =>
         val shorthenId = shortener.shorten(o.id)
@@ -64,7 +69,7 @@ class UrlShortenerStage() extends TransformationStep {
     shorten(element.annotations)
   }
 
-  private def shortenIriValue(element: AmfElement, ids: Set[String]): AmfElement = {
+  private def shortenIriValue(element: AmfElement, ids: Traversable[String]): AmfElement = {
     val stringValue = element.toString
     if (ids.exists(i => stringValue.startsWith(i)))
       AmfScalar(shortener.shorten(stringValue), element.annotations)
