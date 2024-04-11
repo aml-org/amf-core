@@ -1,6 +1,7 @@
 package amf.core.internal.remote
 
 import amf.core.client.scala.model.document.BaseUnit
+import amf.core.internal.utils.GraphCycleDetector
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,42 +20,6 @@ class Cache {
     dependencyGraph.update(to, fromNodes.+(from))
   }
 
-  protected def findCycles(initialNode: String): Boolean = {
-    // Mutable collections are used to improve performance
-    val allVisited   = mutable.Set[String]()
-    val visitedStack = mutable.Stack[String]()
-
-    def innerFindCycles(currentNode: String): Boolean = {
-      if (visitedStack.contains(currentNode)) {
-        // There is a cycle
-        return true
-      }
-
-      if (allVisited.contains(currentNode)) {
-        // This node has already been visited
-        return false
-      }
-
-      allVisited.add(currentNode)
-      visitedStack.push(currentNode)
-
-      val newNodes = dependencyGraph.getOrElse(currentNode, Set())
-      for (newNode <- newNodes) {
-        if (findCycles(newNode)) {
-          // Cycle found
-          visitedStack.pop()
-          return true
-        }
-      }
-
-      // So far no cycles
-      visitedStack.pop()
-      false
-    }
-
-    innerFindCycles(initialNode)
-  }
-
   protected def beforeLast(elms: List[String]): Option[String] = {
     val lastTwo = elms.takeRight(2)
     if (lastTwo.size == 2) {
@@ -70,7 +35,7 @@ class Cache {
     beforeLast(context.history) foreach { from =>
       addFromToEdge(from, url)
     }
-    if (findCycles(url)) {
+    if (GraphCycleDetector.hasCycles(dependencyGraph, url)) {
       if (cache(url).isCompleted) {
         cache(url)
       } else {
