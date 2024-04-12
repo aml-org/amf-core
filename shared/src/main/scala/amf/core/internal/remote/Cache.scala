@@ -1,6 +1,7 @@
 package amf.core.internal.remote
 
 import amf.core.client.scala.model.document.BaseUnit
+import amf.core.internal.utils.GraphCycleDetector
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,17 +20,6 @@ class Cache {
     dependencyGraph.update(to, fromNodes.+(from))
   }
 
-  protected def findCycles(node: String, acc: Set[String] = Set()): Boolean = {
-    if (acc.contains(node)) {
-      true
-    } else {
-      val sources = dependencyGraph.getOrElse(node, Set())
-      sources.exists { source =>
-        findCycles(source, acc + node)
-      }
-    }
-  }
-
   protected def beforeLast(elms: List[String]): Option[String] = {
     val lastTwo = elms.takeRight(2)
     if (lastTwo.size == 2) {
@@ -45,7 +35,7 @@ class Cache {
     beforeLast(context.history) foreach { from =>
       addFromToEdge(from, url)
     }
-    if (findCycles(url)) {
+    if (GraphCycleDetector.hasCycles(dependencyGraph, url)) {
       if (cache(url).isCompleted) {
         cache(url)
       } else {
