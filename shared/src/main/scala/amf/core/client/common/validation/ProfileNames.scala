@@ -114,6 +114,12 @@ object ProfileName {
     case "RAML" | Raml10.id   => Raml10Profile // for compatibility
     case AsyncApi.id          => AsyncProfile
     case AsyncApi20.id        => Async20Profile
+    case AsyncApi21.id        => Async20Profile
+    case AsyncApi22.id        => Async20Profile
+    case AsyncApi23.id        => Async20Profile
+    case AsyncApi24.id        => Async20Profile
+    case AsyncApi25.id        => Async20Profile
+    case AsyncApi26.id        => Async20Profile
     case Grpc.id              => GrpcProfile
     case GraphQL.id           => GraphQLProfile
     case GraphQLFederation.id => GraphQLFederationProfile
@@ -124,10 +130,12 @@ object ProfileName {
 
 object MessageStyle {
   def apply(name: String): MessageStyle = name match {
-    case Raml10.id | Raml08.id       => RAMLStyle
-    case Oas20.id | Oas30.id         => OASStyle
-    case AsyncApi.id | AsyncApi20.id => OASStyle
-    case _                           => AMFStyle
+    case Raml10.id | Raml08.id => RAMLStyle
+    case Oas20.id | Oas30.id   => OASStyle
+    case AsyncApi.id | AsyncApi20.id | AsyncApi21.id | AsyncApi22.id | AsyncApi23.id | AsyncApi24.id | AsyncApi25.id |
+        AsyncApi26.id =>
+      OASStyle
+    case _ => AMFStyle
   }
 }
 

@@ -66,9 +66,10 @@ object Spec {
 trait Spec {
   val id: String
 
-  def isRaml: Boolean  = this == Raml10 || this == Raml08
-  def isOas: Boolean   = this == Oas20 || this == Oas30
-  def isAsync: Boolean = this == AsyncApi || this == AsyncApi20
+  def isRaml: Boolean = this == Raml10 || this == Raml08
+  def isOas: Boolean  = this == Oas20 || this == Oas30
+  def isAsync: Boolean =
+    this == AsyncApi || this == AsyncApi20 || this == AsyncApi21 || this == AsyncApi22 || this == AsyncApi23 || this == AsyncApi24 || this == AsyncApi25 || this == AsyncApi26
 
   val mediaType: String
 }
