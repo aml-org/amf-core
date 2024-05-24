@@ -1,15 +1,16 @@
 package amf.core.internal.metamodel
 
-import amf.core.internal.metamodel.domain.{ModelDoc, ModelVocabularies}
 import amf.core.client.scala.vocabulary.Namespace.Xsd
 import amf.core.client.scala.vocabulary.ValueType
+import amf.core.internal.metamodel.domain.{ModelDoc, ModelVocabularies}
 
-import scala.collection.immutable
+import scala.collection.immutable.HashSet
 
 /** */
 trait Type {
   val `type`: List[ValueType]
-  def typeIris: List[String] = `type`.map(_.iri())
+  lazy val typeIris: List[String]       = `type`.map(_.iri())
+  lazy val typeIrisSet: HashSet[String] = HashSet(typeIris: _*)
 }
 
 trait Obj extends Type {

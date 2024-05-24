@@ -48,19 +48,18 @@ case class Reference(url: String, refs: Seq[RefContainer]) extends PlatformSecre
     val kind  = if (kinds.size > 1) UnspecifiedReference else kinds.head
     try {
       val context = compilerContext.forReference(url, allowedSpecs = allowedSpecs)
-      val res: Future[Future[ReferenceResolutionResult]] = AMFCompiler.forContext(context, kind).build() map {
-        eventualUnit =>
-          Future(document.ReferenceResolutionResult(None, Some(eventualUnit)))
-      } recover {
+
+      AMFCompiler.forContext(context, kind).build() flatMap { eventualUnit =>
+        Future.successful(document.ReferenceResolutionResult(None, Some(eventualUnit)))
+      } recoverWith {
         case e: CyclicReferenceException if allowRecursiveRefs =>
           val fullUrl = e.history.last
           resolveRecursiveUnit(fullUrl, compilerContext).map(u => ReferenceResolutionResult(None, Some(u)))
         case e: Throwable =>
-          Future(ReferenceResolutionResult(Some(e), None))
+          Future.successful(ReferenceResolutionResult(Some(e), None))
       }
-      res flatMap identity
     } catch {
-      case e: Throwable => Future(ReferenceResolutionResult(Some(e), None))
+      case e: Throwable => Future.successful(ReferenceResolutionResult(Some(e), None))
     }
   }
 

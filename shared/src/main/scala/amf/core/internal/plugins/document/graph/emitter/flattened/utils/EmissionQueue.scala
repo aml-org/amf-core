@@ -27,21 +27,21 @@ case class EmissionQueue[T]() {
   private val pendingExternalLinks: mutable.HashMap[String, Emission[T] with Metadata] =
     mutable.HashMap[String, Emission[T] with Metadata]()
 
-  def tryEnqueue(e: Emission[T] with Metadata): Try[Unit] = {
+  def tryEnqueue(e: Emission[T] with Metadata): Either[String, Unit] = {
     if (e.isExternal) { // store the external links for later emission
       e.id.map { id =>
         if (!knownIds.contains(id)) pendingExternalLinks.put(id, e)
       }
-      Success((): Unit)
+      Right((): Unit)
     } else if (accepts(e)) {
       queue += e
       e.id.map { id =>
         knownIds += id
         pendingExternalLinks.remove(id)
       }
-      Success((): Unit)
+      Right((): Unit)
     } else {
-      Failure(new IllegalArgumentException("Element already emitted"))
+      Left("Element already emitted")
     }
   }
 
