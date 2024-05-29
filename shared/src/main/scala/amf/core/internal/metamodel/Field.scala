@@ -15,7 +15,8 @@ case class Field(
 ) {
   override def toString: String = value.iri()
 
-  override def canEqual(a: Any) = Option(a).isDefined && a.isInstanceOf[Field]
+  override def canEqual(a: Any): Boolean = Option(a).isDefined && a.isInstanceOf[Field]
+
   override def equals(that: Any): Boolean =
     that match {
       case that: Field => that.value.iri() == value.iri()

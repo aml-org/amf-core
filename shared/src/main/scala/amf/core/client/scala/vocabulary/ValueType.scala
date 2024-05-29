@@ -19,5 +19,7 @@ object ValueType {
 
 /** Value type. */
 case class ValueType(ns: Namespace, name: String) {
-  def iri(): String = ns.base + name
+  private lazy val iriValue = ns.base + name
+
+  def iri(): String = iriValue
 }

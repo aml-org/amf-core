@@ -5,7 +5,6 @@ import amf.core.client.scala.model.domain._
 import amf.core.client.scala.vocabulary.ValueType
 import amf.core.internal.metamodel.Type._
 import amf.core.internal.metamodel.{Field, Obj, Type}
-import amf.core.internal.annotations.{Inferred, SynthesizedField}
 import org.mulesoft.common.time.SimpleDateTime
 
 import scala.collection.immutable.ListMap
@@ -140,6 +139,10 @@ class Fields {
   def remove(uri: String): this.type = {
     fs.find(t => t._1.value.iri().equals(uri)).foreach(t => removeField(t._1))
     this
+  }
+
+  def overrideWith(other: Fields): Unit = {
+    fs = other.fs
   }
 
   def into(other: Fields): Unit = {
@@ -330,7 +333,11 @@ class Value(var value: AmfElement, val annotations: Annotations) {
 
   def cloneAnnotated(annotation: Annotation) = Value(value, Annotations(annotations))
 
-  def cloneValue(branch: mutable.Map[AmfObject, AmfObject]) = Value(value.cloneElement(branch), annotations.copy())
+  def cloneValue(branch: mutable.Map[AmfObject, AmfObject]): Value = {
+    val clonedElement     = value.cloneElement(branch)
+    val clonedAnnotations = annotations.copy()
+    Value(clonedElement, clonedAnnotations)
+  }
 
   lazy val isInferred: Boolean = annotations.isInferred
 
