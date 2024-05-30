@@ -29,6 +29,7 @@ object Spec {
       case GraphQLFederation.id => Some(GraphQLFederation)
       case JsonSchemaDialect.id => Some(JsonSchemaDialect)
       case JsonLDSchema.id      => Some(JsonLDSchema)
+      case AvroSchema.id        => Some(AvroSchema)
       case _                    => None
     }
   }
@@ -60,6 +61,7 @@ object Spec {
   @JSExport val GRAPHQL_FEDERATION: Spec = GraphQLFederation
   @JSExport val JSONSCHEMADIALECT: Spec  = JsonSchemaDialect
   @JSExport val JSONDLSCHEMA: Spec       = JsonLDSchema
+  @JSExport val AvroSchema: Spec         = Avro
 }
 
 @JSExportAll
@@ -250,4 +252,9 @@ private[amf] case object JsonSchemaDialect extends Spec {
 private[amf] case object JsonLDSchema extends Spec {
   override val id: String        = "JSONLD Schema"
   override val mediaType: String = `application/schema+ld+json`
+}
+
+private[amf] case object Avro extends Spec {
+  override val id: String        = "Avro"
+  override val mediaType: String = `application/json`
 }
