@@ -56,7 +56,7 @@ object Spec {
   @JSExport val PAYLOAD: Spec            = Payload
   @JSExport val AML: Spec                = Aml
   @JSExport val JSONSCHEMA: Spec         = JsonSchema
-  @JSExport val AvroSchema: Spec         = Avro
+  @JSExport val AVRO_SCHEMA: Spec        = AvroSchema
   @JSExport val GRPC: Spec               = Grpc
   @JSExport val GRAPHQL: Spec            = GraphQL
   @JSExport val GRAPHQL_FEDERATION: Spec = GraphQLFederation
@@ -255,7 +255,7 @@ private[amf] case object JsonLDSchema extends Spec {
   override val mediaType: String = `application/schema+ld+json`
 }
 
-private[amf] case object Avro extends Spec {
+private[amf] case object AvroSchema extends Spec {
   override val id: String        = "Avro"
   override val mediaType: String = `application/json`
 }
