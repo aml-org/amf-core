@@ -43,3 +43,5 @@ object PayloadJsonHint extends Hint(Payload, Json)
 object PayloadYamlHint extends Hint(Payload, Yaml)
 
 object JsonSchemaHint extends Hint(JsonSchema, Json)
+
+object AvroHint extends Hint(AvroSchema, Json)
