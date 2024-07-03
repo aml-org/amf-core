@@ -27,13 +27,13 @@ import scala.collection.mutable.ListBuffer
 
 /** Element annotations
   */
-class Annotations() {
-
-  private var annotations: ListBuffer[Annotation] = new ListBuffer()
+class Annotations(private var annotations: List[Annotation] = List()) {
 
   def foreach(fn: Annotation => Unit): Unit = annotations.foreach(fn)
 
   def map(fn: Annotation => Annotation): Unit = annotations = annotations.map(fn)
+
+  def mapToCopy(fn: Annotation => Annotation): Annotations = Annotations(annotations.map(fn))
 
   def find[T <: Annotation](fn: Annotation => Boolean): Option[T] = annotations.find(fn).map(_.asInstanceOf[T])
 
@@ -54,14 +54,14 @@ class Annotations() {
   }
 
   def +=(annotation: Annotation): this.type = {
-    annotations += annotation
+    annotations = annotations.+:(annotation)
     this
   }
 
   def ++=(other: Annotations): this.type = this ++= other.annotations
 
   def ++=(other: TraversableOnce[Annotation]): this.type = {
-    annotations ++= other
+    annotations = annotations ++ other
     this
   }
 
@@ -124,25 +124,27 @@ class Annotations() {
 
   def isInferred: Boolean = find(classOf[Inferred]).isDefined
 
-  def clear(): Unit = annotations.clear()
+  def clear(): Unit = annotations = List()
+
+  def overrideWith(other: Annotations): Unit = {
+    annotations = other.annotations
+  }
 }
 
 object Annotations {
 
   def apply(): Annotations = new Annotations()
 
-  def apply(annotations: Annotations): Annotations = {
-    val result = new Annotations()
-    result.annotations ++= annotations.annotations
-    result
-  }
+  def apply(annotations: Annotations): Annotations = new Annotations(annotations.annotations)
 
   def apply(ast: YPart): Annotations = {
-    val annotations = new Annotations() ++= Set(
-      LexicalInformation(ast),
-      SourceYPart(ast),
-//      AmfSourceLocation(ast.sourceName))
-      AmfSourceLocation(ast)
+    val annotations = new Annotations(
+      List(
+        LexicalInformation(ast),
+        SourceYPart(ast),
+        //      AmfSourceLocation(ast.sourceName))
+        AmfSourceLocation(ast)
+      )
     )
     ast match {
       case node: YNode      => annotations += SourceNode(node)

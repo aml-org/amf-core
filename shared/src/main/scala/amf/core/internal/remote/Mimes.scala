@@ -1,6 +1,5 @@
 package amf.core.internal.remote
 
-/** */
 object Mimes {
   val `text/yaml`: String                         = "text/yaml"
   val `text/x-yaml`: String                       = "text/x-yaml"
@@ -25,5 +24,5 @@ object Mimes {
   val `application/protobuf_` : String            = "application/protobuf; proto=org.some.Message"
   val `application/vnd_google`: String            = "application/vnd.google.protobuf"
   val `application/graphql`: String               = "application/graphql"
-
+  val `application/*+avro`: String                = "application/*+avro"
 }

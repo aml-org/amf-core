@@ -117,20 +117,28 @@ trait AmfObject extends AmfElement {
 
   override def cloneElement(branch: mutable.Map[AmfObject, AmfObject]): AmfObject = {
     branch.get(this) match {
-      case Some(me) if me.meta.`type`.head.iri() == meta.`type`.head.iri() => me
+      case Some(me) if me.meta.typeIris.head == meta.typeIris.head => me
       case _ =>
         val obj = newInstance()
         obj.id = id
+
         branch.put(this, obj)
-        obj.annotations ++= replaceAnnotations(branch)
-        fields.cloneFields(branch).into(obj.fields)
+
+        val clonedAnnotations = replaceAnnotations(branch)
+        obj.annotations.overrideWith(clonedAnnotations)
+
+        val clonedFields = fields.cloneFields(branch)
+        obj.fields.overrideWith(clonedFields)
+
         obj
     }
   }
 
-  private def replaceAnnotations(branch: mutable.Map[AmfObject, AmfObject]) = {
-    val updated = annotations.find(classOf[TrackedElement]).map(updateTrackedElement(branch))
-    annotations.copyFiltering(!_.isInstanceOf[TrackedElement]) ++= updated
+  private def replaceAnnotations(branch: mutable.Map[AmfObject, AmfObject]): Annotations = {
+    annotations.mapToCopy {
+      case annotation: TrackedElement => updateTrackedElement(branch)(annotation)
+      case annotation                 => annotation
+    }
   }
 
   private def updateTrackedElement(branch: mutable.Map[AmfObject, AmfObject])(trackedElement: TrackedElement) =
@@ -140,5 +148,7 @@ trait AmfObject extends AmfElement {
     }
 
   private[amf] def newInstance(): AmfObject =
-    meta.asInstanceOf[ModelDefaultBuilder].modelInstance // make meta be model default builder also
+    meta
+      .asInstanceOf[ModelDefaultBuilder]
+      .modelInstance // make meta be model default builder also
 }
