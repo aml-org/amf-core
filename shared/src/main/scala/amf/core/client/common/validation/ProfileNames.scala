@@ -20,6 +20,7 @@ object ProfileNames {
   val GRAPHQL: ProfileName            = GraphQLProfile
   val GRAPHQL_FEDERATION: ProfileName = GraphQLFederationProfile
   val JSONSCHEMA: ProfileName         = JsonSchemaProfile
+  val AVROSCHEMA: ProfileName         = AvroSchemaProfile
 
   lazy val specProfiles: Seq[ProfileName] =
     Seq(
@@ -33,7 +34,8 @@ object ProfileNames {
       GraphQLProfile,
       GraphQLFederationProfile,
       GrpcProfile,
-      JsonSchemaProfile
+      JsonSchemaProfile,
+      AvroSchemaProfile
     )
 }
 
@@ -91,6 +93,11 @@ object JsonSchemaProfile extends ProfileName(JsonSchema.id, AMFStyle) {
   override def isRaml(): Boolean = false
 }
 
+object AvroSchemaProfile extends ProfileName(AvroSchema.id, AMFStyle) {
+  override def isOas(): Boolean  = false
+  override def isRaml(): Boolean = false
+}
+
 object ProfileName {
   def unapply(name: String): Option[ProfileName] =
     name match {
@@ -103,6 +110,7 @@ object ProfileName {
       case GraphQLProfile.p           => Some(GraphQLProfile)
       case GraphQLFederationProfile.p => Some(GraphQLFederationProfile)
       case JsonSchemaProfile.p        => Some(JsonSchemaProfile)
+      case AvroSchemaProfile.p        => Some(AvroSchemaProfile)
       case _                          => None
     }
 
@@ -124,6 +132,7 @@ object ProfileName {
     case GraphQL.id           => GraphQLProfile
     case GraphQLFederation.id => GraphQLFederationProfile
     case JsonSchema.id        => JsonSchemaProfile
+    case AvroSchema.id        => AvroSchemaProfile
     case custom               => new ProfileName(custom)
   }
 }
