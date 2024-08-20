@@ -20,6 +20,7 @@ object DataType {
   val Duration: String     = Xsd.base + "duration"
   val File: String         = Shapes.base + "file"
   val Byte: String         = Xsd.base + "byte"
+  val Bytes: String        = Xsd.base + "bytes"
   val Binary: String       = Xsd.base + "base64Binary"
   val Password: String     = Shapes.base + "password"
   val Any: String          = Xsd.base + "anyType"
@@ -36,7 +37,7 @@ object DataType {
         case "long"    => Long
         case "float"   => Float
         case "double"  => Double
-        case "bytes"   => String
+        case "bytes"   => Bytes
         case "string"  => String
         case _         => Xsd.base + dataType
       }
