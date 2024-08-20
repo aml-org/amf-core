@@ -18,7 +18,7 @@ trait FileMediaType {
     extension match {
       case "graphql" | "gql"               => Some(Mimes.`application/graphql`)
       case "proto" | "pb"                  => Some(Mimes.`application/x-protobuf`)
-      case "json"                          => Some(Mimes.`application/json`)
+      case "json" | "avsc"                 => Some(Mimes.`application/json`)
       case "yaml" | "yam" | "yml" | "raml" => Some(Mimes.`application/yaml`)
       case "jsonld" | "amf"                => Some(Mimes.`application/ld+json`)
       case "nt"                            => Some(Mimes.`text/n3`)
