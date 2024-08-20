@@ -28,26 +28,40 @@ object DataType {
   val Nil: String          = Xsd.base + "nil"
 
   /** Return dataType qualified with Xsd namespace. */
-  def apply(dataType: String): String = dataType match {
-    case "string"                         => String
-    case "integer"                        => Integer
-    case "number"                         => Number
-    case "long"                           => Long
-    case "double"                         => Double
-    case "float"                          => Float
-    case "decimal"                        => Decimal
-    case "boolean"                        => Boolean
-    case "date" | "date-only"             => Date
-    case "time" | "time-only"             => Time
-    case "dateTime" | "datetime"          => DateTime
-    case "dateTimeOnly" | "datetime-only" => DateTimeOnly
-    case "file"                           => File
-    case "byte"                           => Byte
-    case "base64Binary"                   => Binary
-    case "password"                       => Password
-    case "anyType" | "any"                => Any
-    case "anyUri" | "uri"                 => AnyUri
-    case "nil"                            => Nil
-    case _                                => Xsd.base + dataType
-  }
+  def apply(dataType: String, fromAvro: Boolean = false): String =
+    if (fromAvro) {
+      dataType match {
+        case "boolean" => Boolean
+        case "int"     => Integer
+        case "long"    => Long
+        case "float"   => Float
+        case "double"  => Double
+        case "bytes"   => String
+        case "string"  => String
+        case _         => Xsd.base + dataType
+      }
+    } else {
+      dataType match {
+        case "string"                         => String
+        case "integer"                        => Integer
+        case "number"                         => Number
+        case "long"                           => Long
+        case "double"                         => Double
+        case "float"                          => Float
+        case "decimal"                        => Decimal
+        case "boolean"                        => Boolean
+        case "date" | "date-only"             => Date
+        case "time" | "time-only"             => Time
+        case "dateTime" | "datetime"          => DateTime
+        case "dateTimeOnly" | "datetime-only" => DateTimeOnly
+        case "file"                           => File
+        case "byte"                           => Byte
+        case "base64Binary"                   => Binary
+        case "password"                       => Password
+        case "anyType" | "any"                => Any
+        case "anyUri" | "uri"                 => AnyUri
+        case "nil"                            => Nil
+        case _                                => Xsd.base + dataType
+      }
+    }
 }
