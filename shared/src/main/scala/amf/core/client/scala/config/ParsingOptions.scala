@@ -8,7 +8,8 @@ case class ParsingOptions(
     maxYamlReferences: Option[Int] = None,
     maxJSONComplexity: Option[Int] = None,
     maxJsonYamlDepth: Option[Int] = None,
-    tokens: Boolean = false
+    tokens: Boolean = false,
+    extensionsEverywhere: Boolean = false
 ) {
 
   /** Parse specific AMF JSON-LD serialization */
@@ -40,9 +41,16 @@ case class ParsingOptions(
   /** Discard tokens when parsing with SYAML */
   def withoutTokens: ParsingOptions = copy(tokens = false)
 
+  /** Allows extension parsing in every node of the API (valid for OAS 3.0) */
+  def withExtensionsEverywhere: ParsingOptions = copy(extensionsEverywhere = true)
+
+  /** Does not allow extension parsing in every node of the API (valid for OAS 3.0) */
+  def withoutExtensionsEverywhere: ParsingOptions = copy(extensionsEverywhere = false)
+
   def isAmfJsonLdSerialization: Boolean = amfJsonLdSerialization
   def definedBaseUrl: Option[String]    = baseUnitUrl
   def getMaxYamlReferences: Option[Int] = maxYamlReferences
   def getMaxJsonYamlDepth: Option[Int]  = maxJsonYamlDepth
   def isTokens: Boolean                 = tokens
+  def isExtensionsEverywhere: Boolean   = extensionsEverywhere
 }
