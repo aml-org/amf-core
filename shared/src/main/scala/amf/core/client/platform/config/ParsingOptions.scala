@@ -17,6 +17,7 @@ case class ParsingOptions(private[amf] val _internal: InternalParsingOptions) {
   def getMaxJSONComplexity: ClientOption[Int] = _internal.maxJSONComplexity.asClient
   def getMaxJsonYamlDepth: ClientOption[Int]  = _internal.maxJsonYamlDepth.asClient
   def isTokens: Boolean                       = _internal.tokens
+  def isExtensionsEverywhere: Boolean         = _internal.isExtensionsEverywhere
 
   /** Parse specific AMF JSON-LD serialization */
   def withoutAmfJsonLdSerialization(): ParsingOptions = _internal.withoutAmfJsonLdSerialization
@@ -46,4 +47,10 @@ case class ParsingOptions(private[amf] val _internal: InternalParsingOptions) {
 
   /** Discard tokens when parsing with SYAML */
   def withoutTokens(): ParsingOptions = _internal.withoutTokens
+
+  /** Allows extension parsing in every node of the API (valid for OAS 3.0) */
+  def withExtensionsEverywhere: ParsingOptions = _internal.withExtensionsEverywhere
+
+  /** Does not allow extension parsing in every node of the API (valid for OAS 3.0) */
+  def withoutExtensionsEverywhere: ParsingOptions = _internal.withoutExtensionsEverywhere
 }
