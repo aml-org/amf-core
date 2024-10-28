@@ -44,6 +44,7 @@ object Spec {
   @JSExport val RAML10: Spec             = Raml10
   @JSExport val OAS20: Spec              = Oas20
   @JSExport val OAS30: Spec              = Oas30
+  @JSExport val OAS31: Spec              = Oas31
   @JSExport val AWS_OAS30: Spec          = AwsOas30
   @JSExport val ASYNC20: Spec            = AsyncApi20
   @JSExport val ASYNC21: Spec            = AsyncApi21
@@ -125,6 +126,12 @@ private[amf] case object Oas20 extends Oas {
 
 private[amf] case object Oas30 extends Oas {
   override def version: String = "3.0"
+
+  override val mediaType: String = `application/yaml`
+}
+
+private[amf] case object Oas31 extends Oas {
+  override def version: String = "3.1"
 
   override val mediaType: String = `application/yaml`
 }

@@ -30,7 +30,11 @@ object Oas20JsonHint extends Hint(Oas20, Json)
 
 object Oas30YamlHint extends Hint(Oas30, Yaml)
 
+object Oas31YamlHint extends Hint(Oas31, Yaml)
+
 object Oas30JsonHint extends Hint(Oas30, Json)
+
+object Oas31JsonHint extends Hint(Oas31, Json)
 
 object Async20YamlHint extends Hint(AsyncApi20, Yaml)
 

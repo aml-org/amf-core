@@ -10,6 +10,7 @@ object ProfileNames {
   val AMF: ProfileName                = AmfProfile
   val OAS20: ProfileName              = Oas20Profile
   val OAS30: ProfileName              = Oas30Profile
+  val OAS31: ProfileName              = Oas31Profile
   val RAML10: ProfileName             = Raml10Profile
   val RAML08: ProfileName             = Raml08Profile
   val ASYNC: ProfileName              = AsyncProfile
@@ -59,6 +60,10 @@ object Oas20Profile extends ProfileName(Oas20.id, OASStyle) {
 }
 
 object Oas30Profile extends ProfileName(Oas30.id, OASStyle) {
+  override def isOas(): Boolean = true
+}
+
+object Oas31Profile extends ProfileName(Oas31.id, OASStyle) {
   override def isOas(): Boolean = true
 }
 
