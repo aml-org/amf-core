@@ -12,6 +12,7 @@ object Spec {
       case Raml08.id            => Some(Raml08)
       case Oas20.id             => Some(Oas20)
       case Oas30.id             => Some(Oas30)
+      case Oas31.id             => Some(Oas31)
       case AwsOas30.id          => Some(AwsOas30)
       case AsyncApi20.id        => Some(AsyncApi20)
       case AsyncApi21.id        => Some(AsyncApi21)
@@ -70,7 +71,7 @@ trait Spec {
   val id: String
 
   def isRaml: Boolean = this == Raml10 || this == Raml08
-  def isOas: Boolean  = this == Oas20 || this == Oas30
+  def isOas: Boolean  = this == Oas20 || this == Oas30 || this == Oas31
   def isAsync: Boolean =
     this == AsyncApi || this == AsyncApi20 || this == AsyncApi21 || this == AsyncApi22 || this == AsyncApi23 || this == AsyncApi24 || this == AsyncApi25 || this == AsyncApi26
 
