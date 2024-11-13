@@ -10,6 +10,7 @@ object ProfileNames {
   val AMF: ProfileName                = AmfProfile
   val OAS20: ProfileName              = Oas20Profile
   val OAS30: ProfileName              = Oas30Profile
+  val OAS31: ProfileName              = Oas31Profile
   val RAML10: ProfileName             = Raml10Profile
   val RAML08: ProfileName             = Raml08Profile
   val ASYNC: ProfileName              = AsyncProfile
@@ -59,6 +60,10 @@ object Oas20Profile extends ProfileName(Oas20.id, OASStyle) {
 }
 
 object Oas30Profile extends ProfileName(Oas30.id, OASStyle) {
+  override def isOas(): Boolean = true
+}
+
+object Oas31Profile extends ProfileName(Oas31.id, OASStyle) {
   override def isOas(): Boolean = true
 }
 
@@ -118,6 +123,7 @@ object ProfileName {
     case Amf.id               => AmfProfile
     case "OAS" | Oas20.id     => Oas20Profile  // for compatibility
     case Oas30.id             => Oas30Profile
+    case Oas31.id             => Oas31Profile
     case Raml08.id            => Raml08Profile
     case "RAML" | Raml10.id   => Raml10Profile // for compatibility
     case AsyncApi.id          => AsyncProfile
@@ -139,8 +145,8 @@ object ProfileName {
 
 object MessageStyle {
   def apply(name: String): MessageStyle = name match {
-    case Raml10.id | Raml08.id => RAMLStyle
-    case Oas20.id | Oas30.id   => OASStyle
+    case Raml10.id | Raml08.id          => RAMLStyle
+    case Oas20.id | Oas30.id | Oas31.id => OASStyle
     case AsyncApi.id | AsyncApi20.id | AsyncApi21.id | AsyncApi22.id | AsyncApi23.id | AsyncApi24.id | AsyncApi25.id |
         AsyncApi26.id =>
       OASStyle

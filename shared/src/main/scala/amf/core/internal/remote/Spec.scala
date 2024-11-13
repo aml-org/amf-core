@@ -12,6 +12,7 @@ object Spec {
       case Raml08.id            => Some(Raml08)
       case Oas20.id             => Some(Oas20)
       case Oas30.id             => Some(Oas30)
+      case Oas31.id             => Some(Oas31)
       case AwsOas30.id          => Some(AwsOas30)
       case AsyncApi20.id        => Some(AsyncApi20)
       case AsyncApi21.id        => Some(AsyncApi21)
@@ -44,6 +45,7 @@ object Spec {
   @JSExport val RAML10: Spec             = Raml10
   @JSExport val OAS20: Spec              = Oas20
   @JSExport val OAS30: Spec              = Oas30
+  @JSExport val OAS31: Spec              = Oas31
   @JSExport val AWS_OAS30: Spec          = AwsOas30
   @JSExport val ASYNC20: Spec            = AsyncApi20
   @JSExport val ASYNC21: Spec            = AsyncApi21
@@ -69,7 +71,7 @@ trait Spec {
   val id: String
 
   def isRaml: Boolean = this == Raml10 || this == Raml08
-  def isOas: Boolean  = this == Oas20 || this == Oas30
+  def isOas: Boolean  = this == Oas20 || this == Oas30 || this == Oas31
   def isAsync: Boolean =
     this == AsyncApi || this == AsyncApi20 || this == AsyncApi21 || this == AsyncApi22 || this == AsyncApi23 || this == AsyncApi24 || this == AsyncApi25 || this == AsyncApi26
 
@@ -125,6 +127,12 @@ private[amf] case object Oas20 extends Oas {
 
 private[amf] case object Oas30 extends Oas {
   override def version: String = "3.0"
+
+  override val mediaType: String = `application/yaml`
+}
+
+private[amf] case object Oas31 extends Oas {
+  override def version: String = "3.1"
 
   override val mediaType: String = `application/yaml`
 }

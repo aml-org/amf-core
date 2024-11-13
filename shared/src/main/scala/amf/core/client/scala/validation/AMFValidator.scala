@@ -18,6 +18,7 @@ object VendorToProfile {
     Spec.RAML08  -> Raml08Profile,
     Spec.OAS20   -> Oas20Profile,
     Spec.OAS30   -> Oas30Profile,
+    Spec.OAS31   -> Oas31Profile,
     Spec.AMF     -> AmfProfile
   )
 
