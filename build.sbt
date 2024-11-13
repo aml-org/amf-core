@@ -5,7 +5,7 @@ import sbtsonar.SonarPlugin.autoImport.sonarProperties
 val ivyLocal = Resolver.file("ivy", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns)
 
 name                     := "amf-core"
-ThisBuild / scalaVersion := "2.12.15"
+ThisBuild / scalaVersion := "2.12.20"
 ThisBuild / version      := "5.7.0-SNAPSHOT"
 
 val syamlVersion = "2.1.0-JAVA21-INTERNAL"
@@ -75,8 +75,8 @@ lazy val coreJS = core.js
   .disablePlugins(SonarPlugin, ScoverageSbtPlugin)
 
 ThisBuild / libraryDependencies ++= Seq(
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.14" cross CrossVersion.constant("2.12.18")),
-    "com.github.ghik" % "silencer-lib" % "1.7.14" % Provided cross CrossVersion.constant("2.12.18")
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.19" cross CrossVersion.constant("2.12.20")),
+    "com.github.ghik" % "silencer-lib" % "1.7.19" % Provided cross CrossVersion.constant("2.12.20")
 )
 
 lazy val sonarUrl   = sys.env.getOrElse("SONAR_SERVER_URL", "Not found url.")
