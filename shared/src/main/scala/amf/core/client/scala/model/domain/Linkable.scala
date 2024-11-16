@@ -10,7 +10,7 @@ import amf.core.internal.parser.domain.{Annotations, DeclarationPromise, Fields,
 import amf.core.internal.utils.IdCounter
 import amf.core.internal.validation.CoreValidations.{UnresolvedReference, UnresolvedReferenceWarning}
 import org.mulesoft.common.client.lexical.SourceLocation
-import org.yaml.model.{YMap, YNodePlain, YScalar, YType}
+import org.yaml.model.{YMap, YScalar, YType}
 
 trait Linkable extends AmfObject with AdoptionDependantCalls { this: DomainElement with Linkable =>
 
@@ -83,40 +83,21 @@ trait Linkable extends AmfObject with AdoptionDependantCalls { this: DomainEleme
   ): T = {
     val copied = link(label, annotations, fieldAnn).asInstanceOf[Linkable]
 
-    def parseField2(mapKey: String, field: Field): Unit = {
-      map.key(
-        mapKey,
-        { entry =>
-          entry.value.tagType match {
-            case YType.Str =>
-              val scalar = entry.value.as[YScalar].text
-              copied.set(
-                field,
-                AmfScalar(scalar),
-                Annotations(entry)
-              )
-            case _ => // ignore
-          }
+    def parseField(mapKey: String, field: Field): Unit = map.key(
+      mapKey,
+      { entry =>
+        entry.value.tagType match {
+          case YType.Str =>
+            val scalar = entry.value.as[YScalar].text
+            copied.set(
+              field,
+              AmfScalar(scalar),
+              Annotations(entry)
+            )
+          case _ => // ignore
         }
-      )
-    }
-
-    def parseField(mapKey: String, field: Field): Unit = {
-      map.key(
-        mapKey,
-        { entry =>
-          entry.value match {
-            case plain: YNodePlain if plain.value.isInstanceOf[YScalar] =>
-              copied.set(
-                field,
-                AmfScalar(plain.value.asInstanceOf[YScalar].text),
-                Annotations(entry)
-              )
-            case _ => // ignore
-          }
-        }
-      )
-    }
+      }
+    )
 
     parseField("summary", LinkableElementModel.RefSummary)
     parseField("description", LinkableElementModel.RefDescription)
