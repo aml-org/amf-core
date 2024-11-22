@@ -1,11 +1,10 @@
 package amf.core.client.scala.model.domain.extensions
 
+import amf.core.client.scala.model.StrField
+import amf.core.client.scala.model.domain.{DataNode, NamedDomainElement, Shape}
 import amf.core.internal.metamodel.Field
 import amf.core.internal.metamodel.domain.extensions.DomainExtensionModel
 import amf.core.internal.metamodel.domain.extensions.DomainExtensionModel.{DefinedBy, Element, Extension, Name}
-import amf.core.client.scala.model.StrField
-import amf.core.client.scala.model.domain.{DataNode, NamedDomainElement, Shape}
-import amf.core.internal.parser.domain.Fields
 import amf.core.internal.parser.domain.{Annotations, Fields}
 import org.yaml.model.YPart
 
@@ -29,7 +28,7 @@ case class DomainExtension(fields: Fields, annotations: Annotations) extends Ext
   /** Value , path + field value that is used to compose the id when the object its adopted */
   override def componentId: String = customDomainPropertyName.getOrElse("/extension")
 
-  private def customDomainPropertyName: Option[String] = Option(definedBy).flatMap(_.name.option()).map(x => s"/$x")
+  private def customDomainPropertyName: Option[String] = Option(definedBy).map(_.componentId).map(x => s"/$x")
 
   /** Call after object has been adopted by specified parent. */
   override def adopted(parent: String, cycle: Seq[String] = Seq()): this.type = {
