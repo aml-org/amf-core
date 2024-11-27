@@ -205,31 +205,20 @@ class FlattenedGraphParser(startingPoint: String, overrideAliases: Map[String, S
     findType(typeIris, id, map)
   }
 
-  protected def parseSortedArray(listElement: Type, rawNode: YMap): Seq[AmfElement] = {
-    def key(entry: YMapEntry): String = entry.key.as[String]
-    contentOfNode(rawNode) match {
+  private def parseSortedArray(listType: Type, rawNode: YMap): Seq[AmfElement] = {
+    val members: List[YNode] = rawNode.key(JsonLdKeywords.List) match {
       case Some(node) =>
-        // Sorted array members
-        val members = node.entries.filter { entry =>
-          val property           = key(entry)
-          val sortedMemberPrefix = (Namespace.Rdfs + "_").iri()
-          property.startsWith(compactUriFromContext(sortedMemberPrefix))
-        }
+        // get members of the @list
+        getListMembers(node)
 
-        // Parse members
-        members.sortBy(key).flatMap { entry =>
-          listElement match {
-            case _: Obj   => parse(entry.value.as[YMap])
-            case Type.Any => Some(typedValue(entry.value, ctx.graphContext))
-            case _ =>
-              try { Some(str(value(listElement, entry.value))) }
-              catch {
-                case _: Exception => None
-              }
-          }
+      case None =>
+        // get members of the sorted array implementation that uses a map with entries with _i for index
+        contentOfNode(rawNode) match {
+          case Some(node) => getArrayMapMembers(node)
+          case None       => List.empty
         }
-      case None => Seq.empty // Error already handled by contentOfNode
     }
+    parseListMembers(members, listType)
   }
 
   private def parseNode(map: YMap, id: String, model: ModelDefaultBuilder): Option[AmfObject] = {
