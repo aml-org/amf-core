@@ -5,14 +5,10 @@ import amf.core.client.scala.AMFResult
 import amf.core.client.scala.model.document.Document
 import amf.core.client.scala.validation.AMFValidationResult
 import amf.core.io.FileAssertionTest
-import org.scalatest.funsuite.AsyncFunSuite
 
-import scala.concurrent.ExecutionContext
+class AMFResultPrinterTest extends FileAssertionTest {
 
-class AMFResultPrinterTest extends AsyncFunSuite with FileAssertionTest {
-
-  val goldenPath                                           = "shared/src/test/resources/result/result.txt"
-  override implicit def executionContext: ExecutionContext = ExecutionContext.Implicits.global
+  val goldenPath = "shared/src/test/resources/result/result.txt"
 
   test("AMFResult.toString returns a printed report of it's results and if the unit conforms") {
     val resultAsString = buildResult().toString

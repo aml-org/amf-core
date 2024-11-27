@@ -8,21 +8,17 @@ import amf.core.internal.convert.{BaseUnitConverter, NativeOps}
 import amf.core.internal.plugins.document.graph.parser.EmbeddedGraphParser
 import amf.core.io.FileAssertionTest
 import amf.core.render.ElementsFixture
-import org.scalatest.funsuite.AsyncFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.yaml.model.YDocument
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait EmbeddedGraphParserTest
-    extends AsyncFunSuite
+    extends FileAssertionTest
     with NativeOps
-    with FileAssertionTest
     with BaseUnitConverter
     with Matchers
     with ElementsFixture {
-
-  override implicit val executionContext: ExecutionContext = ExecutionContext.Implicits.global
 
   test("Test parse simple document") {
     val golden               = "shared/src/test/resources/parser/simple-document.expanded.jsonld"
