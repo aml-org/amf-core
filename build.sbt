@@ -5,8 +5,11 @@ import sbtsonar.SonarPlugin.autoImport.sonarProperties
 val ivyLocal = Resolver.file("ivy", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns)
 
 name                     := "amf-core"
-ThisBuild / scalaVersion := "2.12.15"
-ThisBuild / version      := "5.6.2"
+ThisBuild / scalaVersion := "2.12.20"
+ThisBuild / version      := "5.7.0"
+
+val syamlVersion = "2.1.337"
+val scalaCommonTestVersion = "0.2.15"
 
 publish := {}
 
@@ -17,7 +20,7 @@ val settings = Common.settings ++ Common.publish ++ Seq(
     resolvers ++= List(ivyLocal, Common.releases, Common.snapshots, Resolver.mavenLocal, Resolver.mavenCentral),
     credentials ++= Common.credentials(),
     libraryDependencies ++= Seq(
-        "org.mule.common" %%% "scala-common-test" % "0.1.13" % Test
+        "org.mule.common" %%% "scala-common-test" % scalaCommonTestVersion % Test
     )
 )
 
@@ -28,8 +31,6 @@ lazy val workspaceDirectory: File =
     case Some(x) => file(x)
     case _       => Path.userHome / "mulesoft"
   }
-
-val syamlVersion = "2.0.335"
 
 lazy val syamlJVMRef = ProjectRef(workspaceDirectory / "syaml", "syamlJVM")
 lazy val syamlJSRef  = ProjectRef(workspaceDirectory / "syaml", "syamlJS")
@@ -51,7 +52,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(settings)
   .jvmSettings(
       libraryDependencies += "org.scala-js"          %% "scalajs-stubs"           % "1.1.0" % "provided",
-      libraryDependencies += "org.scala-lang.modules" % "scala-java8-compat_2.12" % "0.8.0",
+      libraryDependencies += "org.scala-lang.modules" % "scala-java8-compat_2.12" % "1.0.2",
       Compile / packageDoc / artifactPath := baseDirectory.value / "target" / "artifact" / "amf-core-javadoc.jar"
   )
   .jsSettings(
@@ -74,8 +75,8 @@ lazy val coreJS = core.js
   .disablePlugins(SonarPlugin, ScoverageSbtPlugin)
 
 ThisBuild / libraryDependencies ++= Seq(
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.6" cross CrossVersion.constant("2.12.15")),
-    "com.github.ghik" % "silencer-lib" % "1.7.6" % Provided cross CrossVersion.constant("2.12.15")
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.19" cross CrossVersion.constant("2.12.20")),
+    "com.github.ghik" % "silencer-lib" % "1.7.19" % Provided cross CrossVersion.constant("2.12.20")
 )
 
 lazy val sonarUrl   = sys.env.getOrElse("SONAR_SERVER_URL", "Not found url.")
@@ -84,7 +85,7 @@ lazy val branch     = sys.env.getOrElse("BRANCH_NAME", "develop")
 
 sonarProperties ++= Map(
     "sonar.login"             -> sonarToken,
-    "sonar.projectKey"        -> "mulesoft.amf-core",
+    "sonar.projectKey"        -> "mulesoft.amf-core.gec",
     "sonar.projectName"       -> "AMF-CORE",
     "sonar.projectVersion"    -> version.value,
     "sonar.sourceEncoding"    -> "UTF-8",
@@ -92,5 +93,6 @@ sonarProperties ++= Map(
     "sonar.branch.name"       -> branch,
     "sonar.sources"           -> "shared/src/main/scala",
     "sonar.tests"             -> "shared/src/test/scala",
-    "sonar.userHome"          -> "${buildDir}/.sonar"
+    "sonar.userHome"          -> "${buildDir}/.sonar",
+    "sonar.scala.coverage.reportPaths" -> "target/scala-2.12/scoverage-report/scoverage.xml"
 )

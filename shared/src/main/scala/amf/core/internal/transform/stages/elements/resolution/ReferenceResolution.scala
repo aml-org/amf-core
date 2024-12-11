@@ -66,7 +66,8 @@ class ReferenceResolution(
               linkable.withSupportsRecursion(true)
             case _ => // ignore
           }
-          resolved = customDomainElementTransformation(withName(resolved, l), l)
+          resolved = withName(resolved, l)
+          resolved = customDomainElementTransformation(resolved, l)
           resolved.annotations += ResolvedInheritance()
           if (keepEditingInfo) addResolvedLinkAnnotations(l, resolved)
           addIntermediateLinkTargetsToCache(element, resolved)

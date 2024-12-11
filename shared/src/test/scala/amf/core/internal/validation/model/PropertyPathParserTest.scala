@@ -1,13 +1,8 @@
 package amf.core.internal.validation.model
 
-import amf.core.internal.unsafe.PlatformSecrets
-import org.scalatest.funsuite.AsyncFunSuite
+import amf.core.common.AsyncFunSuiteWithPlatformGlobalExecutionContext
 
-import scala.concurrent.ExecutionContext
-
-class PropertyPathParserTest extends AsyncFunSuite with PlatformSecrets {
-
-  override implicit val executionContext: ExecutionContext = ExecutionContext.Implicits.global
+class PropertyPathParserTest extends AsyncFunSuiteWithPlatformGlobalExecutionContext {
 
   val expander: String => String = (s) => s"prefix::$s"
 

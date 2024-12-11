@@ -13,8 +13,10 @@ trait Linkable { this: DomainElement with Linkable =>
 
   def linkTarget: ClientOption[DomainElement] = _internal.linkTarget.asClient
 
-  def isLink: Boolean     = _internal.linkTarget.isDefined
-  def linkLabel: StrField = _internal.linkLabel
+  def isLink: Boolean          = _internal.linkTarget.isDefined
+  def linkLabel: StrField      = _internal.linkLabel
+  def refSummary: StrField     = _internal.refSummary
+  def refDescription: StrField = _internal.refDescription
 
   def linkCopy(): Linkable
 
@@ -25,6 +27,16 @@ trait Linkable { this: DomainElement with Linkable =>
 
   def withLinkLabel(label: String): this.type = {
     _internal.withLinkLabel(label)
+    this
+  }
+
+  def withRefSummary(refSummary: String): this.type = {
+    _internal.withRefSummary(refSummary)
+    this
+  }
+
+  def withRefDescription(refDescription: String): this.type = {
+    _internal.withRefDescription(refDescription)
     this
   }
 

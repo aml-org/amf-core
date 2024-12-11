@@ -1,15 +1,11 @@
 package amf.core.parser
 
 import amf.core.client.scala.AMFGraphConfiguration
+import amf.core.common.AsyncFunSuiteWithPlatformGlobalExecutionContext
 import amf.core.internal.plugins.parse.AMFGraphParsePlugin
-import org.scalatest.funsuite.AsyncFunSuite
 import org.scalatest.matchers.should.Matchers
 
-import scala.concurrent.ExecutionContext
-
-class JsonLdContextOverrideTest extends AsyncFunSuite with Matchers {
-
-  override implicit def executionContext: ExecutionContext = ExecutionContext.Implicits.global
+class JsonLdContextOverrideTest extends AsyncFunSuiteWithPlatformGlobalExecutionContext with Matchers {
 
   private val aliases = Map("doc" -> "http://a.ml/vocabularies/document#", "data" -> "http://a.ml/vocabularies/data#")
   private val plugin  = AMFGraphParsePlugin(aliases)

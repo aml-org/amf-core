@@ -2,18 +2,23 @@ package amf.core.client.scala.model.domain
 
 import amf.core.client.scala.model.{BoolField, StrField}
 import amf.core.client.scala.parse.document.UnresolvedComponents
+import amf.core.internal.adoption.AdoptionDependantCalls
+import amf.core.internal.metamodel.Field
 import amf.core.internal.metamodel.domain.LinkableElementModel
+import amf.core.internal.parser.YMapOps
 import amf.core.internal.parser.domain.{Annotations, DeclarationPromise, Fields, ScalarNode => ScalarNodeObj}
 import amf.core.internal.utils.IdCounter
-import amf.core.internal.adoption.AdoptionDependantCalls
 import amf.core.internal.validation.CoreValidations.{UnresolvedReference, UnresolvedReferenceWarning}
 import org.mulesoft.common.client.lexical.SourceLocation
+import org.yaml.model.{YMap, YScalar, YType}
 
 trait Linkable extends AmfObject with AdoptionDependantCalls { this: DomainElement with Linkable =>
 
   def linkTarget: Option[DomainElement]    = Option(fields(LinkableElementModel.Target))
   var linkAnnotations: Option[Annotations] = None
   def supportsRecursion: BoolField         = fields.field(LinkableElementModel.SupportsRecursion)
+  def refSummary: StrField                 = fields.field(LinkableElementModel.RefSummary)
+  def refDescription: StrField             = fields.field(LinkableElementModel.RefDescription)
   def effectiveLinkTarget(links: Set[Linkable] = Set()): DomainElement =
     linkTarget
       .map {
@@ -44,6 +49,10 @@ trait Linkable extends AmfObject with AdoptionDependantCalls { this: DomainEleme
     set(LinkableElementModel.Label, AmfScalar(label, annotations), Annotations.inferred())
   def withSupportsRecursion(recursive: Boolean): this.type =
     set(LinkableElementModel.SupportsRecursion, AmfScalar(recursive), Annotations.synthesized())
+  def withRefSummary(refSummary: String, annotations: Annotations = Annotations()): this.type =
+    set(LinkableElementModel.RefSummary, AmfScalar(refSummary, annotations), Annotations.inferred())
+  def withRefDescription(refDescription: String, annotations: Annotations = Annotations()): this.type =
+    set(LinkableElementModel.RefDescription, AmfScalar(refDescription, annotations), Annotations.inferred())
 
   def link[T](label: String, annotations: Annotations = Annotations()): T = {
     link(AmfScalar(label), annotations, Annotations())
@@ -54,17 +63,46 @@ trait Linkable extends AmfObject with AdoptionDependantCalls { this: DomainEleme
   }
 
   private[amf] def link[T](label: AmfScalar, annotations: Annotations, fieldAnn: Annotations): T = {
-    val copied = linkCopy()
-    val hash = buildLinkHash(
-      Option(label.value).map(_.toString).getOrElse(""),
-      annotations
-    ) // todo: label.value is sometimes null!
+    val copied      = linkCopy()
+    val labelString = Option(label.value).map(_.toString).getOrElse("") // label.value is sometimes null!
+    val hash        = buildLinkHash(labelString, annotations)
+
     copied
       .withId(s"${copied.id}/link-$hash")
       .withLinkTarget(this)
       .set(LinkableElementModel.Label, label, fieldAnn)
       .add(annotations)
       .asInstanceOf[T]
+  }
+
+  private[amf] def link[T](
+      map: YMap,
+      label: AmfScalar,
+      annotations: Annotations,
+      fieldAnn: Annotations
+  ): T = {
+    val copied = link(label, annotations, fieldAnn).asInstanceOf[Linkable]
+
+    def parseField(mapKey: String, field: Field): Unit = map.key(
+      mapKey,
+      { entry =>
+        entry.value.tagType match {
+          case YType.Str =>
+            val scalar = entry.value.as[YScalar].text
+            copied.set(
+              field,
+              AmfScalar(scalar),
+              Annotations(entry)
+            )
+          case _ => // ignore
+        }
+      }
+    )
+
+    parseField("summary", LinkableElementModel.RefSummary)
+    parseField("description", LinkableElementModel.RefDescription)
+
+    copied.asInstanceOf[T]
   }
 
   private def buildLinkHash(label: String, annotations: Annotations): Int = {
@@ -79,8 +117,8 @@ trait Linkable extends AmfObject with AdoptionDependantCalls { this: DomainEleme
     sb.toString().hashCode
   }
 
-  /** This can be overriden by subclasses to customise how the links to unresolved classes are generated. By default it
-    * just generates a link.
+  /** This can be overridden by subclasses to customise how the links to unresolved classes are generated. By default,
+    * it just generates a link.
     */
   private[amf] def resolveUnreferencedLink[T](
       label: String,

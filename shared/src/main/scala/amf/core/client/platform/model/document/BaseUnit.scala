@@ -1,13 +1,13 @@
 package amf.core.client.platform.model.document
 
-import amf.core.internal.convert.CoreClientConverters._
-import amf.core.client.platform.config.RenderOptions
 import amf.core.client.platform.model.domain.DomainElement
 import amf.core.client.platform.model.{AmfObjectWrapper, StrField}
 import amf.core.client.scala.model.document.{BaseUnit => InternalBaseUnit}
+import amf.core.client.scala.vocabulary.Namespace
+import amf.core.internal.convert.CoreClientConverters._
 import amf.core.internal.remote.Spec
 import amf.core.internal.unsafe.PlatformSecrets
-import amf.core.client.scala.vocabulary.Namespace
+import com.github.ghik.silencer.silent
 
 import scala.scalajs.js.annotation.JSExportAll
 
@@ -35,7 +35,8 @@ trait BaseUnit extends AmfObjectWrapper with PlatformSecrets {
   def usage: StrField = _internal.usage
 
   /** Returns the version. */
-  @deprecated("Use processingData.modelVersion for API Contract Base Units instead", "AMF 5.0.0 & AML 6.0.0")
+//  @deprecated("Use processingData.modelVersion for API Contract Base Units instead", "AMF 5.0.0 & AML 6.0.0")
+  @silent
   def modelVersion: StrField = _internal.modelVersion
 
   /** Set references

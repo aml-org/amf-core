@@ -1,10 +1,9 @@
 package amf.core.internal.remote
-import java.net.URI
-import amf.core.client.platform.execution.{BaseExecutionEnvironment, DefaultExecutionEnvironment, ExecutionEnvironment}
+
 import amf.core.client.platform.resource.{FileResourceLoader, HttpResourceLoader}
 import amf.core.client.scala.resource.ResourceLoader
-import amf.core.internal.unsafe.PlatformBuilder
 import amf.core.internal.resource.InternalResourceLoaderAdapter
+import amf.core.internal.unsafe.PlatformBuilder
 import org.mulesoft.common.io.{FileSystem, Fs}
 
 import scala.concurrent.ExecutionContext
@@ -59,6 +58,8 @@ class JvmPlatform extends Platform {
       case _                        => "nux"
     }
   }
+
+  override val globalExecutionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 }
 
 object JvmPlatform {
