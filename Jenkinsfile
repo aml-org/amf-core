@@ -71,20 +71,20 @@ pipeline {
                 }
             }
         }
-        stage('Triggers') {
-            when {
-                anyOf {
-                    branch 'develop'
-                }
-            }
-            steps {
-                script {
-                    lastStage = env.STAGE_NAME
-                    echo "Triggering amf-aml on develop branch"
-                    build job: AMF_AML_JOB, wait: false
-                }
-            }
-        }
+        // stage('Triggers') {
+        //     when {
+        //         anyOf {
+        //             branch 'develop'
+        //         }
+        //     }
+        //     steps {
+        //         script {
+        //             lastStage = env.STAGE_NAME
+        //             echo "Triggering amf-aml on develop branch"
+        //             build job: AMF_AML_JOB, wait: false
+        //         }
+        //     }
+        // }
         stage('Tag version') {
             when {
                 anyOf {
