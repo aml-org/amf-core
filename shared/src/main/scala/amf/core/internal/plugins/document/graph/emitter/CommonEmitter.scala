@@ -369,8 +369,9 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
         emitScalar(b, v.value, SType.Float)
         sources(v)
       case Type.DateTime =>
-        val dateTime = v.value.asInstanceOf[AmfScalar].value.asInstanceOf[SimpleDateTime]
-        typedScalar(b, dateTime.toString, DataType.DateTime)
+        // Changing this to handle both: standard cases of datetime and JsonLdSchema cases
+        val dateTimeValue = v.value.asInstanceOf[AmfScalar].value.toString
+        typedScalar(b, dateTimeValue, DataType.DateTime)
         sources(v)
       case Type.Date =>
         emitDate(v, b)
