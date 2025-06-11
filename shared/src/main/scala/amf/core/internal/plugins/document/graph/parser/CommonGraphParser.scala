@@ -3,11 +3,12 @@ package amf.core.internal.plugins.document.graph.parser
 import amf.core.client.scala.model.document.SourceMap
 import amf.core.client.scala.model.domain.extensions.{CustomDomainProperty, DomainExtension}
 import amf.core.client.scala.model.domain._
+import amf.core.client.scala.vocabulary.Namespace
 import amf.core.internal.annotations.DomainExtensionAnnotation
 import amf.core.internal.metamodel.Type.Iri
 import amf.core.internal.metamodel.domain.{DomainElementModel, ExternalSourceElementModel, LinkableElementModel}
 import amf.core.internal.metamodel.domain.extensions.DomainExtensionModel
-import amf.core.internal.metamodel.{Field, ModelDefaultBuilder, Type}
+import amf.core.internal.metamodel.{Field, ModelDefaultBuilder, Obj, Type}
 import amf.core.internal.parser.{YMapOps, YNodeLikeOps}
 import amf.core.internal.parser.domain.{Annotations, FieldEntry}
 import amf.core.internal.plugins.document.graph.JsonLdKeywords
@@ -286,5 +287,54 @@ abstract class CommonGraphParser(implicit ctx: GraphParserContext) extends Graph
 
   private def findType(typeString: String): Option[ModelDefaultBuilder] = {
     ctx.config.registryContext.findType(expandUriFromContext(typeString))
+  }
+
+  protected def parseListMembers(members: List[YNode], listType: Type): Seq[AmfElement] = {
+    val fn     = parseListMember(listType)
+    val result = members.flatMap(fn(_))
+    result
+  }
+
+  private def parseListMember(listType: Type): YNode => Option[AmfElement] = (member: YNode) => {
+    listType match {
+      case _: Obj =>
+        parse(member.as[YMap])
+      case Type.Any =>
+        Some(typedValue(member, ctx.graphContext))
+      case _ =>
+        try {
+          Some(str(value(listType, member)))
+        } catch {
+          case _: Exception => None
+        }
+    }
+  }
+
+  private def getEntryKeyString(entry: YMapEntry): String = entry.key.as[String]
+
+  protected def getArrayMapMembers(node: YMap): List[YNode] = {
+    node.entries
+      .filter { entry =>
+        val property           = getEntryKeyString(entry)
+        val sortedMemberPrefix = (Namespace.Rdfs + "_").iri()
+        property.startsWith(compactUriFromContext(sortedMemberPrefix))
+      }
+      .sortBy(getEntryKeyString)
+      .map { entry =>
+        entry.value.tagType match {
+          case YType.Seq =>
+            entry.value.as[Seq[YNode]].head
+          case _ =>
+            entry.value
+        }
+      }
+      .toList
+  }
+
+  protected def getListMembers(node: YMapEntry): List[YNode] = {
+    node.value.value match {
+      case sequence: YSequence => sequence.nodes.toList
+      case _                   => List.empty
+    }
   }
 }
