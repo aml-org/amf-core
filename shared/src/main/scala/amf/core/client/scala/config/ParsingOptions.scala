@@ -8,7 +8,8 @@ case class ParsingOptions(
     maxYamlReferences: Option[Int] = None,
     maxJSONComplexity: Option[Int] = None,
     maxJsonYamlDepth: Option[Int] = None,
-    tokens: Boolean = false
+    tokens: Boolean = false,
+    sourceSchemaDef: Boolean = false
 ) {
 
   /** Parse specific AMF JSON-LD serialization */
@@ -40,9 +41,16 @@ case class ParsingOptions(
   /** Discard tokens when parsing with SYAML */
   def withoutTokens: ParsingOptions = copy(tokens = false)
 
+  /** Add Shape definition in parsed JsonLdInstances */
+  def withSourceSchemaDef: ParsingOptions = copy(sourceSchemaDef = true)
+
+  /** Discard Shape definition in parsed JsonLdInstances */
+  def withoutSourceSchemaDef: ParsingOptions = copy(sourceSchemaDef = false)
+
   def isAmfJsonLdSerialization: Boolean = amfJsonLdSerialization
   def definedBaseUrl: Option[String]    = baseUnitUrl
   def getMaxYamlReferences: Option[Int] = maxYamlReferences
   def getMaxJsonYamlDepth: Option[Int]  = maxJsonYamlDepth
   def isTokens: Boolean                 = tokens
+  def isSourceSchemaDef: Boolean        = sourceSchemaDef
 }
