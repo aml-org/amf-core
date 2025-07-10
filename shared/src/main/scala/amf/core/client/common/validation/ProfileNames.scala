@@ -23,6 +23,7 @@ object ProfileNames {
   val JSONSCHEMA: ProfileName         = JsonSchemaProfile
   val AVROSCHEMA: ProfileName         = AvroSchemaProfile
   val MCP: ProfileName                = MCPSchemaProfile
+  val AGENT_FABRIC: ProfileName        = AgentFabricProfile
 
   lazy val specProfiles: Seq[ProfileName] =
     Seq(
@@ -38,7 +39,8 @@ object ProfileNames {
       GrpcProfile,
       JsonSchemaProfile,
       AvroSchemaProfile,
-      MCPSchemaProfile
+      MCPSchemaProfile,
+      AgentFabricProfile
     )
 }
 
@@ -110,6 +112,11 @@ object MCPSchemaProfile extends ProfileName(Mcp.id, AMFStyle) {
   override def isRaml(): Boolean = false
 }
 
+object AgentFabricProfile extends ProfileName(AgentFabric.id, AMFStyle) {
+  override def isOas(): Boolean  = false
+  override def isRaml(): Boolean = false
+}
+
 object ProfileName {
   def unapply(name: String): Option[ProfileName] =
     name match {
@@ -124,6 +131,7 @@ object ProfileName {
       case JsonSchemaProfile.p        => Some(JsonSchemaProfile)
       case AvroSchemaProfile.p        => Some(AvroSchemaProfile)
       case MCPSchemaProfile.p         => Some(MCPSchemaProfile)
+      case AgentFabricProfile.p       => Some(AgentFabricProfile)
       case _                          => None
     }
 
@@ -148,6 +156,7 @@ object ProfileName {
     case JsonSchema.id        => JsonSchemaProfile
     case AvroSchema.id        => AvroSchemaProfile
     case Mcp.id               => MCPSchemaProfile
+    case AgentFabric.id       => AgentFabricProfile
     case custom               => new ProfileName(custom)
   }
 }
