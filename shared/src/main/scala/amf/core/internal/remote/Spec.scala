@@ -32,6 +32,7 @@ object Spec {
       case JsonLDSchema.id      => Some(JsonLDSchema)
       case AvroSchema.id        => Some(AvroSchema)
       case MCP.id               => Some(Mcp)
+      case AgentFabric.id       => Some(AgentFabric)
       case _                    => None
     }
   }
@@ -66,6 +67,7 @@ object Spec {
   @JSExport val JSONSCHEMADIALECT: Spec  = JsonSchemaDialect
   @JSExport val JSONDLSCHEMA: Spec       = JsonLDSchema
   @JSExport val MCP: Spec                = Mcp
+  @JSExport val AGENT_FABRIC: Spec       = AgentFabric
 }
 
 @JSExportAll
@@ -272,5 +274,10 @@ private[amf] case object AvroSchema extends Spec {
 
 private[amf] case object Mcp extends Spec {
   override val id: String        = "MCP"
+  override val mediaType: String = `application/json`
+}
+
+private[amf] case object AgentFabric extends Spec {
+  override val id: String        = "Agent Fabric"
   override val mediaType: String = `application/json`
 }
