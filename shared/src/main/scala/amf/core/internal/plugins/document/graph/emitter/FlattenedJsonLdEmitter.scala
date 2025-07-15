@@ -56,13 +56,7 @@ class FlattenedJsonLdEmitter[T](
           /** First queue non declaration elements. We do this because these elements can generate new declarations that
             * we need to know before emitting the Base Unit.
             */
-          val declarationsEntry: Option[FieldEntry] = unit.fields.entry(ModuleModel.Declares)
-          val referencesEntry: Option[FieldEntry]   = unit.fields.entry(ModuleModel.References)
-
-          extractDeclarationsAndReferencesToContext(declarationsEntry, referencesEntry, unit.annotations)
-
-          unit.fields.removeField(ModuleModel.Declares)
-          unit.fields.removeField(ModuleModel.References)
+          extractDeclarationsAndReferences(unit)
 
           unit match {
             case u: EncodesModel if isSelfEncoded(u) =>
@@ -90,13 +84,7 @@ class FlattenedJsonLdEmitter[T](
           }
 
           // Check added declarations
-          while (pending.hasPendingEmissions) {
-            val emission = pending.nextEmission()
-            ctx.emittingDeclarations = emission.isDeclaration
-            ctx.emittingReferences = emission.isReference
-            emission.fn(root)
-          }
-
+          emitPending()
           // Now process external links, not declared as part of the unit
           while (pending.hasPendingExternalEmissions) {
             val emission = pending.nextExternalEmission()
@@ -105,15 +93,19 @@ class FlattenedJsonLdEmitter[T](
             emission.fn(root)
           }
           // new regular nodes might have been generated, annotations for example
-          while (pending.hasPendingEmissions) {
-            val emission = pending.nextEmission()
-            ctx.emittingDeclarations = emission.isDeclaration
-            ctx.emittingReferences = emission.isReference
-            emission.fn(root)
-          }
+          emitPending()
         }
       )
       ctx.emitContext(ob)
+    }
+  }
+
+  private def emitPending(): Unit = {
+    while (pending.hasPendingEmissions) {
+      val emission = pending.nextEmission()
+      ctx.emittingDeclarations = emission.isDeclaration
+      ctx.emittingReferences = emission.isReference
+      emission.fn(root)
     }
   }
 
@@ -124,7 +116,7 @@ class FlattenedJsonLdEmitter[T](
     }
   }
 
-  def queueObjectFieldValues(amfObject: AmfObject, filter: (Field, Value) => Boolean = (_, _) => true): Unit = {
+  private def queueObjectFieldValues(amfObject: AmfObject, filter: (Field, Value) => Boolean = (_, _) => true): Unit = {
 //  should filter fields with getMetaModelFields(amfObject, amfObject.meta, extensionIris, options)
     amfObject.fields.foreach {
       case (field, value) if filter(field, value) && filterSourceInformationNode(field, options) =>
@@ -144,11 +136,11 @@ class FlattenedJsonLdEmitter[T](
     }
   }
 
-  def filterSourceInformationNode(f: Field, options: RenderOptions): Boolean = {
+  private def filterSourceInformationNode(f: Field, options: RenderOptions): Boolean = {
     !(f == BaseUnitModel.SourceInformation && !options.sourceInformation)
   }
 
-  def emitSelfEncodedBaseUnitNode(unit: BaseUnit): Unit = {
+  private def emitSelfEncodedBaseUnitNode(unit: BaseUnit): Unit = {
     unit match {
       case u: EncodesModel =>
         root.obj { b =>
@@ -182,25 +174,28 @@ class FlattenedJsonLdEmitter[T](
     }
   }
 
-  def emitBaseUnitNode(unit: BaseUnit): Unit = {
+  private def emitBaseUnitNode(unit: BaseUnit): Unit = {
     val id = unit.id
 
     root.obj { b =>
       createIdNode(b, id)
-      emitReferences(b, unit.id, SourceMap(unit.id, unit))
-      emitDeclarations(b, unit.id, SourceMap(unit.id, unit))
+      emitDeclarationsAndReferences(unit, b)
 
       val sources = SourceMap(id, unit)
       val obj     = metaModel(unit)
-      createTypeNode(b, obj)
-      traverseMetaModel(id, unit, sources, obj, b)
-      emitDomainExtensions(unit, b)
-
-      val sourceMapId: String = sourceMapIdFor(id)
-      createSourcesNode(sourceMapId, sources, b)
+      emitNode(unit, id, b, sources, obj)
 
     }
 
+  }
+
+  private def emitNode(element: AmfObject, id: String, b: Entry[T], sources: SourceMap, obj: Obj): Unit = {
+    createTypeNode(b, obj)
+    traverseMetaModel(id, element, sources, b)
+    emitDomainExtensions(element, b)
+
+    val sourceMapId: String = sourceMapIdFor(id)
+    createSourcesNode(sourceMapId, sources, b)
   }
 
   implicit def object2Emission(amfObject: AmfObject): Emission[T] with Metadata = {
@@ -226,16 +221,10 @@ class FlattenedJsonLdEmitter[T](
     val sources = SourceMap(id, amfObject)
 
     val obj = metaModel(amfObject)
-    createTypeNode(b, obj)
-    traverseMetaModel(id, amfObject, sources, obj, b)
-
-    emitDomainExtensions(amfObject, b)
-
-    val sourceMapId: String = sourceMapIdFor(id)
-    createSourcesNode(sourceMapId, sources, b)
+    emitNode(amfObject, id, b, sources, obj)
   }
 
-  def traverseMetaModel(id: String, element: AmfObject, sources: SourceMap, obj: Obj, b: Entry[T]): Unit = {
+  def traverseMetaModel(id: String, element: AmfObject, sources: SourceMap, b: Entry[T]): Unit = {
     val modelFields: Seq[Field] = fieldProvision.fieldsFor(element, options)
     emitFields(id, element, sources, b, modelFields)
   }
@@ -275,10 +264,7 @@ class FlattenedJsonLdEmitter[T](
         emitObject(extension.extension, rb)
       }
     }) with Metadata
-    e.id = Some(extension.extension.id)
-    e.isDeclaration = ctx.emittingDeclarations
-    e.isReference = ctx.emittingReferences
-    pending.tryEnqueue(e)
+    idAndEnqueue(extension.extension.id, e)
   }
 
   override protected def createSortedArray(
@@ -307,10 +293,7 @@ class FlattenedJsonLdEmitter[T](
           }
         }
       }) with Metadata
-      e.id = Some(id)
-      e.isDeclaration = ctx.emittingDeclarations
-      e.isReference = ctx.emittingReferences
-      pending.tryEnqueue(e)
+      idAndEnqueue(id, e)
     }
   }
 
@@ -339,13 +322,10 @@ class FlattenedJsonLdEmitter[T](
         createAnnotationNodes(id, rb, filteredSources.eternals)
       }
     }) with Metadata
-    e.id = Some(id)
-    e.isDeclaration = ctx.emittingDeclarations
-    e.isReference = ctx.emittingReferences
-    pending.tryEnqueue(e)
+    idAndEnqueue(id, e)
   }
 
-  override protected def emitEternalsNode(id: String, sources: SourceMap, b: Entry[T]): Unit = {
+  override protected def emitEternalNode(id: String, sources: SourceMap, b: Entry[T]): Unit = {
     createIdNode(b, id)
     val e = new Emission((part: Part[T]) => {
       part.obj { rb =>
@@ -355,10 +335,7 @@ class FlattenedJsonLdEmitter[T](
       }
     }) with Metadata
 
-    e.id = Some(id)
-    e.isDeclaration = ctx.emittingDeclarations
-    e.isReference = ctx.emittingReferences
-    pending.tryEnqueue(e)
+    idAndEnqueue(id, e)
   }
 
   override protected def createAnnotationValueNode(id: String, b: Part[T], annotationEntry: (String, String)): Unit =
@@ -368,17 +345,17 @@ class FlattenedJsonLdEmitter[T](
           createIdNode(b, id)
         }
         val e = new Emission((part: Part[T]) => {
-          part.obj { b =>
-            createIdNode(b, id)
-            b.entry(ctx.emitIri(SourceMapModel.Element.value.iri()), emitScalar(_, iri))
-            b.entry(ctx.emitIri(SourceMapModel.Value.value.iri()), emitScalar(_, v))
-          }
+          withAnnotationEntry(id, part, iri, v)
         }) with Metadata
-        e.id = Some(id)
-        e.isDeclaration = ctx.emittingDeclarations
-        e.isReference = ctx.emittingReferences
-        pending.tryEnqueue(e)
+        idAndEnqueue(id, e)
     }
+
+  private def idAndEnqueue(id: String, e: Emission[T] with Metadata): Unit = {
+    e.id = Some(id)
+    e.isDeclaration = ctx.emittingDeclarations
+    e.isReference = ctx.emittingReferences
+    pending.tryEnqueue(e)
+  }
 
   override protected def scalar(b: Part[T], content: String, t: SType): Unit = b += Scalar(t, content)
 
