@@ -285,6 +285,6 @@ private[amf] case object AgentFabric extends Spec {
 }
 
 private[amf] case object AgentCard extends Spec {
-  override val id: String        = "Agent 2 Agent"
+  override val id: String        = "Agent Card"
   override val mediaType: String = `application/json`
 }
