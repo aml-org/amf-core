@@ -23,7 +23,7 @@ object ProfileNames {
   val JSONSCHEMA: ProfileName         = JsonSchemaProfile
   val AVROSCHEMA: ProfileName         = AvroSchemaProfile
   val MCP: ProfileName                = MCPSchemaProfile
-  val AGENT_FABRIC: ProfileName       = AgentFabricProfile
+  val AGENTS_DOMAIN: ProfileName       = AgentsDomainProfile
   val AGENT_CARD: ProfileName         = AgentCardProfile
 
   lazy val specProfiles: Seq[ProfileName] =
@@ -41,7 +41,7 @@ object ProfileNames {
       JsonSchemaProfile,
       AvroSchemaProfile,
       MCPSchemaProfile,
-      AgentFabricProfile,
+      AgentsDomainProfile,
       AgentCardProfile
     )
 }
@@ -114,7 +114,7 @@ object MCPSchemaProfile extends ProfileName(Mcp.id, AMFStyle) {
   override def isRaml(): Boolean = false
 }
 
-object AgentFabricProfile extends ProfileName(AgentFabric.id, AMFStyle) {
+object AgentsDomainProfile extends ProfileName(AgentsDomain.id, AMFStyle) {
   override def isOas(): Boolean  = false
   override def isRaml(): Boolean = false
 }
@@ -138,7 +138,7 @@ object ProfileName {
       case JsonSchemaProfile.p        => Some(JsonSchemaProfile)
       case AvroSchemaProfile.p        => Some(AvroSchemaProfile)
       case MCPSchemaProfile.p         => Some(MCPSchemaProfile)
-      case AgentFabricProfile.p       => Some(AgentFabricProfile)
+      case AgentsDomainProfile.p       => Some(AgentsDomainProfile)
       case AgentCardProfile.p         => Some(AgentCardProfile)
       case _                          => None
     }
@@ -164,7 +164,7 @@ object ProfileName {
     case JsonSchema.id        => JsonSchemaProfile
     case AvroSchema.id        => AvroSchemaProfile
     case Mcp.id               => MCPSchemaProfile
-    case AgentFabric.id       => AgentFabricProfile
+    case AgentsDomain.id       => AgentsDomainProfile
     case AgentCard.id         => AgentCardProfile
     case custom               => new ProfileName(custom)
   }
