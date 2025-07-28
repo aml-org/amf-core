@@ -32,7 +32,7 @@ object Spec {
       case JsonLDSchema.id      => Some(JsonLDSchema)
       case AvroSchema.id        => Some(AvroSchema)
       case MCP.id               => Some(Mcp)
-      case AgentsDomain.id       => Some(AgentsDomain)
+      case AgentDomain.id       => Some(AgentDomain)
       case AgentCard.id         => Some(AgentCard)
       case _                    => None
     }
@@ -68,7 +68,7 @@ object Spec {
   @JSExport val JSONSCHEMADIALECT: Spec  = JsonSchemaDialect
   @JSExport val JSONDLSCHEMA: Spec       = JsonLDSchema
   @JSExport val MCP: Spec                = Mcp
-  @JSExport val AGENTS_DOMAIN: Spec       = AgentsDomain
+  @JSExport val AGENT_DOMAIN: Spec       = AgentDomain
   @JSExport val AGENT_CARD: Spec         = AgentCard
 }
 
@@ -279,8 +279,8 @@ private[amf] case object Mcp extends Spec {
   override val mediaType: String = `application/json`
 }
 
-private[amf] case object AgentsDomain extends Spec {
-  override val id: String        = "Agents Domain"
+private[amf] case object AgentDomain extends Spec {
+  override val id: String        = "Agent Domain"
   override val mediaType: String = `application/json`
 }
 
