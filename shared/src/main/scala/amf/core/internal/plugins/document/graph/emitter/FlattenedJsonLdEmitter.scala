@@ -8,9 +8,9 @@ import amf.core.client.scala.model.domain.extensions.DomainExtension
 import amf.core.client.scala.vocabulary.{Namespace, NamespaceAliases}
 import amf.core.internal.metamodel.Type._
 import amf.core.internal.metamodel._
-import amf.core.internal.metamodel.document.{BaseUnitModel, FragmentModel, ModuleModel, SourceMapModel}
+import amf.core.internal.metamodel.document.{BaseUnitModel, FragmentModel, SourceMapModel}
 import amf.core.internal.metamodel.domain.extensions.DomainExtensionModel
-import amf.core.internal.parser.domain.{FieldEntry, Value}
+import amf.core.internal.parser.domain.Value
 import amf.core.internal.plugins.document.graph.JsonLdKeywords
 import amf.core.internal.plugins.document.graph.emitter.flattened.utils.{Emission, EmissionQueue, Metadata}
 import org.yaml.builder.DocBuilder
@@ -96,6 +96,7 @@ class FlattenedJsonLdEmitter[T](
           emitPending()
         }
       )
+      emitEntities(unit, ob)
       ctx.emitContext(ob)
     }
   }

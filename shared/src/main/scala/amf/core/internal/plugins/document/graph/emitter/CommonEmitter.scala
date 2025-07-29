@@ -7,6 +7,7 @@ import amf.core.client.scala.model.document.{BaseUnit, SourceMap}
 import amf.core.client.scala.model.domain.DataNodeOps.adoptTree
 import amf.core.client.scala.model.domain.extensions.DomainExtension
 import amf.core.client.scala.model.domain._
+import amf.core.client.scala.model.domain.context.{EntityModel, SelfContainedContext}
 import amf.core.client.scala.vocabulary.{Namespace, ValueType}
 import amf.core.internal.annotations._
 import amf.core.internal.metamodel.Type.{Any, Array, Bool, EncodedIri, Iri, LiteralUri, SortedArray, Str}
@@ -30,7 +31,7 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
 
   val allowList: List[String] = SourceMapsAllowList()
 
-  protected def extractDeclarationsAndReferencesToContext(
+  private def extractDeclarationsAndReferencesToContext(
       declaresEntry: Option[FieldEntry],
       referencesEntry: Option[FieldEntry],
       annotations: Annotations
@@ -577,7 +578,7 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
   }
 
   protected def extractDeclarationsAndReferences(unit: BaseUnit): (Option[FieldEntry], Option[FieldEntry]) = {
-    val declaresEntry: Option[FieldEntry] = unit.fields.entry(ModuleModel.Declares)
+    val declaresEntry: Option[FieldEntry]   = unit.fields.entry(ModuleModel.Declares)
     val referencesEntry: Option[FieldEntry] = unit.fields.entry(ModuleModel.References)
 
     extractDeclarationsAndReferencesToContext(declaresEntry, referencesEntry, unit.annotations)
@@ -590,5 +591,34 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
   protected def emitDeclarationsAndReferences(unit: BaseUnit, eb: Entry[T]): Unit = {
     emitReferences(eb, unit.id, SourceMap(unit.id, unit))
     emitDeclarations(eb, unit.id, SourceMap(unit.id, unit))
+  }
+
+  protected def emitEntities(unit: BaseUnit, b: Entry[T]): Unit = {
+    unit match {
+      case unitWithEntities: SelfContainedContext if unitWithEntities.entityContext.entities.nonEmpty =>
+        b.entry(
+          JsonLdKeywords.Entities,
+          _.list { b =>
+            unitWithEntities.entityContext.entities.foreach(emitEntity(_, b))
+          }
+        )
+      case _ => // The kind of BaseUnit does not contain embedded entities, so nothing to do
+    }
+  }
+
+  private def emitEntity(entity: EntityModel, part: Part[T]): Unit = {
+    part.obj { b =>
+      b.entry(entity.`type`.iri(), emitEntityProperties(_, entity.properties))
+    }
+  }
+
+  private def emitEntityProperties(part: Part[T], props: Map[ValueType, ValueType]): Unit = {
+    part.obj { b =>
+      props.foreach(p => emitEntityProperty(b, p._1, p._2))
+    }
+  }
+
+  private def emitEntityProperty(e: Entry[T], key: ValueType, value: ValueType): Unit = {
+    e.entry(key.iri(), emitScalar(_, value.iri()))
   }
 }

@@ -53,6 +53,7 @@ private[amf] class EmbeddedJsonLdEmitter[T] private (
         traverse(unit, eb)
         emitDeclarationsAndReferences(unit, eb)
         ctx.emitContext(eb)
+        emitEntities(unit, eb)
       }
     }
 
