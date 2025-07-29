@@ -23,7 +23,8 @@ case class RenderOptions(
     schema: JSONSchemaVersion = JSONSchemaVersions.Unspecified,
     rawFieldEmission: Boolean = false,
     governanceMode: Boolean = false,
-    implicitRamlTypes: Boolean = true
+    implicitRamlTypes: Boolean = true,
+    emitEntities: Boolean = false
 ) {
 
   /** Include PrettyPrint when rendering to graph. */
@@ -109,6 +110,12 @@ case class RenderOptions(
   /** Always render `type` facade on types even if the type is already clear by a unique facade. */
   def withoutImplicitRamlTypes: RenderOptions = copy(implicitRamlTypes = false)
 
+  /** Render entities in the JSON-LD if there is a self-contained context with entities. */
+  def withEntityEmission: RenderOptions = copy(emitEntities = true)
+
+  /** Not render entities in the JSON-LD, even if there is a self-contained context with entities. */
+  def withoutEntityEmission: RenderOptions = copy(emitEntities = false)
+
   def isWithDocumentation: Boolean                             = documentation
   def isWithCompactedEmission: Boolean                         = compactedEmission
   def shouldEmitWarningForUnsupportedValidationFacets: Boolean = emitWarningForUnsupportedValidationFacets
@@ -124,6 +131,7 @@ case class RenderOptions(
   def isEmitNodeIds: Boolean            = emitNodeIds
   def isRawFieldEmission: Boolean       = rawFieldEmission
   def isGovernanceMode: Boolean         = governanceMode
+  def shouldEmitEntities: Boolean       = emitEntities
 
   // TODO: remove when embeddedform is deleted
   private[amf] def toGraphSerialization: GraphSerialization = {

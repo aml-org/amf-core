@@ -595,7 +595,7 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
 
   protected def emitEntities(unit: BaseUnit, b: Entry[T]): Unit = {
     unit match {
-      case unitWithEntities: SelfContainedContext if unitWithEntities.entityContext.entities.nonEmpty =>
+      case unitWithEntities: SelfContainedContext if shouldEmitEntities(unitWithEntities) =>
         b.entry(
           JsonLdKeywords.Entities,
           _.list { b =>
@@ -604,6 +604,10 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
         )
       case _ => // The kind of BaseUnit does not contain embedded entities, so nothing to do
     }
+  }
+
+  private def shouldEmitEntities(unit: SelfContainedContext): Boolean = {
+    unit.entityContext.entities.nonEmpty && options.shouldEmitEntities
   }
 
   private def emitEntity(entity: EntityModel, part: Part[T]): Unit = {

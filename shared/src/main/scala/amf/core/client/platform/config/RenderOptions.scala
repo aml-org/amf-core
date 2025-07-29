@@ -73,6 +73,12 @@ case class RenderOptions(private[amf] val _internal: InternalRenderOptions) {
   /** Always render `type` facade on types even if the type is already clear by a unique facade. */
   def withoutImplicitRamlTypes(): RenderOptions = _internal.withoutImplicitRamlTypes
 
+  /** Render entities in the JSON-LD if there is a self-contained context with entities. */
+  def withEntityEmission: RenderOptions = _internal.withEntityEmission
+
+  /** Not render entities in the JSON-LD, even if there is a self-contained context with entities. */
+  def withoutEntityEmission: RenderOptions = _internal.withoutEntityEmission
+
   def isWithDocumentation: Boolean     = _internal.isWithDocumentation
   def isWithCompactedEmission: Boolean = _internal.isWithCompactedEmission
   def schemaVersion: JSONSchemaVersion = _internal.schemaVersion
@@ -85,4 +91,5 @@ case class RenderOptions(private[amf] val _internal: InternalRenderOptions) {
   def isEmitNodeIds: Boolean            = _internal.emitNodeIds
   def isRawFieldEmission: Boolean       = _internal.rawFieldEmission
   def isGovernanceMode: Boolean         = _internal.governanceMode
+  def shouldEmitEntities: Boolean       = _internal.emitEntities
 }
