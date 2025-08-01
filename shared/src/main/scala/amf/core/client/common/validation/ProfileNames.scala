@@ -22,6 +22,9 @@ object ProfileNames {
   val GRAPHQL_FEDERATION: ProfileName = GraphQLFederationProfile
   val JSONSCHEMA: ProfileName         = JsonSchemaProfile
   val AVROSCHEMA: ProfileName         = AvroSchemaProfile
+  val MCP: ProfileName                = MCPSchemaProfile
+  val AGENT_DOMAIN: ProfileName       = AgentDomainProfile
+  val AGENT_CARD: ProfileName         = AgentCardProfile
 
   lazy val specProfiles: Seq[ProfileName] =
     Seq(
@@ -36,7 +39,10 @@ object ProfileNames {
       GraphQLFederationProfile,
       GrpcProfile,
       JsonSchemaProfile,
-      AvroSchemaProfile
+      AvroSchemaProfile,
+      MCPSchemaProfile,
+      AgentDomainProfile,
+      AgentCardProfile
     )
 }
 
@@ -103,6 +109,21 @@ object AvroSchemaProfile extends ProfileName(AvroSchema.id, AMFStyle) {
   override def isRaml(): Boolean = false
 }
 
+object MCPSchemaProfile extends ProfileName(Mcp.id, AMFStyle) {
+  override def isOas(): Boolean  = false
+  override def isRaml(): Boolean = false
+}
+
+object AgentDomainProfile extends ProfileName(AgentDomain.id, AMFStyle) {
+  override def isOas(): Boolean  = false
+  override def isRaml(): Boolean = false
+}
+
+object AgentCardProfile extends ProfileName(AgentCard.id, AMFStyle) {
+  override def isOas(): Boolean  = false
+  override def isRaml(): Boolean = false
+}
+
 object ProfileName {
   def unapply(name: String): Option[ProfileName] =
     name match {
@@ -116,6 +137,9 @@ object ProfileName {
       case GraphQLFederationProfile.p => Some(GraphQLFederationProfile)
       case JsonSchemaProfile.p        => Some(JsonSchemaProfile)
       case AvroSchemaProfile.p        => Some(AvroSchemaProfile)
+      case MCPSchemaProfile.p         => Some(MCPSchemaProfile)
+      case AgentDomainProfile.p       => Some(AgentDomainProfile)
+      case AgentCardProfile.p         => Some(AgentCardProfile)
       case _                          => None
     }
 
@@ -139,6 +163,9 @@ object ProfileName {
     case GraphQLFederation.id => GraphQLFederationProfile
     case JsonSchema.id        => JsonSchemaProfile
     case AvroSchema.id        => AvroSchemaProfile
+    case Mcp.id               => MCPSchemaProfile
+    case AgentDomain.id       => AgentDomainProfile
+    case AgentCard.id         => AgentCardProfile
     case custom               => new ProfileName(custom)
   }
 }
