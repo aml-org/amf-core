@@ -280,7 +280,7 @@ private[amf] case object Mcp extends Spec {
 }
 
 private[amf] case object BrokerGroup extends Spec {
-  override val id: String        = "Agent Domain"
+  override val id: String        = "Broker Group"
   override val mediaType: String = `application/json`
 }
 
