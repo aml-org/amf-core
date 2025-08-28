@@ -9,7 +9,8 @@ case class ParsingOptions(
     maxJSONComplexity: Option[Int] = None,
     maxJsonYamlDepth: Option[Int] = None,
     tokens: Boolean = false,
-    sourceSchemaDef: Boolean = false
+    sourceSchemaDef: Boolean = false,
+    validationLexicalInformation: Boolean = false
 ) {
 
   /** Parse specific AMF JSON-LD serialization */
@@ -47,10 +48,17 @@ case class ParsingOptions(
   /** Discard Shape definition in parsed JsonLdInstances */
   def withoutSourceSchemaDef: ParsingOptions = copy(sourceSchemaDef = false)
 
-  def isAmfJsonLdSerialization: Boolean = amfJsonLdSerialization
-  def definedBaseUrl: Option[String]    = baseUnitUrl
-  def getMaxYamlReferences: Option[Int] = maxYamlReferences
-  def getMaxJsonYamlDepth: Option[Int]  = maxJsonYamlDepth
-  def isTokens: Boolean                 = tokens
-  def isSourceSchemaDef: Boolean        = sourceSchemaDef
+  /** Add Lexical Information in JSON Schema validation results (validation may take more time) */
+  def withValidationLexicalInformation: ParsingOptions = copy(validationLexicalInformation = true)
+
+  /** Do not add Lexical Information in JSON Schema validation results */
+  def withoutValidationLexicalInformation: ParsingOptions = copy(validationLexicalInformation = false)
+
+  def isAmfJsonLdSerialization: Boolean       = amfJsonLdSerialization
+  def definedBaseUrl: Option[String]          = baseUnitUrl
+  def getMaxYamlReferences: Option[Int]       = maxYamlReferences
+  def getMaxJsonYamlDepth: Option[Int]        = maxJsonYamlDepth
+  def isTokens: Boolean                       = tokens
+  def isSourceSchemaDef: Boolean              = sourceSchemaDef
+  def isValidationLexicalInformation: Boolean = validationLexicalInformation
 }
