@@ -438,6 +438,7 @@ object FlattenedUnitGraphParser extends GraphContextHelper with GraphParserHelpe
         case _: Error => None
       }
     }
+    processEntities(m, ctx)
     ctx.addTerms(aliases)
     m.key(JsonLdKeywords.Graph).flatMap { graphEntry =>
       val graphYSeq = graphEntry.value.as[YSequence]

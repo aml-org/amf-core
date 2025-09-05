@@ -33,6 +33,7 @@ class EmbeddedGraphParser(private val aliases: Map[String, String])(implicit val
         aliases.foreach { case (term, iri) =>
           ctx.graphContext.withTerm(term, iri)
         }
+        processEntities(head, ctx)
         parse(head)
       }
     } yield {
