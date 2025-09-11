@@ -25,6 +25,9 @@ object ProfileNames {
   val MCP: ProfileName                = MCPSchemaProfile
   val BROKER_GROUP: ProfileName       = BrokerGroupProfile
   val AGENT_CARD: ProfileName         = AgentCardProfile
+  val OTHER_CARD: ProfileName         = OtherCardProfile
+  val AGENT_METADATA: ProfileName     = AgentMetadataProfile
+  val LLM_METADATA: ProfileName       = LLMMetadataProfile
 
   lazy val specProfiles: Seq[ProfileName] =
     Seq(
@@ -42,7 +45,10 @@ object ProfileNames {
       AvroSchemaProfile,
       MCPSchemaProfile,
       BrokerGroupProfile,
-      AgentCardProfile
+      AgentCardProfile,
+      OtherCardProfile,
+      AgentMetadataProfile,
+      LLMMetadataProfile
     )
 }
 
@@ -124,6 +130,21 @@ object AgentCardProfile extends ProfileName(AgentCard.id, AMFStyle) {
   override def isRaml(): Boolean = false
 }
 
+object OtherCardProfile extends ProfileName(OtherCard.id, AMFStyle) {
+  override def isOas(): Boolean  = false
+  override def isRaml(): Boolean = false
+}
+
+object AgentMetadataProfile extends ProfileName(AgentMetadata.id, AMFStyle) {
+  override def isOas(): Boolean  = false
+  override def isRaml(): Boolean = false
+}
+
+object LLMMetadataProfile extends ProfileName(LLMMetadata.id, AMFStyle) {
+  override def isOas(): Boolean  = false
+  override def isRaml(): Boolean = false
+}
+
 object ProfileName {
   def unapply(name: String): Option[ProfileName] =
     name match {
@@ -140,6 +161,9 @@ object ProfileName {
       case MCPSchemaProfile.p         => Some(MCPSchemaProfile)
       case BrokerGroupProfile.p       => Some(BrokerGroupProfile)
       case AgentCardProfile.p         => Some(AgentCardProfile)
+      case OtherCardProfile.p         => Some(OtherCardProfile)
+      case AgentMetadataProfile.p     => Some(AgentMetadataProfile)
+      case LLMMetadataProfile.p       => Some(LLMMetadataProfile)
       case _                          => None
     }
 
@@ -166,6 +190,9 @@ object ProfileName {
     case Mcp.id               => MCPSchemaProfile
     case BrokerGroup.id       => BrokerGroupProfile
     case AgentCard.id         => AgentCardProfile
+    case OtherCard.id         => OtherCardProfile
+    case AgentMetadata.id     => AgentMetadataProfile
+    case LLMMetadata.id       => LLMMetadataProfile
     case custom               => new ProfileName(custom)
   }
 }
