@@ -2,11 +2,10 @@ package amf.core.internal.plugins.document.graph.emitter
 
 import amf.core.client.scala.config.RenderOptions
 import amf.core.client.scala.model.document.{BaseUnit, Fragment, Module}
-import amf.core.client.scala.model.domain.context.{EntityContext, EntityModel, SelfContainedContext}
 import amf.core.client.scala.model.domain.{AmfElement, DomainElement}
-import amf.core.internal.utils.IdCounter
-import amf.core.client.scala.vocabulary.{Namespace, NamespaceAliases, ValueType}
+import amf.core.client.scala.vocabulary.{Namespace, NamespaceAliases}
 import amf.core.internal.plugins.document.graph.JsonLdKeywords
+import amf.core.internal.utils.IdCounter
 import org.yaml.builder.DocBuilder.Entry
 
 import scala.collection.mutable
@@ -80,20 +79,20 @@ class GraphEmitterContext(
   def canGenerateLink(e: AmfElement): Boolean =
     emittingEncodes && (isDeclared(e) || isInReferencedShapes(e) || canBeExtractedToDeclares(e))
 
-  def canBeExtractedToDeclares(e: AmfElement): Boolean = e match {
+  private def canBeExtractedToDeclares(e: AmfElement): Boolean = e match {
     case e: DomainElement => validToExtract.contains(e.id)
     case _                => false
   }
 
-  def emittingEncodes: Boolean = !emittingDeclarations && !emittingReferences
+  private def emittingEncodes: Boolean = !emittingDeclarations && !emittingReferences
 
   def declared: Seq[AmfElement] = declarations.toSeq
 
   def referenced: Seq[AmfElement] = references.toSeq
 
-  def shouldCompact: Boolean = options.isCompactUris
+  private def shouldCompact: Boolean = options.isCompactUris
 
-  protected def compactAndCollect(uri: String): String = namespaceAliases.compactAndCollect(uri, prefixes)
+  private def compactAndCollect(uri: String): String = namespaceAliases.compactAndCollect(uri, prefixes)
 
   def emitIri(uri: String): String = if (shouldCompact) compactAndCollect(uri) else uri
 

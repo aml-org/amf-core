@@ -1,5 +1,7 @@
 package amf.core.internal.plugins.document.graph.context
 
+import amf.core.client.scala.model.domain.context.EntityModel
+
 import scala.collection.mutable
 
 // This class represents a simplified version of an rdf graph context such as JSON-LD's @context
@@ -9,6 +11,8 @@ case class GraphContext() {
 
   // Term -> Definition
   private val termDefinitions: mutable.Map[String, TermDefinition] = mutable.Map.empty
+
+  private var contextEntities: Map[String, EntityModel] = Map.empty
 
   def withTerm(term: String, iri: String): this.type = {
     termDefinitions.put(term, SimpleTermDefinition(iri))
@@ -28,6 +32,15 @@ case class GraphContext() {
   }
 
   def definitions(): Map[String, TermDefinition] = termDefinitions.toMap
+
+  def withContextEntities(entities: Map[String, EntityModel]): this.type = {
+    this.contextEntities = entities
+    this
+  }
+
+  def findContextEntity(typeString: String): Option[EntityModel] = {
+    contextEntities.get(typeString)
+  }
 
 }
 

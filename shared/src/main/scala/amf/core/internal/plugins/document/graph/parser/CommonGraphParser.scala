@@ -25,6 +25,8 @@ abstract class CommonGraphParser(implicit ctx: GraphParserContext) extends Graph
     mutable.Map[String, ExternalSourceElement]()
   protected val referencesMap: mutable.Map[String, DomainElement] = mutable.Map[String, DomainElement]()
 
+  protected val shouldRegisterMissingTypes: Boolean = true
+
   protected def parse(map: YMap): Option[AmfObject]
   protected def parseAtTraversion(node: YNode, `type`: Type): Option[AmfElement]
   protected def parseLinkableProperties(map: YMap, instance: DomainElement with Linkable): Unit
@@ -158,8 +160,8 @@ abstract class CommonGraphParser(implicit ctx: GraphParserContext) extends Graph
     typeIris.find(findType(_).isDefined) match {
       case Some(t) => findType(t)
       case None =>
-        ctx.eh
-          .violation(UnableToParseNode, id, s"Error parsing JSON-LD node, unknown @types $typeIris", map.location)
+        if (shouldRegisterMissingTypes)
+          ctx.eh.violation(UnableToParseNode, id, s"Error parsing JSON-LD node, unknown @types $typeIris", map.location)
         None
     }
   }

@@ -366,4 +366,14 @@ abstract class GraphContextHelper extends GraphContextOperations {
     case Some(v) => Seq(v)
     case None    => Nil
   }
+
+  protected def processEntities(m: YMap, ctx: GraphParserContext): Unit = {
+    m.key(JsonLdKeywords.Entities).foreach { entry =>
+      try {
+        JsonLdEntitiesParser(entry.value, ctx).parse()
+      } catch {
+        case _: Error => None
+      }
+    }
+  }
 }
