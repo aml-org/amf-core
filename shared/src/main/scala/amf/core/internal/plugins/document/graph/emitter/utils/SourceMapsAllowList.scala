@@ -1,7 +1,14 @@
 package amf.core.internal.plugins.document.graph.emitter.utils
 
-import amf.core.internal.annotations.{DeclaredElement, DefaultNode, TrackedElement, VirtualElement}
+import amf.core.internal.annotations.{
+  DeclaredElement,
+  DefaultNode,
+  ResolvedReferenceLike,
+  TrackedElement,
+  VirtualElement
+}
 
 object SourceMapsAllowList {
-  def apply(): List[String] = List(TrackedElement.name, DeclaredElement.name, VirtualElement.name, DefaultNode.name)
+  def apply(): List[String] =
+    List(TrackedElement.name, DeclaredElement.name, VirtualElement.name, DefaultNode.name, ResolvedReferenceLike.name)
 }
