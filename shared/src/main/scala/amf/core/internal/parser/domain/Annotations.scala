@@ -14,6 +14,7 @@ import amf.core.internal.annotations.{
   LexicalInformation,
   ResolvedLinkAnnotation,
   ResolvedLinkTargetAnnotation,
+  ResolvedReferenceLike,
   SourceNode,
   SourceYPart,
   SynthesizedField,
@@ -126,6 +127,8 @@ class Annotations(private var annotations: List[Annotation] = List()) {
   def isInferred: Boolean = find(classOf[Inferred]).isDefined
 
   def isDefault: Boolean = find(classOf[DefaultNode]).isDefined
+
+  def resolvedReferenceLike: Option[String] = find(classOf[ResolvedReferenceLike]).map(_.value)
 
   def clear(): Unit = annotations = List()
 
