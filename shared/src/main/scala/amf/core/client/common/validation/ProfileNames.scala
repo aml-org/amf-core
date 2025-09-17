@@ -23,7 +23,7 @@ object ProfileNames {
   val JSONSCHEMA: ProfileName         = JsonSchemaProfile
   val AVROSCHEMA: ProfileName         = AvroSchemaProfile
   val MCP: ProfileName                = MCPSchemaProfile
-  val BROKER_GROUP: ProfileName       = BrokerGroupProfile
+  val AGENT_NETWORK: ProfileName      = AgentNetworkProfile
   val AGENT_CARD: ProfileName         = AgentCardProfile
   val OTHER_CARD: ProfileName         = OtherCardProfile
   val AGENT_METADATA: ProfileName     = AgentMetadataProfile
@@ -44,7 +44,7 @@ object ProfileNames {
       JsonSchemaProfile,
       AvroSchemaProfile,
       MCPSchemaProfile,
-      BrokerGroupProfile,
+      AgentNetworkProfile,
       AgentCardProfile,
       OtherCardProfile,
       AgentMetadataProfile,
@@ -120,7 +120,7 @@ object MCPSchemaProfile extends ProfileName(Mcp.id, AMFStyle) {
   override def isRaml(): Boolean = false
 }
 
-object BrokerGroupProfile extends ProfileName(BrokerGroup.id, AMFStyle) {
+object AgentNetworkProfile extends ProfileName(AgentNetwork.id, AMFStyle) {
   override def isOas(): Boolean  = false
   override def isRaml(): Boolean = false
 }
@@ -159,7 +159,7 @@ object ProfileName {
       case JsonSchemaProfile.p        => Some(JsonSchemaProfile)
       case AvroSchemaProfile.p        => Some(AvroSchemaProfile)
       case MCPSchemaProfile.p         => Some(MCPSchemaProfile)
-      case BrokerGroupProfile.p       => Some(BrokerGroupProfile)
+      case AgentNetworkProfile.p      => Some(AgentNetworkProfile)
       case AgentCardProfile.p         => Some(AgentCardProfile)
       case OtherCardProfile.p         => Some(OtherCardProfile)
       case AgentMetadataProfile.p     => Some(AgentMetadataProfile)
@@ -188,7 +188,7 @@ object ProfileName {
     case JsonSchema.id        => JsonSchemaProfile
     case AvroSchema.id        => AvroSchemaProfile
     case Mcp.id               => MCPSchemaProfile
-    case BrokerGroup.id       => BrokerGroupProfile
+    case AgentNetwork.id      => AgentNetworkProfile
     case AgentCard.id         => AgentCardProfile
     case OtherCard.id         => OtherCardProfile
     case AgentMetadata.id     => AgentMetadataProfile
