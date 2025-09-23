@@ -3,9 +3,10 @@ package amf.core.client.scala.render
 import amf.core.client.scala.AMFGraphConfiguration
 import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.parse.document.ParsedDocument
-import amf.core.internal.plugins.render.AMFGraphRenderPlugin
+import amf.core.internal.remote.Mimes._
 import amf.core.internal.render.AMFSerializer
 import org.yaml.builder.DocBuilder
+
 object AMFRenderer {
 
   def render(baseUnit: BaseUnit, configuration: AMFGraphConfiguration): String =
@@ -22,7 +23,8 @@ object AMFRenderer {
 
   def renderGraphToBuilder[T](baseUnit: BaseUnit, builder: DocBuilder[T], configuration: AMFGraphConfiguration): T = {
     // only plugin that currently supports rendering to builder interface
-    AMFGraphRenderPlugin.emitToYDocBuilder(baseUnit, builder, configuration.renderConfiguration)
+    new AMFSerializer(baseUnit, configuration.renderConfiguration, Some(`application/ld+json`))
+      .emitToBuilder(builder)
     builder.result
   }
 
