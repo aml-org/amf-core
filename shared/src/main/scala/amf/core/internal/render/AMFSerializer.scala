@@ -2,15 +2,15 @@ package amf.core.internal.render
 
 import amf.core.client.scala.config._
 import amf.core.client.scala.model.document.{BaseUnit, ExternalFragment}
-import amf.core.client.scala.parse.document.{ParsedDocument, SyamlParsedDocument}
+import amf.core.client.scala.parse.document.ParsedDocument
+import amf.core.client.scala.render.AMFSyntaxRenderPlugin
 import amf.core.internal.plugins.render.{AMFGraphRenderPlugin, AMFRenderPlugin, RenderConfiguration, RenderInfo}
 import amf.core.internal.remote.Mimes.`application/ld+json`
-import amf.core.internal.remote.Platform
+import amf.core.internal.remote.{Mimes, Platform}
 import amf.core.internal.unsafe.PlatformSecrets
 import org.mulesoft.common.io.Output
 import org.mulesoft.common.io.Output._
-import org.yaml.builder.{JsonOutputBuilder, YDocumentBuilder}
-import org.yaml.model.YDocument
+import org.yaml.builder.{DocBuilder, JsonOutputBuilder}
 
 import java.io.StringWriter
 import scala.concurrent.{ExecutionContext, Future}
@@ -66,14 +66,19 @@ class AMFSerializer(unit: BaseUnit, config: RenderConfiguration, mediaType: Opti
     renderAsYDocument(renderPlugin)
   }
 
-  private def getSyntaxPlugin(renderResult: RenderResult) = {
+  private def getSyntaxPlugin(renderResult: RenderResult): Option[AMFSyntaxRenderPlugin] = {
     val candidates = config.syntaxPlugin.filter(_.mediaTypes.contains(renderResult.syntax))
     candidates.find(_.applies(renderResult.document))
   }
 
   private def emitJsonldToWriter[W: Output](writer: W): Unit = {
     val b = JsonOutputBuilder[W](writer, options.isPrettyPrint)
-    AMFGraphRenderPlugin.emitToYDocBuilder(unit, b, config)
+    emitToBuilder[W](b)
+  }
+
+  def emitToBuilder[T](builder: DocBuilder[T]): Unit = {
+    val graphConfig: AMFGraphRenderPlugin = getGraphRenderPlugin.getOrElse(AMFGraphRenderPlugin)
+    graphConfig.emitToYDocBuilder(unit, builder, config)
   }
 
   private[amf] def render(): String = {
@@ -92,4 +97,12 @@ class AMFSerializer(unit: BaseUnit, config: RenderConfiguration, mediaType: Opti
       throw new Exception(s"Cannot serialize domain model '${unit.location()}' for media type $mediaType")
     }
   }
+
+  private[amf] def getGraphRenderPlugin: Option[AMFGraphRenderPlugin] =
+    config.renderPlugins
+      .filter(p => p.mediaTypes.contains(`application/ld+json`))
+      .sorted
+      .find(p => p.applies(RenderInfo(unit, `application/ld+json`)))
+      .collect { case p: AMFGraphRenderPlugin => p }
+
 }
