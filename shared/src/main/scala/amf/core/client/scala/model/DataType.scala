@@ -28,6 +28,9 @@ object DataType {
   val Link: String         = Shapes.base + "link"
   val Nil: String          = Xsd.base + "nil"
 
+  // This is to fix the difference between Type and Datatype
+  val Int: String = Xsd.base + "int"
+
   /** Return dataType qualified with Xsd namespace. */
   def apply(dataType: String, fromAvro: Boolean = false): String =
     if (fromAvro) {
@@ -41,7 +44,8 @@ object DataType {
         case "string"  => String
         case _         => Xsd.base + dataType
       }
-    } else {
+    }
+    else {
       dataType match {
         case "string"                         => String
         case "integer"                        => Integer
@@ -65,4 +69,36 @@ object DataType {
         case _                                => Xsd.base + dataType
       }
     }
+
+  val scalarValues: Seq[String] = Seq(
+      String,
+      Integer,
+      Number,
+      Long,
+      Double,
+      Float,
+      Decimal,
+      Boolean,
+      Date,
+      Time,
+      DateTime,
+      DateTimeOnly,
+      Byte,
+      Bytes,
+      Binary,
+      Password,
+      Int
+  )
+
+  val values: Seq[String] = scalarValues ++ Seq(
+      Duration,
+      File,
+      Any,
+      AnyUri,
+      Link,
+      Nil
+  )
+
+  def isKnownScalarDataType(iri: String): Boolean = scalarValues.contains(iri)
+  def isKnownDataType(iri: String): Boolean       = values.contains(iri)
 }

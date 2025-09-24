@@ -1,18 +1,16 @@
 package amf.core.client.scala.model.domain.context
 
-import amf.core.client.scala.model.document.BaseUnit
 import amf.core.client.scala.vocabulary.ValueType
 import amf.core.internal.metamodel.Field
 import amf.core.internal.metamodel.domain.DomainElementModel
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 class EntityContext(val entities: List[EntityModel]) {}
 
 case class EntityModel(`type`: ValueType, properties: Map[ValueType, ValueType])
 
-class EntityContextBuilder() {
+class EntityContextBuilder {
   def build(): EntityContext = new EntityContext(
     entities
       .map({ case (uri, list) => EntityModel(uri, list.map(f => f.value -> f.`type`.`type`.head).toMap) })

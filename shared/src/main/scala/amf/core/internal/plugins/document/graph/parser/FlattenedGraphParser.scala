@@ -76,6 +76,7 @@ class FlattenedGraphParser(startingPoint: String, overrideAliases: Map[String, S
           .key(JsonLdKeywords.Context)
           .foreach(e => JsonLdGraphContextParser(e.value, ctx).parse())
         stepOrAddAliasesFromOptions()
+        processEntities(documentMap, ctx)
         documentMap.key(JsonLdKeywords.Graph).flatMap { e =>
           parseGraph(e.value)
         }
@@ -172,7 +173,7 @@ class FlattenedGraphParser(startingPoint: String, overrideAliases: Map[String, S
     }
   }
 
-  private def retrieveType(id: String, map: YMap): Option[ModelDefaultBuilder] = retrieveTypeIgnoring(id, map, Nil)
+  protected def retrieveType(id: String, map: YMap): Option[ModelDefaultBuilder] = retrieveTypeIgnoring(id, map, Nil)
 
   private def retrieveTypeFrom(id: String, map: YMap, from: Seq[ValueType]): Option[ModelDefaultBuilder] = {
     val expectedIris = from.map(_.iri())
@@ -232,7 +233,7 @@ class FlattenedGraphParser(startingPoint: String, overrideAliases: Map[String, S
     }
   }
 
-  private def parseNode(map: YMap, id: String, model: ModelDefaultBuilder): Option[AmfObject] = {
+  protected def parseNode(map: YMap, id: String, model: ModelDefaultBuilder): Option[AmfObject] = {
     val sources               = retrieveSources(map)
     val transformedId: String = transformIdFromContext(id)
 
@@ -267,7 +268,7 @@ class FlattenedGraphParser(startingPoint: String, overrideAliases: Map[String, S
     id.flatMap(nodeFromId)
   }
 
-  private def nodeFromId(id: String): Option[YMap] = {
+  protected def nodeFromId(id: String): Option[YMap] = {
     graphMap.get(id) match {
       case Some(raw) => Some(raw)
       case None =>
@@ -327,7 +328,7 @@ class FlattenedGraphParser(startingPoint: String, overrideAliases: Map[String, S
     }
   }
 
-  private def isReferenceNode(m: YMap): Boolean = m.entries.size == 1 && m.key(JsonLdKeywords.Id).isDefined
+  protected def isReferenceNode(m: YMap): Boolean = m.entries.size == 1 && m.key(JsonLdKeywords.Id).isDefined
 
   override protected def parseAtTraversion(node: YNode, `type`: Type): Option[AmfElement] = {
     `type` match {

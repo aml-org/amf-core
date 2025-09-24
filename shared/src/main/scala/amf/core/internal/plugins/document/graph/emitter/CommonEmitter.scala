@@ -3,14 +3,15 @@ package amf.core.internal.plugins.document.graph.emitter
 import amf.core.client.scala.config
 import amf.core.client.scala.config.RenderOptions
 import amf.core.client.scala.model.DataType
-import amf.core.client.scala.model.document.SourceMap
+import amf.core.client.scala.model.document.{BaseUnit, SourceMap}
 import amf.core.client.scala.model.domain.DataNodeOps.adoptTree
 import amf.core.client.scala.model.domain.extensions.DomainExtension
 import amf.core.client.scala.model.domain._
+import amf.core.client.scala.model.domain.context.{EntityModel, SelfContainedContext}
 import amf.core.client.scala.vocabulary.{Namespace, ValueType}
 import amf.core.internal.annotations._
 import amf.core.internal.metamodel.Type.{Any, Array, Bool, EncodedIri, Iri, LiteralUri, SortedArray, Str}
-import amf.core.internal.metamodel.document.ModuleModel
+import amf.core.internal.metamodel.document.{ModuleModel, SourceMapModel}
 import amf.core.internal.metamodel.domain.{DomainElementModel, LinkableElementModel, ShapeModel}
 import amf.core.internal.metamodel.{Field, Obj, Type}
 import amf.core.internal.parser.domain.{Annotations, FieldEntry, Value}
@@ -30,7 +31,7 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
 
   val allowList: List[String] = SourceMapsAllowList()
 
-  protected def extractDeclarationsAndReferencesToContext(
+  private def extractDeclarationsAndReferencesToContext(
       declaresEntry: Option[FieldEntry],
       referencesEntry: Option[FieldEntry],
       annotations: Annotations
@@ -112,7 +113,7 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
     })
   }
 
-  protected def filterSourceMaps(sources: SourceMap): SourceMap = {
+  private def filterSourceMaps(sources: SourceMap): SourceMap = {
     val filteredAnnotations = sources.annotations.filter(a => allowList.contains(a._1))
     val filteredEternals    = sources.eternals.filter(a => allowList.contains(a._1))
     new SourceMap(filteredAnnotations, filteredEternals)
@@ -166,7 +167,7 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
     }
   }
 
-  protected def extractToLink(shape: Shape, b: Part[T], inArray: Boolean = false): Unit = {
+  private def extractToLink(shape: Shape, b: Part[T], inArray: Boolean = false): Unit = {
     if (!ctx.isDeclared(shape) && !ctx.isInReferencedShapes(shape)) {
       ctx + shape
       shape.name.option() match {
@@ -274,7 +275,7 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
       )
   }
 
-  protected def emitGroupedDomainExtensions(
+  private def emitGroupedDomainExtensions(
       b: Entry[T],
       uri: String,
       extensions: Seq[DomainExtension],
@@ -308,7 +309,7 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
       field: Option[Field] = None
   ): Unit
 
-  protected def emitDate(v: Value, b: Part[T]): Unit = {
+  private def emitDate(v: Value, b: Part[T]): Unit = {
     val maybeDateTime = v.value.asInstanceOf[AmfScalar].value match {
       case dt: SimpleDateTime => Some(dt)
       case other              => SimpleDateTime.parse(other.toString).toOption
@@ -325,7 +326,7 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
     }
   }
 
-  protected def emitSimpleDateTime(b: Part[T], dateTime: SimpleDateTime, inArray: Boolean = true): Unit = {
+  private def emitSimpleDateTime(b: Part[T], dateTime: SimpleDateTime, inArray: Boolean = true): Unit = {
     if (dateTime.timeOfDay.isDefined || dateTime.zoneOffset.isDefined) {
       typedScalar(b, dateTime.toString, DataType.DateTime, inArray)
     } else {
@@ -394,10 +395,10 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
     }
   }
 
-  protected def emitNull(b: Part[T]) = {
+  private def emitNull(b: Part[T]): Unit = {
     b += Scalar(SType.Null, null)
   }
-  protected def emitArray(a: Array, v: Value, b: Part[T], sources: Value => Unit) = {
+  protected def emitArray(a: Array, v: Value, b: Part[T], sources: Value => Unit): Option[T] = {
     b.list { b =>
       val seq = v.value.asInstanceOf[AmfArray]
       sources(v)
@@ -405,7 +406,7 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
     }
   }
 
-  protected def emitObjMember(amfObject: AmfObject, b: Part[T], inArray: Boolean) = amfObject match {
+  protected def emitObjMember(amfObject: AmfObject, b: Part[T], inArray: Boolean): Unit = amfObject match {
     case v @ (_: Shape) if ctx.canGenerateLink(v) =>
       extractToLink(v, b, inArray = true)
     case elementInArray: DomainElement with Linkable if elementInArray.isLink =>
@@ -534,13 +535,13 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
         )
       }
     } else {
-      createEternalsAnnotationsNodes(id, options, b, filteredSources)
+      createEternalAnnotationsNodes(id, options, b, filteredSources)
     }
   }
 
   protected def emitAnnotations(id: String, filteredSources: SourceMap, b: Entry[T]): Unit
 
-  protected def createEternalsAnnotationsNodes(
+  private def createEternalAnnotationsNodes(
       id: String,
       options: RenderOptions,
       b: Entry[T],
@@ -559,13 +560,69 @@ abstract class CommonEmitter[T, C <: GraphEmitterContext](options: RenderOptions
           ctx.emitIri(DomainElementModel.Sources.value.iri()),
           _.list {
             _.obj { b =>
-              emitEternalsNode(id, sources, b)
+              emitEternalNode(id, sources, b)
             }
           }
         )
       }
   }
 
-  protected def emitEternalsNode(id: String, sources: SourceMap, b: Entry[T]): Unit
+  protected def emitEternalNode(id: String, sources: SourceMap, b: Entry[T]): Unit
 
+  protected def withAnnotationEntry(id: String, part: Part[T], iri: String, v: String): Unit = {
+    part.obj { b =>
+      createIdNode(b, id)
+      b.entry(ctx.emitIri(SourceMapModel.Element.value.iri()), emitScalar(_, iri))
+      b.entry(ctx.emitIri(SourceMapModel.Value.value.iri()), emitScalar(_, v))
+    }
+  }
+
+  protected def extractDeclarationsAndReferences(unit: BaseUnit): (Option[FieldEntry], Option[FieldEntry]) = {
+    val declaresEntry: Option[FieldEntry]   = unit.fields.entry(ModuleModel.Declares)
+    val referencesEntry: Option[FieldEntry] = unit.fields.entry(ModuleModel.References)
+
+    extractDeclarationsAndReferencesToContext(declaresEntry, referencesEntry, unit.annotations)
+
+    unit.fields.removeField(ModuleModel.Declares)
+    unit.fields.removeField(ModuleModel.References)
+    (declaresEntry, referencesEntry)
+  }
+
+  protected def emitDeclarationsAndReferences(unit: BaseUnit, eb: Entry[T]): Unit = {
+    emitReferences(eb, unit.id, SourceMap(unit.id, unit))
+    emitDeclarations(eb, unit.id, SourceMap(unit.id, unit))
+  }
+
+  protected def emitEntities(unit: BaseUnit, b: Entry[T]): Unit = {
+    unit match {
+      case unitWithEntities: SelfContainedContext if shouldEmitEntities(unitWithEntities) =>
+        b.entry(
+          JsonLdKeywords.Entities,
+          _.list { b =>
+            unitWithEntities.entityContext.entities.foreach(emitEntity(_, b))
+          }
+        )
+      case _ => // The kind of BaseUnit does not contain embedded entities, so nothing to do
+    }
+  }
+
+  private def shouldEmitEntities(unit: SelfContainedContext): Boolean = {
+    unit.entityContext.entities.nonEmpty && options.shouldEmitEntities
+  }
+
+  private def emitEntity(entity: EntityModel, part: Part[T]): Unit = {
+    part.obj { b =>
+      b.entry(entity.`type`.iri(), emitEntityProperties(_, entity.properties))
+    }
+  }
+
+  private def emitEntityProperties(part: Part[T], props: Map[ValueType, ValueType]): Unit = {
+    part.obj { b =>
+      props.foreach(p => emitEntityProperty(b, p._1, p._2))
+    }
+  }
+
+  private def emitEntityProperty(e: Entry[T], key: ValueType, value: ValueType): Unit = {
+    e.entry(key.iri(), emitScalar(_, value.iri()))
+  }
 }

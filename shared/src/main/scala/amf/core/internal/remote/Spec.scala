@@ -32,8 +32,11 @@ object Spec {
       case JsonLDSchema.id      => Some(JsonLDSchema)
       case AvroSchema.id        => Some(AvroSchema)
       case MCP.id               => Some(Mcp)
-      case BrokerGroup.id       => Some(BrokerGroup)
+      case AgentNetwork.id      => Some(AgentNetwork)
       case AgentCard.id         => Some(AgentCard)
+      case OtherCard.id         => Some(OtherCard)
+      case AgentMetadata.id     => Some(AgentMetadata)
+      case LLMMetadata.id       => Some(LLMMetadata)
       case _                    => None
     }
   }
@@ -68,8 +71,11 @@ object Spec {
   @JSExport val JSONSCHEMADIALECT: Spec  = JsonSchemaDialect
   @JSExport val JSONDLSCHEMA: Spec       = JsonLDSchema
   @JSExport val MCP: Spec                = Mcp
-  @JSExport val BROKER_GROUP: Spec       = BrokerGroup
+  @JSExport val AGENT_NETWORK: Spec      = AgentNetwork
   @JSExport val AGENT_CARD: Spec         = AgentCard
+  @JSExport val OTHER_CARD: Spec         = OtherCard
+  @JSExport val AGENT_METADATA: Spec     = AgentMetadata
+  @JSExport val LLM_METADATA: Spec       = LLMMetadata
 }
 
 @JSExportAll
@@ -279,12 +285,27 @@ private[amf] case object Mcp extends Spec {
   override val mediaType: String = `application/json`
 }
 
-private[amf] case object BrokerGroup extends Spec {
-  override val id: String        = "Broker Group"
+private[amf] case object AgentNetwork extends Spec {
+  override val id: String        = "Agent Network"
   override val mediaType: String = `application/json`
 }
 
 private[amf] case object AgentCard extends Spec {
   override val id: String        = "Agent Card"
+  override val mediaType: String = `application/json`
+}
+
+private[amf] case object OtherCard extends Spec {
+  override val id: String        = "Other Card"
+  override val mediaType: String = `application/json`
+}
+
+private[amf] case object AgentMetadata extends Spec {
+  override val id: String        = "Agent Metadata"
+  override val mediaType: String = `application/json`
+}
+
+private[amf] case object LLMMetadata extends Spec {
+  override val id: String        = "LLM Metadata"
   override val mediaType: String = `application/json`
 }

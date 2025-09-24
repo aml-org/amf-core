@@ -44,20 +44,16 @@ private[amf] class EmbeddedJsonLdEmitter[T] private (
   val cache: mutable.Map[String, T] = mutable.Map[String, T]()
 
   def root(unit: BaseUnit): Unit = {
-    val declaresEntry: Option[FieldEntry]   = unit.fields.entry(ModuleModel.Declares)
-    val referencesEntry: Option[FieldEntry] = unit.fields.entry(ModuleModel.References)
-
-    extractDeclarationsAndReferencesToContext(declaresEntry, referencesEntry, unit.annotations)
-
-    unit.fields.removeField(ModuleModel.Declares)
-    unit.fields.removeField(ModuleModel.References)
+    val (declaresEntry: Option[FieldEntry], referencesEntry: Option[FieldEntry]) = extractDeclarationsAndReferences(
+      unit
+    )
 
     builder.list {
       _.obj { eb =>
         traverse(unit, eb)
-        emitReferences(eb, unit.id, SourceMap(unit.id, unit))
-        emitDeclarations(eb, unit.id, SourceMap(unit.id, unit))
+        emitDeclarationsAndReferences(unit, eb)
         ctx.emitContext(eb)
+        emitEntities(unit, eb)
       }
     }
 
@@ -166,7 +162,7 @@ private[amf] class EmbeddedJsonLdEmitter[T] private (
     createAnnotationNodes(id, b, filteredSources.eternals)
   }
 
-  override protected def emitEternalsNode(id: String, sources: SourceMap, b: Entry[T]): Unit = {
+  override protected def emitEternalNode(id: String, sources: SourceMap, b: Entry[T]): Unit = {
     createIdNode(b, id)
     createTypeNode(b, SourceMapModel)
     createAnnotationNodes(id, b, sources.eternals)
@@ -174,12 +170,7 @@ private[amf] class EmbeddedJsonLdEmitter[T] private (
 
   override protected def createAnnotationValueNode(id: String, b: Part[T], annotationEntry: (String, String)): Unit =
     annotationEntry match {
-      case (iri, v) =>
-        b.obj { b =>
-          createIdNode(b, id)
-          b.entry(ctx.emitIri(SourceMapModel.Element.value.iri()), emitScalar(_, iri))
-          b.entry(ctx.emitIri(SourceMapModel.Value.value.iri()), emitScalar(_, v))
-        }
+      case (iri, v) => withAnnotationEntry(id, b, iri, v)
     }
 
   override protected def scalar(b: Part[T], content: String, t: SType): Unit =
