@@ -20,13 +20,13 @@ class ScalarNode(override val fields: Fields, val annotations: Annotations)
   def withValue(v: String): this.type = withValue(v, Annotations())
 
   def withValue(v: String, ann: Annotations): this.type =
-    set(Value, AmfScalar(v, ann))
+    set(Value, AmfScalar(v, ann), ann)
 
   def withDataType(dataType: String): this.type =
     set(ScalarNodeModel.DataType, forDataType(dataType))
 
   def withDataType(dataType: String, ann: Annotations): this.type =
-    set(ScalarNodeModel.DataType, AmfScalar(dataType, ann))
+    set(ScalarNodeModel.DataType, AmfScalar(dataType, ann), ann)
 
   def value: StrField = fields.field(Value)
 
