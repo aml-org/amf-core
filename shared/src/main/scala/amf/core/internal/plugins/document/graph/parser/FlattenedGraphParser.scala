@@ -6,6 +6,7 @@ import amf.core.client.scala.model.domain._
 import amf.core.client.scala.parse.document.SyamlParsedDocument
 import amf.core.client.scala.vocabulary.Namespace.XsdTypes.xsdBoolean
 import amf.core.client.scala.vocabulary.{Namespace, ValueType}
+import amf.core.internal.annotations.TrackedElement
 import amf.core.internal.metamodel.Type.{Array, Bool, Iri, LiteralUri, RegExp, SortedArray, Str}
 import amf.core.internal.metamodel.document.BaseUnitModel
 import amf.core.internal.metamodel.domain.{DomainElementModel, LinkableElementModel}
@@ -236,12 +237,31 @@ class FlattenedGraphParser(startingPoint: String, overrideAliases: Map[String, S
   protected def parseNode(map: YMap, id: String, model: ModelDefaultBuilder): Option[AmfObject] = {
     val sources               = retrieveSources(map)
     val transformedId: String = transformIdFromContext(id)
-
-    val builder = buildType(model, annotations(nodes, sources, transformedId))
+    val ann: Annotations      = annotations(nodes, sources, transformedId)
+    fixTrackedElementAnnotations(ann)
+    val builder = buildType(model, ann)
     cache(id) = builder
     val fields = getMetaModelFields(model)
 
     parseNodeFields(map, fields, sources, transformedId, builder)
+  }
+
+  /** Fixes TrackedElement annotations by replacing the String ID with it's cached instance (W-20125020) */
+  private def fixTrackedElementAnnotations(ann: Annotations): Unit = {
+    ann.collect { case t: TrackedElement => t } foreach { trackedElement =>
+      val targetID = trackedElement.value
+      // IDs may contain a base IRI if compactUris was used
+      val elementId = ctx.graphContext.base.map(_.iri) match {
+        case Some(base) if targetID.startsWith(base) => targetID.substring(base.length)
+        case None                                    => targetID
+      }
+      // if the element is in the cache, replace the TrackedElement string value with the cached element value
+      // this way the tracked-element keeps pointing to the right value even if the element is re-adopted
+      cache.get(elementId).map { element =>
+        ann.reject(_.equals(trackedElement))
+        ann += TrackedElement.fromInstance(element)
+      }
+    }
   }
 
   private def getMetaModelFields(model: ModelDefaultBuilder): Seq[Field] = {
@@ -252,14 +272,12 @@ class FlattenedGraphParser(startingPoint: String, overrideAliases: Map[String, S
     model.`type`.flatMap(valueType => extensionFields.get(valueType.iri())).flatten
   }
 
-  private def parseReferenceNode(node: YMap): Option[AmfObject] = {
-    retrieveId(node, ctx).flatMap { id =>
-      cache.get(id) match {
-        case Some(parsed) => Some(parsed)
-        case None         =>
-          // Cache miss
-          nodeFromId(id).flatMap(parse)
-      }
+  private def parseReferenceNode(node: YMap): Option[AmfObject] = retrieveId(node, ctx).flatMap(getFromCache)
+
+  private def getFromCache(id: String): Option[AmfObject] = {
+    cache.get(id) match {
+      case Some(parsed) => Some(parsed)
+      case None         => nodeFromId(id).flatMap(parse) // cache miss
     }
   }
 
