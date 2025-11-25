@@ -275,8 +275,6 @@ trait GraphParserHelpers extends GraphContextHelper {
   }
 
   protected def retrieveId(map: YMap, ctx: ParserContext): Option[String] = {
-    implicit val errorHandler: AMFErrorHandler = ctx.eh
-
     map.key(JsonLdKeywords.Id) match {
       case Some(entry) => Some(entry.value.as[YScalar].text)
       case _ =>
