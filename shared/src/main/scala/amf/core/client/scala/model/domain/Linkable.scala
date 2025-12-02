@@ -55,7 +55,7 @@ trait Linkable extends AmfObject with AdoptionDependantCalls { this: DomainEleme
     set(LinkableElementModel.RefDescription, AmfScalar(refDescription, annotations), Annotations.inferred())
 
   def link[T](label: String, annotations: Annotations = Annotations()): T = {
-    link(AmfScalar(label), annotations, Annotations())
+    link(AmfScalar(label, annotations), annotations, Annotations.inferred())
   }
 
   private[amf] def link[T](label: ScalarNodeObj, annotations: Annotations): T = {
