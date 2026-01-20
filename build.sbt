@@ -12,6 +12,10 @@ ThisBuild / version      := "5.10.0-SNAPSHOT"
 val syamlVersion = "2.1.338"
 val scalaCommonTestVersion = "0.2.15"
 
+ThisBuild / organizationName := "MuleSoft, Inc."
+ThisBuild / organizationHomepage := Some(url("http://www.mulesoft.com"))
+ThisBuild / licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+
 publish := {}
 
 jsEnv := new org.scalajs.jsenv.nodejs.NodeJSEnv()
