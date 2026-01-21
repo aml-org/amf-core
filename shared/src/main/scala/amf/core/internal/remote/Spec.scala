@@ -37,6 +37,7 @@ object Spec {
       case OtherCard.id         => Some(OtherCard)
       case AgentMetadata.id     => Some(AgentMetadata)
       case LLMMetadata.id       => Some(LLMMetadata)
+      case AgentGraph.id        => Some(AgentGraph)
       case _                    => None
     }
   }
@@ -76,6 +77,7 @@ object Spec {
   @JSExport val OTHER_CARD: Spec         = OtherCard
   @JSExport val AGENT_METADATA: Spec     = AgentMetadata
   @JSExport val LLM_METADATA: Spec       = LLMMetadata
+  @JSExport val AGENT_GRAPH: Spec        = AgentGraph
 }
 
 @JSExportAll
@@ -308,4 +310,9 @@ private[amf] case object AgentMetadata extends Spec {
 private[amf] case object LLMMetadata extends Spec {
   override val id: String        = "LLM Metadata"
   override val mediaType: String = `application/json`
+}
+
+private[amf] case object AgentGraph extends Spec {
+  override val id: String        = "Agent Graph"
+  override val mediaType: String = `application/yaml`
 }
