@@ -28,6 +28,7 @@ object ProfileNames {
   val OTHER_CARD: ProfileName         = OtherCardProfile
   val AGENT_METADATA: ProfileName     = AgentMetadataProfile
   val LLM_METADATA: ProfileName       = LLMMetadataProfile
+  val AGENT_GRAPH: ProfileName        = AgentGraphProfile
 
   lazy val specProfiles: Seq[ProfileName] =
     Seq(
@@ -48,7 +49,8 @@ object ProfileNames {
       AgentCardProfile,
       OtherCardProfile,
       AgentMetadataProfile,
-      LLMMetadataProfile
+      LLMMetadataProfile,
+      AgentGraphProfile
     )
 }
 
@@ -145,6 +147,11 @@ object LLMMetadataProfile extends ProfileName(LLMMetadata.id, AMFStyle) {
   override def isRaml(): Boolean = false
 }
 
+object AgentGraphProfile extends ProfileName(AgentGraph.id, AMFStyle) {
+  override def isOas(): Boolean  = false
+  override def isRaml(): Boolean = false
+}
+
 object ProfileName {
   def unapply(name: String): Option[ProfileName] =
     name match {
@@ -164,6 +171,7 @@ object ProfileName {
       case OtherCardProfile.p         => Some(OtherCardProfile)
       case AgentMetadataProfile.p     => Some(AgentMetadataProfile)
       case LLMMetadataProfile.p       => Some(LLMMetadataProfile)
+      case AgentGraphProfile.p        => Some(AgentGraphProfile)
       case _                          => None
     }
 
@@ -193,6 +201,7 @@ object ProfileName {
     case OtherCard.id         => OtherCardProfile
     case AgentMetadata.id     => AgentMetadataProfile
     case LLMMetadata.id       => LLMMetadataProfile
+    case AgentGraph.id        => AgentGraphProfile
     case custom               => new ProfileName(custom)
   }
 }
