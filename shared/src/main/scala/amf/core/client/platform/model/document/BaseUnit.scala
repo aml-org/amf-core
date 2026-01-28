@@ -7,7 +7,6 @@ import amf.core.client.scala.vocabulary.Namespace
 import amf.core.internal.convert.CoreClientConverters._
 import amf.core.internal.remote.Spec
 import amf.core.internal.unsafe.PlatformSecrets
-import com.github.ghik.silencer.silent
 
 import scala.scalajs.js.annotation.JSExportAll
 
@@ -36,7 +35,6 @@ trait BaseUnit extends AmfObjectWrapper with PlatformSecrets {
 
   /** Returns the version. */
 //  @deprecated("Use processingData.modelVersion for API Contract Base Units instead", "AMF 5.0.0 & AML 6.0.0")
-  @silent
   def modelVersion: StrField = _internal.modelVersion
 
   /** Set references

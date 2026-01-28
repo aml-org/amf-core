@@ -5,7 +5,6 @@ import amf.core.client.scala.vocabulary.{Namespace, ValueType}
 import amf.core.internal.metamodel.Type.{Array, Bool, Iri, Str}
 import amf.core.internal.metamodel.domain.{ModelDoc, ModelVocabularies}
 import amf.core.internal.metamodel.{Field, ModelDefaultBuilder}
-import com.github.ghik.silencer.silent
 
 /** BaseUnit metamodel
   *
@@ -57,7 +56,7 @@ trait BaseUnitModel extends ModelDefaultBuilder {
     )
   )
 
-  @deprecated("Use DialectInstanceProcessingDataModel.DefinedBy instead", "AMF 5.0.0 & AML 6.0.0")
+  // @deprecated("Use DialectInstanceProcessingDataModel.DefinedBy instead", "AMF 5.0.0 & AML 6.0.0")
   val DescribedBy: Field = Field(
     Iri,
     ValueType(Namespace.Meta, "describedBy"),
@@ -69,7 +68,7 @@ trait BaseUnitModel extends ModelDefaultBuilder {
     deprecated = true
   )
 
-  @deprecated("Use APIContractProcessingDataModel.APIContractModelVersion instead", "AMF 5.0.0 & AML 6.0.0")
+  // @deprecated("Use APIContractProcessingDataModel.APIContractModelVersion instead", "AMF 5.0.0 & AML 6.0.0")
   val ModelVersion: Field =
     Field(
       Str,
@@ -106,7 +105,6 @@ object BaseUnitModel extends BaseUnitModel {
 
   override val `type`: List[ValueType] = List(Document + "Unit")
 
-  @silent("deprecated")
   override val fields: List[Field] =
     List(ModelVersion, References, Usage, DescribedBy, Root, Package, ProcessingData, SourceInformation)
 
