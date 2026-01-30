@@ -9,8 +9,8 @@ ThisBuild / scalaVersion := "2.12.21"
 ThisBuild / version      := "5.11.0-SNAPSHOT"
 
 
-val syamlVersion = "2.1.338"
-val scalaCommonTestVersion = "0.2.15"
+val syamlVersion = "2.1.341"
+val scalaCommonTestVersion = "0.2.18"
 
 ThisBuild / organizationName := "MuleSoft, Inc."
 ThisBuild / organizationHomepage := Some(url("http://www.mulesoft.com"))
