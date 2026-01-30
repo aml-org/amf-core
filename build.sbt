@@ -5,12 +5,12 @@ import sbtsonar.SonarPlugin.autoImport.sonarProperties
 val ivyLocal = Resolver.file("ivy", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns)
 
 name                     := "amf-core"
-ThisBuild / scalaVersion := "2.12.20"
+ThisBuild / scalaVersion := "2.12.21"
 ThisBuild / version      := "5.11.0-SNAPSHOT"
 
 
-val syamlVersion = "2.1.338"
-val scalaCommonTestVersion = "0.2.15"
+val syamlVersion = "2.1.341"
+val scalaCommonTestVersion = "0.2.18"
 
 ThisBuild / organizationName := "MuleSoft, Inc."
 ThisBuild / organizationHomepage := Some(url("http://www.mulesoft.com"))
@@ -79,11 +79,12 @@ lazy val coreJS = core.js
   .sourceDependency(syamlJSRef, syamlLibJS)
   .disablePlugins(SonarPlugin, ScoverageSbtPlugin)
 
+/**
 ThisBuild / libraryDependencies ++= Seq(
     compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.19" cross CrossVersion.constant("2.12.20")),
     "com.github.ghik" % "silencer-lib" % "1.7.19" % Provided cross CrossVersion.constant("2.12.20")
 )
-
+**/
 lazy val sonarUrl   = sys.env.getOrElse("SONAR_SERVER_URL", "Not found url.")
 lazy val sonarToken = sys.env.getOrElse("SONAR_SERVER_TOKEN", "Not found token.")
 lazy val branch     = sys.env.getOrElse("BRANCH_NAME", "develop")
