@@ -65,7 +65,7 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
   def root: BoolField = fields.field(Root)
 
   /** Returns the version. */
-  @deprecated("Use processingData.modelVersion for API Contract Base Units only", "AMF 5.0.0 & AML 6.0.0")
+  // @deprecated("Use processingData.modelVersion for API Contract Base Units only", "AMF 5.0.0 & AML 6.0.0")
   def modelVersion: StrField = fields.field(ModelVersion)
 
   /** Set the raw value for the base unit */
@@ -104,7 +104,7 @@ trait BaseUnit extends AmfObject with MetaModelTypeMapping with PlatformSecrets 
 
   def sourceInformation: BaseUnitSourceInformation = fields.field(SourceInformation)
 
-  @deprecated("Use processingData.withModelVersion for API Contract Base Units only", "AMF 5.0.0 & AML 6.0.0")
+  // @deprecated("Use processingData.withModelVersion for API Contract Base Units only", "AMF 5.0.0 & AML 6.0.0")
   private def withModelVersion(version: String): this.type = set(ModelVersion, version)
 
   def withRoot(value: Boolean): this.type = set(Root, value)
