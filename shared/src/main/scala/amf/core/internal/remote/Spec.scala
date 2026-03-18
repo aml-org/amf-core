@@ -37,7 +37,7 @@ object Spec {
       case OtherCard.id         => Some(OtherCard)
       case AgentMetadata.id     => Some(AgentMetadata)
       case LLMMetadata.id       => Some(LLMMetadata)
-      case AgentGraph.id        => Some(AgentGraph)
+      case AgenticNetwork.id        => Some(AgenticNetwork)
       case _                    => None
     }
   }
@@ -72,12 +72,12 @@ object Spec {
   @JSExport val JSONSCHEMADIALECT: Spec  = JsonSchemaDialect
   @JSExport val JSONDLSCHEMA: Spec       = JsonLDSchema
   @JSExport val MCP: Spec                = Mcp
-  @JSExport val AGENT_NETWORK: Spec      = AgentNetwork
+  @JSExport val AGENT_NETWORK: Spec      = AgentNetwork // agent fabric V1
   @JSExport val AGENT_CARD: Spec         = AgentCard
   @JSExport val OTHER_CARD: Spec         = OtherCard
   @JSExport val AGENT_METADATA: Spec     = AgentMetadata
   @JSExport val LLM_METADATA: Spec       = LLMMetadata
-  @JSExport val AGENT_GRAPH: Spec        = AgentGraph
+  @JSExport val AGENTIC_NETWORK: Spec    = AgenticNetwork // agent fabric V2
 }
 
 @JSExportAll
@@ -312,7 +312,7 @@ private[amf] case object LLMMetadata extends Spec {
   override val mediaType: String = `application/json`
 }
 
-private[amf] case object AgentGraph extends Spec {
-  override val id: String        = "Agent Graph"
+private[amf] case object AgenticNetwork extends Spec {
+  override val id: String        = "Agentic Network"
   override val mediaType: String = `application/yaml`
 }
