@@ -28,29 +28,29 @@ object ProfileNames {
   val OTHER_CARD: ProfileName         = OtherCardProfile
   val AGENT_METADATA: ProfileName     = AgentMetadataProfile
   val LLM_METADATA: ProfileName       = LLMMetadataProfile
-  val AGENT_GRAPH: ProfileName        = AgentGraphProfile
+  val AGENTIC_NETWORK: ProfileName    = AgenticNetworkProfile
 
   lazy val specProfiles: Seq[ProfileName] =
     Seq(
-      AmfProfile,
-      Oas20Profile,
-      Oas30Profile,
-      Raml08Profile,
-      Raml10Profile,
-      AsyncProfile,
-      Async20Profile,
-      GraphQLProfile,
-      GraphQLFederationProfile,
-      GrpcProfile,
-      JsonSchemaProfile,
-      AvroSchemaProfile,
-      MCPSchemaProfile,
-      AgentNetworkProfile,
-      AgentCardProfile,
-      OtherCardProfile,
-      AgentMetadataProfile,
-      LLMMetadataProfile,
-      AgentGraphProfile
+        AmfProfile,
+        Oas20Profile,
+        Oas30Profile,
+        Raml08Profile,
+        Raml10Profile,
+        AsyncProfile,
+        Async20Profile,
+        GraphQLProfile,
+        GraphQLFederationProfile,
+        GrpcProfile,
+        JsonSchemaProfile,
+        AvroSchemaProfile,
+        MCPSchemaProfile,
+        AgentNetworkProfile,
+        AgentCardProfile,
+        OtherCardProfile,
+        AgentMetadataProfile,
+        LLMMetadataProfile,
+        AgenticNetworkProfile
     )
 }
 
@@ -147,7 +147,7 @@ object LLMMetadataProfile extends ProfileName(LLMMetadata.id, AMFStyle) {
   override def isRaml(): Boolean = false
 }
 
-object AgentGraphProfile extends ProfileName(AgentGraph.id, AMFStyle) {
+object AgenticNetworkProfile extends ProfileName(AgenticNetwork.id, AMFStyle) {
   override def isOas(): Boolean  = false
   override def isRaml(): Boolean = false
 }
@@ -171,13 +171,13 @@ object ProfileName {
       case OtherCardProfile.p         => Some(OtherCardProfile)
       case AgentMetadataProfile.p     => Some(AgentMetadataProfile)
       case LLMMetadataProfile.p       => Some(LLMMetadataProfile)
-      case AgentGraphProfile.p        => Some(AgentGraphProfile)
+      case AgenticNetworkProfile.p    => Some(AgenticNetworkProfile)
       case _                          => None
     }
 
   def apply(profile: String): ProfileName = profile match {
     case Amf.id               => AmfProfile
-    case "OAS" | Oas20.id     => Oas20Profile  // for compatibility
+    case "OAS" | Oas20.id     => Oas20Profile // for compatibility
     case Oas30.id             => Oas30Profile
     case Oas31.id             => Oas31Profile
     case Raml08.id            => Raml08Profile
@@ -201,7 +201,7 @@ object ProfileName {
     case OtherCard.id         => OtherCardProfile
     case AgentMetadata.id     => AgentMetadataProfile
     case LLMMetadata.id       => LLMMetadataProfile
-    case AgentGraph.id        => AgentGraphProfile
+    case AgenticNetwork.id    => AgenticNetworkProfile
     case custom               => new ProfileName(custom)
   }
 }
