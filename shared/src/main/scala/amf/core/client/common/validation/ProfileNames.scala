@@ -7,28 +7,29 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 @JSExportAll
 @JSExportTopLevel("ProfileNames")
 object ProfileNames {
-  val AMF: ProfileName                = AmfProfile
-  val OAS20: ProfileName              = Oas20Profile
-  val OAS30: ProfileName              = Oas30Profile
-  val OAS31: ProfileName              = Oas31Profile
-  val RAML10: ProfileName             = Raml10Profile
-  val RAML08: ProfileName             = Raml08Profile
-  val ASYNC: ProfileName              = AsyncProfile
-  val ASYNC20: ProfileName            = Async20Profile
-  val AML: ProfileName                = AmlProfile
-  val PAYLOAD: ProfileName            = PayloadProfile
-  val GRPC: ProfileName               = GrpcProfile
-  val GRAPHQL: ProfileName            = GraphQLProfile
-  val GRAPHQL_FEDERATION: ProfileName = GraphQLFederationProfile
-  val JSONSCHEMA: ProfileName         = JsonSchemaProfile
-  val AVROSCHEMA: ProfileName         = AvroSchemaProfile
-  val MCP: ProfileName                = MCPSchemaProfile
-  val AGENT_NETWORK: ProfileName      = AgentNetworkProfile
-  val AGENT_CARD: ProfileName         = AgentCardProfile
-  val OTHER_CARD: ProfileName         = OtherCardProfile
-  val AGENT_METADATA: ProfileName     = AgentMetadataProfile
-  val LLM_METADATA: ProfileName       = LLMMetadataProfile
-  val AGENTIC_NETWORK: ProfileName    = AgenticNetworkProfile
+  val AMF: ProfileName                    = AmfProfile
+  val OAS20: ProfileName                  = Oas20Profile
+  val OAS30: ProfileName                  = Oas30Profile
+  val OAS31: ProfileName                  = Oas31Profile
+  val RAML10: ProfileName                 = Raml10Profile
+  val RAML08: ProfileName                 = Raml08Profile
+  val ASYNC: ProfileName                  = AsyncProfile
+  val ASYNC20: ProfileName                = Async20Profile
+  val AML: ProfileName                    = AmlProfile
+  val PAYLOAD: ProfileName                = PayloadProfile
+  val GRPC: ProfileName                   = GrpcProfile
+  val GRAPHQL: ProfileName                = GraphQLProfile
+  val GRAPHQL_FEDERATION: ProfileName     = GraphQLFederationProfile
+  val JSONSCHEMA: ProfileName             = JsonSchemaProfile
+  val AVROSCHEMA: ProfileName             = AvroSchemaProfile
+  val MCP: ProfileName                    = MCPSchemaProfile
+  val AGENT_NETWORK: ProfileName          = AgentNetworkProfile
+  val AGENT_CARD: ProfileName             = AgentCardProfile
+  val OTHER_CARD: ProfileName             = OtherCardProfile
+  val AGENT_METADATA: ProfileName         = AgentMetadataProfile
+  val LLM_METADATA: ProfileName           = LLMMetadataProfile
+  val AGENTIC_NETWORK: ProfileName        = AgenticNetworkProfile
+  val AGENT_NETWORK_METADATA: ProfileName = AgentNetworkMetadataProfile
 
   lazy val specProfiles: Seq[ProfileName] =
     Seq(
@@ -50,7 +51,8 @@ object ProfileNames {
         OtherCardProfile,
         AgentMetadataProfile,
         LLMMetadataProfile,
-        AgenticNetworkProfile
+        AgenticNetworkProfile,
+        AgentNetworkMetadataProfile,
     )
 }
 
@@ -152,57 +154,64 @@ object AgenticNetworkProfile extends ProfileName(AgenticNetwork.id, AMFStyle) {
   override def isRaml(): Boolean = false
 }
 
+object AgentNetworkMetadataProfile extends ProfileName(AgentNetworkMetadata.id, AMFStyle) {
+  override def isOas(): Boolean  = false
+  override def isRaml(): Boolean = false
+}
+
 object ProfileName {
   def unapply(name: String): Option[ProfileName] =
     name match {
-      case AmfProfile.p               => Some(AmfProfile)
-      case Oas30Profile.p             => Some(Oas30Profile)
-      case Raml08Profile.p            => Some(Raml08Profile)
-      case AsyncProfile.p             => Some(AsyncProfile)
-      case Async20Profile.p           => Some(Async20Profile)
-      case GrpcProfile.p              => Some(GrpcProfile)
-      case GraphQLProfile.p           => Some(GraphQLProfile)
-      case GraphQLFederationProfile.p => Some(GraphQLFederationProfile)
-      case JsonSchemaProfile.p        => Some(JsonSchemaProfile)
-      case AvroSchemaProfile.p        => Some(AvroSchemaProfile)
-      case MCPSchemaProfile.p         => Some(MCPSchemaProfile)
-      case AgentNetworkProfile.p      => Some(AgentNetworkProfile)
-      case AgentCardProfile.p         => Some(AgentCardProfile)
-      case OtherCardProfile.p         => Some(OtherCardProfile)
-      case AgentMetadataProfile.p     => Some(AgentMetadataProfile)
-      case LLMMetadataProfile.p       => Some(LLMMetadataProfile)
-      case AgenticNetworkProfile.p    => Some(AgenticNetworkProfile)
-      case _                          => None
+      case AmfProfile.p                  => Some(AmfProfile)
+      case Oas30Profile.p                => Some(Oas30Profile)
+      case Raml08Profile.p               => Some(Raml08Profile)
+      case AsyncProfile.p                => Some(AsyncProfile)
+      case Async20Profile.p              => Some(Async20Profile)
+      case GrpcProfile.p                 => Some(GrpcProfile)
+      case GraphQLProfile.p              => Some(GraphQLProfile)
+      case GraphQLFederationProfile.p    => Some(GraphQLFederationProfile)
+      case JsonSchemaProfile.p           => Some(JsonSchemaProfile)
+      case AvroSchemaProfile.p           => Some(AvroSchemaProfile)
+      case MCPSchemaProfile.p            => Some(MCPSchemaProfile)
+      case AgentNetworkProfile.p         => Some(AgentNetworkProfile)
+      case AgentCardProfile.p            => Some(AgentCardProfile)
+      case OtherCardProfile.p            => Some(OtherCardProfile)
+      case AgentMetadataProfile.p        => Some(AgentMetadataProfile)
+      case LLMMetadataProfile.p          => Some(LLMMetadataProfile)
+      case AgenticNetworkProfile.p       => Some(AgenticNetworkProfile)
+      case AgentNetworkMetadataProfile.p => Some(AgentNetworkMetadataProfile)
+      case _                             => None
     }
 
   def apply(profile: String): ProfileName = profile match {
-    case Amf.id               => AmfProfile
-    case "OAS" | Oas20.id     => Oas20Profile // for compatibility
-    case Oas30.id             => Oas30Profile
-    case Oas31.id             => Oas31Profile
-    case Raml08.id            => Raml08Profile
-    case "RAML" | Raml10.id   => Raml10Profile // for compatibility
-    case AsyncApi.id          => AsyncProfile
-    case AsyncApi20.id        => Async20Profile
-    case AsyncApi21.id        => Async20Profile
-    case AsyncApi22.id        => Async20Profile
-    case AsyncApi23.id        => Async20Profile
-    case AsyncApi24.id        => Async20Profile
-    case AsyncApi25.id        => Async20Profile
-    case AsyncApi26.id        => Async20Profile
-    case Grpc.id              => GrpcProfile
-    case GraphQL.id           => GraphQLProfile
-    case GraphQLFederation.id => GraphQLFederationProfile
-    case JsonSchema.id        => JsonSchemaProfile
-    case AvroSchema.id        => AvroSchemaProfile
-    case Mcp.id               => MCPSchemaProfile
-    case AgentNetwork.id      => AgentNetworkProfile
-    case AgentCard.id         => AgentCardProfile
-    case OtherCard.id         => OtherCardProfile
-    case AgentMetadata.id     => AgentMetadataProfile
-    case LLMMetadata.id       => LLMMetadataProfile
-    case AgenticNetwork.id    => AgenticNetworkProfile
-    case custom               => new ProfileName(custom)
+    case Amf.id                  => AmfProfile
+    case "OAS" | Oas20.id        => Oas20Profile // for compatibility
+    case Oas30.id                => Oas30Profile
+    case Oas31.id                => Oas31Profile
+    case Raml08.id               => Raml08Profile
+    case "RAML" | Raml10.id      => Raml10Profile // for compatibility
+    case AsyncApi.id             => AsyncProfile
+    case AsyncApi20.id           => Async20Profile
+    case AsyncApi21.id           => Async20Profile
+    case AsyncApi22.id           => Async20Profile
+    case AsyncApi23.id           => Async20Profile
+    case AsyncApi24.id           => Async20Profile
+    case AsyncApi25.id           => Async20Profile
+    case AsyncApi26.id           => Async20Profile
+    case Grpc.id                 => GrpcProfile
+    case GraphQL.id              => GraphQLProfile
+    case GraphQLFederation.id    => GraphQLFederationProfile
+    case JsonSchema.id           => JsonSchemaProfile
+    case AvroSchema.id           => AvroSchemaProfile
+    case Mcp.id                  => MCPSchemaProfile
+    case AgentNetwork.id         => AgentNetworkProfile
+    case AgentCard.id            => AgentCardProfile
+    case OtherCard.id            => OtherCardProfile
+    case AgentMetadata.id        => AgentMetadataProfile
+    case LLMMetadata.id          => LLMMetadataProfile
+    case AgenticNetwork.id       => AgenticNetworkProfile
+    case AgentNetworkMetadata.id => AgentNetworkMetadataProfile
+    case custom                  => new ProfileName(custom)
   }
 }
 
