@@ -8,37 +8,38 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
 object Spec {
   def unapply(name: String): Option[Spec] = {
     name match {
-      case Raml10.id            => Some(Raml10)
-      case Raml08.id            => Some(Raml08)
-      case Oas20.id             => Some(Oas20)
-      case Oas30.id             => Some(Oas30)
-      case Oas31.id             => Some(Oas31)
-      case AwsOas30.id          => Some(AwsOas30)
-      case AsyncApi20.id        => Some(AsyncApi20)
-      case AsyncApi21.id        => Some(AsyncApi21)
-      case AsyncApi22.id        => Some(AsyncApi22)
-      case AsyncApi23.id        => Some(AsyncApi23)
-      case AsyncApi24.id        => Some(AsyncApi24)
-      case AsyncApi25.id        => Some(AsyncApi25)
-      case AsyncApi26.id        => Some(AsyncApi26)
-      case Amf.id               => Some(Amf)
-      case Payload.id           => Some(Payload)
-      case Aml.id               => Some(Aml)
-      case JsonSchema.id        => Some(JsonSchema)
-      case Grpc.id              => Some(Grpc)
-      case GraphQL.id           => Some(GraphQL)
-      case GraphQLFederation.id => Some(GraphQLFederation)
-      case JsonSchemaDialect.id => Some(JsonSchemaDialect)
-      case JsonLDSchema.id      => Some(JsonLDSchema)
-      case AvroSchema.id        => Some(AvroSchema)
-      case MCP.id               => Some(Mcp)
-      case AgentNetwork.id      => Some(AgentNetwork)
-      case AgentCard.id         => Some(AgentCard)
-      case OtherCard.id         => Some(OtherCard)
-      case AgentMetadata.id     => Some(AgentMetadata)
-      case LLMMetadata.id       => Some(LLMMetadata)
-      case AgenticNetwork.id        => Some(AgenticNetwork)
-      case _                    => None
+      case Raml10.id               => Some(Raml10)
+      case Raml08.id               => Some(Raml08)
+      case Oas20.id                => Some(Oas20)
+      case Oas30.id                => Some(Oas30)
+      case Oas31.id                => Some(Oas31)
+      case AwsOas30.id             => Some(AwsOas30)
+      case AsyncApi20.id           => Some(AsyncApi20)
+      case AsyncApi21.id           => Some(AsyncApi21)
+      case AsyncApi22.id           => Some(AsyncApi22)
+      case AsyncApi23.id           => Some(AsyncApi23)
+      case AsyncApi24.id           => Some(AsyncApi24)
+      case AsyncApi25.id           => Some(AsyncApi25)
+      case AsyncApi26.id           => Some(AsyncApi26)
+      case Amf.id                  => Some(Amf)
+      case Payload.id              => Some(Payload)
+      case Aml.id                  => Some(Aml)
+      case JsonSchema.id           => Some(JsonSchema)
+      case Grpc.id                 => Some(Grpc)
+      case GraphQL.id              => Some(GraphQL)
+      case GraphQLFederation.id    => Some(GraphQLFederation)
+      case JsonSchemaDialect.id    => Some(JsonSchemaDialect)
+      case JsonLDSchema.id         => Some(JsonLDSchema)
+      case AvroSchema.id           => Some(AvroSchema)
+      case MCP.id                  => Some(Mcp)
+      case AgentNetwork.id         => Some(AgentNetwork)
+      case AgentCard.id            => Some(AgentCard)
+      case OtherCard.id            => Some(OtherCard)
+      case AgentMetadata.id        => Some(AgentMetadata)
+      case LLMMetadata.id          => Some(LLMMetadata)
+      case AgenticNetwork.id       => Some(AgenticNetwork)
+      case AgentNetworkMetadata.id => Some(AgentNetworkMetadata)
+      case _                       => None
     }
   }
 
@@ -48,36 +49,37 @@ object Spec {
     case _          => UnknownSpec(name)
   }
 
-  @JSExport val RAML08: Spec             = Raml08
-  @JSExport val RAML10: Spec             = Raml10
-  @JSExport val OAS20: Spec              = Oas20
-  @JSExport val OAS30: Spec              = Oas30
-  @JSExport val OAS31: Spec              = Oas31
-  @JSExport val AWS_OAS30: Spec          = AwsOas30
-  @JSExport val ASYNC20: Spec            = AsyncApi20
-  @JSExport val ASYNC21: Spec            = AsyncApi21
-  @JSExport val ASYNC22: Spec            = AsyncApi22
-  @JSExport val ASYNC23: Spec            = AsyncApi23
-  @JSExport val ASYNC24: Spec            = AsyncApi24
-  @JSExport val ASYNC25: Spec            = AsyncApi25
-  @JSExport val ASYNC26: Spec            = AsyncApi26
-  @JSExport val AMF: Spec                = Amf
-  @JSExport val PAYLOAD: Spec            = Payload
-  @JSExport val AML: Spec                = Aml
-  @JSExport val JSONSCHEMA: Spec         = JsonSchema
-  @JSExport val AVRO_SCHEMA: Spec        = AvroSchema
-  @JSExport val GRPC: Spec               = Grpc
-  @JSExport val GRAPHQL: Spec            = GraphQL
-  @JSExport val GRAPHQL_FEDERATION: Spec = GraphQLFederation
-  @JSExport val JSONSCHEMADIALECT: Spec  = JsonSchemaDialect
-  @JSExport val JSONDLSCHEMA: Spec       = JsonLDSchema
-  @JSExport val MCP: Spec                = Mcp
-  @JSExport val AGENT_NETWORK: Spec      = AgentNetwork // agent fabric V1
-  @JSExport val AGENT_CARD: Spec         = AgentCard
-  @JSExport val OTHER_CARD: Spec         = OtherCard
-  @JSExport val AGENT_METADATA: Spec     = AgentMetadata
-  @JSExport val LLM_METADATA: Spec       = LLMMetadata
-  @JSExport val AGENTIC_NETWORK: Spec    = AgenticNetwork // agent fabric V2
+  @JSExport val RAML08: Spec                 = Raml08
+  @JSExport val RAML10: Spec                 = Raml10
+  @JSExport val OAS20: Spec                  = Oas20
+  @JSExport val OAS30: Spec                  = Oas30
+  @JSExport val OAS31: Spec                  = Oas31
+  @JSExport val AWS_OAS30: Spec              = AwsOas30
+  @JSExport val ASYNC20: Spec                = AsyncApi20
+  @JSExport val ASYNC21: Spec                = AsyncApi21
+  @JSExport val ASYNC22: Spec                = AsyncApi22
+  @JSExport val ASYNC23: Spec                = AsyncApi23
+  @JSExport val ASYNC24: Spec                = AsyncApi24
+  @JSExport val ASYNC25: Spec                = AsyncApi25
+  @JSExport val ASYNC26: Spec                = AsyncApi26
+  @JSExport val AMF: Spec                    = Amf
+  @JSExport val PAYLOAD: Spec                = Payload
+  @JSExport val AML: Spec                    = Aml
+  @JSExport val JSONSCHEMA: Spec             = JsonSchema
+  @JSExport val AVRO_SCHEMA: Spec            = AvroSchema
+  @JSExport val GRPC: Spec                   = Grpc
+  @JSExport val GRAPHQL: Spec                = GraphQL
+  @JSExport val GRAPHQL_FEDERATION: Spec     = GraphQLFederation
+  @JSExport val JSONSCHEMADIALECT: Spec      = JsonSchemaDialect
+  @JSExport val JSONDLSCHEMA: Spec           = JsonLDSchema
+  @JSExport val MCP: Spec                    = Mcp
+  @JSExport val AGENT_NETWORK: Spec          = AgentNetwork // agent fabric V1
+  @JSExport val AGENT_CARD: Spec             = AgentCard
+  @JSExport val OTHER_CARD: Spec             = OtherCard
+  @JSExport val AGENT_METADATA: Spec         = AgentMetadata
+  @JSExport val LLM_METADATA: Spec           = LLMMetadata
+  @JSExport val AGENT_NETWORK_METADATA: Spec = AgentNetworkMetadata
+  @JSExport val AGENTIC_NETWORK: Spec        = AgenticNetwork // agent fabric V2
 }
 
 @JSExportAll
@@ -315,4 +317,8 @@ private[amf] case object LLMMetadata extends Spec {
 private[amf] case object AgenticNetwork extends Spec {
   override val id: String        = "Agentic Network"
   override val mediaType: String = `application/yaml`
+}
+private[amf] case object AgentNetworkMetadata extends Spec {
+  override val id: String        = "Agent Network Metadata"
+  override val mediaType: String = `application/json`
 }
